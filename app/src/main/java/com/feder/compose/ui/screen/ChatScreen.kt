@@ -1,5 +1,6 @@
 package com.feder.compose.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,15 +25,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import android.widget.Toast
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.concurrent.TimeUnit
 
 data class MessageItem(
     val from_user: String,
@@ -41,20 +41,31 @@ data class MessageItem(
     val timestamp: String
 )
 
-data class SendRequest(val to: String, val text: String)
+data class WsMessage(
+    val type: String = "message",
+    val from_user: String = "",
+    val to_user: String = "",
+    val text: String = "",
+    val timestamp: String = ""
+)
 
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
-    val client = remember { OkHttpClient() }
-    val gson = remember { Gson() }
     var messages by remember { mutableStateOf<List<MessageItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    val client = remember {
+        OkHttpClient.Builder()
+            .pingInterval(30, TimeUnit.SECONDS)
+            .build()
+    }
+    val gson = remember { Gson() }
+    var webSocket by remember { mutableStateOf<WebSocket?>(null) }
     
-    // Загружаем сообщения и получаем токен
+    // Подключение WebSocket и загрузка истории
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
@@ -65,53 +76,75 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val loginResponse = client.newCall(loginRequest).execute()
                 token = gson.fromJson(loginResponse.body?.string(), LoginResponse::class.java).accessToken
                 
-                // Загружаем сообщения
+                // Загружаем историю
                 loadMessages(client, gson, token, chatUsername) { messages = it }
+                isLoading = false
+                
+                // Подключаем WebSocket
+                val wsUrl = "ws://2.26.71.102:8002/api/ws/$myUsername?token=$token"
+                val wsRequest = Request.Builder().url(wsUrl).build()
+                webSocket = client.newWebSocket(wsRequest, object : WebSocketListener() {
+                    override fun onMessage(webSocket: WebSocket, text: String) {
+                        try {
+                            val msg = gson.fromJson(text, WsMessage::class.java)
+                            if (msg.type == "message") {
+                                val newMsg = MessageItem(
+                                    from_user = msg.from_user,
+                                    to_user = msg.to_user,
+                                    text = msg.text,
+                                    timestamp = msg.timestamp.ifEmpty { "now" }
+                                )
+                                // Добавляем сообщение если относится к этому чату
+                                if (newMsg.from_user == chatUsername || newMsg.to_user == chatUsername) {
+                                    messages = messages + newMsg
+                                }
+                            }
+                        } catch (e: Exception) { }
+                    }
+                    
+                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        // WebSocket упал — продолжаем без него
+                    }
+                })
             } catch (e: Exception) {
-                messages = listOf(
-                    MessageItem(chatUsername, myUsername, "Hey! Did you have a chance to look at the latest UI proposal?", "10:42 AM"),
-                    MessageItem(myUsername, chatUsername, "Just finished reviewing it. Looking solid!", "10:45 AM"),
-                    MessageItem(chatUsername, myUsername, "Awesome! Should we sync at 2 PM?", "10:46 AM")
-                )
+                isLoading = false
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Ошибка подключения", Toast.LENGTH_SHORT).show()
+                }
             }
-            isLoading = false
         }
     }
     
-    // Автоскролл вниз
+    // Отключаем WebSocket при уходе
+    DisposableEffect(Unit) {
+        onDispose { webSocket?.close(1000, "close") }
+    }
+    
+    // Автоскролл
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
     }
     
-    // Отправка сообщения
     fun sendMessage() {
         val text = inputText.trim()
-        if (text.isEmpty()) return
+        if (text.isEmpty() || token.isEmpty()) return
         
-        // Добавляем сообщение сразу в список (оптимистично)
+        val wsMsg = WsMessage(
+            type = "message",
+            from_user = myUsername,
+            to_user = chatUsername,
+            text = text,
+            timestamp = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        )
+        val json = gson.toJson(wsMsg)
+        
+        // Отправляем через WebSocket
+        webSocket?.send(json)
+        
+        // Добавляем сообщение себе сразу
         val newMsg = MessageItem(myUsername, chatUsername, text, "now")
         messages = messages + newMsg
         inputText = ""
-        
-        // Отправляем на сервер
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val sendJson = gson.toJson(SendRequest(chatUsername, text))
-                val body = sendJson.toRequestBody("application/json".toMediaType())
-                val request = Request.Builder()
-                    .url("http://2.26.71.102:8002/api/chat/send")
-                    .header("Authorization", "Bearer $token")
-                    .post(body)
-                    .build()
-                client.newCall(request).execute()
-                // Обновляем сообщения с сервера
-                loadMessages(client, gson, token, chatUsername) { messages = it }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Ошибка отправки: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -211,11 +244,9 @@ suspend fun loadMessages(client: OkHttpClient, gson: Gson, token: String, chatUs
             .build()
         val response = client.newCall(request).execute()
         val json = response.body?.string() ?: "[]"
-        val type = object : TypeToken<List<MessageItem>>() {}.type
+        val type = object : com.google.gson.reflect.TypeToken<List<MessageItem>>() {}.type
         onResult(gson.fromJson(json, type))
-    } catch (e: Exception) {
-        // Оставляем текущие сообщения
-    }
+    } catch (e: Exception) { }
 }
 
 @Composable
@@ -226,16 +257,10 @@ fun MessageBubble(text: String, time: String, isMine: Boolean) {
     ) {
         Surface(
             modifier = Modifier.widthIn(max = 340.dp),
-            shape = if (isMine) RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
-                    else RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp),
+            shape = if (isMine) RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp) else RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp),
             color = if (isMine) PrimaryContainer else SecondaryContainer
         ) {
-            Text(
-                text,
-                color = if (isMine) OnPrimaryContainer else OnSurface,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
+            Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
         Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
     }
