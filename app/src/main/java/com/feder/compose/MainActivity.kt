@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -55,24 +56,6 @@ data class ChatItem(
     @SerializedName("last_message") val lastMessage: String = "",
     val timestamp: String = ""
 )
-
-object FederColors {
-    val Background = Color(0xFF131313)
-    val Surface = Color(0xFF131313)
-    val SurfaceContainerLow = Color(0xFF1C1B1B)
-    val SurfaceContainerHigh = Color(0xFF2A2A2A)
-    val Primary = Color(0xFFA1C9FF)
-    val PrimaryContainer = Color(0xFF339DFF)
-    val OnPrimary = Color(0xFF00325A)
-    val OnPrimaryContainer = Color(0xFF00335C)
-    val Secondary = Color(0xFFC8C6C5)
-    val OnSurface = Color(0xFFE5E2E1)
-    val OnSurfaceVariant = Color(0xFFC0C7D4)
-    val Outline = Color(0xFF8A919E)
-    val OutlineVariant = Color(0xFF404752)
-    val OnlineGreen = Color(0xFF41B35D)
-    val Muted = Color(0xFFFFB4AB)
-}
 
 class ChatViewModel : ViewModel() {
     private val client = OkHttpClient()
@@ -130,12 +113,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         try {
             setContent {
-                MaterialTheme(colorScheme = darkColorScheme(
-                    primary = FederColors.Primary,
-                    background = FederColors.Background,
-                    surface = FederColors.Surface,
-                    onSurface = FederColors.OnSurface,
-                )) {
+                FederTheme {
                     FederApp()
                 }
             }
@@ -151,24 +129,24 @@ fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
     
     Scaffold(
-        containerColor = FederColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Surface(color = FederColors.Surface) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
                 Row(
                     modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(Modifier.size(36.dp).clip(CircleShape).background(FederColors.SurfaceContainerLow).border(1.dp, FederColors.OutlineVariant, CircleShape), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Filled.Person, "avatar", tint = FederColors.Primary, modifier = Modifier.size(24.dp))
+                    Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow).border(1.dp, OutlineVariant, CircleShape), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text("Messenger", color = FederColors.Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { }) { Icon(Icons.Filled.Search, "search", tint = FederColors.Primary) }
+                    Text("Messenger", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Search, "search", tint = Primary) }
                 }
             }
         },
         bottomBar = {
-            NavigationBar(containerColor = FederColors.Surface) {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 val tabs = listOf("Chats" to Icons.Filled.Chat, "Stories" to Icons.Outlined.AutoAwesome, "Contacts" to Icons.Outlined.Contacts, "Settings" to Icons.Outlined.Settings)
                 tabs.forEachIndexed { index, (label, icon) ->
                     NavigationBarItem(
@@ -176,7 +154,12 @@ fun FederApp() {
                         label = { Text(label, fontSize = 11.sp) },
                         selected = viewModel.selectedTab == index,
                         onClick = { viewModel.selectedTab = index },
-                        colors = NavigationBarItemDefaults.colors(selectedIconColor = FederColors.Primary, selectedTextColor = FederColors.Primary, unselectedIconColor = FederColors.OnSurfaceVariant, unselectedTextColor = FederColors.OnSurfaceVariant)
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Primary,
+                            selectedTextColor = Primary,
+                            unselectedIconColor = OnSurfaceVariant,
+                            unselectedTextColor = OnSurfaceVariant
+                        )
                     )
                 }
             }
@@ -184,12 +167,12 @@ fun FederApp() {
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
-                viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = FederColors.Primary) }
+                viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(viewModel.error!!, color = Color(0xFFFFB4AB), fontSize = 14.sp)
+                        Text(viewModel.error!!, color = Error, fontSize = 14.sp)
                         Spacer(Modifier.height(16.dp))
-                        Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = FederColors.Primary)) { Text("Повторить", color = FederColors.OnPrimary) }
+                        Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
                 else -> ChatListScreen(viewModel.chats)
@@ -202,11 +185,11 @@ fun FederApp() {
 fun ChatListScreen(chats: List<ChatItem>) {
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 8.dp)) {
         item {
-            Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = FederColors.SurfaceContainerHigh) {
+            Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh) {
                 Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Search, "search", tint = FederColors.Outline, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Search chats...", color = FederColors.Outline, fontSize = 14.sp)
+                    Text("Search chats...", color = Outline, fontSize = 14.sp)
                 }
             }
         }
@@ -216,7 +199,7 @@ fun ChatListScreen(chats: List<ChatItem>) {
 
 @Composable
 fun ChatRow(chat: ChatItem) {
-    val avatarColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { FederColors.Primary }
+    val avatarColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
     
     Surface(Modifier.fillMaxWidth().clickable { }, color = Color.Transparent) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -234,32 +217,29 @@ fun ChatRow(chat: ChatItem) {
                     }
                 }
                 if (chat.online) {
-                    Box(Modifier.size(12.dp).clip(CircleShape).background(FederColors.OnlineGreen).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp).border(2.dp, FederColors.Background, CircleShape))
+                    Box(Modifier.size(12.dp).clip(CircleShape).background(OnlineGreen).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp).border(2.dp, Background, CircleShape))
                 }
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(chat.name, color = FederColors.OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (chat.isMuted) {
-                            Icon(Icons.Filled.VolumeOff, "muted", tint = FederColors.Muted, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                        }
-                        Text(chat.timestamp.ifEmpty { "" }, color = if (chat.unread > 0) FederColors.Primary else FederColors.OnSurfaceVariant, fontSize = 12.sp)
+                        if (chat.isMuted) { Icon(Icons.Filled.VolumeOff, "muted", tint = Muted, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)) }
+                        Text(chat.timestamp.ifEmpty { "" }, color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
                     }
                 }
                 Spacer(Modifier.height(2.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = if (chat.unread > 0) FederColors.OnSurface else FederColors.Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                    Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
                     if (chat.unread > 0) {
-                        Box(Modifier.size(20.dp).clip(CircleShape).background(FederColors.PrimaryContainer), contentAlignment = Alignment.Center) {
-                            Text(chat.unread.toString(), color = FederColors.OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                            Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
         }
     }
-    HorizontalDivider(color = FederColors.SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
+    HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
 }
