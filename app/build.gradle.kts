@@ -16,9 +16,7 @@ android {
         versionName = "2.0.0"
     }
 
-    buildFeatures {
-        compose = true
-    }
+    buildFeatures { compose = true }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -37,13 +35,14 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("androidx.activity:activity-compose:1.9.0")
-
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
+    // Coil для загрузки фото
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.code.gson:gson:2.11.0")
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
