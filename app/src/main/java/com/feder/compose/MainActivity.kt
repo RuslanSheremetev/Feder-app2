@@ -263,7 +263,20 @@ fun FederApp() {
                                         }
                                     }
                                     if (lastMsg.isNotEmpty()) {
-                                        Text(lastMsg, color = Secondary, fontSize = 14.sp, maxLines = 1)
+                                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                            Text(lastMsg, color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                                            if (chat.unread > 0) {
+                                                Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                                                    Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                            }
+                                        }
+                                    } else if (chat.unread > 0) {
+                                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                                            Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                                                Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
                                     }
                                 }
                             }
