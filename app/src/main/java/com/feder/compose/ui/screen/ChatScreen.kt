@@ -34,6 +34,13 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
 
+data class LoginRequest(val username: String, val password: String)
+data class LoginResponse(
+    @SerializedName("access_token") val accessToken: String,
+    @SerializedName("token_type") val tokenType: String,
+    val username: String
+)
+
 data class MessageItem(
     val from_user: String,
     val to_user: String,
