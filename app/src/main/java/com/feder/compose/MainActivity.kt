@@ -147,6 +147,7 @@ fun FederApp() {
             when {
                 viewModel.selectedChat != null -> ChatScreen(
                     chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
+                    chatUsername = viewModel.selectedChat ?: "",
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat }
                 )
