@@ -37,6 +37,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
 import com.feder.compose.ui.screen.SettingsScreen
+import com.feder.compose.ui.screen.ContactProfileScreen
 import com.feder.compose.ui.screen.ChatScreen
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -82,6 +83,7 @@ fun formatTimestamp(timestamp: String): String {
 
 class ChatViewModel : ViewModel() {
     var selectedChat by mutableStateOf<String?>(null)
+    var selectedProfile by mutableStateOf<String?>(null)
     private val client = OkHttpClient()
     private val gson = Gson()
     private val server = "http://2.26.71.102:8002"
@@ -140,14 +142,19 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedTab == 3) {
+    if (viewModel.selectedChat != null || viewModel.selectedTab == 3 || viewModel.selectedProfile != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
                 viewModel.selectedChat != null -> ChatScreen(
                     chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
-                    onBack = { viewModel.selectedChat = null }
+                    onBack = { viewModel.selectedChat = null },
+                    onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat }
                 )
                 viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
+                viewModel.selectedProfile != null -> ContactProfileScreen(
+                    contactName = viewModel.selectedProfile ?: "",
+                    onBack = { viewModel.selectedProfile = null }
+                )
             }
         }
         return
@@ -208,6 +215,10 @@ fun FederApp() {
                     )
                 }
                 viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
+                viewModel.selectedProfile != null -> ContactProfileScreen(
+                    contactName = viewModel.selectedProfile ?: "",
+                    onBack = { viewModel.selectedProfile = null }
+                )
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         // Поиск — появляется по нажатию на лупу

@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
-import com.feder.compose.ui.screen.ContactProfileScreen
 
 data class Message(
     val text: String,
@@ -34,7 +33,7 @@ data class Message(
 )
 
 @Composable
-fun ChatScreen(chatName: String, onBack: () -> Unit) {
+fun ChatScreen(chatName: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     var showProfile by remember { mutableStateOf(false) }
     val messages = remember {
         listOf(
@@ -87,7 +86,7 @@ fun ChatScreen(chatName: String, onBack: () -> Unit) {
                 // Icons
                 IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                IconButton(onClick = { showProfile = true }) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
             }
         }
         
