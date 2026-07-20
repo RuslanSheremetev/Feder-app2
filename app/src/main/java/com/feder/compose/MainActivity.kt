@@ -131,7 +131,10 @@ fun FederApp() {
             }
         },
         bottomBar = {
-            NavigationBar(containerColor = Surface) {
+            NavigationBar(
+                containerColor = Background,
+                tonalElevation = 0.dp
+            ) {
                 listOf("Chats" to Icons.Filled.Chat, "Stories" to Icons.Outlined.AutoAwesome, "Contacts" to Icons.Outlined.Contacts, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (l, ic) ->
                     NavigationBarItem(icon = { Icon(ic, l, modifier = Modifier.size(24.dp)) }, label = { Text(l, fontSize = 11.sp) }, selected = viewModel.selectedTab == i, onClick = { viewModel.selectedTab = i }, colors = NavigationBarItemDefaults.colors(selectedIconColor = Primary, unselectedIconColor = OnSurfaceVariant))
                 }
