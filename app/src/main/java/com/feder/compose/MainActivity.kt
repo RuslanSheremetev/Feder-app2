@@ -46,8 +46,8 @@ data class ChatItem(
     @SerializedName("avatar_color") val avatarColor: String = "#339dff",
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
-    @SerializedName("last_message") val lastMessage: String = "",
-    val timestamp: String = ""
+    @SerializedName("last_message") val lastMessage: String? = null,
+    val timestamp: String? = null
 )
 
 class ChatViewModel : ViewModel() {
@@ -135,9 +135,9 @@ fun FederApp() {
                             ) {
                                 Column(Modifier.weight(1f)) {
                                     Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                                    // Добавляем сообщение
+                                    // ✅ Безопасно: проверяем null через ?:
                                     Text(
-                                        chat.lastMessage.ifEmpty { "Нет сообщений" },
+                                        chat.lastMessage ?: "Нет сообщений",
                                         color = Secondary,
                                         fontSize = 14.sp
                                     )
