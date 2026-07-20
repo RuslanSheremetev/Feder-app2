@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -73,9 +74,7 @@ class ChatViewModel : ViewModel() {
                 val response = client.newCall(request).execute()
                 token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 loadChats()
-            } catch (e: Exception) {
-                error = "Ошибка: ${e.message}"; isLoading = false
-            }
+            } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
         }
     }
     
@@ -88,9 +87,7 @@ class ChatViewModel : ViewModel() {
                 val type = object : TypeToken<List<ChatItem>>() {}.type
                 chats = gson.fromJson(json, type)
                 isLoading = false
-            } catch (e: Exception) {
-                error = "Ошибка: ${e.message}"; isLoading = false
-            }
+            } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
         }
     }
     
@@ -139,23 +136,49 @@ fun FederApp() {
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(viewModel.error!!, color = Error) }
-                else -> {
-                    // ✅ LazyColumn с ПРОСТЫМ текстом
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        item {
-                            Text("🔍 Search...", color = Outline, modifier = Modifier.padding(16.dp))
-                        }
-                        items(viewModel.chats) { chat ->
-                            Text(
-                                "  ${chat.name} (@${chat.username})",
-                                color = OnSurface,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-                }
+                else -> ChatListScreen(viewModel.chats)
             }
         }
     }
+}
+
+@Composable
+fun ChatListScreen(chats: List<ChatItem>) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            Surface(Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh) {
+                Text("🔍 Search chats...", color = Outline, modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp))
+            }
+        }
+        items(chats) { chat -> ChatRow(chat) }
+    }
+}
+
+@Composable
+fun ChatRow(chat: ChatItem) {
+    val avatarColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
+    
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { }.padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Аватар — буква
+        Box(Modifier.size(56.dp).clip(CircleShape).background(avatarColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+            Text(chat.name.take(1).uppercase(), color = avatarColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        }
+        
+        Spacer(Modifier.width(16.dp))
+        
+        Column(Modifier.weight(1f)) {
+            Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = Secondary, fontSize = 14.sp)
+        }
+        
+        if (chat.unread > 0) {
+            Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+    // ✅ БЕЗ HorizontalDivider
 }
