@@ -27,22 +27,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.util.concurrent.TimeUnit
+import java.text.SimpleDateFormat
+import java.util.*
 
-
-data class MessageItem(
+data class MsgItem(
     val from_user: String,
     val to_user: String,
     val text: String,
     val timestamp: String
 )
 
-data class WsMessage(
+data class WsMsg(
     val type: String = "message",
     val from_user: String = "",
     val to_user: String = "",
@@ -52,77 +52,45 @@ data class WsMessage(
 
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
-    var messages by remember { mutableStateOf<List<MessageItem>>(emptyList()) }
+    var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val context = LocalContext.current
-    val client = remember {
-        OkHttpClient.Builder()
-            .pingInterval(30, TimeUnit.SECONDS)
-            .build()
-    }
+    val client = remember { OkHttpClient.Builder().pingInterval(30, java.util.concurrent.TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
     var webSocket by remember { mutableStateOf<WebSocket?>(null) }
     
-    // Подключение WebSocket и загрузка истории
+    // Загрузка истории
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
-                // Логинимся
-                val loginJson = gson.toJson(LoginRequest(myUsername, myUsername))
+                // Логинимся через POST
+                val loginJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                 val loginBody = loginJson.toRequestBody("application/json".toMediaType())
-                val loginRequest = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
-                val loginResponse = client.newCall(loginRequest).execute()
-                token = gson.fromJson(loginResponse.body?.string(), LoginResponse::class.java).accessToken
+                val loginReq = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
+                val loginResp = client.newCall(loginReq).execute()
+                val loginData = gson.fromJson(loginResp.body?.string(), Map::class.java)
+                token = loginData["access_token"]?.toString() ?: ""
                 
-                // Загружаем историю
-                loadMessages(client, gson, token, chatUsername) { messages = it }
+                // Загружаем сообщения
+                val msgReq = Request.Builder()
+                    .url("http://2.26.71.102:8002/api/messages/$chatUsername")
+                    .header("Authorization", "Bearer $token")
+                    .build()
+                val msgResp = client.newCall(msgReq).execute()
+                val json = msgResp.body?.string() ?: "[]"
+                val type = object : TypeToken<List<MsgItem>>() {}.type
+                messages = gson.fromJson(json, type)
                 isLoading = false
-                
-                // Подключаем WebSocket
-                val wsUrl = "ws://2.26.71.102:8002/api/ws/$myUsername?token=$token"
-                val wsRequest = Request.Builder().url(wsUrl).build()
-                try {
-                    webSocket = client.newWebSocket(wsRequest, object : WebSocketListener() {
-                    override fun onMessage(webSocket: WebSocket, text: String) {
-                        try {
-                            val msg = gson.fromJson(text, WsMessage::class.java)
-                            if (msg.type == "message") {
-                                val newMsg = MessageItem(
-                                    from_user = msg.from_user,
-                                    to_user = msg.to_user,
-                                    text = msg.text,
-                                    timestamp = msg.timestamp.ifEmpty { "now" }
-                                )
-                                // Добавляем сообщение если относится к этому чату
-                                if (newMsg.from_user == chatUsername || newMsg.to_user == chatUsername) {
-                                    messages = messages + newMsg
-                                }
-                            }
-                        } catch (e: Exception) { }
-                    }
-                    
-                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                        // WebSocket упал — продолжаем без него
-                    }
-                    })
-                } catch (e: Exception) {
-                    // WebSocket не подключился — работаем без него
-                }
             } catch (e: Exception) {
                 isLoading = false
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Ошибка подключения", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-    }
-    
-    // Отключаем WebSocket при уходе
-    DisposableEffect(Unit) {
-        onDispose { webSocket?.close(1000, "close") }
     }
     
     // Автоскролл
@@ -134,22 +102,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         val text = inputText.trim()
         if (text.isEmpty() || token.isEmpty()) return
         
-        val wsMsg = WsMessage(
-            type = "message",
-            from_user = myUsername,
-            to_user = chatUsername,
-            text = text,
-            timestamp = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
-        )
-        val json = gson.toJson(wsMsg)
+        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         
-        // Отправляем через WebSocket
-        webSocket?.send(json)
-        
-        // Добавляем сообщение себе сразу
-        val newMsg = MessageItem(myUsername, chatUsername, text, "now")
-        messages = messages + newMsg
+        // Добавляем сразу
+        messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
+        
+        // Отправляем через POST
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to text))
+                val body = sendJson.toRequestBody("application/json".toMediaType())
+                val req = Request.Builder()
+                    .url("http://2.26.71.102:8002/api/chat/send")
+                    .header("Authorization", "Bearer $token")
+                    .post(body)
+                    .build()
+                client.newCall(req).execute()
+            } catch (e: Exception) { }
+        }
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -239,19 +210,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         }
     }
-}
-
-suspend fun loadMessages(client: OkHttpClient, gson: Gson, token: String, chatUsername: String, onResult: (List<MessageItem>) -> Unit) {
-    try {
-        val request = Request.Builder()
-            .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-            .header("Authorization", "Bearer $token")
-            .build()
-        val response = client.newCall(request).execute()
-        val json = response.body?.string() ?: "[]"
-        val type = object : com.google.gson.reflect.TypeToken<List<MessageItem>>() {}.type
-        onResult(gson.fromJson(json, type))
-    } catch (e: Exception) { }
 }
 
 @Composable
