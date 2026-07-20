@@ -179,7 +179,7 @@ fun MessageBubble(msg: Message) {
         ) {
             Text(
                 msg.text,
-                color = if (msg.isOutgoing) OnPrimaryContainer else OnSecondaryContainer,
+                color = if (msg.isOutgoing) OnPrimaryContainer else OnSurface,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
