@@ -136,49 +136,20 @@ fun FederApp() {
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(viewModel.error!!, color = Error) }
-                else -> ChatListScreen(viewModel.chats)
+                else -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(viewModel.chats) { chat ->
+                            // СУПЕР-МИНИМУМ: только одна строка текста
+                            Text(
+                                chat.name,
+                                color = OnSurface,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
-}
-
-@Composable
-fun ChatListScreen(chats: List<ChatItem>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            Surface(Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh) {
-                Text("🔍 Search chats...", color = Outline, modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp))
-            }
-        }
-        items(chats) { chat -> ChatRow(chat) }
-    }
-}
-
-@Composable
-fun ChatRow(chat: ChatItem) {
-    val avatarColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
-    
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable { }.padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Аватар — буква
-        Box(Modifier.size(56.dp).clip(CircleShape).background(avatarColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-            Text(chat.name.take(1).uppercase(), color = avatarColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        }
-        
-        Spacer(Modifier.width(16.dp))
-        
-        Column(Modifier.weight(1f)) {
-            Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = Secondary, fontSize = 14.sp)
-        }
-        
-        if (chat.unread > 0) {
-            Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
-                Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-    // ✅ БЕЗ HorizontalDivider
 }
