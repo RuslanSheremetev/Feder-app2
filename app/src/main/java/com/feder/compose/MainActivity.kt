@@ -129,11 +129,14 @@ fun FederApp() {
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(viewModel.chats) { chat ->
-                            // Тест: ТОЛЬКО Row, БЕЗ Column
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                // Добавляем Column с weight
+                                Column(Modifier.weight(1f)) {
+                                    Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                }
                             }
                         }
                     }
