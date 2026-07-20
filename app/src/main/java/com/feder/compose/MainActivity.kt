@@ -139,6 +139,20 @@ fun FederApp() {
     val context = LocalContext.current
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
+    // Если открыт чат или настройки — показываем без шапки
+    if (viewModel.selectedChat != null || viewModel.selectedTab == 3) {
+        Box(Modifier.fillMaxSize().background(Background)) {
+            when {
+                viewModel.selectedChat != null -> ChatScreen(
+                    chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
+                    onBack = { viewModel.selectedChat = null }
+                )
+                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
+            }
+        }
+        return
+    }
+    
     Scaffold(
         containerColor = Background,
         topBar = {
