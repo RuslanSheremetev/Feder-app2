@@ -1,6 +1,7 @@
 package com.feder.compose
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -37,7 +38,6 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
-// ============ DATA ============
 data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(
     @SerializedName("access_token") val accessToken: String,
@@ -56,13 +56,11 @@ data class ChatItem(
     val timestamp: String = ""
 )
 
-// ============ COLORS ============
 object FederColors {
     val Background = Color(0xFF131313)
     val Surface = Color(0xFF131313)
     val SurfaceContainerLow = Color(0xFF1C1B1B)
     val SurfaceContainerHigh = Color(0xFF2A2A2A)
-    val SurfaceContainerHighest = Color(0xFF353534)
     val Primary = Color(0xFFA1C9FF)
     val PrimaryContainer = Color(0xFF339DFF)
     val OnPrimary = Color(0xFF00325A)
@@ -73,10 +71,9 @@ object FederColors {
     val Outline = Color(0xFF8A919E)
     val OutlineVariant = Color(0xFF404752)
     val OnlineGreen = Color(0xFF41B35D)
-    val Muted = Color(0xFFFFB4AB) // красноватый для mute
+    val Muted = Color(0xFFFFB4AB)
 }
 
-// ============ VIEWMODEL ============
 class ChatViewModel : ViewModel() {
     private val client = OkHttpClient()
     private val gson = Gson()
@@ -100,7 +97,7 @@ class ChatViewModel : ViewModel() {
                 token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 loadChats()
             } catch (e: Exception) {
-                error = "Сервер недоступен: ${e.message}"
+                error = "Сервер недоступен"
                 isLoading = false
             }
         }
@@ -119,7 +116,7 @@ class ChatViewModel : ViewModel() {
                 chats = gson.fromJson(json, type)
                 isLoading = false
             } catch (e: Exception) {
-                error = "Ошибка загрузки: ${e.message}"
+                error = "Ошибка загрузки"
                 isLoading = false
             }
         }
@@ -128,19 +125,23 @@ class ChatViewModel : ViewModel() {
     fun refresh() { isLoading = true; error = null; loginAndLoad() }
 }
 
-// ============ MAIN ============
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme(colorScheme = darkColorScheme(
-                primary = FederColors.Primary,
-                background = FederColors.Background,
-                surface = FederColors.Surface,
-                onSurface = FederColors.OnSurface,
-            )) {
-                FederApp()
+        try {
+            setContent {
+                MaterialTheme(colorScheme = darkColorScheme(
+                    primary = FederColors.Primary,
+                    background = FederColors.Background,
+                    surface = FederColors.Surface,
+                    onSurface = FederColors.OnSurface,
+                )) {
+                    FederApp()
+                }
             }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
 }
@@ -152,7 +153,7 @@ fun FederApp() {
     Scaffold(
         containerColor = FederColors.Background,
         topBar = {
-            Surface(color = FederColors.Surface, shadowElevation = 2.dp) {
+            Surface(color = FederColors.Surface) {
                 Row(
                     modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -219,8 +220,6 @@ fun ChatRow(chat: ChatItem) {
     
     Surface(Modifier.fillMaxWidth().clickable { }, color = Color.Transparent) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            
-            // Аватар
             Box(Modifier.size(56.dp)) {
                 if (!chat.avatarUrl.isNullOrEmpty()) {
                     AsyncImage(
@@ -238,14 +237,11 @@ fun ChatRow(chat: ChatItem) {
                     Box(Modifier.size(12.dp).clip(CircleShape).background(FederColors.OnlineGreen).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp).border(2.dp, FederColors.Background, CircleShape))
                 }
             }
-            
             Spacer(Modifier.width(16.dp))
-            
             Column(Modifier.weight(1f)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(chat.name, color = FederColors.OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Иконка mute
                         if (chat.isMuted) {
                             Icon(Icons.Filled.VolumeOff, "muted", tint = FederColors.Muted, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(4.dp))
