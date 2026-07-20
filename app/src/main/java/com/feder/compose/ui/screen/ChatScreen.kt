@@ -2,9 +2,11 @@ package com.feder.compose.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -17,10 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -37,6 +41,8 @@ data class MessageItem(
     val timestamp: String
 )
 
+data class SendRequest(val from_user: String, val to_user: String, val text: String)
+
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val client = remember { OkHttpClient() }
@@ -44,37 +50,67 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var messages by remember { mutableStateOf<List<MessageItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
-    // myUsername передаётся из ViewModel
+    var token by remember { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    val context = LocalContext.current
     
-    // Загружаем сообщения
+    // Загружаем сообщения и получаем токен
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
                 // Логинимся
-                val loginJson = gson.toJson(LoginRequest("demo", "demo"))
+                val loginJson = gson.toJson(LoginRequest(myUsername, myUsername))
                 val loginBody = loginJson.toRequestBody("application/json".toMediaType())
                 val loginRequest = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
                 val loginResponse = client.newCall(loginRequest).execute()
-                val token = gson.fromJson(loginResponse.body?.string(), LoginResponse::class.java).accessToken
+                token = gson.fromJson(loginResponse.body?.string(), LoginResponse::class.java).accessToken
                 
                 // Загружаем сообщения
-                val msgRequest = Request.Builder()
-                    .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $token")
-                    .build()
-                val msgResponse = client.newCall(msgRequest).execute()
-                val json = msgResponse.body?.string() ?: "[]"
-                val type = object : TypeToken<List<MessageItem>>() {}.type
-                messages = gson.fromJson(json, type)
+                loadMessages(client, gson, token, chatUsername) { messages = it }
             } catch (e: Exception) {
-                // Если не загрузились — показываем тестовые
                 messages = listOf(
-                    MessageItem("alex", "demo", "Hey! Did you have a chance to look at the latest UI proposal?", "10:42 AM"),
-                    MessageItem("demo", "alex", "Just finished reviewing it. Looking solid!", "10:45 AM"),
-                    MessageItem("alex", "demo", "Awesome! Should we sync at 2 PM?", "10:46 AM")
+                    MessageItem(chatUsername, myUsername, "Hey! Did you have a chance to look at the latest UI proposal?", "10:42 AM"),
+                    MessageItem(myUsername, chatUsername, "Just finished reviewing it. Looking solid!", "10:45 AM"),
+                    MessageItem(chatUsername, myUsername, "Awesome! Should we sync at 2 PM?", "10:46 AM")
                 )
             }
             isLoading = false
+        }
+    }
+    
+    // Автоскролл вниз
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+    }
+    
+    // Отправка сообщения
+    fun sendMessage() {
+        val text = inputText.trim()
+        if (text.isEmpty()) return
+        
+        // Добавляем сообщение сразу в список (оптимистично)
+        val newMsg = MessageItem(myUsername, chatUsername, text, "now")
+        messages = messages + newMsg
+        inputText = ""
+        
+        // Отправляем на сервер
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val sendJson = gson.toJson(SendRequest(myUsername, chatUsername, text))
+                val body = sendJson.toRequestBody("application/json".toMediaType())
+                val request = Request.Builder()
+                    .url("http://2.26.71.102:8002/api/chat/send")
+                    .header("Authorization", "Bearer $token")
+                    .post(body)
+                    .build()
+                client.newCall(request).execute()
+                // Обновляем сообщения с сервера
+                loadMessages(client, gson, token, chatUsername) { messages = it }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Ошибка отправки: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
     
@@ -112,16 +148,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                state = listState,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 item { Spacer(Modifier.height(16.dp)) }
                 items(messages) { msg ->
                     val isMine = msg.from_user == myUsername
-                    MessageBubble(
-                        text = msg.text,
-                        time = msg.timestamp.takeLast(8),
-                        isMine = isMine
-                    )
+                    MessageBubble(text = msg.text, time = msg.timestamp.takeLast(8), isMine = isMine)
                 }
                 item { Spacer(Modifier.height(16.dp)) }
             }
@@ -156,7 +189,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                 }
                 Spacer(Modifier.width(8.dp))
-                Box(Modifier.size(48.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.size(48.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() },
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send,
                         "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp)
@@ -164,6 +200,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 }
             }
         }
+    }
+}
+
+suspend fun loadMessages(client: OkHttpClient, gson: Gson, token: String, chatUsername: String, onResult: (List<MessageItem>) -> Unit) {
+    try {
+        val request = Request.Builder()
+            .url("http://2.26.71.102:8002/api/messages/$chatUsername")
+            .header("Authorization", "Bearer $token")
+            .build()
+        val response = client.newCall(request).execute()
+        val json = response.body?.string() ?: "[]"
+        val type = object : TypeToken<List<MessageItem>>() {}.type
+        onResult(gson.fromJson(json, type))
+    } catch (e: Exception) {
+        // Оставляем текущие сообщения
     }
 }
 
