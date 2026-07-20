@@ -41,7 +41,7 @@ data class MessageItem(
     val timestamp: String
 )
 
-data class SendRequest(val from_user: String, val to_user: String, val text: String)
+data class SendRequest(val to: String, val text: String)
 
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
@@ -96,7 +96,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         // Отправляем на сервер
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val sendJson = gson.toJson(SendRequest(myUsername, chatUsername, text))
+                val sendJson = gson.toJson(SendRequest(chatUsername, text))
                 val body = sendJson.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
                     .url("http://2.26.71.102:8002/api/chat/send")
