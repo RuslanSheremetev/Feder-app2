@@ -133,9 +133,14 @@ fun FederApp() {
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Добавляем Column с weight
                                 Column(Modifier.weight(1f)) {
                                     Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                    // Добавляем сообщение
+                                    Text(
+                                        chat.lastMessage.ifEmpty { "Нет сообщений" },
+                                        color = Secondary,
+                                        fontSize = 14.sp
+                                    )
                                 }
                             }
                         }
