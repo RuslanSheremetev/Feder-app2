@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.unit.offset
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -224,7 +225,7 @@ fun FederApp() {
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Аватар: фото если есть URL, иначе буква
+                                // Аватар: фото если есть URL, иначе буква + онлайн-точка
                                 Box(Modifier.size(56.dp)) {
                                     if (chat.avatarUrl != null) {
                                         AsyncImage(
@@ -240,6 +241,17 @@ fun FederApp() {
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                             Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                         }
+                                    }
+                                    // Онлайн-индикатор (зелёная точка)
+                                    if (chat.online) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .clip(CircleShape)
+                                                .background(Color(0xFF41B35D))
+                                                .align(Alignment.BottomEnd)
+                                                .offset(x = 2.dp, y = 2.dp)
+                                        )
                                     }
                                 }
                                 Spacer(Modifier.width(16.dp))
