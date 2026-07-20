@@ -193,7 +193,7 @@ fun FederApp() {
                         onBack = { viewModel.selectedChat = null }
                     )
                 }
-                viewModel.selectedTab == 3 -> SettingsScreen()
+                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         // Поиск — появляется по нажатию на лупу

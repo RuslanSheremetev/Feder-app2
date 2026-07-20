@@ -1,7 +1,7 @@
 package com.feder.compose.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,10 +24,29 @@ import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onBack: () -> Unit = {}) {
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 16.dp, bottom = 96.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 96.dp)
     ) {
+        // Header
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant)
+            }
+            Text("Settings", color = Primary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        }
+        
+        Spacer(Modifier.height(16.dp))
+        
+        // Профиль
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(96.dp)) {
                 Box(Modifier.size(96.dp).clip(CircleShape).background(SurfaceContainerLow).border(2.dp, PrimaryContainer, CircleShape).padding(4.dp)) {
@@ -45,11 +64,14 @@ fun SettingsScreen() {
                 Text("Edit Profile", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             }
         }
+        
         Spacer(Modifier.height(32.dp))
+        
         SettingsCard(Icons.Filled.Person, "Account", "Security, change number")
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status")
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones")
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download")
+        
         var isDarkMode by remember { mutableStateOf(true) }
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
             Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -59,11 +81,9 @@ fun SettingsScreen() {
                 Switch(checked = isDarkMode, onCheckedChange = { isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
+        
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us")
-        Spacer(Modifier.height(16.dp))
-        Surface(Modifier.fillMaxWidth().clickable { }, shape = RoundedCornerShape(12.dp), color = Color.Transparent, border = BorderStroke(1.dp, Error.copy(alpha = 0.2f))) {
-            Text("Log Out", color = Error, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        }
+        Spacer(Modifier.height(32.dp))
     }
 }
 
