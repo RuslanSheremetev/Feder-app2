@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +37,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
 import com.feder.compose.ui.screen.SettingsScreen
+import com.feder.compose.ui.screen.ChatScreen
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -79,6 +81,7 @@ fun formatTimestamp(timestamp: String): String {
 }
 
 class ChatViewModel : ViewModel() {
+    var selectedChat by mutableStateOf<String?>(null)
     private val client = OkHttpClient()
     private val gson = Gson()
     private val server = "http://2.26.71.102:8002"
@@ -183,6 +186,10 @@ fun FederApp() {
                         Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
+                viewModel.selectedChat != null -> ChatScreen(
+                    chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
+                    onBack = { viewModel.selectedChat = null }
+                )
                 viewModel.selectedTab == 3 -> SettingsScreen()
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -231,7 +238,7 @@ fun FederApp() {
                             val time = chat.timestamp ?: ""
                             
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+                                modifier = Modifier.fillMaxWidth().clickable { viewModel.selectedChat = chat.username }.padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Аватар + онлайн-точка
