@@ -38,13 +38,13 @@ data class MessageItem(
 )
 
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val client = remember { OkHttpClient() }
     val gson = remember { Gson() }
     var messages by remember { mutableStateOf<List<MessageItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
-    val myUsername = "demo"
+    // myUsername передаётся из ViewModel
     
     // Загружаем сообщения
     LaunchedEffect(chatUsername) {
