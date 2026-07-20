@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.unit.offset
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -21,16 +23,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.feder.compose.ui.theme.*
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import androidx.compose.ui.layout.ContentScale
+import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -57,6 +61,22 @@ data class ChatItem(
     val timestamp: String? = null
 )
 
+fun formatTimestamp(timestamp: String): String {
+    return try {
+        val parts = timestamp.split(" ")
+        if (parts.size >= 2) {
+            val time = parts[1].split(":")
+            if (time.size >= 2) {
+                val hour = time[0].toInt()
+                val minute = time[1]
+                val ampm = if (hour >= 12) "PM" else "AM"
+                val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
+                "$hour12:$minute $ampm"
+            } else timestamp.takeLast(8)
+        } else timestamp.takeLast(8)
+    } catch (e: Exception) { timestamp.takeLast(8) }
+}
+
 class ChatViewModel : ViewModel() {
     private val client = OkHttpClient()
     private val gson = Gson()
@@ -66,6 +86,7 @@ class ChatViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
+    var isSearchVisible by mutableStateOf(false)
     var searchQuery by mutableStateOf("")
     
     val filteredChats: List<ChatItem>
@@ -100,25 +121,6 @@ class ChatViewModel : ViewModel() {
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
 }
 
-fun formatTimestamp(timestamp: String): String {
-    // timestamp format: "2026-07-20 10:42:00"
-    return try {
-        val parts = timestamp.split(" ")
-        if (parts.size >= 2) {
-            val time = parts[1].split(":")
-            if (time.size >= 2) {
-                val hour = time[0].toInt()
-                val minute = time[1]
-                val ampm = if (hour >= 12) "PM" else "AM"
-                val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-                "$hour12:$minute $ampm"
-            } else timestamp.takeLast(8)
-        } else timestamp.takeLast(8)
-    } catch (e: Exception) {
-        timestamp.takeLast(8)
-    }
-}
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,25 +139,33 @@ fun FederApp() {
         containerColor = Background,
         topBar = {
             Surface(color = Surface) {
-                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow), contentAlignment = Alignment.Center) {
                         Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                     }
                     Spacer(Modifier.width(12.dp))
                     Text("Messenger", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
-                    if (viewModel.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.searchQuery = "" }) {
-                            Icon(Icons.Filled.Close, "clear", tint = Primary)
-                        }
+                    
+                    // Кнопка поиска — иконка лупы как в дизайне
+                    IconButton(onClick = {
+                        viewModel.isSearchVisible = !viewModel.isSearchVisible
+                        if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
+                    }) {
+                        Icon(
+                            Icons.Filled.Search,
+                            "search",
+                            tint = Primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Background,
-                tonalElevation = 0.dp
-            ) {
+            NavigationBar(containerColor = Background, tonalElevation = 0.dp) {
                 listOf("Chats" to Icons.Filled.Chat, "Stories" to Icons.Outlined.AutoAwesome, "Contacts" to Icons.Outlined.Contacts, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (l, ic) ->
                     NavigationBarItem(icon = { Icon(ic, l, modifier = Modifier.size(24.dp)) }, label = { Text(l, fontSize = 11.sp) }, selected = viewModel.selectedTab == i, onClick = { viewModel.selectedTab = i }, colors = NavigationBarItemDefaults.colors(selectedIconColor = Primary, unselectedIconColor = OnSurfaceVariant))
                 }
@@ -174,44 +184,41 @@ fun FederApp() {
                 }
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        // Поиск
+                        // Поиск — появляется по нажатию на лупу
                         item {
-                            // Search bar — точные размеры как в HTML (40dp высота, margin 16dp)
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .padding(top = 8.dp, bottom = 8.dp),
-                                shape = RoundedCornerShape(20.dp),
-                                color = SurfaceContainerHigh
+                            AnimatedVisibility(
+                                visible = viewModel.isSearchVisible,
+                                enter = fadeIn(),
+                                exit = fadeOut()
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .height(40.dp)
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 8.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = SurfaceContainerHigh
                                 ) {
-                                    Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                    BasicTextField(
-                                        value = viewModel.searchQuery,
-                                        onValueChange = { viewModel.searchQuery = it },
-                                        singleLine = true,
-                                        textStyle = androidx.compose.ui.text.TextStyle(
-                                            color = OnSurface,
-                                            fontSize = 14.sp
-                                        ),
-                                        cursorBrush = androidx.compose.ui.graphics.SolidColor(Primary),
-                                        modifier = Modifier.weight(1f),
-                                        decorationBox = { innerTextField ->
-                                            Box {
-                                                if (viewModel.searchQuery.isEmpty()) {
-                                                    Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                    Row(
+                                        modifier = Modifier.height(40.dp).padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        BasicTextField(
+                                            value = viewModel.searchQuery,
+                                            onValueChange = { viewModel.searchQuery = it },
+                                            singleLine = true,
+                                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                            cursorBrush = SolidColor(Primary),
+                                            modifier = Modifier.weight(1f),
+                                            decorationBox = { innerTextField ->
+                                                Box {
+                                                    if (viewModel.searchQuery.isEmpty()) {
+                                                        Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                                    }
+                                                    innerTextField()
                                                 }
-                                                innerTextField()
                                             }
-                                        }
-                                    )
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -225,14 +232,11 @@ fun FederApp() {
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Аватар: фото если есть URL, иначе буква + онлайн-точка
+                                // Аватар + онлайн-точка
                                 Box(Modifier.size(56.dp)) {
                                     if (chat.avatarUrl != null) {
                                         AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(chat.avatarUrl)
-                                                .crossfade(true)
-                                                .build(),
+                                            model = ImageRequest.Builder(LocalContext.current).data(chat.avatarUrl).crossfade(true).build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)
@@ -242,16 +246,8 @@ fun FederApp() {
                                             Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                         }
                                     }
-                                    // Онлайн-индикатор (зелёная точка)
                                     if (chat.online) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(12.dp)
-                                                .clip(CircleShape)
-                                                .background(Color(0xFF41B35D))
-                                                .align(Alignment.BottomEnd)
-                                                .offset(x = 2.dp, y = 2.dp)
-                                        )
+                                        Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
                                     }
                                 }
                                 Spacer(Modifier.width(16.dp))
@@ -262,17 +258,11 @@ fun FederApp() {
                                             Text(formatTimestamp(time), color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
                                         }
                                     }
-                                    if (lastMsg.isNotEmpty()) {
-                                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                        if (lastMsg.isNotEmpty()) {
                                             Text(lastMsg, color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
-                                            if (chat.unread > 0) {
-                                                Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
-                                                    Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                                }
-                                            }
                                         }
-                                    } else if (chat.unread > 0) {
-                                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                                        if (chat.unread > 0) {
                                             Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
                                                 Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                             }
