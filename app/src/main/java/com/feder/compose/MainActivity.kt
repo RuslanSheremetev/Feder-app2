@@ -47,8 +47,8 @@ data class ChatItem(
     @SerializedName("avatar_url") val avatarUrl: String? = null,
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
-    @SerializedName("last_message") val lastMessage: String = "",
-    val timestamp: String = ""
+    @SerializedName("last_message") val lastMessage: String? = null,
+    val timestamp: String? = null
 )
 
 class ChatViewModel : ViewModel() {
@@ -70,7 +70,7 @@ class ChatViewModel : ViewModel() {
                 val response = client.newCall(request).execute()
                 token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 loadChats()
-            } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
+            } catch (e: Exception) { error = "Сервер недоступен"; isLoading = false }
         }
     }
     private fun loadChats() {
@@ -82,7 +82,7 @@ class ChatViewModel : ViewModel() {
                 val type = object : TypeToken<List<ChatItem>>() {}.type
                 chats = gson.fromJson(json, type)
                 isLoading = false
-            } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
+            } catch (e: Exception) { error = "Ошибка загрузки"; isLoading = false }
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try { setContent { FederTheme { FederApp() } } }
-        catch (e: Exception) { Toast.makeText(this, "КРАШ: ${e.message}", Toast.LENGTH_LONG).show() }
+        catch (e: Exception) { Toast.makeText(this, "Ошибка запуска", Toast.LENGTH_LONG).show() }
     }
 }
 
@@ -130,12 +130,14 @@ fun FederApp() {
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(viewModel.chats) { chat ->
+                            val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
+                            val lastMsg = chat.lastMessage ?: ""
+                            val time = chat.timestamp ?: ""
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Аватар
-                                val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
                                 Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                     Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                 }
@@ -143,12 +145,12 @@ fun FederApp() {
                                 Column(Modifier.weight(1f)) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                                        if (chat.timestamp.isNotEmpty()) {
-                                            Text(chat.timestamp.takeLast(8), color = OnSurfaceVariant, fontSize = 12.sp)
+                                        if (time.isNotEmpty()) {
+                                            Text(time.takeLast(8), color = OnSurfaceVariant, fontSize = 12.sp)
                                         }
                                     }
-                                    if (chat.lastMessage.isNotEmpty()) {
-                                        Text(chat.lastMessage, color = Secondary, fontSize = 14.sp, maxLines = 1)
+                                    if (lastMsg.isNotEmpty()) {
+                                        Text(lastMsg, color = Secondary, fontSize = 14.sp, maxLines = 1)
                                     }
                                 }
                             }
