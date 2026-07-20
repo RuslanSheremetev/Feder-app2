@@ -1,6 +1,7 @@
 package com.feder.compose
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -68,20 +69,31 @@ class ChatViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
     
+    private var cachedChats: List<ChatItem> = emptyList()
+    
     init { loginAndLoad() }
     
     fun loginAndLoad() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                Log.d("Feder", "Логин...")
                 val json = gson.toJson(LoginRequest("demo", "demo"))
                 val body = json.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder().url("$server/api/login").post(body).build()
                 val response = client.newCall(request).execute()
                 token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
+                Log.d("Feder", "Токен получен")
                 loadChats()
             } catch (e: Exception) {
-                error = "Сервер недоступен"
-                isLoading = false
+                Log.e("Feder", "Ошибка логина: ${e.message}", e)
+                if (cachedChats.isNotEmpty()) {
+                    chats = cachedChats
+                    isLoading = false
+                    error = "Сервер недоступен. Кэш."
+                } else {
+                    error = "Сервер недоступен: ${e.message}"
+                    isLoading = false
+                }
             }
         }
     }
@@ -89,6 +101,7 @@ class ChatViewModel : ViewModel() {
     private fun loadChats() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                Log.d("Feder", "Загрузка чатов...")
                 val request = Request.Builder()
                     .url("$server/api/chat_settings/all?me=demo")
                     .header("Authorization", "Bearer $token")
@@ -96,30 +109,50 @@ class ChatViewModel : ViewModel() {
                 val response = client.newCall(request).execute()
                 val json = response.body?.string() ?: "[]"
                 val type = object : TypeToken<List<ChatItem>>() {}.type
-                chats = gson.fromJson(json, type)
+                val newChats = gson.fromJson<List<ChatItem>>(json, type)
+                cachedChats = newChats
+                chats = newChats
                 isLoading = false
+                error = null
+                Log.d("Feder", "Загружено ${chats.size} чатов")
             } catch (e: Exception) {
-                error = "Ошибка загрузки"
-                isLoading = false
+                Log.e("Feder", "Ошибка чатов: ${e.message}", e)
+                if (cachedChats.isNotEmpty()) {
+                    chats = cachedChats
+                    isLoading = false
+                    error = "Сеть недоступна. Кэш."
+                } else {
+                    error = "Ошибка: ${e.message}"
+                    isLoading = false
+                }
             }
         }
     }
     
-    fun refresh() { isLoading = true; error = null; loginAndLoad() }
+    fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
 }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+            Log.d("Feder", "Запуск")
             setContent {
                 FederTheme {
                     FederApp()
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
-            finish()
+            val msg = "КРАШ: ${e.message}"
+            Log.e("Feder", msg, e)
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+            setContentView(android.widget.TextView(this).apply {
+                text = "Ошибка:\n${e.message}"
+                setTextColor(0xFFFFB4AB.toInt())
+                setBackgroundColor(0xFF131313.toInt())
+                setPadding(32, 64, 32, 32)
+                textSize = 12f
+            })
         }
     }
 }
@@ -127,6 +160,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
+    val context = LocalContext.current
+    
+    LaunchedEffect(viewModel.error) {
+        viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+    }
     
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -154,12 +192,7 @@ fun FederApp() {
                         label = { Text(label, fontSize = 11.sp) },
                         selected = viewModel.selectedTab == index,
                         onClick = { viewModel.selectedTab = index },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Primary,
-                            selectedTextColor = Primary,
-                            unselectedIconColor = OnSurfaceVariant,
-                            unselectedTextColor = OnSurfaceVariant
-                        )
+                        colors = NavigationBarItemDefaults.colors(selectedIconColor = Primary, selectedTextColor = Primary, unselectedIconColor = OnSurfaceVariant, unselectedTextColor = OnSurfaceVariant)
                     )
                 }
             }
@@ -175,71 +208,20 @@ fun FederApp() {
                         Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
-                else -> ChatListScreen(viewModel.chats)
-            }
-        }
-    }
-}
-
-@Composable
-fun ChatListScreen(chats: List<ChatItem>) {
-    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 8.dp)) {
-        item {
-            Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh) {
-                Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Search chats...", color = Outline, fontSize = 14.sp)
-                }
-            }
-        }
-        items(chats) { chat -> ChatRow(chat) }
-    }
-}
-
-@Composable
-fun ChatRow(chat: ChatItem) {
-    val avatarColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
-    
-    Surface(Modifier.fillMaxWidth().clickable { }, color = Color.Transparent) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(56.dp)) {
-                if (!chat.avatarUrl.isNullOrEmpty()) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current).data(chat.avatarUrl).crossfade(true).build(),
-                        contentDescription = chat.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(56.dp).clip(CircleShape)
-                    )
-                } else {
-                    Box(Modifier.size(56.dp).clip(CircleShape).background(avatarColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                        Text(chat.name.take(1).uppercase(), color = avatarColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-                if (chat.online) {
-                    Box(Modifier.size(12.dp).clip(CircleShape).background(OnlineGreen).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp).border(2.dp, Background, CircleShape))
-                }
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (chat.isMuted) { Icon(Icons.Filled.VolumeOff, "muted", tint = Muted, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)) }
-                        Text(chat.timestamp.ifEmpty { "" }, color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                }
-                Spacer(Modifier.height(2.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
-                    if (chat.unread > 0) {
-                        Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
-                            Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                else -> {
+                    // ⚡ ВРЕМЕННО: только текст, без AsyncImage и сложной верстки
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(viewModel.chats, key = { it.username }) { chat ->
+                            Text(
+                                text = "${chat.name} (@${chat.username})",
+                                color = OnSurface,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(16.dp)
+                            )
                         }
                     }
                 }
             }
         }
     }
-    HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
 }
