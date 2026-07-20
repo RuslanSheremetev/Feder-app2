@@ -196,4 +196,22 @@ fun ProfileSettingsRow(icon: androidx.compose.ui.graphics.vector.ImageVector, ti
         Text(title, color = OnSurface, fontSize = 17.sp, modifier = Modifier.weight(1f))
         Icon(Icons.Filled.ChevronRight, "next", tint = Outline, modifier = Modifier.size(20.dp))
     }
+
+@Composable
+fun CommonGroup(name: String, members: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHighest),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Filled.Groups, "group", tint = OnSurface, modifier = Modifier.size(24.dp))
+        }
+        Spacer(Modifier.width(16.dp))
+        Column {
+            Text(name, color = OnSurface, fontSize = 14.sp)
+            Text(members, color = Secondary, fontSize = 11.sp)
+        }
+    }
+}
+
 }
