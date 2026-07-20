@@ -57,7 +57,7 @@ data class ChatItem(
 class ChatViewModel : ViewModel() {
     private val client = OkHttpClient()
     private val gson = Gson()
-    private val server = "http://2.26.71.102"
+    private val server = "https://2.26.71.102"
     var token by mutableStateOf("")
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
