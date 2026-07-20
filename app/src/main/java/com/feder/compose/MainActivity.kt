@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
+import com.feder.compose.ui.screen.SettingsScreen
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -182,6 +183,7 @@ fun FederApp() {
                         Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
+                viewModel.selectedTab == 3 -> SettingsScreen()
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         // Поиск — появляется по нажатию на лупу
