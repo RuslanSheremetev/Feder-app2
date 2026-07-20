@@ -34,12 +34,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
 
-data class LoginRequest(val username: String, val password: String)
-data class LoginResponse(
-    @SerializedName("access_token") val accessToken: String,
-    @SerializedName("token_type") val tokenType: String,
-    val username: String
-)
 
 data class MessageItem(
     val from_user: String,
@@ -90,7 +84,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 // Подключаем WebSocket
                 val wsUrl = "ws://2.26.71.102:8002/api/ws/$myUsername?token=$token"
                 val wsRequest = Request.Builder().url(wsUrl).build()
-                webSocket = client.newWebSocket(wsRequest, object : WebSocketListener() {
+                try {
+                    webSocket = client.newWebSocket(wsRequest, object : WebSocketListener() {
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         try {
                             val msg = gson.fromJson(text, WsMessage::class.java)
@@ -112,7 +107,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                         // WebSocket упал — продолжаем без него
                     }
-                })
+                    })
+                } catch (e: Exception) {
+                    // WebSocket не подключился — работаем без него
+                }
             } catch (e: Exception) {
                 isLoading = false
                 withContext(Dispatchers.Main) {
