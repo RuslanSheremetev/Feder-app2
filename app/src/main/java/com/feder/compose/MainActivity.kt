@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -18,15 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -63,6 +61,12 @@ class ChatViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
+    var searchQuery by mutableStateOf("")
+    
+    val filteredChats: List<ChatItem>
+        get() = if (searchQuery.isEmpty()) chats
+                else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    
     init { loginAndLoad() }
     fun loginAndLoad() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -115,6 +119,11 @@ fun FederApp() {
                     }
                     Spacer(Modifier.width(12.dp))
                     Text("Messenger", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                    if (viewModel.searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.searchQuery = "" }) {
+                            Icon(Icons.Filled.Close, "clear", tint = Primary)
+                        }
+                    }
                 }
             }
         },
@@ -129,10 +138,49 @@ fun FederApp() {
         Box(Modifier.padding(padding)) {
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
-                viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(viewModel.error!!, color = Error) }
+                viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(viewModel.error!!, color = Error, fontSize = 14.sp)
+                        Spacer(Modifier.height(16.dp))
+                        Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
+                    }
+                }
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(viewModel.chats) { chat ->
+                        // Поиск
+                        item {
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                                shape = RoundedCornerShape(20.dp),
+                                color = SurfaceContainerHigh
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    TextField(
+                                        value = viewModel.searchQuery,
+                                        onValueChange = { viewModel.searchQuery = it },
+                                        placeholder = { Text("Search chats...", color = Outline, fontSize = 14.sp) },
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedTextColor = OnSurface,
+                                            unfocusedTextColor = OnSurface,
+                                            cursorColor = Primary,
+                                            focusedBorderColor = Color.Transparent,
+                                            unfocusedBorderColor = Color.Transparent,
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent
+                                        ),
+                                        singleLine = true,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
+                        }
+                        // Список чатов
+                        items(viewModel.filteredChats) { chat ->
                             val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
                             val lastMsg = chat.lastMessage ?: ""
                             val time = chat.timestamp ?: ""
@@ -141,19 +189,8 @@ fun FederApp() {
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(Modifier.size(56.dp)) {
-                                    if (chat.avatarUrl != null) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current).data(chat.avatarUrl).crossfade(true).build(),
-                                            contentDescription = chat.name,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier.size(56.dp).clip(CircleShape)
-                                        )
-                                    } else {
-                                        Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                                            Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                        }
-                                    }
+                                Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                    Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                 }
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
@@ -168,6 +205,7 @@ fun FederApp() {
                                     }
                                 }
                             }
+                            HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
                         }
                     }
                 }
