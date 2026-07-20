@@ -98,6 +98,25 @@ class ChatViewModel : ViewModel() {
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
 }
 
+fun formatTimestamp(timestamp: String): String {
+    // timestamp format: "2026-07-20 10:42:00"
+    return try {
+        val parts = timestamp.split(" ")
+        if (parts.size >= 2) {
+            val time = parts[1].split(":")
+            if (time.size >= 2) {
+                val hour = time[0].toInt()
+                val minute = time[1]
+                val ampm = if (hour >= 12) "PM" else "AM"
+                val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
+                "$hour12:$minute $ampm"
+            } else timestamp.takeLast(8)
+        } else timestamp.takeLast(8)
+    } catch (e: Exception) {
+        timestamp.takeLast(8)
+    }
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -225,7 +244,7 @@ fun FederApp() {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                                         if (time.isNotEmpty()) {
-                                            Text(time.takeLast(8), color = OnSurfaceVariant, fontSize = 12.sp)
+                                            Text(formatTimestamp(time), color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
                                         }
                                     }
                                     if (lastMsg.isNotEmpty()) {
