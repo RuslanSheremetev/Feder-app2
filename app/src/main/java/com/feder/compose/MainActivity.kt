@@ -5,13 +5,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -62,9 +59,7 @@ class ChatViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
-    
     init { loginAndLoad() }
-    
     fun loginAndLoad() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -77,7 +72,6 @@ class ChatViewModel : ViewModel() {
             } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
         }
     }
-    
     private fun loadChats() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -90,7 +84,6 @@ class ChatViewModel : ViewModel() {
             } catch (e: Exception) { error = "Ошибка: ${e.message}"; isLoading = false }
         }
     }
-    
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
 }
 
@@ -106,10 +99,7 @@ class MainActivity : ComponentActivity() {
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
     val context = LocalContext.current
-    
-    LaunchedEffect(viewModel.error) {
-        viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
-    }
+    LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     Scaffold(
         containerColor = Background,
@@ -139,13 +129,16 @@ fun FederApp() {
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(viewModel.chats) { chat ->
-                            // СУПЕР-МИНИМУМ: только одна строка текста
-                            Text(
-                                chat.name,
-                                color = OnSurface,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                            )
+                            // ChatRow: ТОЛЬКО Row с именем и сообщением
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                    Text(chat.lastMessage.ifEmpty { "Нет сообщений" }, color = Secondary, fontSize = 14.sp)
+                                }
+                            }
                         }
                     }
                 }
