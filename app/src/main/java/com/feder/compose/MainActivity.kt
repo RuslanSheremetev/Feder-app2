@@ -44,10 +44,11 @@ data class ChatItem(
     val name: String,
     val unread: Int = 0,
     @SerializedName("avatar_color") val avatarColor: String = "#339dff",
+    @SerializedName("avatar_url") val avatarUrl: String? = null,
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
-    @SerializedName("last_message") val lastMessage: String? = null,
-    val timestamp: String? = null
+    @SerializedName("last_message") val lastMessage: String = "",
+    val timestamp: String = ""
 )
 
 class ChatViewModel : ViewModel() {
@@ -133,14 +134,22 @@ fun FederApp() {
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // Аватар
+                                val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
+                                Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                    Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                                    // ✅ Безопасно: проверяем null через ?:
-                                    Text(
-                                        chat.lastMessage ?: "Нет сообщений",
-                                        color = Secondary,
-                                        fontSize = 14.sp
-                                    )
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                                        if (chat.timestamp.isNotEmpty()) {
+                                            Text(chat.timestamp.takeLast(8), color = OnSurfaceVariant, fontSize = 12.sp)
+                                        }
+                                    }
+                                    if (chat.lastMessage.isNotEmpty()) {
+                                        Text(chat.lastMessage, color = Secondary, fontSize = 14.sp, maxLines = 1)
+                                    }
                                 }
                             }
                         }
