@@ -149,32 +149,39 @@ fun FederApp() {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         // Поиск
                         item {
+                            // Search bar — точные размеры как в HTML (40dp высота, margin 16dp)
                             Surface(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .padding(top = 8.dp, bottom = 8.dp),
                                 shape = RoundedCornerShape(20.dp),
                                 color = SurfaceContainerHigh
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                    modifier = Modifier
+                                        .height(40.dp)
+                                        .padding(horizontal = 16.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
                                     Spacer(Modifier.width(8.dp))
-                                    TextField(
+                                    BasicTextField(
                                         value = viewModel.searchQuery,
                                         onValueChange = { viewModel.searchQuery = it },
-                                        placeholder = { Text("Search chats...", color = Outline, fontSize = 14.sp) },
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = OnSurface,
-                                            unfocusedTextColor = OnSurface,
-                                            cursorColor = Primary,
-                                            focusedBorderColor = Color.Transparent,
-                                            unfocusedBorderColor = Color.Transparent,
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent
-                                        ),
                                         singleLine = true,
-                                        modifier = Modifier.weight(1f)
+                                        textStyle = androidx.compose.ui.text.TextStyle(
+                                            color = OnSurface,
+                                            fontSize = 14.sp
+                                        ),
+                                        cursorBrush = androidx.compose.ui.graphics.SolidColor(Primary),
+                                        modifier = Modifier.weight(1f),
+                                        decorationBox = { innerTextField ->
+                                            if (viewModel.searchQuery.isEmpty()) {
+                                                Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                            }
+                                            innerTextField()
+                                        }
                                     )
                                 }
                             }
