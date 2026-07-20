@@ -213,6 +213,8 @@ fun FederApp() {
                     // Чат на весь экран без шапки и нижнего меню
                     ChatScreen(
                         chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
+                        chatUsername = viewModel.selectedChat ?: "",
+                        myUsername = "demo",
                         onBack = { viewModel.selectedChat = null }
                     )
                 }
