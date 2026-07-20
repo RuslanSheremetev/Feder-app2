@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -202,10 +203,12 @@ fun FederApp() {
                                         cursorBrush = androidx.compose.ui.graphics.SolidColor(Primary),
                                         modifier = Modifier.weight(1f),
                                         decorationBox = { innerTextField ->
-                                            if (viewModel.searchQuery.isEmpty()) {
-                                                Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                            Box {
+                                                if (viewModel.searchQuery.isEmpty()) {
+                                                    Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                                }
+                                                innerTextField()
                                             }
-                                            innerTextField()
                                         }
                                     )
                                 }
