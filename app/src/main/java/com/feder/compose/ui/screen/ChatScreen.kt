@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
+import com.feder.compose.ui.screen.ContactProfileScreen
 
 data class Message(
     val text: String,
@@ -34,6 +35,7 @@ data class Message(
 
 @Composable
 fun ChatScreen(chatName: String, onBack: () -> Unit) {
+    var showProfile by remember { mutableStateOf(false) }
     val messages = remember {
         listOf(
             Message("Hey! Did you have a chance to look at the latest UI proposal?", "10:42 AM", false),
@@ -45,6 +47,11 @@ fun ChatScreen(chatName: String, onBack: () -> Unit) {
     
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
+    
+    if (showProfile) {
+        ContactProfileScreen(contactName = chatName, onBack = { showProfile = false })
+        return
+    }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
         // Header
@@ -80,7 +87,7 @@ fun ChatScreen(chatName: String, onBack: () -> Unit) {
                 // Icons
                 IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                IconButton(onClick = { }) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                IconButton(onClick = { showProfile = true }) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
             }
         }
         
