@@ -34,6 +34,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 data class MsgItem(
     val from_user: String,
@@ -43,11 +44,10 @@ data class MsgItem(
 )
 
 data class WsMsg(
-    val type: String = "message",
-    val from_user: String = "",
-    val to_user: String = "",
+    val type: String = "",
     val text: String = "",
-    val timestamp: String = ""
+    val from_user: String = "",
+    val time: Long = 0
 )
 
 @Composable
@@ -58,15 +58,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val context = LocalContext.current
-    val client = remember { OkHttpClient.Builder().pingInterval(30, java.util.concurrent.TimeUnit.SECONDS).build() }
+    val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
     var webSocket by remember { mutableStateOf<WebSocket?>(null) }
     
-    // Загрузка истории
+    // Подключение и загрузка истории
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
-                // Логинимся через POST
+                // 1. Логин
                 val loginJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                 val loginBody = loginJson.toRequestBody("application/json".toMediaType())
                 val loginReq = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
@@ -74,7 +74,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val loginData = gson.fromJson(loginResp.body?.string(), Map::class.java)
                 token = loginData["access_token"]?.toString() ?: ""
                 
-                // Загружаем сообщения
+                // 2. Загружаем историю
                 val msgReq = Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token")
@@ -84,16 +84,44 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(json, type)
                 isLoading = false
+                
+                // 3. Подключаем WebSocket
+                val wsUrl = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
+                val wsReq = Request.Builder().url(wsUrl).build()
+                webSocket = client.newWebSocket(wsReq, object : WebSocketListener() {
+                    override fun onOpen(webSocket: WebSocket, response: Response) {
+                        println("WS: connected as $myUsername")
+                    }
+                    
+                    override fun onMessage(webSocket: WebSocket, text: String) {
+                        try {
+                            val msg = gson.fromJson(text, WsMsg::class.java)
+                            if (msg.type == "message" && msg.text.isNotEmpty()) {
+                                val sender = msg.from_user.ifEmpty { chatUsername }
+                                val time = if (msg.time > 0) {
+                                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(msg.time * 1000))
+                                } else "now"
+                                
+                                val newMsg = MsgItem(sender, myUsername, msg.text, time)
+                                messages = messages + newMsg
+                            }
+                        } catch (e: Exception) { }
+                    }
+                    
+                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        println("WS: failed - ${t.message}")
+                    }
+                })
             } catch (e: Exception) {
                 isLoading = false
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
-                }
             }
         }
     }
     
-    // Автоскролл
+    DisposableEffect(Unit) {
+        onDispose { webSocket?.close(1000, "close") }
+    }
+    
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
     }
@@ -103,24 +131,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         if (text.isEmpty() || token.isEmpty()) return
         
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        
-        // Добавляем сразу
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         
-        // Отправляем через POST
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to text))
-                val body = sendJson.toRequestBody("application/json".toMediaType())
-                val req = Request.Builder()
-                    .url("http://2.26.71.102:8002/api/chat/send")
-                    .header("Authorization", "Bearer $token")
-                    .post(body)
-                    .build()
-                client.newCall(req).execute()
-            } catch (e: Exception) { }
-        }
+        // Отправляем через WebSocket
+        val wsMsg = gson.toJson(mapOf("type" to "message", "text" to text))
+        webSocket?.send(wsMsg)
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -149,11 +165,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         }
         
-        // Messages
         if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Primary)
-            }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
@@ -162,8 +175,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             ) {
                 item { Spacer(Modifier.height(16.dp)) }
                 items(messages) { msg ->
-                    val isMine = msg.from_user == myUsername
-                    MessageBubble(text = msg.text, time = msg.timestamp.takeLast(8), isMine = isMine)
+                    MessageBubble(text = msg.text, time = msg.timestamp.takeLast(8), isMine = msg.from_user == myUsername)
                 }
                 item { Spacer(Modifier.height(16.dp)) }
             }
@@ -198,14 +210,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                 }
                 Spacer(Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier.size(48.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send,
-                        "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp)
-                    )
+                Box(Modifier.size(48.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
+                    Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                 }
             }
         }
