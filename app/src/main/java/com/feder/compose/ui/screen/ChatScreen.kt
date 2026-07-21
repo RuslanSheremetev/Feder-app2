@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.feder.compose.WebSocketManager
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -35,7 +36,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 data class MsgItem(
     val from_user: String,
@@ -52,13 +52,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val context = LocalContext.current
-    val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
-    var ws by remember { mutableStateOf<WebSocket?>(null) }
     var wsStatus by remember { mutableStateOf("") }
+    val wsManager = remember { WebSocketManager() }
 
-    // Загрузка истории и токена
+    // Загрузка истории
     LaunchedEffect(chatUsername) {
+        val client = OkHttpClient()
         withContext(Dispatchers.IO) {
             try {
                 val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
@@ -72,38 +72,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { Toast.makeText(context, "Ошибка загрузки: ${e.message}", Toast.LENGTH_SHORT).show() }
+                withContext(Dispatchers.Main) { Toast.makeText(context, "Ошибка загрузки", Toast.LENGTH_SHORT).show() }
             }
             isLoading = false
         }
     }
 
-    // WebSocket подключение
-    DisposableEffect(token) {
-        if (token.isEmpty()) return@DisposableEffect onDispose { }
-        val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
-        val socket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                wsStatus = "connected"
-            }
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                try {
-                    val obj = JsonParser.parseString(text).asJsonObject
-                    if (obj.get("type")?.asString == "message") {
-                        val sender = obj.get("from_user")?.asString ?: chatUsername
-                        val msgText = obj.get("text")?.asString ?: return
-                        val timeVal = obj.get("time")?.asLong ?: 0
-                        val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-                        messages = messages + MsgItem(sender, myUsername, msgText, timeStr)
-                    }
-                } catch (e: Exception) { }
-            }
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                wsStatus = "error: ${t.message}"
-            }
-        })
-        ws = socket
-        onDispose { socket.close(1000, "close") }
+    // WebSocket через менеджер
+    LaunchedEffect(token) {
+        if (token.isEmpty()) return@LaunchedEffect
+        
+        wsManager.onMessage { sender, text, timeVal ->
+            val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
+            messages = messages + MsgItem(sender, myUsername, text, timeStr)
+        }
+        
+        wsManager.onStatus { status ->
+            wsStatus = status
+        }
+        
+        wsManager.connect(myUsername, token)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { wsManager.disconnect() }
     }
 
     LaunchedEffect(messages.size) {
@@ -118,9 +110,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
 
-        val json = gson.toJson(mapOf("type" to "message", "text" to text, "to_user" to chatUsername))
-        val sent = ws?.send(json) ?: false
-        if (!sent) Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
+        wsManager.send("message", text, chatUsername)
     }
 
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
