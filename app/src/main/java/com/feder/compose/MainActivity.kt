@@ -202,6 +202,102 @@ fun FederApp() {
         Box(Modifier.padding(padding)) {
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
+                else -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        // Поиск — появляется по нажатию на лупу
+                        item {
+                            AnimatedVisibility(
+                                visible = viewModel.isSearchVisible,
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 8.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = SurfaceContainerHigh
+                                ) {
+                                    Row(
+                                        modifier = Modifier.height(40.dp).padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        BasicTextField(
+                                            value = viewModel.searchQuery,
+                                            onValueChange = { viewModel.searchQuery = it },
+                                            singleLine = true,
+                                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                            cursorBrush = SolidColor(Primary),
+                                            modifier = Modifier.weight(1f),
+                                            decorationBox = { innerTextField ->
+                                                Box {
+                                                    if (viewModel.searchQuery.isEmpty()) {
+                                                        Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                                    }
+                                                    innerTextField()
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        // Список чатов
+                        items(viewModel.filteredChats) { chat ->
+                            val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
+                            val lastMsg = chat.lastMessage ?: ""
+                            val time = chat.timestamp ?: ""
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().clickable { viewModel.selectedChat = chat.username }.padding(horizontal = 16.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Аватар + онлайн-точка
+                                Box(Modifier.size(56.dp)) {
+                                    if (chat.avatarUrl != null) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current).data(chat.avatarUrl).crossfade(true).build(),
+                                            contentDescription = chat.name,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.size(56.dp).clip(CircleShape)
+                                        )
+                                    } else {
+                                        Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                            Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                    if (chat.online) {
+                                        Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
+                                    }
+                                }
+                                Spacer(Modifier.width(16.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                                        if (time.isNotEmpty()) {
+                                            Text(formatTimestamp(time), color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
+                                        }
+                                    }
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                        if (lastMsg.isNotEmpty()) {
+                                            Text(lastMsg, color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                                        }
+                                        if (chat.unread > 0) {
+                                            Box(Modifier.size(20.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
+                                                Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(viewModel.error!!, color = Error, fontSize = 14.sp)
