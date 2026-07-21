@@ -174,7 +174,7 @@ fun FederApp() {
                         Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text("Messenger", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                    Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
                     
                     // Кнопка поиска — иконка лупы как в дизайне
                     IconButton(onClick = {
