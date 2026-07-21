@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -43,13 +44,6 @@ data class MsgItem(
     val timestamp: String
 )
 
-data class WsMsg(
-    val type: String = "",
-    val text: String = "",
-    val from_user: String = "",
-    val time: Long = 0
-)
-
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -60,22 +54,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val context = LocalContext.current
     val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
-    var webSocket by remember { mutableStateOf<WebSocket?>(null) }
     
-    // Подключение и загрузка истории
+    // Загрузка истории через POST
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
-                // 1. Логин
                 val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                 val loginBody = authJson.toRequestBody("application/json".toMediaType())
                 val loginReq = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
                 val loginResp = client.newCall(loginReq).execute()
                 val authResponse = loginResp.body?.string() ?: ""
-                val loginObj = com.google.gson.JsonParser.parseString(authResponse).asJsonObject
-                token = loginObj.get("access_token")?.asString ?: ""
+                token = JsonParser.parseString(authResponse).asJsonObject.get("access_token")?.asString ?: ""
                 
-                // 2. Загружаем историю
                 val msgReq = Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token")
@@ -84,45 +74,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val json = msgResp.body?.string() ?: "[]"
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(json, type)
-                isLoading = false
-                
-                // 3. Подключаем WebSocket
-                val wsUrl = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
-                val wsReq = Request.Builder().url(wsUrl).build()
-                webSocket = client.newWebSocket(wsReq, object : WebSocketListener() {
-                    override fun onOpen(webSocket: WebSocket, response: Response) {
-                        println("WS: connected as $myUsername")
-                    }
-                    
-                    override fun onMessage(webSocket: WebSocket, text: String) {
-                        try {
-                            val msg = gson.fromJson(text, WsMsg::class.java)
-                            if (msg.type == "message" && msg.text.isNotEmpty()) {
-                                val sender = msg.from_user.ifEmpty { chatUsername }
-                                val time = if (msg.time > 0) {
-                                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(msg.time * 1000))
-                                } else "now"
-                                
-                                val newMsg = MsgItem(sender, myUsername, msg.text, time)
-                                messages = messages + newMsg
-                            }
-                        } catch (e: Exception) { }
-                    }
-                    
-                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                        println("WS: failed - ${t.message}")
-                    }
-                })
-            } catch (e: Exception) {
-                isLoading = false
-            }
+            } catch (e: Exception) { }
+            isLoading = false
         }
     }
     
-    DisposableEffect(Unit) {
-        onDispose { webSocket?.close(1000, "close") }
-    }
-    
+    // Автоскролл
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
     }
@@ -135,9 +92,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         
-        // Отправляем через WebSocket
-        val wsMsg = gson.toJson(mapOf("type" to "message", "text" to text))
-        webSocket?.send(wsMsg)
+        // Отправка через POST
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to text))
+                val body = sendJson.toRequestBody("application/json".toMediaType())
+                val req = Request.Builder()
+                    .url("http://2.26.71.102:8002/api/chat/send")
+                    .header("Authorization", "Bearer $token")
+                    .post(body).build()
+                client.newCall(req).execute()
+            } catch (e: Exception) { }
+        }
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -147,9 +113,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                }
+                IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 Box(modifier = Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
                     Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -169,14 +133,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         if (isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
         } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp), state = listState) {
                 item { Spacer(Modifier.height(16.dp)) }
                 items(messages) { msg ->
-                    MessageBubble(text = msg.text, time = msg.timestamp.takeLast(8), isMine = msg.from_user == myUsername)
+                    MessageBubble(msg.text, msg.timestamp.takeLast(8), msg.from_user == myUsername)
                 }
                 item { Spacer(Modifier.height(16.dp)) }
             }
@@ -184,30 +144,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         
         // Input
         Surface(color = Surface, shadowElevation = 8.dp) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).navigationBarsPadding(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).navigationBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(Modifier.weight(1f), shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh) {
                     Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                        }
-                        BasicTextField(
-                            value = inputText,
-                            onValueChange = { inputText = it },
-                            singleLine = true,
-                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
-                            cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.weight(1f).padding(vertical = 10.dp),
-                            decorationBox = { innerTextField ->
-                                if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
-                                innerTextField()
-                            }
-                        )
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.AttachFile, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                        }
+                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) { Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true, textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary), modifier = Modifier.weight(1f).padding(vertical = 10.dp), decorationBox = { innerTextField ->
+                            if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
+                            innerTextField()
+                        })
+                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) { Icon(Icons.Filled.AttachFile, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     }
                 }
                 Spacer(Modifier.width(8.dp))
@@ -221,10 +166,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
 
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-        horizontalAlignment = if (isMine) Alignment.End else Alignment.Start
-    ) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(
             modifier = Modifier.widthIn(max = 340.dp),
             shape = if (isMine) RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp) else RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp),
