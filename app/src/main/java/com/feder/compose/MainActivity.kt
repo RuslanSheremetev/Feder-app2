@@ -212,7 +212,53 @@ fun FederApp() {
                 }
             }
         },
-        bottomBar = {}
+        bottomBar = {
+            // Telegram pill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp)
+                    .navigationBarsPadding()
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                    color = SurfaceContainerHigh.copy(alpha = 0.9f),
+                    shadowElevation = 8.dp
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(
+                            "Chats" to Icons.Filled.Chat,
+                            "Stories" to Icons.Outlined.AutoAwesome,
+                            "Contacts" to Icons.Outlined.Contacts,
+                            "Settings" to Icons.Outlined.Settings
+                        ).forEachIndexed { i, (label, icon) ->
+                            val selected = viewModel.selectedTab == i
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(if (selected) Primary.copy(alpha = 0.15f) else Color.Transparent)
+                                    .clickable { viewModel.selectedTab = i }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    icon,
+                                    label,
+                                    tint = if (selected) Primary else OnSurfaceVariant,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
