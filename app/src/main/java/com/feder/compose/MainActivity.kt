@@ -307,7 +307,7 @@ fun FederApp() {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(28.dp),
-                    color = SurfaceContainerHigh,
+                    color = SurfaceContainerHigh.copy(alpha = 0.9f),
                     shadowElevation = 4.dp
                 ) {
                     Row(
