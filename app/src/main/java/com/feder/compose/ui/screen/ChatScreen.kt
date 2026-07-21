@@ -67,12 +67,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         withContext(Dispatchers.IO) {
             try {
                 // 1. Логин
-                val loginJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
-                val loginBody = loginJson.toRequestBody("application/json".toMediaType())
+                val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+                val loginBody = authJson.toRequestBody("application/json".toMediaType())
                 val loginReq = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
                 val loginResp = client.newCall(loginReq).execute()
-                val loginJson = loginResp.body?.string() ?: ""
-                val loginObj = com.google.gson.JsonParser.parseString(loginJson).asJsonObject
+                val authResponse = loginResp.body?.string() ?: ""
+                val loginObj = com.google.gson.JsonParser.parseString(authResponse).asJsonObject
                 token = loginObj.get("access_token")?.asString ?: ""
                 
                 // 2. Загружаем историю
