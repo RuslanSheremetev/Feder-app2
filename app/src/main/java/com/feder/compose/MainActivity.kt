@@ -209,16 +209,6 @@ fun FederApp() {
                         Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
-                viewModel.selectedChat != null -> {
-                    // Чат на весь экран без шапки и нижнего меню
-                    ChatScreen(
-                        chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
-                        chatUsername = viewModel.selectedChat ?: "",
-                        myUsername = "demo",
-                        onBack = { viewModel.selectedChat = null }
-                    )
-                }
-                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
                 viewModel.selectedProfile != null -> ContactProfileScreen(
                     contactName = viewModel.selectedProfile ?: "",
                     onBack = { viewModel.selectedProfile = null }
