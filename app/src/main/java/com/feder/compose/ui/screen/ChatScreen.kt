@@ -71,8 +71,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val loginBody = loginJson.toRequestBody("application/json".toMediaType())
                 val loginReq = Request.Builder().url("http://2.26.71.102:8002/api/login").post(loginBody).build()
                 val loginResp = client.newCall(loginReq).execute()
-                val loginData = gson.fromJson(loginResp.body?.string(), Map::class.java)
-                token = loginData["access_token"]?.toString() ?: ""
+                val loginJson = loginResp.body?.string() ?: ""
+                val loginObj = com.google.gson.JsonParser.parseString(loginJson).asJsonObject
+                token = loginObj.get("access_token")?.asString ?: ""
                 
                 // 2. Загружаем историю
                 val msgReq = Request.Builder()
