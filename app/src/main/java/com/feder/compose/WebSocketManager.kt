@@ -2,6 +2,7 @@ package com.feder.compose
 
 import android.os.Handler
 import android.os.Looper
+import com.google.gson.Gson
 import com.google.gson.JsonParser
 import okhttp3.*
 import java.util.concurrent.TimeUnit
@@ -11,6 +12,7 @@ class WebSocketManager(
     private val port: Int = 8002
 ) {
     private var webSocket: WebSocket? = null
+    private val gson = Gson()
     private val client = OkHttpClient.Builder()
         .pingInterval(30, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -19,48 +21,35 @@ class WebSocketManager(
     
     private var onMessageCallback: ((String, String, Long) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
-    
     private val mainHandler = Handler(Looper.getMainLooper())
     
     fun connect(username: String, token: String) {
-        // Закрываем предыдущее соединение
         disconnect()
-        
         val url = "ws://$serverUrl:$port/ws/$username?token=$token"
-        
-        // Создаём WebSocket в главном потоке через Handler
         mainHandler.post {
             try {
-                webSocket = client.newWebSocket(
-                    Request.Builder().url(url).build(),
-                    object : WebSocketListener() {
-                        override fun onOpen(webSocket: WebSocket, response: Response) {
-                            onStatusCallback?.invoke("connected")
-                        }
-                        
-                        override fun onMessage(webSocket: WebSocket, text: String) {
-                            try {
-                                val obj = JsonParser.parseString(text).asJsonObject
-                                if (obj.get("type")?.asString == "message") {
-                                    val sender = obj.get("from_user")?.asString ?: "unknown"
-                                    val msgText = obj.get("text")?.asString ?: return
-                                    val timeVal = obj.get("time")?.asLong ?: 0L
-                                    onMessageCallback?.invoke(sender, msgText, timeVal)
-                                }
-                            } catch (e: Exception) {
-                                // ignore parse errors
-                            }
-                        }
-                        
-                        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                            onStatusCallback?.invoke("error: ${t.message}")
-                        }
-                        
-                        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                            webSocket.close(1000, null)
-                        }
+                webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+                    override fun onOpen(webSocket: WebSocket, response: Response) {
+                        onStatusCallback?.invoke("connected")
                     }
-                )
+                    override fun onMessage(webSocket: WebSocket, text: String) {
+                        try {
+                            val obj = JsonParser.parseString(text).asJsonObject
+                            if (obj.get("type")?.asString == "message") {
+                                val sender = obj.get("from_user")?.asString ?: "unknown"
+                                val msgText = obj.get("text")?.asString ?: return
+                                val timeVal = obj.get("time")?.asLong ?: 0L
+                                onMessageCallback?.invoke(sender, msgText, timeVal)
+                            }
+                        } catch (e: Exception) { }
+                    }
+                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        onStatusCallback?.invoke("error: ${t.message}")
+                    }
+                    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                        webSocket.close(1000, null)
+                    }
+                })
             } catch (e: Exception) {
                 onStatusCallback?.invoke("error: ${e.message}")
             }
@@ -68,7 +57,7 @@ class WebSocketManager(
     }
     
     fun send(type: String, text: String, toUser: String) {
-        val json = """{"type":"$type","text":"$text","to_user":"$toUser"}"""
+        val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         webSocket?.send(json)
     }
     
