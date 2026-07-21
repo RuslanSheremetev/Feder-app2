@@ -96,7 +96,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-            messages = messages + MsgItem(sender, myUsername, text, timeStr)
+            // Не добавляем свои сообщения (эхо) — они уже есть
+            if (sender != myUsername) {
+                messages = messages + MsgItem(sender, myUsername, text, timeStr)
+            }
         }
         wsManager.onStatus { wsStatus = it }
         wsManager.connect(myUsername, token)
@@ -113,8 +116,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
-        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
