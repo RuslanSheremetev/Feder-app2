@@ -30,10 +30,10 @@ import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -55,27 +55,39 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val wsManager = remember { WebSocketManager() }
+    val httpClient = remember { OkHttpClient() }
 
-    // Загрузка истории
+    // Загрузка истории через enqueue (асинхронно, без корутин)
     LaunchedEffect(chatUsername) {
-        val client = OkHttpClient()
-        withContext(Dispatchers.IO) {
-            try {
-                val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
-                val body = authJson.toRequestBody("application/json".toMediaType())
-                val resp = client.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).execute()
-                token = JsonParser.parseString(resp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
-
-                val msgResp = client.newCall(Request.Builder()
-                    .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $token").build()).execute()
-                val type = object : TypeToken<List<MsgItem>>() {}.type
-                messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) { Toast.makeText(context, "Ошибка загрузки", Toast.LENGTH_SHORT).show() }
+        val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+        val body = authJson.toRequestBody("application/json".toMediaType())
+        
+        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                isLoading = false
             }
-            isLoading = false
-        }
+
+            override fun onResponse(call: Call, response: Response) {
+                val respBody = response.body?.string() ?: ""
+                token = try { JsonParser.parseString(respBody).asJsonObject.get("access_token")?.asString ?: "" } catch (e: Exception) { "" }
+                
+                // Загружаем историю
+                httpClient.newCall(Request.Builder()
+                    .url("http://2.26.71.102:8002/api/messages/$chatUsername")
+                    .header("Authorization", "Bearer $token")
+                    .build()).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        isLoading = false
+                    }
+                    override fun onResponse(call: Call, response: Response) {
+                        val json = response.body?.string() ?: "[]"
+                        val type = object : TypeToken<List<MsgItem>>() {}.type
+                        messages = gson.fromJson(json, type)
+                        isLoading = false
+                    }
+                })
+            }
+        })
     }
 
     // WebSocket через менеджер
@@ -86,11 +98,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             messages = messages + MsgItem(sender, myUsername, text, timeStr)
         }
-        
-        wsManager.onStatus { status ->
-            wsStatus = status
-        }
-        
+        wsManager.onStatus { wsStatus = it }
         wsManager.connect(myUsername, token)
     }
 
@@ -105,16 +113,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
-
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
-
         wsManager.send("message", text, chatUsername)
     }
 
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
-        // Header
         Surface(color = Surface, shadowElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
@@ -141,7 +146,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             item { Spacer(Modifier.height(16.dp)) }
         }
 
-        // Input
         Surface(color = Surface, shadowElevation = 8.dp) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).navigationBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(Modifier.weight(1f), shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh) {
