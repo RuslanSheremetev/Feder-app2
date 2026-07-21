@@ -290,7 +290,7 @@ fun FederApp() {
                                     }
                                 }
                             }
-                            HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
+                            
                         }
                     }
                 }
@@ -393,7 +393,7 @@ fun FederApp() {
                                     }
                                 }
                             }
-                            HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
+                            
                         }
                     }
                 }
