@@ -41,7 +41,8 @@ data class MsgItem(
     val from: String,
     val to: String,
     val text: String,
-    val time: String
+    val time: String,
+    var status: String = "sent"
 )
 
 @Composable
