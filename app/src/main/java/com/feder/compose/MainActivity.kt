@@ -130,7 +130,11 @@ class ChatViewModel : ViewModel() {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try { setContent { FederTheme { FederApp() } } }
+        try {
+            window.statusBarColor = 0x00000000  // прозрачный
+            window.navigationBarColor = 0x00000000  // прозрачный
+            setContent { FederTheme { FederApp() } }
+        }
         catch (e: Exception) { Toast.makeText(this, "Ошибка запуска", Toast.LENGTH_LONG).show() }
     }
 }
