@@ -67,16 +67,43 @@ data class ChatItem(
 
 fun formatTimestamp(timestamp: String): String {
     return try {
+        // timestamp format: "2026-07-21 10:42:00" или "2026-07-21 10:42"
         val parts = timestamp.split(" ")
         if (parts.size >= 2) {
-            val time = parts[1].split(":")
+            val datePart = parts[0]  // "2026-07-21"
+            val timePart = parts[1]  // "10:42:00" или "10:42"
+            val time = timePart.split(":")
             if (time.size >= 2) {
                 val hour = time[0].toInt()
                 val minute = time[1]
                 val ampm = if (hour >= 12) "PM" else "AM"
                 val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-                "$hour12:$minute $ampm"
-            } else timestamp.takeLast(8)
+                val timeStr = "$hour12:$minute $ampm"
+                
+                // Проверяем сегодня ли это
+                val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                if (datePart == today) {
+                    timeStr  // Сегодня — только время
+                } else {
+                    // Вчера?
+                    val cal = java.util.Calendar.getInstance()
+                    cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+                    val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(cal.time)
+                    if (datePart == yesterday) {
+                        "Yesterday"
+                    } else {
+                        // Показываем дату: "21 Jul"
+                        try {
+                            val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            val date = dateFormat.parse(datePart)
+                            val outFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
+                            outFormat.format(date!!)
+                        } catch (e: Exception) {
+                            datePart.takeLast(5)  // "07-21"
+                        }
+                    }
+                }
+            } else timePart
         } else timestamp.takeLast(8)
     } catch (e: Exception) { timestamp.takeLast(8) }
 }
