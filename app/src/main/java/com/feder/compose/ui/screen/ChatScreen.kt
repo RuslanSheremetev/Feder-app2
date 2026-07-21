@@ -98,7 +98,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             // Не добавляем свои сообщения (эхо) — они уже есть
             if (sender != myUsername) {
-                messages = messages + MsgItem(sender, myUsername, text, timeStr)
+                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received")
             }
         }
         wsManager.onStatus { wsStatus = it }
@@ -117,7 +117,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         val text = inputText.trim()
         if (text.isEmpty()) return
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        messages = messages + MsgItem(myUsername, chatUsername, text, now)
+        messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending")
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
@@ -170,11 +170,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
 }
 
 @Composable
-fun MessageBubble(text: String, time: String, isMine: Boolean) {
+fun MessageBubble(text: String, time: String, isMine: Boolean, status: String = "") {
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 340.dp), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
-        Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp)) {
+            Text(time, color = OnSurfaceVariant, fontSize = 11.sp)
+            if (isMine && status.isNotEmpty()) {
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = when (status) {
+                        "pending" -> "✓"
+                        "sent" -> "✓✓"
+                        else -> ""
+                    },
+                    color = if (status == "sent") Primary else OnSurfaceVariant,
+                    fontSize = 12.sp
+                )
+            }
+        }
     }
 }
