@@ -37,7 +37,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class MsgItem(val from_user: String, val to_user: String, val text: String, val timestamp: String)
+data class MsgItem(
+    val from_user: String,
+    val to_user: String,
+    val text: String,
+    val timestamp: String
+)
 
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
@@ -49,11 +54,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val context = LocalContext.current
     val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
-    val scope = rememberCoroutineScope()
     var ws by remember { mutableStateOf<WebSocket?>(null) }
     var wsStatus by remember { mutableStateOf("") }
-    
-    // История
+
+    // Загрузка истории и токена
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
@@ -61,22 +65,22 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val body = authJson.toRequestBody("application/json".toMediaType())
                 val resp = client.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).execute()
                 token = JsonParser.parseString(resp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
-                
+
                 val msgResp = client.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token").build()).execute()
-                messages = gson.fromJson(msgResp.body?.string() ?: "[]", object : TypeToken<List<MsgItem>>() {}.type)
+                val type = object : TypeToken<List<MsgItem>>() {}.type
+                messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show() }
+                withContext(Dispatchers.Main) { Toast.makeText(context, "Ошибка загрузки: ${e.message}", Toast.LENGTH_SHORT).show() }
             }
             isLoading = false
         }
     }
-    
-    // WebSocket через DisposableEffect — надёжнее
+
+    // WebSocket подключение
     DisposableEffect(token) {
         if (token.isEmpty()) return@DisposableEffect onDispose { }
-        
         val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
         val socket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -99,28 +103,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         })
         ws = socket
-        
         onDispose { socket.close(1000, "close") }
     }
-    
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
     }
-    
+
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
-        
+
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
-        
-        val json = gson.toJson(mapOf("type" to "message", "text" to text))
-        val ok = ws?.send(json) ?: false
-        if (!ok) Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
+
+        val json = gson.toJson(mapOf("type" to "message", "text" to text, "to_user" to chatUsername))
+        val sent = ws?.send(json) ?: false
+        if (!sent) Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
     }
-    
+
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
+        // Header
         Surface(color = Surface, shadowElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
@@ -139,12 +143,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
             }
         }
+
         if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
         else LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState) {
             item { Spacer(Modifier.height(16.dp)) }
             items(messages) { msg -> MessageBubble(msg.text, msg.timestamp.takeLast(8), msg.from_user == myUsername) }
             item { Spacer(Modifier.height(16.dp)) }
         }
+
+        // Input
         Surface(color = Surface, shadowElevation = 8.dp) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).navigationBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(Modifier.weight(1f), shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh) {
