@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -70,34 +69,14 @@ fun formatTimestamp(timestamp: String): String {
     return try {
         val parts = timestamp.split(" ")
         if (parts.size >= 2) {
-            val datePart = parts[0]
-            val timePart = parts[1]
-            val time = timePart.split(":")
+            val time = parts[1].split(":")
             if (time.size >= 2) {
                 val hour = time[0].toInt()
                 val minute = time[1]
                 val ampm = if (hour >= 12) "PM" else "AM"
                 val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-                val timeStr = "$hour12:$minute $ampm"
-                val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                if (datePart == today) {
-                    timeStr
-                } else {
-                    val cal = java.util.Calendar.getInstance()
-                    cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
-                    val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(cal.time)
-                    if (datePart == yesterday) {
-                        "Yesterday"
-                    } else {
-                        try {
-                            val df = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                            val d = df.parse(datePart)
-                            val out = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
-                            out.format(d!!)
-                        } catch (e: Exception) { datePart.takeLast(5) }
-                    }
-                }
-            } else timePart
+                "$hour12:$minute $ampm"
+            } else timestamp.takeLast(8)
         } else timestamp.takeLast(8)
     } catch (e: Exception) { timestamp.takeLast(8) }
 }
@@ -212,7 +191,47 @@ fun FederApp() {
                 }
             }
         },
-        bottomBar = {}
+        bottomBar = {
+            // Telegram pill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp)
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                    color = SurfaceContainerHigh.copy(alpha = 0.9f),
+                    shadowElevation = 8.dp
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(
+                            "Chats" to Icons.Filled.Chat,
+                            "Stories" to Icons.Outlined.AutoAwesome,
+                            "Contacts" to Icons.Outlined.Contacts,
+                            "Settings" to Icons.Outlined.Settings
+                        ).forEachIndexed { i, (l, ic) ->
+                            val selected = viewModel.selectedTab == i
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(if (selected) Primary.copy(alpha = 0.15f) else Color.Transparent)
+                                    .clickable { viewModel.selectedTab = i }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(ic, l, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
@@ -312,96 +331,7 @@ fun FederApp() {
                                     }
                                 }
                             }
-
-                        }
-                    }
-                }
-            }
-            
-        }
-        
-        // Floating pill
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-                .navigationBarsPadding()
-        ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
-                color = SurfaceContainerHigh.copy(alpha = 0.9f),
-                shadowElevation = 8.dp
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(4.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    listOf(
-                        "Chats" to Icons.Filled.Chat,
-                        "Stories" to Icons.Outlined.AutoAwesome,
-                        "Contacts" to Icons.Outlined.Contacts,
-                        "Settings" to Icons.Outlined.Settings
-                    ).forEachIndexed { i, (label, icon) ->
-                        val selected = viewModel.selectedTab == i
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(if (selected) Primary.copy(alpha = 0.15f) else Color.Transparent)
-                                .clickable { viewModel.selectedTab = i }
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                icon,
-                                label,
-                                tint = if (selected) Primary else OnSurfaceVariant,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                }
-            }
-            
-            // Floating pill
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 32.dp, vertical = 12.dp)
-                    .navigationBarsPadding()
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
-                    color = SurfaceContainerHigh.copy(alpha = 0.85f),
-                    shadowElevation = 8.dp
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(4.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        listOf(
-                            "Chats" to Icons.Filled.Chat,
-                            "Stories" to Icons.Outlined.AutoAwesome,
-                            "Contacts" to Icons.Outlined.Contacts,
-                            "Settings" to Icons.Outlined.Settings
-                        ).forEachIndexed { i, (label, icon) ->
-                            val selected = viewModel.selectedTab == i
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(if (selected) Primary.copy(alpha = 0.15f) else Color.Transparent)
-                                    .clickable { viewModel.selectedTab = i }
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                            }
+                            HorizontalDivider(color = SurfaceContainerHigh, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
                         }
                     }
                 }
