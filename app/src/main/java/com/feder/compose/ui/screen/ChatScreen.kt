@@ -62,8 +62,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
     var ws by remember { mutableStateOf<WebSocket?>(null) }
+    var wsError by remember { mutableStateOf<String?>(null) }
     
-    // Шаг 1: Загружаем историю через POST
+    // История
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
@@ -77,19 +78,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     .header("Authorization", "Bearer $token").build()).execute()
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
-            } catch (e: Exception) { }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "История: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
             isLoading = false
         }
     }
     
-    // Шаг 2: Подключаем WebSocket вручную через Dispatchers.Main
+    // WebSocket
     LaunchedEffect(token) {
         if (token.isEmpty()) return@LaunchedEffect
         try {
             val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
             ws = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
-                    println("WS: connected")
+                    wsError = null
                 }
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     try {
@@ -101,9 +106,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         }
                     } catch (e: Exception) { }
                 }
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) { }
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    wsError = "WS: ${t.message}"
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "WebSocket: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             })
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            wsError = "WS connect: ${e.message}"
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "WS подключение: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     
     DisposableEffect(Unit) {
@@ -122,9 +137,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         
-        // Отправляем через WebSocket
         val json = gson.toJson(mapOf("type" to "message", "text" to text))
-        ws?.send(json)
+        val sent = ws?.send(json) ?: false
+        if (!sent) {
+            Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
+        }
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -137,7 +154,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                 }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium); Text("online", color = Primary, fontSize = 11.sp) }
+                Column(Modifier.weight(1f)) { Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium); Text(if (wsError != null) wsError!! else "online", color = if (wsError != null) Error else Primary, fontSize = 11.sp) }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
