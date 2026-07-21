@@ -37,19 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class MsgItem(
-    val from_user: String,
-    val to_user: String,
-    val text: String,
-    val timestamp: String
-)
-
-data class WsMsg(
-    val type: String = "",
-    val text: String = "",
-    val from_user: String = "",
-    val time: Long = 0
-)
+data class MsgItem(val from_user: String, val to_user: String, val text: String, val timestamp: String)
 
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
@@ -61,8 +49,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val context = LocalContext.current
     val client = remember { OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build() }
     val gson = remember { Gson() }
+    val scope = rememberCoroutineScope()
     var ws by remember { mutableStateOf<WebSocket?>(null) }
-    var wsError by remember { mutableStateOf<String?>(null) }
+    var wsStatus by remember { mutableStateOf("") }
     
     // История
     LaunchedEffect(chatUsername) {
@@ -76,53 +65,42 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val msgResp = client.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token").build()).execute()
-                val type = object : TypeToken<List<MsgItem>>() {}.type
-                messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
+                messages = gson.fromJson(msgResp.body?.string() ?: "[]", object : TypeToken<List<MsgItem>>() {}.type)
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "История: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                withContext(Dispatchers.Main) { Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show() }
             }
             isLoading = false
         }
     }
     
-    // WebSocket
-    LaunchedEffect(token) {
-        if (token.isEmpty()) return@LaunchedEffect
-        try {
-            val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
-            ws = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
-                override fun onOpen(webSocket: WebSocket, response: Response) {
-                    wsError = null
-                }
-                override fun onMessage(webSocket: WebSocket, text: String) {
-                    try {
-                        val msg = gson.fromJson(text, WsMsg::class.java)
-                        if (msg.type == "message" && msg.text.isNotEmpty()) {
-                            val sender = msg.from_user.ifEmpty { chatUsername }
-                            val timeStr = if (msg.time > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(msg.time * 1000)) else "now"
-                            messages = messages + MsgItem(sender, myUsername, msg.text, timeStr)
-                        }
-                    } catch (e: Exception) { }
-                }
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    wsError = "WS: ${t.message}"
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "WebSocket: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
-        } catch (e: Exception) {
-            wsError = "WS connect: ${e.message}"
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, "WS подключение: ${e.message}", Toast.LENGTH_SHORT).show()
+    // WebSocket через DisposableEffect — надёжнее
+    DisposableEffect(token) {
+        if (token.isEmpty()) return@DisposableEffect onDispose { }
+        
+        val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
+        val socket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: Response) {
+                wsStatus = "connected"
             }
-        }
-    }
-    
-    DisposableEffect(Unit) {
-        onDispose { ws?.close(1000, "close") }
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                try {
+                    val obj = JsonParser.parseString(text).asJsonObject
+                    if (obj.get("type")?.asString == "message") {
+                        val sender = obj.get("from_user")?.asString ?: chatUsername
+                        val msgText = obj.get("text")?.asString ?: return
+                        val timeVal = obj.get("time")?.asLong ?: 0
+                        val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
+                        messages = messages + MsgItem(sender, myUsername, msgText, timeStr)
+                    }
+                } catch (e: Exception) { }
+            }
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                wsStatus = "error: ${t.message}"
+            }
+        })
+        ws = socket
+        
+        onDispose { socket.close(1000, "close") }
     }
     
     LaunchedEffect(messages.size) {
@@ -138,10 +116,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         inputText = ""
         
         val json = gson.toJson(mapOf("type" to "message", "text" to text))
-        val sent = ws?.send(json) ?: false
-        if (!sent) {
-            Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
-        }
+        val ok = ws?.send(json) ?: false
+        if (!ok) Toast.makeText(context, "Нет соединения", Toast.LENGTH_SHORT).show()
     }
     
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -154,7 +130,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                 }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium); Text(if (wsError != null) wsError!! else "online", color = if (wsError != null) Error else Primary, fontSize = 11.sp) }
+                Column(Modifier.weight(1f)) {
+                    Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
+                }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
