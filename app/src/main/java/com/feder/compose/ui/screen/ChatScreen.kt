@@ -116,6 +116,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
+        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
