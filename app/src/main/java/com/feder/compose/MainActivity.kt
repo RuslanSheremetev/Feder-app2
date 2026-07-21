@@ -209,10 +209,6 @@ fun FederApp() {
                         Button(onClick = { viewModel.refresh() }, colors = ButtonDefaults.buttonColors(containerColor = Primary)) { Text("Повторить", color = OnPrimary) }
                     }
                 }
-                viewModel.selectedProfile != null -> ContactProfileScreen(
-                    contactName = viewModel.selectedProfile ?: "",
-                    onBack = { viewModel.selectedProfile = null }
-                )
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         // Поиск — появляется по нажатию на лупу
