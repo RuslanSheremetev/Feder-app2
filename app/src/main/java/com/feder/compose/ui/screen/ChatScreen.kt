@@ -85,10 +85,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     // Шаг 2: Подключаем WebSocket вручную через Dispatchers.Main
     LaunchedEffect(token) {
         if (token.isEmpty()) return@LaunchedEffect
-        withContext(Dispatchers.Main) {
-            try {
-                val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
-                ws = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+        try {
+            val url = "ws://2.26.71.102:8002/ws/$myUsername?token=$token"
+            ws = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     println("WS: connected")
                 }
