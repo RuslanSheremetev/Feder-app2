@@ -174,7 +174,7 @@ fun FederApp() {
         topBar = {
             Surface(color = SurfaceContainerHigh.copy(alpha = 0.9f)) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow), contentAlignment = Alignment.Center) {
