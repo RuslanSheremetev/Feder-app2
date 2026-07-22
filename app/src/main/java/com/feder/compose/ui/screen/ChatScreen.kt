@@ -338,15 +338,26 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
 
                 Spacer(Modifier.height(16.dp))
 
-                // Caption input
-                Surface(Modifier.fillMaxWidth(), RoundedCornerShape(28.dp), color = SurfaceContainerHighest) {
-                    Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.EmojiEmotions, "emoji", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("Добавить подпись...", color = OnSurfaceVariant, fontSize = 14.sp)
-                        Spacer(Modifier.weight(1f))
-                        Box(Modifier.size(48.dp).clip(CircleShape).background(Primary), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Filled.Send, "send", tint = OnPrimary, modifier = Modifier.size(24.dp))
+                // Input like in chat
+                var attachCaption by remember { mutableStateOf("") }
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
+                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.EmojiEmotions, "emoji", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Spacer(Modifier.width(8.dp))
+                            BasicTextField(
+                                value = attachCaption,
+                                onValueChange = { attachCaption = it },
+                                singleLine = true,
+                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                cursorBrush = SolidColor(Primary),
+                                modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                                decorationBox = { if (attachCaption.isEmpty()) Text("Добавить подпись...", color = OnSurfaceVariant, fontSize = 14.sp); it() }
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { showAttachSheet = false }, contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                            }
                         }
                     }
                 }
