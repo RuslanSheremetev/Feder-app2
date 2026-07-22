@@ -170,6 +170,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                 }
             }
+            }
         }
     }
 }
