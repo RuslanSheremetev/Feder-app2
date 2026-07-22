@@ -144,14 +144,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         }
 
         if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
-        else LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState) {
+        else LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
             item { Spacer(Modifier.height(16.dp)) }
             items(messages) { msg -> MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername) }
             item { Spacer(Modifier.height(16.dp)) }
         }
 
-        Surface(color = Surface, shadowElevation = 8.dp) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).navigationBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
+        // Floating input like pill
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).navigationBarsPadding()
+        ) {
+            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Surface(Modifier.weight(1f), shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh) {
                     Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) { Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
