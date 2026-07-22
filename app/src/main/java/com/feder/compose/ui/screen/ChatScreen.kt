@@ -397,9 +397,9 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 }
 
 @Composable
-fun MessageBubble(text: String, time: String, isMine: Boolean) {
+fun MessageBubble(text: String, time: String, isMine: Boolean, onClick: (() -> Unit)? = null) {
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
-        Surface(Modifier.widthIn(max = 340.dp).clickable { selectedMessage = msg }, shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+        Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.clickable(onClick = onClick!!) else Modifier), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
         Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
