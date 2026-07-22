@@ -172,10 +172,10 @@ fun FederApp() {
     Scaffold(
         containerColor = Background,
         topBar = {
-            Row(
-                modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Color.Transparent).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                 }
@@ -188,6 +188,7 @@ fun FederApp() {
                     Icon(Icons.Filled.Search, "search", tint = Primary, modifier = Modifier.size(24.dp))
                 }
             }
+        }
         },
         bottomBar = {}
     ) { padding ->
