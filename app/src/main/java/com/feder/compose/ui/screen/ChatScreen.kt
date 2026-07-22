@@ -1,15 +1,18 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 package com.feder.compose.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -32,19 +35,19 @@ import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 data class MsgItem(
-    val from: String,
-    val to: String,
+    val from_user: String,
+    val to_user: String,
     val text: String,
-    val time: String,
-    var status: String = "sent"
+    val timestamp: String
 )
 
 @Composable
@@ -59,8 +62,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var wsStatus by remember { mutableStateOf("") }
     val wsManager = remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
+    var showAttachSheet by remember { mutableStateOf(false) }
 
-    // Загрузка истории
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
@@ -68,7 +71,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val body = authJson.toRequestBody("application/json".toMediaType())
                 val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).execute()
                 token = JsonParser.parseString(resp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
-                
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token").build()).execute()
@@ -79,24 +81,24 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         }
     }
 
-    // WebSocket через менеджер
     LaunchedEffect(token) {
         if (token.isEmpty()) return@LaunchedEffect
-        
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-            // Не добавляем свои сообщения (эхо) — они уже есть
-            if (sender != myUsername) {
-                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received")
+            if (sender == myUsername) {
+                messages = messages.map { msg ->
+                    if (msg.from_user == myUsername && msg.text == text && msg.timestamp == "pending") msg.copy(timestamp = timeStr)
+                    else msg
+                }
+            } else {
+                messages = messages + MsgItem(sender, myUsername, text, timeStr)
             }
         }
         wsManager.onStatus { wsStatus = it }
         wsManager.connect(myUsername, token)
     }
 
-    DisposableEffect(Unit) {
-        onDispose { wsManager.disconnect() }
-    }
+    DisposableEffect(Unit) { onDispose { wsManager.disconnect() } }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
@@ -106,83 +108,144 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         val text = inputText.trim()
         if (text.isEmpty()) return
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending")
+        messages = messages + MsgItem(myUsername, chatUsername, text, now)
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Background)) {
-        Surface(color = Surface, shadowElevation = 2.dp) {
-            Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
-                    Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                        Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header
+            Surface(color = Surface, shadowElevation = 2.dp) {
+                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
+                        Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                            Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
+                    }
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                }
+            }
+
+            if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
+            else {
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
+                    item { Spacer(Modifier.height(16.dp)) }
+                    items(messages) { msg ->
+                        MessageBubble(msg.text, msg.timestamp.takeLast(8), msg.from_user == myUsername)
+                    }
+                    item { Spacer(Modifier.height(16.dp)) }
+                }
+            }
+
+            // Input
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        }
+                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true,
+                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
+                            modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                            decorationBox = { innerTextField ->
+                                if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
+                                innerTextField()
+                            })
+                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Filled.AttachFile, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        }
+                        Spacer(Modifier.width(4.dp))
+                        Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
+                            Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                        }
                     }
                 }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                    Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
-                }
-                IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
             }
         }
 
-        if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
-        else LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
-            item { Spacer(Modifier.height(16.dp)) }
-            items(messages) { msg -> MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername) }
-            item { Spacer(Modifier.height(16.dp)) }
-        }
-
-        // Floating input like pill
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(Modifier.weight(1f), shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh) {
-                    Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) { Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true, textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary), modifier = Modifier.weight(1f).padding(vertical = 10.dp), decorationBox = { innerTextField ->
-                            if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp); innerTextField()
-                        })
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) { Icon(Icons.Filled.AttachFile, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+        // Attach Sheet
+        if (showAttachSheet) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false })
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+            ) {
+                // Gallery grid
+                Text("Недавние фото", color = OnSurface, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(12.dp))
+                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(6) { i ->
+                        Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh), contentAlignment = Alignment.Center) {
+                            if (i < 5) Icon(Icons.Filled.Image, "photo", tint = Outline, modifier = Modifier.size(32.dp))
+                            else Icon(Icons.Filled.PhotoCamera, "camera", tint = Outline, modifier = Modifier.size(32.dp))
+                        }
                     }
                 }
-                Spacer(Modifier.width(8.dp))
-                Box(Modifier.size(48.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
-                    Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+
+                Spacer(Modifier.height(16.dp))
+
+                // Attach options
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    AttachOption(Icons.Filled.Image, "Галерея", true)
+                    AttachOption(Icons.Filled.PhotoCamera, "Камера")
+                    AttachOption(Icons.Filled.Description, "Файл")
+                    AttachOption(Icons.Filled.LocationOn, "Локация")
+                    AttachOption(Icons.Filled.Person, "Контакт")
                 }
-            }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Caption input
+                Surface(Modifier.fillMaxWidth(), RoundedCornerShape(28.dp), color = SurfaceContainerHighest) {
+                    Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.EmojiEmotions, "emoji", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Добавить подпись...", color = OnSurfaceVariant, fontSize = 14.sp)
+                        Spacer(Modifier.weight(1f))
+                        Box(Modifier.size(48.dp).clip(CircleShape).background(Primary), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Filled.Send, "send", tint = OnPrimary, modifier = Modifier.size(24.dp))
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun MessageBubble(text: String, time: String, isMine: Boolean, status: String = "") {
+fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
+                .background(if (selected) PrimaryContainer else SurfaceContainerHigh),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, label, tint = if (selected) OnPrimaryContainer else OnSurfaceVariant, modifier = Modifier.size(28.dp))
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(label, color = if (selected) Primary else OnSurfaceVariant, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun MessageBubble(text: String, time: String, isMine: Boolean) {
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 340.dp), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp)) {
-            Text(time, color = OnSurfaceVariant, fontSize = 11.sp)
-            if (isMine && status.isNotEmpty()) {
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = when (status) {
-                        "pending" -> "✓"
-                        "sent" -> "✓✓"
-                        else -> ""
-                    },
-                    color = if (status == "sent") Primary else OnSurfaceVariant,
-                    fontSize = 12.sp
-                )
-            }
-        }
+        Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
     }
 }
