@@ -232,16 +232,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                 }
                 
-                // Forward button
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { showForward = false; selectedMessage = null },
-                    shape = RoundedCornerShape(28.dp),
-                    color = PrimaryContainer
-                ) {
-                    Row(Modifier.padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Forward to chats", color = OnPrimaryContainer, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                        Spacer(Modifier.width(8.dp))
-                        Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(20.dp))
+                // Input field like in chat
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).navigationBarsPadding()) {
+                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            var forwardText by remember { mutableStateOf("") }
+                            BasicTextField(
+                                value = forwardText,
+                                onValueChange = { forwardText = it },
+                                singleLine = true,
+                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                cursorBrush = SolidColor(Primary),
+                                modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                                decorationBox = { if (forwardText.isEmpty()) Text("Add comment...", color = OnSurfaceVariant, fontSize = 14.sp); it() }
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Box(
+                                Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { showForward = false; selectedMessage = null },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }
