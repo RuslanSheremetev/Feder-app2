@@ -172,28 +172,20 @@ fun FederApp() {
     Scaffold(
         containerColor = Background,
         topBar = {
-                Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 0.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
-                    
-                    // Кнопка поиска — иконка лупы как в дизайне
-                    IconButton(onClick = {
-                        viewModel.isSearchVisible = !viewModel.isSearchVisible
-                        if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
-                    }) {
-                        Icon(
-                            Icons.Filled.Search,
-                            "search",
-                            tint = Primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+            Row(
+                modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    viewModel.isSearchVisible = !viewModel.isSearchVisible
+                    if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
+                }) {
+                    Icon(Icons.Filled.Search, "search", tint = Primary, modifier = Modifier.size(24.dp))
                 }
             }
         },
