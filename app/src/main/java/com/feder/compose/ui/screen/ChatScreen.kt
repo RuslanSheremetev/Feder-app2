@@ -99,7 +99,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         wsManager.connect(myUsername, token)
     }
 
-    DisposableEffect(Unit) { onDispose { wsManager.disconnect() } }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
