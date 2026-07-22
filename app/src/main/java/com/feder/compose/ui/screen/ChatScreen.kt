@@ -45,10 +45,11 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class MsgItem(
-    val from_user: String,
-    val to_user: String,
+    val from: String,
+    val to: String,
     val text: String,
-    val timestamp: String
+    val time: String,
+    var status: String = "sent"
 )
 
 @Composable
@@ -88,11 +89,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             if (sender == myUsername) {
                 messages = messages.map { msg ->
-                    if (msg.from_user == myUsername && msg.text == text && msg.timestamp == "pending") msg.copy(timestamp = timeStr)
+                    if (msg.from == myUsername && msg.text == text && msg.time == "pending") msg.copy(time = timeStr)
                     else msg
                 }
             } else {
-                messages = messages + MsgItem(sender, myUsername, text, timeStr)
+                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received")
             }
         }
         wsManager.onStatus { wsStatus = it }
@@ -108,7 +109,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         val text = inputText.trim()
         if (text.isEmpty()) return
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        messages = messages + MsgItem(myUsername, chatUsername, text, now)
+        messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending")
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
@@ -140,7 +141,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
-                        MessageBubble(msg.text, msg.timestamp.takeLast(8), msg.from_user == myUsername)
+                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername)
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }
