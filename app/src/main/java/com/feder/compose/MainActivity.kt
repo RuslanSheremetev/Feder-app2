@@ -172,7 +172,6 @@ fun FederApp() {
     Scaffold(
         containerColor = Background,
         topBar = {
-            Surface(color = SurfaceContainerHigh.copy(alpha = 0.9f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 0.dp),
                     verticalAlignment = Alignment.CenterVertically
