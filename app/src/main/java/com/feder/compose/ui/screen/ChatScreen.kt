@@ -58,37 +58,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val wsManager = remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
 
-    // Загрузка истории через enqueue (асинхронно, без корутин)
+    // Загрузка истории
     LaunchedEffect(chatUsername) {
-        val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
-        val body = authJson.toRequestBody("application/json".toMediaType())
-        
-        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                isLoading = false
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val respBody = response.body?.string() ?: ""
-                token = try { JsonParser.parseString(respBody).asJsonObject.get("access_token")?.asString ?: "" } catch (e: Exception) { "" }
+        withContext(Dispatchers.IO) {
+            try {
+                val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+                val body = authJson.toRequestBody("application/json".toMediaType())
+                val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).execute()
+                token = JsonParser.parseString(resp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
                 
-                // Загружаем историю
-                httpClient.newCall(Request.Builder()
+                val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $token")
-                    .build()).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        isLoading = false
-                    }
-                    override fun onResponse(call: Call, response: Response) {
-                        val json = response.body?.string() ?: "[]"
-                        val type = object : TypeToken<List<MsgItem>>() {}.type
-                        messages = gson.fromJson(json, type)
-                        isLoading = false
-                    }
-                })
-            }
-        })
+                    .header("Authorization", "Bearer $token").build()).execute()
+                val type = object : TypeToken<List<MsgItem>>() {}.type
+                messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
+            } catch (e: Exception) { }
+            isLoading = false
+        }
     }
 
     // WebSocket через менеджер
