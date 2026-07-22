@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,6 +67,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val wsManager = remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
+    var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var showDeleteSub by remember { mutableStateOf(false) }
 
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
@@ -141,6 +145,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
+                        val isMine = msg.from == myUsername
                         MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername)
                     }
                     item { Spacer(Modifier.height(16.dp)) }
@@ -173,6 +178,48 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         }
 
+        // Message action menu
+        if (selectedMessage != null) {
+            // Backdrop
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
+            
+            // Actions menu
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .padding(horizontal = 32.dp)
+                    .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
+                    .padding(8.dp)
+            ) {
+                // Reaction row
+                Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
+                        Text(emoji, fontSize = 24.sp, modifier = Modifier.clickable { selectedMessage = null })
+                    }
+                }
+                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
+                // Actions
+                MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
+                MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
+                MenuAction(Icons.Filled.Forward, "Переслать") { selectedMessage = null }
+                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
+                // Delete
+                Column {
+                    Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Delete, "delete", tint = Error, modifier = Modifier.size(24.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Удалить", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                        Icon(if (showDeleteSub) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, "expand", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                    }
+                    if (showDeleteSub) {
+                        MenuAction(null, "Удалить у меня", indent = true) { selectedMessage = null; showDeleteSub = false }
+                        MenuAction(null, "Удалить у всех", textColor = Error, indent = true) { selectedMessage = null; showDeleteSub = false }
+                    }
+                }
+            }
+        }
+        
         // Attach Sheet
         if (showAttachSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false })
@@ -241,10 +288,25 @@ fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: S
     }
 }
 
+
+@Composable
+fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: String, textColor: Color = OnSurface, indent: Boolean = false, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp).padding(start = if (indent) 24.dp else 0.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(icon, text, tint = Primary, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.width(12.dp))
+        }
+        Text(text, color = textColor, fontSize = 16.sp)
+    }
+}
+
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean) {
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
-        Surface(Modifier.widthIn(max = 340.dp), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+        Surface(Modifier.widthIn(max = 340.dp).combinedClickable(onClick = {}, onLongClick = { selectedMessage = msg }), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
         Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
