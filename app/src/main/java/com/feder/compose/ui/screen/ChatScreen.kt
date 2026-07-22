@@ -69,6 +69,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var showAttachSheet by remember { mutableStateOf(false) }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
     var showDeleteSub by remember { mutableStateOf(false) }
+    var showForward by remember { mutableStateOf(false) }
+    var forwardSearch by remember { mutableStateOf("") }
 
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
@@ -178,6 +180,73 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         }
 
+        // Forward screen
+        if (showForward && selectedMessage != null) {
+            Column(
+                modifier = Modifier.fillMaxSize().background(Background)
+            ) {
+                // Header
+                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { showForward = false }) { Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    Spacer(Modifier.width(8.dp))
+                    Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                }
+                
+                // Preview
+                Surface(Modifier.fillMaxWidth().padding(16.dp), RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text("Preview", color = Primary, fontSize = 12.sp)
+                        Spacer(Modifier.height(4.dp))
+                        Text(selectedMessage!!.text, color = OnSurface, fontSize = 14.sp, maxLines = 2)
+                    }
+                }
+                
+                // Search
+                Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp), RoundedCornerShape(28.dp), color = SurfaceContainerHigh) {
+                    Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        BasicTextField(value = forwardSearch, onValueChange = { forwardSearch = it }, singleLine = true,
+                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
+                            modifier = Modifier.weight(1f),
+                            decorationBox = { if (forwardSearch.isEmpty()) Text("Search chats...", color = Outline, fontSize = 14.sp); it() }
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(8.dp))
+                Text("Recipients", color = OnSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 16.dp))
+                Spacer(Modifier.height(8.dp))
+                
+                // Chat list for forward
+                LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+                    items(listOf("Alex Rivera", "Sarah Jenkins", "David Miller", "Elena Rodriguez")) { name ->
+                        Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Text(name, color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                            Icon(Icons.Filled.CheckCircle, "selected", tint = Primary, modifier = Modifier.size(24.dp))
+                        }
+                    }
+                }
+                
+                // Forward button
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { showForward = false; selectedMessage = null },
+                    shape = RoundedCornerShape(28.dp),
+                    color = PrimaryContainer
+                ) {
+                    Row(Modifier.padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Forward to chats", color = OnPrimaryContainer, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.width(8.dp))
+                        Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(20.dp))
+                    }
+                }
+            }
+        }
+        
         // Message action menu
         if (selectedMessage != null) {
             // Backdrop
@@ -202,7 +271,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 // Actions
                 MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
                 MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
-                MenuAction(Icons.Filled.Forward, "Переслать") { selectedMessage = null }
+                MenuAction(Icons.Filled.Forward, "Переслать") { showForward = true }
                 HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
                 // Delete
                 Column {
