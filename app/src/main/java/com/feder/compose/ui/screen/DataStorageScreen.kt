@@ -289,7 +289,7 @@ private fun SettingsItem(
             }
         }
         Icon(
-            if (showDropdown) Icons.Filled.ExpandMore else ArrowForward,
+            if (showDropdown) Icons.Filled.ExpandMore else Icons.Filled.ChevronRight,
             contentDescription = null,
             tint = OnSurfaceVariant,
             modifier = Modifier.size(20.dp)
