@@ -40,6 +40,12 @@ private val OnSurfaceVariant = Color(0xFFC2C6D0)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onBack: () -> Unit) {
+    var showTerms by remember { mutableStateOf(false) }
+
+    if (showTerms) {
+        TermsScreen(onBack = { showTerms = false })
+        return
+    }
     val scrollState = rememberScrollState()
     var searchText by remember { mutableStateOf("") }
 
@@ -115,7 +121,7 @@ fun HelpScreen(onBack: () -> Unit) {
                         .height(192.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(PrimaryContainer)
-                        .clickable { }
+                        .clickable(onClick = onClick)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -153,7 +159,7 @@ fun HelpScreen(onBack: () -> Unit) {
                         .height(192.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(SecondaryContainer)
-                        .clickable { }
+                        .clickable(onClick = onClick)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -199,7 +205,7 @@ fun HelpScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
             )
 
-            HelpItem(Icons.Filled.Policy, "Terms and Privacy Policy", "Review our latest guidelines")
+            HelpItem(Icons.Filled.Policy, "Terms and Privacy Policy", "Review our latest guidelines", onClick = { showTerms = true })
             HelpItem(Icons.Filled.Info, "App info", "Version 4.22.1 (Deep Dark)")
             HelpItem(Icons.Filled.BugReport, "Report a bug", "Help us improve the experience")
 
@@ -244,12 +250,12 @@ fun HelpScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun HelpItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String) {
+private fun HelpItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
