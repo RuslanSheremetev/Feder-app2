@@ -263,7 +263,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         // Message action menu
         if (selectedMessage != null) {
             // Backdrop
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false; showForward = false })
             
             // Actions menu
             Column(
@@ -284,7 +284,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 // Actions
                 MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
                 MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
-                MenuAction(Icons.Filled.Forward, "Переслать") { showForward = true }
+                MenuAction(Icons.Filled.Forward, "Переслать") { selectedMessage = selectedMessage; showForward = true }
                 HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
                 // Delete
                 Column {
