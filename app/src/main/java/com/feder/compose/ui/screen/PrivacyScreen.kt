@@ -38,7 +38,9 @@ fun PrivacyScreen(onBack: () -> Unit) {
     var showLastSeen by remember { mutableStateOf(false) }
     var showProfilePhoto by remember { mutableStateOf(false) }
     var showBlockedContacts by remember { mutableStateOf(false) }
+    var showStatus by remember { mutableStateOf(false) }
 
+    if (showStatus) { StatusScreen(onBack = { showStatus = false }); return }
     if (showBlockedContacts) { BlockedContactsScreen(onBack = { showBlockedContacts = false }); return }
     if (showProfilePhoto) { ProfilePhotoScreen(onBack = { showProfilePhoto = false }); return }
     if (showLastSeen) {
