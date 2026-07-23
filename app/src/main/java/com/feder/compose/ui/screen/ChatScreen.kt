@@ -290,7 +290,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     .fillMaxWidth()
                     .align(Alignment.Center)
                     .padding(horizontal = 32.dp)
-                    .background(SurfaceContainer, RoundedCornerShape(16.dp))
+                    .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
                     .padding(4.dp)
             ) {
                 MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
