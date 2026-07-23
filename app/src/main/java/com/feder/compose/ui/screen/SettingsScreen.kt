@@ -25,6 +25,13 @@ import com.feder.compose.ui.theme.*
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit = {}) {
+    var showAccount by remember { mutableStateOf(false) }
+
+    if (showAccount) {
+        AccountScreen(onBack = { showAccount = false })
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,9 +50,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
             }
             Text("Settings", color = Primary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
-        
         Spacer(Modifier.height(16.dp))
-        
         // Профиль
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(96.dp)) {
@@ -64,14 +69,11 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
                 Text("Edit Profile", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             }
         }
-        
         Spacer(Modifier.height(32.dp))
-        
-        SettingsCard(Icons.Filled.Person, "Account", "Security, change number")
+        SettingsCard(Icons.Filled.Person, "Account", "Security, change number", onClick = { showAccount = true })
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status")
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones")
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download")
-        
         var isDarkMode by remember { mutableStateOf(true) }
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
             Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -81,15 +83,14 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
                 Switch(checked = isDarkMode, onCheckedChange = { isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
-        
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us")
         Spacer(Modifier.height(32.dp))
     }
 }
 
 @Composable
-fun SettingsCard(icon: ImageVector, title: String, subtitle: String) {
-    Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { }, shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
+fun SettingsCard(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit = {}) {
+    Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable(onClick = onClick), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
         Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryContainer.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) { Icon(icon, title, tint = Primary, modifier = Modifier.size(24.dp)) }
             Spacer(Modifier.width(16.dp))
