@@ -149,7 +149,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
                         val isMine = msg.from == myUsername
-                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername)
+                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg })
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }
