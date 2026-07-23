@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -289,7 +290,7 @@ private fun SettingsItem(
             }
         }
         Icon(
-            if (showDropdown) Icons.Filled.ExpandMore else Icons.AutoMirrored.Filled.ArrowForward,
+            if (showDropdown) Icons.Filled.ExpandMore else ArrowForward,
             contentDescription = null,
             tint = OnSurfaceVariant,
             modifier = Modifier.size(20.dp)
