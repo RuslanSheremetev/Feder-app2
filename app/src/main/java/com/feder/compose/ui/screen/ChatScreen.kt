@@ -262,7 +262,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         }
         
         // Message action menu
-        if (selectedMessage != null) {
+        if (selectedMessage != null && !showForward) {
             // Backdrop
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false; showForward = false })
             
