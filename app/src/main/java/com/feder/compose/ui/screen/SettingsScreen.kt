@@ -26,9 +26,14 @@ import com.feder.compose.ui.theme.*
 @Composable
 fun SettingsScreen(onBack: () -> Unit = {}) {
     var showAccount by remember { mutableStateOf(false) }
+    var showPrivacy by remember { mutableStateOf(false) }
 
     if (showAccount) {
         AccountScreen(onBack = { showAccount = false })
+        return
+    }
+    if (showPrivacy) {
+        PrivacyScreen(onBack = { showPrivacy = false })
         return
     }
 
@@ -40,7 +45,6 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
             .padding(horizontal = 16.dp)
             .padding(bottom = 96.dp)
     ) {
-        // Header
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -51,7 +55,6 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
             Text("Settings", color = Primary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.height(16.dp))
-        // Профиль
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(96.dp)) {
                 Box(Modifier.size(96.dp).clip(CircleShape).background(SurfaceContainerLow).border(2.dp, PrimaryContainer, CircleShape).padding(4.dp)) {
@@ -71,7 +74,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         }
         Spacer(Modifier.height(32.dp))
         SettingsCard(Icons.Filled.Person, "Account", "Security, change number", onClick = { showAccount = true })
-        SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status")
+        SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status", onClick = { showPrivacy = true })
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones")
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download")
         var isDarkMode by remember { mutableStateOf(true) }
