@@ -245,13 +245,13 @@ fun TwoStepScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        Icons.Filled.Shield,
+                        Icons.Filled.Security,
                         contentDescription = null,
                         tint = Color(0xFF353534),
                         modifier = Modifier.size(64.dp)
                     )
                     Icon(
-                        Icons.Filled.Encrypted,
+                        Icons.Filled.Lock,
                         contentDescription = null,
                         tint = Color(0xFF353534),
                         modifier = Modifier.size(64.dp)

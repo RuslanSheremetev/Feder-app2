@@ -277,12 +277,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 32.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Background, Background)
-                        )
-                    ),
-                color = Color.Transparent
+                    .background(Color.Transparent)
             ) {
                 Button(
                     onClick = { },
@@ -426,4 +421,4 @@ private fun FeatureCard(icon: androidx.compose.ui.graphics.vector.ImageVector, l
     }
 }
 
-private fun Modifier.offset(y: dp): Modifier = this.then(Modifier.offset(y = y))
+
