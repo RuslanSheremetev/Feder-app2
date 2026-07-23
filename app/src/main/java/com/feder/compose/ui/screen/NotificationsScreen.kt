@@ -37,6 +37,12 @@ private val Secondary = Color(0xFFB5C8E2)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(onBack: () -> Unit) {
+    var showMessageTones by remember { mutableStateOf(false) }
+
+    if (showMessageTones) {
+        MessageTonesScreen(onBack = { showMessageTones = false })
+        return
+    }
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -79,7 +85,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
             // Messages Section
             SectionHeader("Messages")
             SettingsGroup {
-                InfoItem(Icons.Filled.MusicNote, "Message tones", "Default (Skyline)")
+                InfoItem(Icons.Filled.MusicNote, "Message tones", "Default (Skyline)", onClick = { showMessageTones = true })
                 InfoItem(Icons.Filled.Vibration, "Vibrate", "Default")
                 SwitchItem(Icons.Filled.Wysiwyg, "Popup notifications", "Always show popup", checked = true)
             }
