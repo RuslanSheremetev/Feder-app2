@@ -39,7 +39,9 @@ private val Secondary = Color(0xFFB5C8E2)
 fun NotificationsScreen(onBack: () -> Unit) {
     var showMessageTones by remember { mutableStateOf(false) }
     var showGroupTones by remember { mutableStateOf(false) }
+    var showCallTones by remember { mutableStateOf(false) }
 
+    if (showCallTones) { CallTonesScreen(onBack = { showCallTones = false }); return }
     if (showGroupTones) { GroupTonesScreen(onBack = { showGroupTones = false }); return }
     if (showMessageTones) {
         MessageTonesScreen(onBack = { showMessageTones = false })
@@ -106,7 +108,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
             // Calls Section
             SectionHeader("Calls")
             SettingsGroup {
-                InfoItem(Icons.Filled.Call, "Call tones", "Default (Messenger)")
+                InfoItem(Icons.Filled.Call, "Call tones", "Default (Messenger)", onClick = { showCallTones = true })
                 SwitchItem(Icons.Filled.Vibration, "Vibrate", "Enabled", checked = true)
             }
 
