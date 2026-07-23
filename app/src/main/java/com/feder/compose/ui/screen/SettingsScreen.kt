@@ -29,10 +29,12 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
     var showPrivacy by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
     var showDataStorage by remember { mutableStateOf(false) }
+    var showHelp by remember { mutableStateOf(false) }
 
     if (showAccount) { AccountScreen(onBack = { showAccount = false }); return }
     if (showPrivacy) { PrivacyScreen(onBack = { showPrivacy = false }); return }
     if (showNotifications) { NotificationsScreen(onBack = { showNotifications = false }); return }
+    if (showHelp) { HelpScreen(onBack = { showHelp = false }); return }
     if (showDataStorage) { DataStorageScreen(onBack = { showDataStorage = false }); return }
 
     Column(
