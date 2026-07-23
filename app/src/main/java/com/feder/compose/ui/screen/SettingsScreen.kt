@@ -27,6 +27,7 @@ import com.feder.compose.ui.theme.*
 fun SettingsScreen(onBack: () -> Unit = {}) {
     var showAccount by remember { mutableStateOf(false) }
     var showPrivacy by remember { mutableStateOf(false) }
+    var showNotifications by remember { mutableStateOf(false) }
 
     if (showAccount) {
         AccountScreen(onBack = { showAccount = false })
@@ -34,6 +35,10 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
     }
     if (showPrivacy) {
         PrivacyScreen(onBack = { showPrivacy = false })
+        return
+    }
+    if (showNotifications) {
+        NotificationsScreen(onBack = { showNotifications = false })
         return
     }
 
@@ -75,7 +80,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         Spacer(Modifier.height(32.dp))
         SettingsCard(Icons.Filled.Person, "Account", "Security, change number", onClick = { showAccount = true })
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status", onClick = { showPrivacy = true })
-        SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones")
+        SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones", onClick = { showNotifications = true })
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download")
         var isDarkMode by remember { mutableStateOf(true) }
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
