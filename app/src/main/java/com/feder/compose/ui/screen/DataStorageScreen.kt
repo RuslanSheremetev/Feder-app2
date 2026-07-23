@@ -38,6 +38,12 @@ private val OutlineVariant = Color(0xFF42474F)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DataStorageScreen(onBack: () -> Unit) {
+    var showManageStorage by remember { mutableStateOf(false) }
+
+    if (showManageStorage) {
+        ManageStorageScreen(onBack = { showManageStorage = false })
+        return
+    }
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -89,7 +95,8 @@ fun DataStorageScreen(onBack: () -> Unit) {
             SettingsItem(
                 icon = Icons.Filled.Storage,
                 title = "Storage management",
-                subtitle = "Clear cache and delete old media"
+                subtitle = "Clear cache and delete old media",
+                onClick = { showManageStorage = true }
             )
 
             Spacer(Modifier.height(16.dp))
@@ -240,12 +247,13 @@ private fun SettingsItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     subtitle: String,
-    showDropdown: Boolean = false
+    showDropdown: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -302,7 +310,7 @@ private fun SimpleItem(title: String, subtitle: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
