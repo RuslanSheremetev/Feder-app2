@@ -84,7 +84,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
                 Switch(checked = isDarkMode, onCheckedChange = { isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
-        SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us")
+        SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us", onClick = { showHelp = true })
         Spacer(Modifier.height(32.dp))
     }
 }
