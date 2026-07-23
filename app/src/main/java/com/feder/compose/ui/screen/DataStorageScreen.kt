@@ -311,7 +311,7 @@ private fun SettingsItem(
 }
 
 @Composable
-private fun SimpleItem(title: String, subtitle: String) {
+private fun SimpleItem(title: String, subtitle: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
