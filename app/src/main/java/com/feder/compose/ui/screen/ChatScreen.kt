@@ -8,6 +8,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -265,30 +266,39 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             // Backdrop
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false; showForward = false })
             
-            // Actions menu
+            // Reactions row — отдельная капсула
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(y = (-140).dp),
+                shape = RoundedCornerShape(40.dp),
+                color = SurfaceContainerHigh.copy(alpha = 0.9f),
+                shadowElevation = 8.dp
+            ) {
+                Row(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
+                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) {
+                            Text(emoji, fontSize = 20.sp)
+                        }
+                    }
+                }
+            }
+            
+            // Actions menu — отдельно
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center)
                     .padding(horizontal = 32.dp)
-                    .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
-                    .padding(8.dp)
+                    .background(SurfaceContainer, RoundedCornerShape(16.dp))
+                    .padding(4.dp)
             ) {
-                // Reaction row
-                Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
-                        Text(emoji, fontSize = 24.sp, modifier = Modifier.clickable { selectedMessage = null })
-                    }
-                }
-                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
-                // Actions
                 MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
                 MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
-                MenuAction(Icons.Filled.Forward, "Переслать") { selectedMessage = selectedMessage; showForward = true }
-                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f))
-                // Delete
+                MenuAction(Icons.Filled.Forward, "Переслать") { showForward = true }
+                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 12.dp))
                 Column {
-                    Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Delete, "delete", tint = Error, modifier = Modifier.size(24.dp))
                         Spacer(Modifier.width(12.dp))
                         Text("Удалить", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
