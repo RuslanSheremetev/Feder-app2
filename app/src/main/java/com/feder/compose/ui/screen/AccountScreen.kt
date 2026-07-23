@@ -211,7 +211,7 @@ private fun OptionsList() {
         SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onClick = { showSecurity = true })
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onClick = { showChangeNumber = true })
         TwoStepVerificationOption(onClick = { showTwoStep = true })
-        SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report")
+        SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onClick = { showRequestInfo = true })
 
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
