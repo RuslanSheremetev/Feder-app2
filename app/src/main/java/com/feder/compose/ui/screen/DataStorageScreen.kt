@@ -39,7 +39,9 @@ private val OutlineVariant = Color(0xFF42474F)
 @Composable
 fun DataStorageScreen(onBack: () -> Unit) {
     var showManageStorage by remember { mutableStateOf(false) }
+    var showNetworkUsage by remember { mutableStateOf(false) }
 
+    if (showNetworkUsage) { NetworkUsageScreen(onBack = { showNetworkUsage = false }); return }
     if (showManageStorage) {
         ManageStorageScreen(onBack = { showManageStorage = false })
         return
@@ -90,7 +92,8 @@ fun DataStorageScreen(onBack: () -> Unit) {
             SettingsItem(
                 icon = Icons.Filled.NetworkCheck,
                 title = "Network usage",
-                subtitle = "2.1 GB sent • 8.4 GB received"
+                subtitle = "2.1 GB sent • 8.4 GB received",
+                onClick = { showNetworkUsage = true }
             )
             SettingsItem(
                 icon = Icons.Filled.Storage,
