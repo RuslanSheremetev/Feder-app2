@@ -39,16 +39,11 @@ private val OnSurfaceVariant = Color(0xFFC2C6D0)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onBack: () -> Unit) {
-    var showTerms by remember { mutableStateOf(false) }
     var showChatWithUs by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
     if (showChatWithUs) { ChatWithUsScreen(onBack = { showChatWithUs = false }); return }
-    if (showTerms) {
-        TermsScreen(onBack = { showTerms = false })
-        return
-    }
 
     Scaffold(
         containerColor = Background,
@@ -213,7 +208,7 @@ fun HelpScreen(onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { showTerms = true },
+                    .clickable { },
                 color = SurfaceContainerLow,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
