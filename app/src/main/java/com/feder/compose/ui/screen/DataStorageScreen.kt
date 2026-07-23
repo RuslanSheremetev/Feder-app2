@@ -40,7 +40,9 @@ private val OutlineVariant = Color(0xFF42474F)
 fun DataStorageScreen(onBack: () -> Unit) {
     var showManageStorage by remember { mutableStateOf(false) }
     var showNetworkUsage by remember { mutableStateOf(false) }
+    var showMobileData by remember { mutableStateOf(false) }
 
+    if (showMobileData) { MobileDataScreen(onBack = { showMobileData = false }); return }
     if (showNetworkUsage) { NetworkUsageScreen(onBack = { showNetworkUsage = false }); return }
     if (showManageStorage) {
         ManageStorageScreen(onBack = { showManageStorage = false })
@@ -113,7 +115,7 @@ fun DataStorageScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
             Spacer(Modifier.height(8.dp))
-            SimpleItem("When using mobile data", "Photos")
+            SimpleItem("When using mobile data", "Photos", onClick = { showMobileData = true })
             SimpleItem("When connected on Wi-Fi", "All media")
             SimpleItem("When roaming", "No media")
 
