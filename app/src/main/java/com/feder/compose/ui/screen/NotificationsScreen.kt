@@ -38,7 +38,9 @@ private val Secondary = Color(0xFFB5C8E2)
 @Composable
 fun NotificationsScreen(onBack: () -> Unit) {
     var showMessageTones by remember { mutableStateOf(false) }
+    var showGroupTones by remember { mutableStateOf(false) }
 
+    if (showGroupTones) { GroupTonesScreen(onBack = { showGroupTones = false }); return }
     if (showMessageTones) {
         MessageTonesScreen(onBack = { showMessageTones = false })
         return
@@ -95,7 +97,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
             // Groups Section
             SectionHeader("Groups")
             SettingsGroup {
-                InfoItem(Icons.Filled.Group, "Group tones", "Default (Pebble)")
+                InfoItem(Icons.Filled.Group, "Group tones", "Default (Pebble)", onClick = { showGroupTones = true })
                 InfoItem(Icons.Filled.Vibration, "Vibrate", "Off")
             }
 
