@@ -3,7 +3,6 @@ package com.feder.compose.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -56,7 +55,6 @@ fun AccountScreen(onBack: () -> Unit) {
     if (showRequestInfo) { RequestInfoScreen(onBack = { showRequestInfo = false }); return }
     if (showDeleteAccount) { DeleteAccountScreen(onBack = { showDeleteAccount = false }); return }
 
-    val scrollState = rememberScrollState()
     Scaffold(
         containerColor = Surface,
         topBar = {
@@ -72,7 +70,11 @@ fun AccountScreen(onBack: () -> Unit) {
         }
     ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(scrollState).padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
         ) {
             HeroSection()
             Spacer(Modifier.height(24.dp))
@@ -91,26 +93,59 @@ fun AccountScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun HeroSection() = Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
-    Box(Modifier.weight(2f).height(112.dp).clip(RoundedCornerShape(16.dp)).background(TonalLayer1).border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))) {
-        Row(Modifier.fillMaxSize().padding(24.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            Box(contentAlignment = Alignment.BottomEnd) {
-                AsyncImage("https://via.placeholder.com/80", null, Modifier.size(80.dp).clip(CircleShape).border(2.dp, PrimaryFixedDim, CircleShape), contentScale = ContentScale.Crop)
-                Box(Modifier.size(24.dp).clip(CircleShape).background(PrimaryFixedDim).border(2.dp, Surface, CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Verified, null, tint = OnPrimaryContainer, modifier = Modifier.size(16.dp))
+private fun HeroSection() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(2f)
+                .height(112.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(TonalLayer1)
+                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(24.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                Box(contentAlignment = Alignment.BottomEnd) {
+                    AsyncImage(
+                        model = "https://via.placeholder.com/80",
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp).clip(CircleShape).border(2.dp, PrimaryFixedDim, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier.size(24.dp).clip(CircleShape).background(PrimaryFixedDim).border(2.dp, Surface, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Verified, null, tint = OnPrimaryContainer, modifier = Modifier.size(16.dp))
+                    }
+                }
+                Column {
+                    Text("Alex Rivera", color = OnSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
+                    Text("+1 (555) 012-3456", color = OnSurfaceVariant, fontSize = 14.sp)
                 }
             }
-            Column {
-                Text("Alex Rivera", color = OnSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
-                Text("+1 (555) 012-3456", color = OnSurfaceVariant, fontSize = 14.sp)
-            }
         }
-    }
-    Box(Modifier.weight(1f).height(112.dp).clip(RoundedCornerShape(16.dp)).background(TonalLayer1).border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp)).clickable { }, contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Filled.CloudDone, null, tint = PrimaryFixedDim, modifier = Modifier.size(36.dp))
-            Text("Cloud Sync", color = OnSurfaceVariant, fontSize = 14.sp)
-            Text("Connected", color = Primary, fontSize = 11.sp)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(112.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(TonalLayer1)
+                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                .clickable { },
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(Icons.Filled.CloudDone, null, tint = PrimaryFixedDim, modifier = Modifier.size(36.dp))
+                Text("Cloud Sync", color = OnSurfaceVariant, fontSize = 14.sp)
+                Text("Connected", color = Primary, fontSize = 11.sp)
+            }
         }
     }
 }
@@ -122,75 +157,114 @@ private fun OptionsList(
     onTwoStep: () -> Unit,
     onRequestInfo: () -> Unit,
     onDeleteAccount: () -> Unit
-) = Column(Arrangement.spacedBy(4.dp)) {
-    SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onClick = onSecurity)
-    SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onClick = onChangeNumber)
-    TwoStepOption(onClick = onTwoStep)
-    SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onClick = onRequestInfo)
-    HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), color = OutlineVariant)
-    DeleteOption(onClick = onDeleteAccount)
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onSecurity)
+        SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
+        TwoStepOption(onTwoStep)
+        SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onRequestInfo)
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), color = OutlineVariant)
+        DeleteOption(onDeleteAccount)
+    }
 }
 
 @Composable
-private fun SettingsOption(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) = Row(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp), Arrangement.SpaceBetween, Alignment.CenterVertically
-) {
-    Row(Arrangement.spacedBy(16.dp), Alignment.CenterVertically) {
-        Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
-            Icon(icon, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+private fun SettingsOption(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
+                Icon(icon, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+            }
+            Column {
+                Text(title, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text(subtitle, color = OnSurfaceVariant, fontSize = 14.sp)
+            }
         }
-        Column {
-            Text(title, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-            Text(subtitle, color = OnSurfaceVariant, fontSize = 14.sp)
-        }
-    }
-    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Outline, modifier = Modifier.size(20.dp))
-}
-
-@Composable
-private fun TwoStepOption(onClick: () -> Unit) = Row(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp), Arrangement.SpaceBetween, Alignment.CenterVertically
-) {
-    Row(Arrangement.spacedBy(16.dp), Alignment.CenterVertically) {
-        Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.VerifiedUser, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
-        }
-        Column {
-            Text("Two-step verification", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-            Text("Extra layer of security", color = OnSurfaceVariant, fontSize = 14.sp)
-        }
-    }
-    Row(Arrangement.spacedBy(8.dp), Alignment.CenterVertically) {
-        Text("On", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
         Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Outline, modifier = Modifier.size(20.dp))
     }
 }
 
 @Composable
-private fun DeleteOption(onClick: () -> Unit) = Row(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp), Arrangement.SpaceBetween, Alignment.CenterVertically
-) {
-    Row(Arrangement.spacedBy(16.dp), Alignment.CenterVertically) {
-        Box(Modifier.size(48.dp).clip(CircleShape).background(ErrorContainer.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Delete, null, tint = Error, modifier = Modifier.size(24.dp))
+private fun TwoStepOption(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
+                Icon(Icons.Filled.VerifiedUser, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+            }
+            Column {
+                Text("Two-step verification", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Extra layer of security", color = OnSurfaceVariant, fontSize = 14.sp)
+            }
         }
-        Column {
-            Text("Delete account", color = Error, fontWeight = FontWeight.W500, fontSize = 16.sp)
-            Text("Permanently erase your data", color = OnSurfaceVariant, fontSize = 14.sp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("On", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Outline, modifier = Modifier.size(20.dp))
         }
     }
 }
 
 @Composable
-private fun PrivacyTipCard() = Box(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(TonalLayer1).border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
-) {
-    Column(Modifier.padding(24.dp)) {
-        Row(Arrangement.spacedBy(8.dp), Alignment.CenterVertically) {
-            Icon(Icons.Filled.Lightbulb, null, tint = Primary, modifier = Modifier.size(20.dp))
-            Text("PRIVACY TIP", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp, letterSpacing = 2.sp)
+private fun DeleteOption(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(48.dp).clip(CircleShape).background(ErrorContainer.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Filled.Delete, null, tint = Error, modifier = Modifier.size(24.dp))
+            }
+            Column {
+                Text("Delete account", color = Error, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Permanently erase your data", color = OnSurfaceVariant, fontSize = 14.sp)
+            }
         }
-        Spacer(Modifier.height(8.dp))
-        Text("Keep your primary phone number updated to ensure you never lose access to your encrypted chat history and media backups.", color = OnSurface, fontSize = 14.sp)
+    }
+}
+
+@Composable
+private fun PrivacyTipCard() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(TonalLayer1)
+            .border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.Lightbulb, null, tint = Primary, modifier = Modifier.size(20.dp))
+                Text("PRIVACY TIP", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp, letterSpacing = 2.sp)
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Keep your primary phone number updated to ensure you never lose access to your encrypted chat history and media backups.",
+                color = OnSurface,
+                fontSize = 14.sp
+            )
+        }
     }
 }
