@@ -46,7 +46,7 @@ fun HelpScreen(onBack: () -> Unit) {
 
     if (showChatWithUs) { ChatWithUsScreen(onBack = { showChatWithUs = false }); return }
     if (showTerms) {
-        com.feder.compose.ui.screen.TermsScreen(onBack = { showTerms = false })
+        TermsScreen(onBack = { showTerms = false })
         return
     }
 
