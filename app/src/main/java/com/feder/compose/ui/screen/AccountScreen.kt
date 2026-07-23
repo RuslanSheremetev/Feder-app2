@@ -42,6 +42,12 @@ private val ErrorContainer = Color(0xFF93000A)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(onBack: () -> Unit) {
+    var showSecurity by remember { mutableStateOf(false) }
+
+    if (showSecurity) {
+        SecurityScreen(onBack = { showSecurity = false })
+        return
+    }
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -166,7 +172,7 @@ private fun HeroSection() {
                 .clip(RoundedCornerShape(16.dp))
                 .background(TonalLayer1)
                 .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-                .clickable { },
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -202,9 +208,9 @@ private fun HeroSection() {
 @Composable
 private fun OptionsList() {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption")
-        SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups")
-        TwoStepVerificationOption()
+        SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onClick = { showSecurity = true })
+        SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onClick = { showChangeNumber = true })
+        TwoStepVerificationOption(onClick = { showTwoStep = true })
         SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report")
 
         HorizontalDivider(
@@ -213,17 +219,17 @@ private fun OptionsList() {
             thickness = 1.dp
         )
 
-        DeleteAccountOption()
+        DeleteAccountOption(onClick = { showDeleteAccount = true })
     }
 }
 
 @Composable
-private fun SettingsOption(icon: ImageVector, title: String, subtitle: String) {
+private fun SettingsOption(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -276,12 +282,12 @@ private fun SettingsOption(icon: ImageVector, title: String, subtitle: String) {
 }
 
 @Composable
-private fun TwoStepVerificationOption() {
+private fun TwoStepVerificationOption(onClick = { showTwoStep = true }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -347,12 +353,12 @@ private fun TwoStepVerificationOption() {
 }
 
 @Composable
-private fun DeleteAccountOption() {
+private fun DeleteAccountOption(onClick = { showDeleteAccount = true }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
