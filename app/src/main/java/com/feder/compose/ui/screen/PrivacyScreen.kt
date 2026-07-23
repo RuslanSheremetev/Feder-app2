@@ -35,6 +35,12 @@ private val OnSecondaryContainer = Color(0xFFA4B7D0)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacyScreen(onBack: () -> Unit) {
+    var showLastSeen by remember { mutableStateOf(false) }
+
+    if (showLastSeen) {
+        LastSeenScreen(onBack = { showLastSeen = false })
+        return
+    }
     val scrollState = rememberScrollState()
 
     Scaffold(
