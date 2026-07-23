@@ -36,7 +36,9 @@ private val OnSecondaryContainer = Color(0xFFA4B7D0)
 @Composable
 fun PrivacyScreen(onBack: () -> Unit) {
     var showLastSeen by remember { mutableStateOf(false) }
+    var showProfilePhoto by remember { mutableStateOf(false) }
 
+    if (showProfilePhoto) { ProfilePhotoScreen(onBack = { showProfilePhoto = false }); return }
     if (showLastSeen) {
         LastSeenScreen(onBack = { showLastSeen = false })
         return
