@@ -28,19 +28,12 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
     var showAccount by remember { mutableStateOf(false) }
     var showPrivacy by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
+    var showDataStorage by remember { mutableStateOf(false) }
 
-    if (showAccount) {
-        AccountScreen(onBack = { showAccount = false })
-        return
-    }
-    if (showPrivacy) {
-        PrivacyScreen(onBack = { showPrivacy = false })
-        return
-    }
-    if (showNotifications) {
-        NotificationsScreen(onBack = { showNotifications = false })
-        return
-    }
+    if (showAccount) { AccountScreen(onBack = { showAccount = false }); return }
+    if (showPrivacy) { PrivacyScreen(onBack = { showPrivacy = false }); return }
+    if (showNotifications) { NotificationsScreen(onBack = { showNotifications = false }); return }
+    if (showDataStorage) { DataStorageScreen(onBack = { showDataStorage = false }); return }
 
     Column(
         modifier = Modifier
@@ -81,7 +74,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         SettingsCard(Icons.Filled.Person, "Account", "Security, change number", onClick = { showAccount = true })
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status", onClick = { showPrivacy = true })
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones", onClick = { showNotifications = true })
-        SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download")
+        SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download", onClick = { showDataStorage = true })
         var isDarkMode by remember { mutableStateOf(true) }
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
             Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
