@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +19,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val SurfaceContainerHighest = Color(0xFF353534)
+private val SurfaceVariant = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +50,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -49,7 +60,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Primary
                     )
                 },
                 navigationIcon = {
@@ -57,11 +68,11 @@ fun PrivacyScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -79,7 +90,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
             Text(
                 "Control who can see your personal info and which messages you receive.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp, letterSpacing = 0.25.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = OnSurfaceVariant
             )
 
             Spacer(Modifier.height(24.dp))
@@ -146,17 +157,17 @@ private fun SectionHeader(title: String) {
             fontSize = 14.sp,
             letterSpacing = 2.sp
         ),
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+        color = Primary.copy(alpha = 0.8f),
         modifier = Modifier.padding(horizontal = 4.dp, vertical = 12.dp)
     )
 }
 
 @Composable
 private fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
-    MaterialTheme.colorScheme.surface(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer
+        color = SurfaceContainer
     ) {
         Column(
             modifier = Modifier.padding(vertical = 4.dp),
@@ -187,7 +198,7 @@ private fun PrivacyItem(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = OnSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Column {
@@ -197,7 +208,7 @@ private fun PrivacyItem(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
                 Text(
                     subtitle,
@@ -205,7 +216,7 @@ private fun PrivacyItem(
                         fontSize = 14.sp,
                         letterSpacing = 0.25.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = OnSurfaceVariant
                 )
             }
         }
@@ -231,7 +242,7 @@ private fun FingerprintLockItem() {
             Icon(
                 Icons.Filled.Fingerprint,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = OnSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Column {
@@ -241,7 +252,7 @@ private fun FingerprintLockItem() {
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
                 Text(
                     if (enabled) "Enabled" else "Disabled",
@@ -249,7 +260,7 @@ private fun FingerprintLockItem() {
                         fontSize = 14.sp,
                         letterSpacing = 0.25.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = OnSurfaceVariant
                 )
             }
         }
@@ -259,9 +270,9 @@ private fun FingerprintLockItem() {
             onCheckedChange = { enabled = it },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                checkedTrackColor = PrimaryContainer,
                 uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                uncheckedTrackColor = SurfaceContainerHighest
             )
         )
     }
@@ -273,7 +284,7 @@ private fun EncryptionCard() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .background(SurfaceContainerHigh)
             .padding(24.dp)
     ) {
         Row(
@@ -283,7 +294,7 @@ private fun EncryptionCard() {
             Icon(
                 Icons.Filled.Lock,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Primary,
                 modifier = Modifier.size(20.dp)
             )
             Text(
@@ -292,7 +303,7 @@ private fun EncryptionCard() {
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = MaterialTheme.colorScheme.primary
+                color = Primary
             )
         }
 
@@ -304,7 +315,7 @@ private fun EncryptionCard() {
                 fontSize = 14.sp,
                 letterSpacing = 0.25.sp
             ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = OnSurfaceVariant
         )
     }
 }

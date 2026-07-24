@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +25,20 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val SurfaceContainerHighest = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,16 +73,16 @@ fun CallTonesScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
-                title = { Text("Call Tones", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Call Tones", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -99,15 +112,15 @@ fun CallTonesScreen(onBack: () -> Unit) {
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background.copy(alpha = 0.4f), MaterialTheme.colorScheme.background)
+                                colors = listOf(Color.Transparent, Background.copy(alpha = 0.4f), Background)
                             )
                         )
                 )
                 Column(
                     modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)
                 ) {
-                    Text("Call Tones", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W600, fontSize = 28.sp)
-                    Text("Personalize your velocity experience", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+                    Text("Call Tones", color = Primary, fontWeight = FontWeight.W600, fontSize = 28.sp)
+                    Text("Personalize your velocity experience", color = OnSurfaceVariant, fontSize = 14.sp)
                 }
             }
 
@@ -119,11 +132,11 @@ fun CallTonesScreen(onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Ringtones", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                MaterialTheme.colorScheme.surface(shape = RoundedCornerShape(50), color = MaterialTheme.colorScheme.secondaryContainer) {
+                Text("Ringtones", color = Primary, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Surface(shape = RoundedCornerShape(50), color = SecondaryContainer) {
                     Text(
                         "${ringtones.size} Available",
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        color = OnSecondaryContainer,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.W500,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -133,11 +146,11 @@ fun CallTonesScreen(onBack: () -> Unit) {
 
             Spacer(Modifier.height(8.dp))
 
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                color = SurfaceContainerLow,
+                border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.2f))
             ) {
                 Column {
                     ringtones.forEachIndexed { index, ringtone ->
@@ -148,8 +161,8 @@ fun CallTonesScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .then(
-                                    if (isSelected) Modifier.background(MaterialTheme.colorScheme.surfaceContainer).border(
-                                        4.dp, MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(0.dp)
+                                    if (isSelected) Modifier.background(SurfaceContainer).border(
+                                        4.dp, PrimaryContainer, RoundedCornerShape(0.dp)
                                     ) else Modifier
                                 )
                                 .clickable { selectedRingtone = index }
@@ -166,20 +179,20 @@ fun CallTonesScreen(onBack: () -> Unit) {
                                         .size(40.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh
+                                            if (isSelected) PrimaryContainer else SurfaceContainerHigh
                                         ),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         Icons.Filled.MusicNote,
                                         null,
-                                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        tint = if (isSelected) OnPrimaryContainer else OnSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
                                 Column {
-                                    Text(ringtone.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                                    Text(ringtone.description, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                                    Text(ringtone.name, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                                    Text(ringtone.description, color = OnSurfaceVariant, fontSize = 11.sp)
                                 }
                             }
                             Row(
@@ -190,12 +203,12 @@ fun CallTonesScreen(onBack: () -> Unit) {
                                     Icon(
                                         if (isPlaying) Icons.Filled.PauseCircle else Icons.Filled.PlayCircle,
                                         null,
-                                        tint = if (isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        tint = if (isPlaying) Primary else OnSurfaceVariant,
                                         modifier = Modifier.size(28.dp)
                                     )
                                 }
                                 if (isSelected) {
-                                    Icon(Icons.Filled.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                                    Icon(Icons.Filled.CheckCircle, null, tint = Primary, modifier = Modifier.size(24.dp))
                                 }
                             }
                         }
@@ -210,11 +223,11 @@ fun CallTonesScreen(onBack: () -> Unit) {
                 onClick = {},
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(2.dp, OutlineVariant.copy(alpha = 0.3f))
             ) {
-                Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+                Icon(Icons.Filled.Add, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Add Custom Ringtone", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                Text("Add Custom Ringtone", color = OnSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -222,7 +235,7 @@ fun CallTonesScreen(onBack: () -> Unit) {
             // Vibration
             Text(
                 "Vibration",
-                color = MaterialTheme.colorScheme.primary,
+                color = Primary,
                 fontWeight = FontWeight.W500,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -244,15 +257,15 @@ fun CallTonesScreen(onBack: () -> Unit) {
                             val vibration = vibrations[index]
                             val isSelected = selectedVibration == index
 
-                            MaterialTheme.colorScheme.surface(
+                            Surface(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(16.dp))
                                     .clickable { selectedVibration = index },
-                                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                color = SurfaceContainerLow,
                                 border = androidx.compose.foundation.BorderStroke(
                                     1.dp,
-                                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                                    if (isSelected) Primary else OutlineVariant.copy(alpha = 0.2f)
                                 )
                             ) {
                                 Column(
@@ -261,19 +274,19 @@ fun CallTonesScreen(onBack: () -> Unit) {
                                     Icon(
                                         vibration.icon,
                                         null,
-                                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        tint = if (isSelected) Primary else OnSurfaceVariant,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Spacer(Modifier.height(8.dp))
                                     Text(
                                         vibration.name,
-                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                        color = if (isSelected) Primary else OnSurface,
                                         fontWeight = FontWeight.W500,
                                         fontSize = 16.sp
                                     )
                                     Text(
                                         vibration.description,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = OnSurfaceVariant,
                                         fontSize = 11.sp
                                     )
                                 }
@@ -285,7 +298,7 @@ fun CallTonesScreen(onBack: () -> Unit) {
 
             Spacer(Modifier.height(24.dp))
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
 
             Spacer(Modifier.height(16.dp))
 
@@ -299,17 +312,17 @@ fun CallTonesScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(Icons.Filled.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("Ringtone Volume", color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
+                    Icon(Icons.Filled.VolumeUp, null, tint = OnSurfaceVariant)
+                    Text("Ringtone Volume", color = OnSurface, fontSize = 16.sp)
                 }
                 Slider(
                     value = volume,
                     onValueChange = { volume = it },
                     modifier = Modifier.width(150.dp),
                     colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.primaryContainer,
-                        activeTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                        thumbColor = PrimaryContainer,
+                        activeTrackColor = PrimaryContainer,
+                        inactiveTrackColor = SurfaceContainerHighest
                     )
                 )
             }
@@ -326,17 +339,17 @@ fun CallTonesScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(Icons.Filled.Vibration, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("Vibrate while ringing", color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
+                    Icon(Icons.Filled.Vibration, null, tint = OnSurfaceVariant)
+                    Text("Vibrate while ringing", color = OnSurface, fontSize = 16.sp)
                 }
                 Switch(
                     checked = vibrateWhileRinging,
                     onCheckedChange = { vibrateWhileRinging = it },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        checkedTrackColor = PrimaryContainer,
                         uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                        uncheckedTrackColor = SurfaceContainerHighest
                     )
                 )
             }

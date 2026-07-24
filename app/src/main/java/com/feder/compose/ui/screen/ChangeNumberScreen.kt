@@ -13,7 +13,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
+private val SecondaryContainer = Color(0xFF36485E)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +42,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
     var newNumber by remember { mutableStateOf("") }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -42,7 +52,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                 },
                 navigationIcon = {
@@ -50,12 +60,12 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    containerColor = Surface.copy(alpha = 0.8f)
                 )
             )
         }
@@ -89,13 +99,13 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
+                                .background(PrimaryContainer.copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Filled.SyncAlt,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = Primary,
                                 modifier = Modifier.size(36.dp)
                             )
                         }
@@ -119,13 +129,13 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 22.sp
                                 ),
-                                color = MaterialTheme.colorScheme.primary
+                                color = Primary
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 "Changing your phone number will migrate your account info, groups, and settings from your old number to the new one.",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = OnSurfaceVariant
                             )
                         }
                     }
@@ -158,7 +168,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = OnSurfaceVariant
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -167,7 +177,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                .background(SurfaceContainerHigh)
                                 .clickable { }
                                 .padding(horizontal = 16.dp),
                             contentAlignment = Alignment.Center
@@ -182,12 +192,12 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                                         fontWeight = FontWeight.W500,
                                         fontSize = 16.sp
                                     ),
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = Primary
                                 )
                                 Icon(
                                     Icons.Filled.ExpandMore,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = OnSurfaceVariant,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -198,7 +208,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                                 .weight(1f)
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                .background(SurfaceContainerHigh)
                                 .padding(horizontal = 16.dp),
                             contentAlignment = Alignment.CenterStart
                         ) {
@@ -206,15 +216,15 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                                 value = newNumber,
                                 onValueChange = { newNumber = it },
                                 placeholder = {
-                                    Text("Phone number", color = MaterialTheme.colorScheme.outline)
+                                    Text("Phone number", color = Outline)
                                 },
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
                                     focusedIndicatorColor = Color.Transparent,
                                     unfocusedIndicatorColor = Color.Transparent,
-                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                                    focusedTextColor = OnSurface,
+                                    unfocusedTextColor = OnSurface
                                 ),
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
@@ -232,7 +242,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.Filled.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = Primary,
                             modifier = Modifier.size(14.dp).offset(y = 2.dp)
                         )
                         Text(
@@ -241,7 +251,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 11.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -262,7 +272,7 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
             }
 
             // Next button fixed at bottom
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
@@ -276,8 +286,8 @@ fun ChangeNumberScreen(onBack: () -> Unit) {
                         .height(56.dp),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        containerColor = PrimaryContainer,
+                        contentColor = OnPrimaryContainer
                     )
                 ) {
                     Row(
@@ -324,7 +334,7 @@ private fun BentoCard(
                 fontWeight = FontWeight.W500,
                 fontSize = 14.sp
             ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = OnSurfaceVariant
         )
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -332,7 +342,7 @@ private fun BentoCard(
                 modifier = Modifier
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .background(SurfaceContainerHigh)
                     .clickable { }
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
@@ -347,12 +357,12 @@ private fun BentoCard(
                             fontWeight = FontWeight.W500,
                             fontSize = 16.sp
                         ),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Primary
                     )
                     Icon(
                         Icons.Filled.ExpandMore,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = OnSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -362,21 +372,21 @@ private fun BentoCard(
                     .weight(1f)
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .background(SurfaceContainerHigh)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 TextField(
                     value = value,
                     onValueChange = onValueChange,
-                    placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.outline) },
+                    placeholder = { Text(placeholder, color = Outline) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                        focusedTextColor = OnSurface,
+                        unfocusedTextColor = OnSurface
                     ),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -397,7 +407,7 @@ private fun FeatureCard(icon: androidx.compose.ui.graphics.vector.ImageVector, l
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Icon(icon, contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(8.dp))
             Text(
                 label,
@@ -405,7 +415,7 @@ private fun FeatureCard(icon: androidx.compose.ui.graphics.vector.ImageVector, l
                     fontWeight = FontWeight.W500,
                     fontSize = 11.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = OnSurfaceVariant
             )
         }
     }

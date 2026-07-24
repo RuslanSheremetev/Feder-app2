@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +21,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val PrimaryFixedDim = Color(0xFFA1C9FF)
+private val Secondary = Color(0xFFB5C8E2)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
+private val Error = Color(0xFFFFB4AB)
+private val ErrorContainer = Color(0xFF93000A)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +44,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -39,7 +54,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Primary
                     )
                 },
                 navigationIcon = {
@@ -47,12 +62,12 @@ fun TwoStepScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    containerColor = Surface.copy(alpha = 0.8f)
                 )
             )
         }
@@ -83,13 +98,13 @@ fun TwoStepScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
+                            .background(PrimaryContainer.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Filled.VerifiedUser,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primaryContainer,
+                            tint = PrimaryFixedDim,
                             modifier = Modifier.size(40.dp)
                         )
                     }
@@ -102,16 +117,16 @@ fun TwoStepScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W600,
                             fontSize = 24.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
 
                     Spacer(Modifier.height(8.dp))
 
                     // Status badge
-                    MaterialTheme.colorScheme.surface(
+                    Surface(
                         shape = RoundedCornerShape(50),
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+                        color = SecondaryContainer.copy(alpha = 0.3f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SecondaryContainer.copy(alpha = 0.5f))
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
@@ -122,7 +137,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .background(PrimaryContainer)
                             )
                             Text(
                                 "Status: On",
@@ -130,7 +145,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 14.sp
                                 ),
-                                color = MaterialTheme.colorScheme.secondary
+                                color = Secondary
                             )
                         }
                     }
@@ -140,11 +155,11 @@ fun TwoStepScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Why it matters card
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                color = SurfaceContainerLow,
+                border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -153,7 +168,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.Info,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Primary,
                         modifier = Modifier.size(20.dp)
                     )
                     Column {
@@ -163,13 +178,13 @@ fun TwoStepScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 16.sp
                             ),
-                            color = MaterialTheme.colorScheme.primary
+                            color = Primary
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             "Two-step verification adds a layer of security by requiring a PIN when registering your phone number with Midnight Velocity again. This prevents unauthorized access even if your SIM card is stolen.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -185,7 +200,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                     fontSize = 14.sp,
                     letterSpacing = 1.sp
                 ),
-                color = MaterialTheme.colorScheme.outline,
+                color = Outline,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
             )
 
@@ -193,24 +208,24 @@ fun TwoStepScreen(onBack: () -> Unit) {
             TwoStepAction(
                 icon = Icons.Filled.Cancel,
                 title = "Disable",
-                iconTint = MaterialTheme.colorScheme.error,
-                iconBg = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+                iconTint = Error,
+                iconBg = ErrorContainer.copy(alpha = 0.2f)
             )
 
             // Change PIN
             TwoStepAction(
                 icon = Icons.Filled.Password,
                 title = "Change PIN",
-                iconTint = MaterialTheme.colorScheme.primaryContainer,
-                iconBg = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
+                iconTint = PrimaryFixedDim,
+                iconBg = PrimaryContainer.copy(alpha = 0.1f)
             )
 
             // Change Email
             TwoStepAction(
                 icon = Icons.Filled.AlternateEmail,
                 title = "Change email address",
-                iconTint = MaterialTheme.colorScheme.primaryContainer,
-                iconBg = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
+                iconTint = PrimaryFixedDim,
+                iconBg = PrimaryContainer.copy(alpha = 0.1f)
             )
 
             Spacer(Modifier.height(24.dp))
@@ -221,7 +236,7 @@ fun TwoStepScreen(onBack: () -> Unit) {
                     .fillMaxWidth()
                     .height(128.dp)
                     .clip(RoundedCornerShape(24.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f), RoundedCornerShape(24.dp))
+                    .border(1.dp, OutlineVariant.copy(alpha = 0.2f), RoundedCornerShape(24.dp))
                     .background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
@@ -291,13 +306,13 @@ private fun TwoStepAction(
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = OnSurface
             )
         }
         Icon(
             Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = OnSurfaceVariant,
             modifier = Modifier.size(20.dp)
         )
     }

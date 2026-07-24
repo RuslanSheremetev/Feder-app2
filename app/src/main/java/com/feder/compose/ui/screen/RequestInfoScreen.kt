@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +21,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceVariant = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val PrimaryFixedDim = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +45,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
     var requestDate by remember { mutableStateOf("") }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -41,7 +55,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                 },
                 navigationIcon = {
@@ -49,11 +63,11 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -76,13 +90,13 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer),
+                        .background(SecondaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.Assessment,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        tint = OnSecondaryContainer,
                         modifier = Modifier.size(48.dp)
                     )
                 }
@@ -95,7 +109,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W600,
                         fontSize = 24.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -103,7 +117,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                 Text(
                     "Create a report of your account settings and information to download at any time.",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = OnSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
@@ -126,14 +140,14 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.Schedule,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        tint = PrimaryFixedDim,
                         modifier = Modifier.size(20.dp)
                     )
                     Column {
                         Text(
                             "Your report will be ready in about",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                         Text(
                             "3 days",
@@ -141,18 +155,18 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = MaterialTheme.colorScheme.primaryContainer
+                            color = PrimaryFixedDim
                         )
                         Text(
                             ". You'll have a few weeks to download it after it's available.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
                             "Requesting a report won't delete any of your data.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -174,10 +188,10 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                     .height(56.dp),
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                    disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
+                    containerColor = PrimaryContainer,
+                    contentColor = OnPrimaryContainer,
+                    disabledContainerColor = PrimaryContainer.copy(alpha = 0.5f),
+                    disabledContentColor = OnPrimaryContainer.copy(alpha = 0.5f)
                 ),
                 enabled = !isRequested
             ) {
@@ -210,7 +224,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                     fontSize = 14.sp,
                     letterSpacing = 2.sp
                 ),
-                color = MaterialTheme.colorScheme.primary
+                color = Primary
             )
 
             Spacer(Modifier.height(16.dp))
@@ -238,13 +252,13 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    .background(SurfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Filled.PendingActions,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = OnSurfaceVariant,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -255,7 +269,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                                         fontWeight = FontWeight.W500,
                                         fontSize = 16.sp
                                     ),
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = OnSurface
                                 )
                                 Text(
                                     "Requested on $requestDate",
@@ -263,13 +277,13 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                                         fontWeight = FontWeight.W500,
                                         fontSize = 11.sp
                                     ),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = OnSurfaceVariant
                                 )
                             }
                         }
-                        MaterialTheme.colorScheme.surface(
+                        Surface(
                             shape = RoundedCornerShape(50),
-                            color = MaterialTheme.colorScheme.secondaryContainer
+                            color = SecondaryContainer
                         ) {
                             Text(
                                 "Pending",
@@ -277,7 +291,7 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 11.sp
                                 ),
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                color = OnSecondaryContainer,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                             )
                         }
@@ -288,21 +302,21 @@ fun RequestInfoScreen(onBack: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                        .border(2.dp, OutlineVariant, RoundedCornerShape(12.dp))
                         .padding(48.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
                         Icons.Filled.History,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline,
+                        tint = Outline,
                         modifier = Modifier.size(40.dp)
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
                         "No reports requested yet.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = OnSurfaceVariant
                     )
                 }
             }

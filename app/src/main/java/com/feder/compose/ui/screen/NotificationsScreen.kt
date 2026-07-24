@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val SurfaceContainerHighest = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val Secondary = Color(0xFFB5C8E2)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +50,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -50,7 +60,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                 },
                 navigationIcon = {
@@ -58,11 +68,11 @@ fun NotificationsScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -119,17 +129,17 @@ private fun SectionHeader(title: String) {
             fontSize = 14.sp,
             letterSpacing = 2.sp
         ),
-        color = MaterialTheme.colorScheme.primary,
+        color = Primary,
         modifier = Modifier.padding(horizontal = 4.dp, vertical = 12.dp)
     )
 }
 
 @Composable
 private fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
-    MaterialTheme.colorScheme.surface(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer
+        color = SurfaceContainer
     ) {
         Column(modifier = Modifier.padding(vertical = 4.dp), content = content)
     }
@@ -157,7 +167,7 @@ private fun InfoItem(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = OnSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Column {
@@ -167,7 +177,7 @@ private fun InfoItem(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
                 Text(
                     subtitle,
@@ -175,7 +185,7 @@ private fun InfoItem(
                         fontSize = 14.sp,
                         letterSpacing = 0.25.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = OnSurfaceVariant
                 )
             }
         }
@@ -207,7 +217,7 @@ private fun SwitchItem(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = OnSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Column {
@@ -217,7 +227,7 @@ private fun SwitchItem(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
                 Text(
                     subtitle,
@@ -225,7 +235,7 @@ private fun SwitchItem(
                         fontSize = 14.sp,
                         letterSpacing = 0.25.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = OnSurfaceVariant
                 )
             }
         }
@@ -238,9 +248,9 @@ private fun SwitchItem(
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color(0xFF00325B),
-                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                checkedTrackColor = PrimaryContainer,
+                uncheckedThumbColor = Outline,
+                uncheckedTrackColor = SurfaceContainerHighest
             )
         )
     }
@@ -291,7 +301,7 @@ private fun FocusModeCard() {
                     fontSize = 14.sp,
                     letterSpacing = 0.25.sp
                 ),
-                color = MaterialTheme.colorScheme.secondary
+                color = Secondary
             )
         }
     }
