@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
 import com.feder.compose.ui.theme.LocalDarkTheme
+import com.feder.compose.ui.theme.updateThemeColors
 import com.feder.compose.ui.theme.ThemeController
 import com.feder.compose.ui.screen.SettingsScreen
 import com.feder.compose.ui.screen.ContactProfileScreen
@@ -146,7 +147,7 @@ class MainActivity : ComponentActivity() {
         CompositionLocalProvider(
             LocalDarkTheme provides ThemeController(
                 isDark = isDarkMode,
-                onToggle = { val newValue = !isDarkMode; isDarkMode = newValue; updateThemeColors(newValue); prefs.edit().putBoolean("dark_mode", newValue).apply() }
+                onToggle = { val newValue = !isDarkMode; isDarkMode = newValue; com.feder.compose.ui.theme.updateThemeColors(newValue); prefs.edit().putBoolean("dark_mode", newValue).apply() }
             )
         ) {
             FederTheme(darkTheme = isDarkMode) {
