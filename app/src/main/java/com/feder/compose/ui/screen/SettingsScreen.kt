@@ -84,7 +84,8 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                 Box(Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryContainer.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DarkMode, "dark", tint = Primary, modifier = Modifier.size(24.dp)) }
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) { Text("Appearance", color = OnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold); Text("Toggle dark mode", color = Secondary, fontSize = 11.sp) }
-                Switch(checked = isDarkMode, onCheckedChange = { com.feder.compose.ui.theme.isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
+                val themeController = LocalDarkTheme.current
+                Switch(checked = themeController.isDark, onCheckedChange = { themeController.onToggle() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us", onClick = { showHelp = true })
