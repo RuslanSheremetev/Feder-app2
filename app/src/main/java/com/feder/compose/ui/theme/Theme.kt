@@ -27,28 +27,55 @@ val DarkOutlineVariant = Color(0xFF404752)
 val DarkOnlineGreen = Color(0xFF41B35D)
 val DarkMuted = Color(0xFFFFB4AB)
 
-// Совместимость со старым кодом (всегда тёмные)
-val Background = DarkBackground
-val Surface = DarkSurface
-val SurfaceContainerLow = DarkSurfaceContainerLow
-val SurfaceContainerHigh = DarkSurfaceContainerHigh
-val SurfaceContainerHighest = DarkSurfaceContainerHighest
-val SurfaceVariant = DarkSurfaceVariant
-val Primary = DarkPrimary
-val PrimaryContainer = DarkPrimaryContainer
-val OnPrimary = DarkOnPrimary
-val OnPrimaryContainer = DarkOnPrimaryContainer
-val Secondary = DarkSecondary
-val SecondaryContainer = DarkSecondaryContainer
-val OnSecondary = DarkOnSecondary
-val Tertiary = DarkTertiary
-val Error = DarkError
-val OnSurface = DarkOnSurface
-val OnSurfaceVariant = DarkOnSurfaceVariant
-val Outline = DarkOutline
-val OutlineVariant = DarkOutlineVariant
-val OnlineGreen = DarkOnlineGreen
-val Muted = DarkMuted
+// Совместимость со старым кодом — используют MaterialTheme.colorScheme
+// (экраны должны использовать эти переменные вместо прямых DarkColors)
+var Background by mutableStateOf(DarkBackground)
+var Surface by mutableStateOf(DarkSurface)
+var SurfaceContainerLow by mutableStateOf(DarkSurfaceContainerLow)
+var SurfaceContainerHigh by mutableStateOf(DarkSurfaceContainerHigh)
+var SurfaceContainerHighest by mutableStateOf(DarkSurfaceContainerHighest)
+var SurfaceVariant by mutableStateOf(DarkSurfaceVariant)
+var Primary by mutableStateOf(DarkPrimary)
+var PrimaryContainer by mutableStateOf(DarkPrimaryContainer)
+var OnPrimary by mutableStateOf(DarkOnPrimary)
+var OnPrimaryContainer by mutableStateOf(DarkOnPrimaryContainer)
+var Secondary by mutableStateOf(DarkSecondary)
+var SecondaryContainer by mutableStateOf(DarkSecondaryContainer)
+var OnSecondary by mutableStateOf(DarkOnSecondary)
+var Tertiary by mutableStateOf(DarkTertiary)
+var Error by mutableStateOf(DarkError)
+var OnSurface by mutableStateOf(DarkOnSurface)
+var OnSurfaceVariant by mutableStateOf(DarkOnSurfaceVariant)
+var Outline by mutableStateOf(DarkOutline)
+var OutlineVariant by mutableStateOf(DarkOutlineVariant)
+var OnlineGreen by mutableStateOf(DarkOnlineGreen)
+var Muted by mutableStateOf(DarkMuted)
+
+fun updateThemeColors(isDark: Boolean) {
+    if (isDark) {
+        Background = DarkBackground; Surface = DarkSurface
+        SurfaceContainerLow = DarkSurfaceContainerLow; SurfaceContainerHigh = DarkSurfaceContainerHigh
+        SurfaceContainerHighest = DarkSurfaceContainerHighest; SurfaceVariant = DarkSurfaceVariant
+        Primary = DarkPrimary; PrimaryContainer = DarkPrimaryContainer
+        OnPrimary = DarkOnPrimary; OnPrimaryContainer = DarkOnPrimaryContainer
+        Secondary = DarkSecondary; SecondaryContainer = DarkSecondaryContainer
+        OnSecondary = DarkOnSecondary; Tertiary = DarkTertiary
+        Error = DarkError; OnSurface = DarkOnSurface
+        OnSurfaceVariant = DarkOnSurfaceVariant; Outline = DarkOutline
+        OutlineVariant = DarkOutlineVariant; OnlineGreen = DarkOnlineGreen; Muted = DarkMuted
+    } else {
+        Background = LightBackground; Surface = LightSurface
+        SurfaceContainerLow = LightSurfaceContainerLow; SurfaceContainerHigh = LightSurfaceContainerHigh
+        SurfaceContainerHighest = LightSurfaceContainerHighest; SurfaceVariant = LightSurfaceVariant
+        Primary = LightPrimary; PrimaryContainer = LightPrimaryContainer
+        OnPrimary = LightOnPrimary; OnPrimaryContainer = LightOnPrimaryContainer
+        Secondary = LightSecondary; SecondaryContainer = LightSecondaryContainer
+        OnSecondary = LightOnSecondary; Tertiary = LightTertiary
+        Error = LightError; OnSurface = LightOnSurface
+        OnSurfaceVariant = LightOnSurfaceVariant; Outline = LightOutline
+        OutlineVariant = LightOutlineVariant; OnlineGreen = LightOnlineGreen; Muted = LightMuted
+    }
+}
 
 // Light Theme Colors
 val LightBackground = Color(0xFFF8F9FF)
