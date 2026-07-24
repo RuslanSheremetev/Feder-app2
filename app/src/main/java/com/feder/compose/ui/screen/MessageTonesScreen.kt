@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
+private val Background = Color(0xFF131313)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,16 +62,16 @@ fun MessageTonesScreen(onBack: () -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = Background,
             topBar = {
                 TopAppBar(
-                    title = { Text("Message Tones", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                    title = { Text("Message Tones", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow)
                 )
             }
         ) { paddingValues ->
@@ -82,7 +91,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W600,
                         fontSize = 24.sp
                     ),
-                    color = MaterialTheme.colorScheme.primary
+                    color = Primary
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -94,14 +103,14 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W500,
                         fontSize = 14.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    color = OnSurfaceVariant.copy(alpha = 0.7f),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                MaterialTheme.colorScheme.surface(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainer
+                    color = SurfaceContainer
                 ) {
                     Column {
                         defaultTones.forEachIndexed { index, tone ->
@@ -132,19 +141,19 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = OnSurfaceVariant.copy(alpha = 0.7f)
                     )
                     TextButton(onClick = {}) {
-                        Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Filled.Add, null, tint = PrimaryContainer, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Add New", color = MaterialTheme.colorScheme.primaryContainer, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                        Text("Add New", color = PrimaryContainer, fontWeight = FontWeight.W500, fontSize = 14.sp)
                     }
                 }
 
-                MaterialTheme.colorScheme.surface(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainer
+                    color = SurfaceContainer
                 ) {
                     Column {
                         customTones.forEachIndexed { index, tone ->
@@ -166,7 +175,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                     Icon(
                                         Icons.Filled.MusicNote,
                                         null,
-                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                        tint = Primary.copy(alpha = 0.7f),
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Column {
@@ -176,7 +185,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                                 fontWeight = FontWeight.W500,
                                                 fontSize = 16.sp
                                             ),
-                                            color = MaterialTheme.colorScheme.onSurface
+                                            color = OnSurface
                                         )
                                         Text(
                                             tone.description,
@@ -184,7 +193,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                                 fontWeight = FontWeight.W500,
                                                 fontSize = 11.sp
                                             ),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = OnSurfaceVariant
                                         )
                                     }
                                 }
@@ -195,15 +204,15 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                         previewTone = tone.name
                                     },
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = MaterialTheme.colorScheme.primaryContainer,
-                                        unselectedColor = MaterialTheme.colorScheme.outline
+                                        selectedColor = PrimaryContainer,
+                                        unselectedColor = Outline
                                     )
                                 )
                             }
                             if (index < customTones.size - 1) {
                                 HorizontalDivider(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                                    color = OutlineVariant.copy(alpha = 0.2f)
                                 )
                             }
                         }
@@ -223,7 +232,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 16.dp, vertical = 96.dp)
         ) {
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 color = Color(0xCC1E1F20),
@@ -242,13 +251,13 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
+                                .background(PrimaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Filled.GraphicEq,
                                 null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                tint = OnPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -260,7 +269,7 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                     fontSize = 11.sp,
                                     letterSpacing = 2.sp
                                 ),
-                                color = MaterialTheme.colorScheme.primary
+                                color = Primary
                             )
                             Text(
                                 previewTone ?: "",
@@ -268,12 +277,12 @@ fun MessageTonesScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 16.sp
                                 ),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = OnSurface
                             )
                         }
                     }
                     IconButton(onClick = { previewTone = null }) {
-                        Icon(Icons.Filled.Close, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Filled.Close, null, tint = OnSurfaceVariant)
                     }
                 }
             }
@@ -306,7 +315,7 @@ private fun ToneRow(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
                 Text(
                     tone.description,
@@ -314,22 +323,22 @@ private fun ToneRow(
                         fontWeight = FontWeight.W500,
                         fontSize = 11.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = OnSurfaceVariant
                 )
             }
             RadioButton(
                 selected = isSelected,
                 onClick = onClick,
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = MaterialTheme.colorScheme.primaryContainer,
-                    unselectedColor = MaterialTheme.colorScheme.outline
+                    selectedColor = PrimaryContainer,
+                    unselectedColor = Outline
                 )
             )
         }
         if (showDivider) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                color = OutlineVariant.copy(alpha = 0.2f)
             )
         }
     }

@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val TonalLayer1 = Color(0xFF1E1F20)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceVariant = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,16 +51,16 @@ fun GroupTonesScreen(onBack: () -> Unit) {
     )
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
-                title = { Text("Group Tones", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Group Tones", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -65,21 +77,21 @@ fun GroupTonesScreen(onBack: () -> Unit) {
             Text(
                 "Group Tones",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.W600, fontSize = 24.sp),
-                color = MaterialTheme.colorScheme.onSurface
+                color = OnSurface
             )
             Text(
                 "Customize how you hear your communities.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = OnSurfaceVariant
             )
 
             Spacer(Modifier.height(24.dp))
 
             // Sync Toggle Card
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer,
+                color = TonalLayer1,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Row(
@@ -95,14 +107,14 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                                .background(SecondaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Filled.SyncAlt, null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.SyncAlt, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
                         }
                         Column {
-                            Text("Use same as message tones", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                            Text("Sync global notification sounds", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                            Text("Use same as message tones", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                            Text("Sync global notification sounds", color = OnSurfaceVariant, fontSize = 11.sp)
                         }
                     }
                     Switch(
@@ -110,9 +122,9 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                         onCheckedChange = { syncEnabled = it },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
-                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                            checkedTrackColor = PrimaryContainer,
                             uncheckedThumbColor = Color.White,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                            uncheckedTrackColor = SurfaceVariant
                         )
                     )
                 }
@@ -133,7 +145,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                         fontSize = 14.sp,
                         letterSpacing = 2.sp
                     ),
-                    color = if (syncEnabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else MaterialTheme.colorScheme.primary
+                    color = if (syncEnabled) Primary.copy(alpha = 0.4f) else Primary
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -150,7 +162,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                             val index = row * columns + col
                             if (index < tones.size) {
                                 val tone = tones[index]
-                                MaterialTheme.colorScheme.surface(
+                                Surface(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(12.dp))
@@ -158,7 +170,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                                             if (!syncEnabled) Modifier.clickable { selectedTone = index }
                                             else Modifier
                                         ),
-                                    color = MaterialTheme.colorScheme.surfaceContainer,
+                                    color = TonalLayer1,
                                     border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
                                 ) {
                                     Row(
@@ -173,13 +185,13 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                                             Icon(
                                                 tone.icon,
                                                 null,
-                                                tint = if (syncEnabled) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                tint = if (syncEnabled) OnSurfaceVariant.copy(alpha = 0.4f) else OnSurfaceVariant,
                                                 modifier = Modifier.size(20.dp)
                                             )
                                             Text(
                                                 tone.name,
                                                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
-                                                color = if (syncEnabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) else MaterialTheme.colorScheme.onSurface
+                                                color = if (syncEnabled) OnSurface.copy(alpha = 0.4f) else OnSurface
                                             )
                                         }
                                         RadioButton(
@@ -187,10 +199,10 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                                             onClick = if (!syncEnabled) {{ selectedTone = index }} else {{}},
                                             enabled = !syncEnabled,
                                             colors = RadioButtonDefaults.colors(
-                                                selectedColor = MaterialTheme.colorScheme.primaryContainer,
-                                                unselectedColor = MaterialTheme.colorScheme.outline,
-                                                disabledSelectedColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                                disabledUnselectedColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                                selectedColor = PrimaryContainer,
+                                                unselectedColor = Outline,
+                                                disabledSelectedColor = PrimaryContainer.copy(alpha = 0.3f),
+                                                disabledUnselectedColor = Outline.copy(alpha = 0.3f)
                                             )
                                         )
                                     }
@@ -212,7 +224,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                     .fillMaxWidth()
                     .height(192.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(TonalLayer1)
                     .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
             ) {
                 Box(
@@ -220,7 +232,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surface)
+                                colors = listOf(Color.Transparent, Surface)
                             )
                         )
                 )
@@ -240,7 +252,7 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                                 fontSize = 11.sp,
                                 letterSpacing = 2.sp
                             ),
-                            color = MaterialTheme.colorScheme.primary
+                            color = Primary
                         )
                         Text(
                             "Audio Waveform Analysis",
@@ -248,13 +260,13 @@ fun GroupTonesScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 16.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                     }
                     FloatingActionButton(
                         onClick = {},
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = PrimaryContainer,
+                        contentColor = OnPrimaryContainer,
                         shape = CircleShape,
                         modifier = Modifier.size(48.dp)
                     ) {
@@ -266,21 +278,21 @@ fun GroupTonesScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Info card
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer,
+                color = TonalLayer1,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(Icons.Filled.Info, null, tint = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Info, null, tint = PrimaryContainer, modifier = Modifier.size(20.dp))
                     Text(
                         "Selecting a unique tone for groups helps you differentiate between direct messages and community activity without looking at your screen.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = OnSurfaceVariant
                     )
                 }
             }

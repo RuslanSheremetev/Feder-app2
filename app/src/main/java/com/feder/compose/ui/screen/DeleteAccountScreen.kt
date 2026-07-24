@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val SurfaceContainerHighest = Color(0xFF353534)
+private val Primary = Color(0xFFD2E3FF)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Error = Color(0xFFFFB4AB)
+private val ErrorContainer = Color(0xFF93000A)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +44,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -43,7 +54,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Primary
                     )
                 },
                 navigationIcon = {
@@ -51,12 +62,12 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    containerColor = Surface.copy(alpha = 0.8f)
                 )
             )
         }
@@ -80,13 +91,13 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.errorContainer),
+                        .background(ErrorContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.Warning,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = Error,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -99,7 +110,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W600,
                         fontSize = 24.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -107,7 +118,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                 Text(
                     "Deleting your account is permanent. Your message history will be erased, you will be removed from all groups, and your cloud backups will be deleted.",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = OnSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
@@ -116,10 +127,10 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
 
             // Warning Cards
             // Erase message history
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                color = SurfaceContainerHigh
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -129,14 +140,14 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .background(SurfaceContainerHighest)
                             .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Filled.History,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = OnSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -147,12 +158,12 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 16.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                         Text(
                             "All private and secure chats will be purged from our end-to-end encrypted servers.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -166,10 +177,10 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Leave Groups
-                MaterialTheme.colorScheme.surface(
+                Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    color = SurfaceContainerHigh
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -178,14 +189,14 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                .background(SurfaceContainerHighest)
                                 .padding(6.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Filled.GroupOff,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = OnSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -196,7 +207,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 14.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                         Text(
                             "Immediate removal from all collaborative group channels.",
@@ -204,16 +215,16 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 11.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
 
                 // Wipe Sync
-                MaterialTheme.colorScheme.surface(
+                Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    color = SurfaceContainerHigh
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -222,14 +233,14 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                .background(SurfaceContainerHighest)
                                 .padding(6.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Filled.CloudOff,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = OnSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -240,7 +251,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 14.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = OnSurface
                         )
                         Text(
                             "Delete all encrypted cloud backup files.",
@@ -248,7 +259,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 11.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -257,10 +268,10 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Confirmation Section
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow
+                color = SurfaceContainerLow
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp)
@@ -271,7 +282,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -279,7 +290,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        placeholder = { Text("••••••••", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
+                        placeholder = { Text("••••••••", color = OnSurfaceVariant.copy(alpha = 0.4f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -288,17 +299,17 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                                 Icon(
                                     if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    tint = OnSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = SurfaceContainer,
+                            unfocusedContainerColor = SurfaceContainer,
+                            focusedBorderColor = Primary,
                             unfocusedBorderColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                            focusedTextColor = OnSurface,
+                            unfocusedTextColor = OnSurface
                         ),
                         singleLine = true
                     )
@@ -313,8 +324,8 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             .height(56.dp),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.error
+                            containerColor = ErrorContainer,
+                            contentColor = Error
                         )
                     ) {
                         Row(
@@ -341,9 +352,9 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(50),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onSurface
+                            contentColor = OnSurface
                         )
                     ) {
                         Text(
@@ -366,7 +377,7 @@ fun DeleteAccountScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W500,
                     fontSize = 11.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                color = OnSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
 

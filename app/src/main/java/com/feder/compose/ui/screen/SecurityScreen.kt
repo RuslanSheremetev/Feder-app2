@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
+private val Background = Color(0xFF131313)
+private val Surface = Color(0xFF131313)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val SurfaceContainerHigh = Color(0xFF2A2A2A)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val PrimaryFixedDim = Color(0xFFA1C9FF)
+private val OnPrimaryContainer = Color(0xFF295483)
+private val OnPrimaryFixed = Color(0xFF001C38)
+private val SecondaryContainer = Color(0xFF36485E)
+private val OnSecondaryContainer = Color(0xFFA4B7D0)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +47,7 @@ fun SecurityScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -42,7 +57,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                 },
                 navigationIcon = {
@@ -50,11 +65,11 @@ fun SecurityScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
             )
         }
     ) { paddingValues ->
@@ -77,7 +92,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .size(192.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                        .background(SurfaceContainerHigh),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -85,20 +100,20 @@ fun SecurityScreen(onBack: () -> Unit) {
                             .fillMaxSize()
                             .background(
                                 Brush.linearGradient(
-                                    colors = listOf(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f), Color.Transparent)
+                                    colors = listOf(PrimaryContainer.copy(alpha = 0.2f), Color.Transparent)
                                 )
                             )
                     )
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(28.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(PrimaryFixedDim)
                             .padding(24.dp)
                     ) {
                         Icon(
                             Icons.Filled.VerifiedUser,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = OnPrimaryFixed,
                             modifier = Modifier.size(64.dp)
                         )
                     }
@@ -112,7 +127,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W600,
                         fontSize = 24.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = OnSurface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -120,7 +135,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                 Text(
                     "Your messages and calls are secured with end-to-end encryption. Only you and the person you're communicating with can read or listen to them.",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = OnSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
@@ -145,13 +160,13 @@ fun SecurityScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
+                            .background(PrimaryContainer.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Filled.Lock,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primaryContainer,
+                            tint = PrimaryContainer,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -162,13 +177,13 @@ fun SecurityScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W500,
                                 fontSize = 16.sp
                             ),
-                            color = MaterialTheme.colorScheme.primary
+                            color = Primary
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             "Midnight Velocity cannot read your messages or listen to your calls because they are encrypted from start to finish.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -184,16 +199,16 @@ fun SecurityScreen(onBack: () -> Unit) {
                     fontSize = 14.sp,
                     letterSpacing = 2.sp
                 ),
-                color = MaterialTheme.colorScheme.primary,
+                color = Primary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow
+                color = SurfaceContainerLow
             ) {
                 Column {
                     // Toggle: Security notifications
@@ -212,12 +227,12 @@ fun SecurityScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 16.sp
                                 ),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = OnSurface
                             )
                             Text(
                                 "Get notified when your security code changes for a contact in an end-to-end encrypted chat.",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = OnSurfaceVariant
                             )
                         }
                         Switch(
@@ -225,9 +240,9 @@ fun SecurityScreen(onBack: () -> Unit) {
                             onCheckedChange = { enabled = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color(0xFF00325B),
-                                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurface,
-                                uncheckedTrackColor = MaterialTheme.colorScheme.outline
+                                checkedTrackColor = PrimaryContainer,
+                                uncheckedThumbColor = OnSurface,
+                                uncheckedTrackColor = Outline
                             )
                         )
                     }
@@ -235,7 +250,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                     // Divider
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                        color = OutlineVariant.copy(alpha = 0.3f)
                     )
 
                     // Link: Show security notifications
@@ -254,18 +269,18 @@ fun SecurityScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 16.sp
                                 ),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = OnSurface
                             )
                             Text(
                                 "Learn more about how encryption works on your device.",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = OnSurfaceVariant
                             )
                         }
                         Icon(
                             Icons.Filled.OpenInNew,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = OnSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -293,16 +308,16 @@ fun SecurityScreen(onBack: () -> Unit) {
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+                                colors = listOf(Color.Transparent, Background)
                             )
                         )
                 )
-                MaterialTheme.colorScheme.surface(
+                Surface(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(24.dp),
                     shape = RoundedCornerShape(50),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                    color = PrimaryContainer.copy(alpha = 0.8f)
                 ) {
                     Text(
                         "ENCRYPTION PROTOCOL v4.2",
@@ -310,7 +325,7 @@ fun SecurityScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 11.sp
                         ),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = OnPrimaryContainer,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                     )
                 }

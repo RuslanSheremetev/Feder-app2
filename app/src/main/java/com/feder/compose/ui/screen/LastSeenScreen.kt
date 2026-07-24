@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
+private val Background = Color(0xFF131313)
+private val SurfaceContainerLow = Color(0xFF1C1B1B)
+private val SurfaceContainer = Color(0xFF201F1F)
+private val Primary = Color(0xFFD2E3FF)
+private val PrimaryContainer = Color(0xFFA1C9FF)
+private val OnSurface = Color(0xFFE5E2E1)
+private val OnSurfaceVariant = Color(0xFFC2C6D0)
+private val Outline = Color(0xFF8C919A)
+private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +45,7 @@ fun LastSeenScreen(onBack: () -> Unit) {
     val onlineOptions = listOf("Everyone", "Same as last seen")
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Background,
         topBar = {
             TopAppBar(
                 title = {
@@ -47,7 +55,7 @@ fun LastSeenScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                 },
                 navigationIcon = {
@@ -55,11 +63,11 @@ fun LastSeenScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow)
             )
         }
     ) { paddingValues ->
@@ -80,14 +88,14 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = MaterialTheme.colorScheme.primary,
+                color = Primary,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
             )
 
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer
+                color = SurfaceContainer
             ) {
                 Column {
                     lastSeenOptions.forEachIndexed { index, option ->
@@ -107,7 +115,7 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W500,
                     fontSize = 11.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = OnSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 12.dp)
             )
 
@@ -120,14 +128,14 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = MaterialTheme.colorScheme.primary,
+                color = Primary,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
             )
 
-            MaterialTheme.colorScheme.surface(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer
+                color = SurfaceContainer
             ) {
                 Column {
                     onlineOptions.forEachIndexed { index, option ->
@@ -147,7 +155,7 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W500,
                     fontSize = 11.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = OnSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 12.dp)
             )
 
@@ -159,14 +167,14 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     .fillMaxWidth()
                     .height(192.dp)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(SurfaceContainer)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surfaceContainer)
+                                colors = listOf(Color.Transparent, SurfaceContainer)
                             )
                         )
                         .padding(24.dp),
@@ -175,7 +183,7 @@ fun LastSeenScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.LockPerson,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        tint = PrimaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(Modifier.height(8.dp))
@@ -185,12 +193,12 @@ fun LastSeenScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 16.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = OnSurface
                     )
                     Text(
                         "Your connectivity is under your absolute control.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = OnSurfaceVariant
                     )
                 }
             }
@@ -222,15 +230,15 @@ private fun RadioOption(
                     fontWeight = FontWeight.W400,
                     fontSize = 16.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = OnSurface
             )
             Box(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
                     .then(
-                        if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                        else Modifier.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                        if (selected) Modifier.border(2.dp, PrimaryContainer, CircleShape)
+                        else Modifier.border(2.dp, Outline, CircleShape)
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -239,7 +247,7 @@ private fun RadioOption(
                         modifier = Modifier
                             .size(12.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(PrimaryContainer)
                     )
                 }
             }
@@ -247,7 +255,7 @@ private fun RadioOption(
         if (showDivider) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                color = OutlineVariant.copy(alpha = 0.3f),
                 thickness = 1.dp
             )
         }
