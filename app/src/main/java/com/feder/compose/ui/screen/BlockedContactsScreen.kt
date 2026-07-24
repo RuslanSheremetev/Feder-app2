@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,21 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-private val Background = Color(0xFF131313)
-private val SurfaceContainerLow = Color(0xFF1C1B1B)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerHigh = Color(0xFF2A2A2A)
-private val SurfaceVariant = Color(0xFF353534)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val OnPrimaryContainer = Color(0xFF295483)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val Outline = Color(0xFF8C919A)
-private val OutlineVariant = Color(0xFF42474F)
-private val Error = Color(0xFFFFB4AB)
 
 data class BlockedContact(
     val name: String,
@@ -62,25 +48,25 @@ fun BlockedContactsScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Blocked Contacts", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Blocked Contacts", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
                 actions = {
                     IconButton(onClick = {}) {
-                        Icon(Icons.Filled.PersonAdd, "Add", tint = OnPrimaryContainer, modifier = Modifier
+                        Icon(Icons.Filled.PersonAdd, "Add", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(PrimaryContainer)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                             .padding(8.dp))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow.copy(alpha = 0.8f))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.8f))
             )
         }
     ) { paddingValues ->
@@ -91,10 +77,10 @@ fun BlockedContactsScreen(onBack: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Icon(Icons.Filled.Block, null, tint = OnSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(64.dp))
+                Icon(Icons.Filled.Block, null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(64.dp))
                 Spacer(Modifier.height(16.dp))
-                Text("No blocked contacts", color = OnSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                Text("Users you block will appear here.", color = OnSurfaceVariant.copy(alpha = 0.5f), fontSize = 14.sp)
+                Text("No blocked contacts", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Users you block will appear here.", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 14.sp)
             }
         } else {
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -103,23 +89,23 @@ fun BlockedContactsScreen(onBack: () -> Unit) {
                 Text(
                     "Blocked Contacts",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.W600, fontSize = 24.sp),
-                    color = Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 Spacer(Modifier.height(8.dp))
 
                 // Info card
-                Surface(
+                MaterialTheme.colorScheme.surface(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(12.dp),
-                    color = SurfaceContainerHigh,
-                    border = androidx.compose.foundation.BorderStroke(4.dp, Primary)
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    border = androidx.compose.foundation.BorderStroke(4.dp, MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         "Blocked contacts will no longer be able to call you or send you messages.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = OnSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -146,9 +132,9 @@ fun BlockedContactsScreen(onBack: () -> Unit) {
 
 @Composable
 private fun BlockedContactRow(contact: BlockedContact, onUnblock: () -> Unit) {
-    Surface(
+    MaterialTheme.colorScheme.surface(
         modifier = Modifier.fillMaxWidth(),
-        color = SurfaceContainer
+        color = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Row(
             modifier = Modifier
@@ -178,10 +164,10 @@ private fun BlockedContactRow(contact: BlockedContact, onUnblock: () -> Unit) {
                         )
                     } else {
                         Box(
-                            modifier = Modifier.fillMaxSize().background(SecondaryContainer),
+                            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Filled.Person, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.Person, null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(24.dp))
                         }
                     }
                 }
@@ -190,12 +176,12 @@ private fun BlockedContactRow(contact: BlockedContact, onUnblock: () -> Unit) {
                     Text(
                         contact.name,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500, fontSize = 16.sp),
-                        color = OnSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         contact.phone,
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.W500, fontSize = 11.sp),
-                        color = if (contact.phone == "No Name Provided") Error else OnSurfaceVariant
+                        color = if (contact.phone == "No Name Provided") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -204,12 +190,12 @@ private fun BlockedContactRow(contact: BlockedContact, onUnblock: () -> Unit) {
             OutlinedButton(
                 onClick = onUnblock,
                 shape = RoundedCornerShape(50),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Outline),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary)
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text("Unblock", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W500, fontSize = 14.sp))
             }
         }
-        HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f), thickness = 1.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), thickness = 1.dp)
     }
 }

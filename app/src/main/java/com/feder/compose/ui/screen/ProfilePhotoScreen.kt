@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,18 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-private val Background = Color(0xFF131313)
-private val Surface = Color(0xFF131313)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerHigh = Color(0xFF2A2A2A)
-private val SurfaceContainerHighest = Color(0xFF353534)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val Outline = Color(0xFF8C919A)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,16 +34,16 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
     val visibilityText = listOf("Everyone", "My Contacts", "Selected Contacts", "Nobody")
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Profile Photo", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Profile Photo", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface.copy(alpha = 0.8f))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             )
         }
     ) { paddingValues ->
@@ -74,16 +63,16 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                     fontWeight = FontWeight.W600,
                     fontSize = 24.sp
                 ),
-                color = OnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(Modifier.height(16.dp))
 
             // Radio options
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = SurfaceContainer,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Column {
@@ -107,7 +96,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                                             fontWeight = FontWeight.W400,
                                             fontSize = 16.sp
                                         ),
-                                        color = OnSurface
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     if (isContactsExcept) {
                                         Text(
@@ -116,7 +105,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                                                 fontWeight = FontWeight.W500,
                                                 fontSize = 11.sp
                                             ),
-                                            color = OnSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -126,9 +115,9 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                                         .clip(CircleShape)
                                         .then(
                                             if (selectedOption == index)
-                                                Modifier.border(2.dp, PrimaryContainer, CircleShape)
+                                                Modifier.border(2.dp, MaterialTheme.colorScheme.primaryContainer, CircleShape)
                                             else
-                                                Modifier.border(2.dp, Outline, CircleShape)
+                                                Modifier.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         ),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -137,7 +126,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                                             modifier = Modifier
                                                 .size(12.dp)
                                                 .clip(CircleShape)
-                                                .background(PrimaryContainer)
+                                                .background(MaterialTheme.colorScheme.primaryContainer)
                                         )
                                     }
                                 }
@@ -157,11 +146,11 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Info card
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = SecondaryContainer.copy(alpha = 0.2f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, SecondaryContainer.copy(alpha = 0.3f))
+                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -170,13 +159,13 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.Info,
                         contentDescription = null,
-                        tint = OnSecondaryContainer,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         "If you don't share your profile photo, you won't see the profile photos of other people.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = OnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -188,7 +177,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(SurfaceContainerHigh)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -199,7 +188,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .size(96.dp)
                             .clip(CircleShape)
-                            .border(2.dp, PrimaryContainer.copy(alpha = 0.2f), CircleShape),
+                            .border(2.dp, MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f), CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(Modifier.height(16.dp))
@@ -209,7 +198,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 16.sp
                         ),
-                        color = OnSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         "Your current photo is visible to ${visibilityText[selectedOption]}",
@@ -217,7 +206,7 @@ fun ProfilePhotoScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 11.sp
                         ),
-                        color = OnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

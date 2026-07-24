@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,20 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Background = Color(0xFF131313)
-private val SurfaceContainerLow = Color(0xFF1C1B1B)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val PrimaryFixedDim = Color(0xFFA1C9FF)
-private val OnPrimaryContainer = Color(0xFF295483)
-private val Secondary = Color(0xFFB5C8E2)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val Outline = Color(0xFF8C919A)
-private val SurfaceVariant = Color(0xFF353534)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,16 +34,16 @@ fun StatusScreen(onBack: () -> Unit) {
     val icons = listOf(Icons.Filled.Contacts, Icons.Filled.PersonRemove, Icons.Filled.Favorite)
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Status", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Status", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow.copy(alpha = 0.8f))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.8f))
             )
         }
     ) { paddingValues ->
@@ -74,26 +61,26 @@ fun StatusScreen(onBack: () -> Unit) {
             Text(
                 "Who can see my status updates",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500, fontSize = 16.sp),
-                color = OnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 "Changes to your privacy settings will apply to status updates that you post from now on.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = OnSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(Modifier.height(24.dp))
 
             // Radio options
             options.forEachIndexed { index, option ->
-                Surface(
+                MaterialTheme.colorScheme.surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .clickable { selectedOption = index },
-                    color = SurfaceContainer,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
                 ) {
                     Row(
@@ -109,13 +96,13 @@ fun StatusScreen(onBack: () -> Unit) {
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(SecondaryContainer.copy(alpha = 0.3f)),
+                                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     icons[index],
                                     contentDescription = null,
-                                    tint = Secondary,
+                                    tint = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -125,15 +112,15 @@ fun StatusScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 16.sp
                                 ),
-                                color = OnSurface
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         RadioButton(
                             selected = selectedOption == index,
                             onClick = { selectedOption = index },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = PrimaryContainer,
-                                unselectedColor = Outline
+                                selectedColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedColor = MaterialTheme.colorScheme.outline
                             )
                         )
                     }
@@ -143,11 +130,11 @@ fun StatusScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // 24 Hour Notice
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = PrimaryContainer.copy(alpha = 0.1f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Primary.copy(alpha = 0.2f))
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -156,13 +143,13 @@ fun StatusScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.Schedule,
                         contentDescription = null,
-                        tint = PrimaryFixedDim,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         "Status updates will disappear after 24 hours. Your current status updates will remain visible until they expire.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                        color = OnPrimaryContainer
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -178,7 +165,7 @@ fun StatusScreen(onBack: () -> Unit) {
                 Text(
                     "Facebook",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500, fontSize = 16.sp),
-                    color = OnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     "CONNECT",
@@ -187,18 +174,18 @@ fun StatusScreen(onBack: () -> Unit) {
                         fontSize = 11.sp,
                         letterSpacing = 2.sp
                     ),
-                    color = Primary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
             Spacer(Modifier.height(16.dp))
 
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { },
-                color = SurfaceContainer,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Row(
@@ -233,19 +220,19 @@ fun StatusScreen(onBack: () -> Unit) {
                                     fontWeight = FontWeight.W500,
                                     fontSize = 16.sp
                                 ),
-                                color = OnSurface
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 "Tap to share status to Facebook",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                                color = OnSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
-                        tint = OnSurfaceVariant,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -264,7 +251,7 @@ fun StatusScreen(onBack: () -> Unit) {
                         .clip(CircleShape)
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(SurfaceVariant, Color.Transparent)
+                                colors = listOf(MaterialTheme.colorScheme.surfaceVariant, Color.Transparent)
                             )
                         ),
                     contentAlignment = Alignment.Center
@@ -272,7 +259,7 @@ fun StatusScreen(onBack: () -> Unit) {
                     Icon(
                         Icons.Filled.PrivacyTip,
                         contentDescription = null,
-                        tint = OnSurfaceVariant.copy(alpha = 0.4f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                         modifier = Modifier.size(64.dp)
                     )
                 }
@@ -283,7 +270,7 @@ fun StatusScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.W500,
                         fontSize = 14.sp
                     ),
-                    color = OnSurfaceVariant.copy(alpha = 0.4f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                 )
             }
 
