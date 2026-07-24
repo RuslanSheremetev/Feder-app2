@@ -70,7 +70,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
-    var replyMessage by remember { mutableStateOf<Message?>(null) }
+    var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
@@ -172,7 +172,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(
-                                replyMessage?.from_user ?: "",
+                                replyMessage?.from ?: "",
                                 color = Primary,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
