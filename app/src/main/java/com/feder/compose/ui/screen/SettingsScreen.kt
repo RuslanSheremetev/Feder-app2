@@ -85,7 +85,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) { Text("Appearance", color = OnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold); Text("Toggle dark mode", color = Secondary, fontSize = 11.sp) }
                 val themeController = LocalDarkTheme.current
-                Switch(checked = themeController.isDark, onCheckedChange = { themeController.onToggle(); android.widget.Toast.makeText(context, "Theme: ${if (themeController.isDark) "Dark" else "Light"}", android.widget.Toast.LENGTH_SHORT).show() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
+                Switch(checked = themeController.isDark, onCheckedChange = { themeController.onToggle() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us", onClick = { showHelp = true })
