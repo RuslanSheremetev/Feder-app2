@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,20 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-private val Surface = Color(0xFF131313)
-private val SurfaceContainerLow = Color(0xFF1C1B1B)
-private val TonalLayer1 = Color(0xFF1E1F20)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryFixedDim = Color(0xFFA1C9FF)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val Outline = Color(0xFF8C919A)
-private val OutlineVariant = Color(0xFF42474F)
-private val Error = Color(0xFFFFB4AB)
-private val ErrorContainer = Color(0xFF93000A)
-private val OnPrimaryContainer = Color(0xFF295483)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,16 +43,16 @@ fun AccountScreen(onBack: () -> Unit) {
     if (showDeleteAccount) { DeleteAccountScreen(onBack = { showDeleteAccount = false }); return }
 
     Scaffold(
-        containerColor = Surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = { Text("Account", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Account", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
             )
         }
     ) { paddingValues ->
@@ -103,7 +90,7 @@ private fun HeroSection() {
                 .weight(2f)
                 .height(112.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(TonalLayer1)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
         ) {
             Row(
@@ -115,19 +102,19 @@ private fun HeroSection() {
                     AsyncImage(
                         model = "https://via.placeholder.com/80",
                         contentDescription = null,
-                        modifier = Modifier.size(80.dp).clip(CircleShape).border(2.dp, PrimaryFixedDim, CircleShape),
+                        modifier = Modifier.size(80.dp).clip(CircleShape).border(2.dp, MaterialTheme.colorScheme.primaryContainer, CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Box(
-                        modifier = Modifier.size(24.dp).clip(CircleShape).background(PrimaryFixedDim).border(2.dp, Surface, CircleShape),
+                        modifier = Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer).border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Filled.Verified, null, tint = OnPrimaryContainer, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Filled.Verified, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(16.dp))
                     }
                 }
                 Column {
-                    Text("Alex Rivera", color = OnSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
-                    Text("+1 (555) 012-3456", color = OnSurfaceVariant, fontSize = 14.sp)
+                    Text("Alex Rivera", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
+                    Text("+1 (555) 012-3456", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                 }
             }
         }
@@ -136,15 +123,15 @@ private fun HeroSection() {
                 .weight(1f)
                 .height(112.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(TonalLayer1)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
                 .clickable { },
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Filled.CloudDone, null, tint = PrimaryFixedDim, modifier = Modifier.size(36.dp))
-                Text("Cloud Sync", color = OnSurfaceVariant, fontSize = 14.sp)
-                Text("Connected", color = Primary, fontSize = 11.sp)
+                Icon(Icons.Filled.CloudDone, null, tint = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(36.dp))
+                Text("Cloud Sync", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+                Text("Connected", color = MaterialTheme.colorScheme.primary, fontSize = 11.sp)
             }
         }
     }
@@ -163,7 +150,7 @@ private fun OptionsList(
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
         SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onRequestInfo)
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), color = OutlineVariant)
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
         DeleteOption(onDeleteAccount)
     }
 }
@@ -179,15 +166,15 @@ private fun SettingsOption(icon: ImageVector, title: String, subtitle: String, o
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
-                Icon(icon, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+            Box(Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer), contentAlignment = Alignment.Center) {
+                Icon(icon, null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(24.dp))
             }
             Column {
-                Text(title, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                Text(subtitle, color = OnSurfaceVariant, fontSize = 14.sp)
+                Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             }
         }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Outline, modifier = Modifier.size(20.dp))
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(20.dp))
     }
 }
 
@@ -202,20 +189,20 @@ private fun TwoStepOption(onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(48.dp).clip(CircleShape).background(SecondaryContainer), contentAlignment = Alignment.Center) {
-                Icon(Icons.Filled.VerifiedUser, null, tint = OnSecondaryContainer, modifier = Modifier.size(24.dp))
+            Box(Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer), contentAlignment = Alignment.Center) {
+                Icon(Icons.Filled.VerifiedUser, null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(24.dp))
             }
             Column {
-                Text("Two-step verification", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                Text("Extra layer of security", color = OnSurfaceVariant, fontSize = 14.sp)
+                Text("Two-step verification", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Extra layer of security", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("On", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Outline, modifier = Modifier.size(20.dp))
+            Text("On", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -231,12 +218,12 @@ private fun DeleteOption(onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(48.dp).clip(CircleShape).background(ErrorContainer.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Filled.Delete, null, tint = Error, modifier = Modifier.size(24.dp))
+            Box(Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Filled.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(24.dp))
             }
             Column {
-                Text("Delete account", color = Error, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                Text("Permanently erase your data", color = OnSurfaceVariant, fontSize = 14.sp)
+                Text("Delete account", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Permanently erase your data", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             }
         }
     }
@@ -248,21 +235,21 @@ private fun PrivacyTipCard() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(TonalLayer1)
-            .border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Lightbulb, null, tint = Primary, modifier = Modifier.size(20.dp))
-                Text("PRIVACY TIP", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp, letterSpacing = 2.sp)
+                Icon(Icons.Filled.Lightbulb, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Text("PRIVACY TIP", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 14.sp, letterSpacing = 2.sp)
             }
             Spacer(Modifier.height(8.dp))
             Text(
                 "Keep your primary phone number updated to ensure you never lose access to your encrypted chat history and media backups.",
-                color = OnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp
             )
         }

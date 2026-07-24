@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,21 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Background = Color(0xFF131313)
-private val Surface = Color(0xFF131313)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerHigh = Color(0xFF2A2A2A)
-private val SurfaceContainerHighest = Color(0xFF353534)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val OnPrimary = Color(0xFF00325B)
-private val Secondary = Color(0xFFB5C8E2)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val OutlineVariant = Color(0xFF42474F)
-private val Error = Color(0xFFFFB4AB)
-private val ErrorContainer = Color(0xFF93000A)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,16 +32,16 @@ fun MobileDataScreen(onBack: () -> Unit) {
     var documentsEnabled by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("When using mobile data", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("When using mobile data", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { paddingValues ->
@@ -69,10 +55,10 @@ fun MobileDataScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             // Main Card
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                color = SurfaceContainerHigh,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Column {
@@ -84,13 +70,13 @@ fun MobileDataScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.W600,
                                 fontSize = 24.sp
                             ),
-                            color = OnSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
                             "Select the media types you want to automatically download when connected to mobile data.",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                            color = OnSurfaceVariant.copy(alpha = 0.8f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                         )
                     }
 
@@ -105,21 +91,21 @@ fun MobileDataScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(8.dp))
 
                     // Info banner
-                    Surface(
+                    MaterialTheme.colorScheme.surface(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         shape = RoundedCornerShape(12.dp),
-                        color = SurfaceContainerHighest.copy(alpha = 0.5f),
-                        border = androidx.compose.foundation.BorderStroke(4.dp, Primary)
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
+                        border = androidx.compose.foundation.BorderStroke(4.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(Icons.Filled.Info, null, tint = Primary, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Filled.Info, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                             Text(
                                 "Voice messages are always auto-downloaded for the best communication experience.",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                                color = OnSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -131,14 +117,14 @@ fun MobileDataScreen(onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(onClick = onBack) {
-                            Text("Cancel", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                            Text("Cancel", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
                         }
                         Spacer(Modifier.width(8.dp))
                         Button(
                             onClick = onBack,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Primary,
-                                contentColor = OnPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             shape = RoundedCornerShape(50)
                         ) {
@@ -155,8 +141,8 @@ fun MobileDataScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                InfoCard(Icons.Filled.Wifi, "Wi-Fi Settings", "Configure heavy media for home connections.", SecondaryContainer.copy(alpha = 0.3f), Secondary, Modifier.weight(1f))
-                InfoCard(Icons.Filled.BarChart, "Data Usage", "Monitor your monthly velocity traffic.", ErrorContainer.copy(alpha = 0.2f), Error, Modifier.weight(1f))
+                InfoCard(Icons.Filled.Wifi, "Wi-Fi Settings", "Configure heavy media for home connections.", MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f), MaterialTheme.colorScheme.secondary, Modifier.weight(1f))
+                InfoCard(Icons.Filled.BarChart, "Data Usage", "Monitor your monthly velocity traffic.", MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f), MaterialTheme.colorScheme.error, Modifier.weight(1f))
             }
         }
     }
@@ -185,7 +171,7 @@ private fun CheckOption(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = if (checked) Primary else OnSurfaceVariant,
+                tint = if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Text(
@@ -194,16 +180,16 @@ private fun CheckOption(
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = OnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
-                checkedColor = PrimaryContainer,
-                uncheckedColor = OnSurfaceVariant,
-                checkmarkColor = OnPrimary
+                checkedColor = MaterialTheme.colorScheme.primaryContainer,
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
             )
         )
     }
@@ -218,10 +204,10 @@ private fun InfoCard(
     iconTint: Color,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    MaterialTheme.colorScheme.surface(
         modifier = modifier.clip(RoundedCornerShape(16.dp)).clickable { },
         shape = RoundedCornerShape(16.dp),
-        color = SurfaceContainer
+        color = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Box(
@@ -237,12 +223,12 @@ private fun InfoCard(
             Text(
                 title,
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W500, fontSize = 14.sp),
-                color = OnSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 description,
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = OnSurfaceVariant.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
         }
     }

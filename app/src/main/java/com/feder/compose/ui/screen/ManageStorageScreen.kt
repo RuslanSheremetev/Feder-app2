@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,18 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-private val Background = Color(0xFF131313)
-private val Surface = Color(0xFF131313)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerHigh = Color(0xFF2A2A2A)
-private val SurfaceContainerHighest = Color(0xFF353534)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val SecondaryContainer = Color(0xFF36485E)
-private val TertiaryContainer = Color(0xFFC5C6C9)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val Error = Color(0xFFFFB4AB)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,16 +38,16 @@ fun ManageStorageScreen(onBack: () -> Unit) {
     )
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Manage Storage", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Manage Storage", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface.copy(alpha = 0.8f))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             )
         }
     ) { paddingValues ->
@@ -72,13 +61,13 @@ fun ManageStorageScreen(onBack: () -> Unit) {
         ) {
             Spacer(Modifier.height(16.dp))
 
-            Text("Manage Storage", color = OnSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
-            Text("Free up space by deleting large or unnecessary items.", color = OnSurfaceVariant, fontSize = 14.sp)
+            Text("Manage Storage", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
+            Text("Free up space by deleting large or unnecessary items.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
 
             Spacer(Modifier.height(24.dp))
 
             // Storage Card
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 color = Color(0x4D1E1F20),
@@ -91,15 +80,15 @@ fun ManageStorageScreen(onBack: () -> Unit) {
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Column {
-                            Text("USED SPACE", color = OnSurfaceVariant, fontSize = 11.sp, letterSpacing = 2.sp)
+                            Text("USED SPACE", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, letterSpacing = 2.sp)
                             Row(verticalAlignment = Alignment.Bottom) {
-                                Text("42.8", color = Primary, fontWeight = FontWeight.W600, fontSize = 28.sp)
-                                Text(" GB", color = OnSurfaceVariant, fontSize = 16.sp)
+                                Text("42.8", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W600, fontSize = 28.sp)
+                                Text(" GB", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp)
                             }
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("TOTAL", color = OnSurfaceVariant, fontSize = 11.sp, letterSpacing = 2.sp)
-                            Text("64 GB", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                            Text("TOTAL", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, letterSpacing = 2.sp)
+                            Text("64 GB", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
                         }
                     }
 
@@ -111,12 +100,12 @@ fun ManageStorageScreen(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .height(16.dp)
                             .clip(RoundedCornerShape(50))
-                            .background(SurfaceContainerHigh)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                     ) {
                         Row(Modifier.fillMaxSize()) {
-                            Box(Modifier.weight(0.45f).fillMaxHeight().background(PrimaryContainer))
-                            Box(Modifier.weight(0.20f).fillMaxHeight().background(SecondaryContainer))
-                            Box(Modifier.weight(0.10f).fillMaxHeight().background(TertiaryContainer))
+                            Box(Modifier.weight(0.45f).fillMaxHeight().background(MaterialTheme.colorScheme.primaryContainer))
+                            Box(Modifier.weight(0.20f).fillMaxHeight().background(MaterialTheme.colorScheme.secondaryContainer))
+                            Box(Modifier.weight(0.10f).fillMaxHeight().background(MaterialTheme.colorScheme.tertiaryContainer))
                             Spacer(Modifier.weight(0.25f))
                         }
                     }
@@ -128,15 +117,15 @@ fun ManageStorageScreen(onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        LegendDot(PrimaryContainer, "Media (28.8 GB)")
-                        LegendDot(SecondaryContainer, "Files (12.8 GB)")
+                        LegendDot(MaterialTheme.colorScheme.primaryContainer, "Media (28.8 GB)")
+                        LegendDot(MaterialTheme.colorScheme.secondaryContainer, "Files (12.8 GB)")
                     }
                     Spacer(Modifier.height(4.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        LegendDot(TertiaryContainer, "Other (1.2 GB)")
+                        LegendDot(MaterialTheme.colorScheme.tertiaryContainer, "Other (1.2 GB)")
                         LegendDot(Color.White.copy(alpha = 0.1f), "Free (21.2 GB)")
                     }
                 }
@@ -145,7 +134,7 @@ fun ManageStorageScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Review and delete
-            Text("Review and delete items", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+            Text("Review and delete items", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
             Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -155,14 +144,14 @@ fun ManageStorageScreen(onBack: () -> Unit) {
                     icon = Icons.Filled.FilterTiltShift,
                     title = "Larger than 5 MB",
                     size = "1.8 GB",
-                    iconTint = Primary,
+                    iconTint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
                 ReviewCard(
                     icon = Icons.Filled.Forward10,
                     title = "Forwarded many times",
                     size = "450 MB",
-                    iconTint = Error,
+                    iconTint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -174,13 +163,13 @@ fun ManageStorageScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Chats", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                Text("Sort by Size", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                Text("Chats", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                Text("Sort by Size", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 14.sp)
             }
 
             Spacer(Modifier.height(12.dp))
 
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 color = Color(0x4D1E1F20),
@@ -194,7 +183,7 @@ fun ManageStorageScreen(onBack: () -> Unit) {
             }
 
             TextButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                Text("Show more chats", color = OnSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                Text("Show more chats", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
             }
 
             Spacer(Modifier.height(32.dp))
@@ -219,7 +208,7 @@ private fun LegendDot(color: Color, label: String) {
                     else Modifier
                 )
         )
-        Text(label, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 14.sp)
+        Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 14.sp)
     }
 }
 
@@ -231,7 +220,7 @@ private fun ReviewCard(
     iconTint: Color,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    MaterialTheme.colorScheme.surface(
         modifier = modifier
             .aspectRatio(1f)
             .clip(RoundedCornerShape(24.dp))
@@ -253,8 +242,8 @@ private fun ReviewCard(
                 Icon(icon, null, tint = iconTint, modifier = Modifier.size(28.dp))
             }
             Column {
-                Text(size, color = OnSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
-                Text(title, color = OnSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                Text(size, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
+                Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.W500, fontSize = 14.sp)
             }
         }
     }
@@ -277,7 +266,7 @@ private fun ChatStorageRow(chat: StorageChat, showDivider: Boolean) {
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .border(2.dp, Primary.copy(alpha = 0.2f), CircleShape),
+                    .border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
                 contentScale = ContentScale.Crop
             )
             Column(modifier = Modifier.weight(1f)) {
@@ -285,8 +274,8 @@ private fun ChatStorageRow(chat: StorageChat, showDivider: Boolean) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(chat.name, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                    Text(chat.size, color = Primary, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                    Text(chat.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                    Text(chat.size, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 16.sp)
                 }
                 Spacer(Modifier.height(4.dp))
                 Box(
@@ -294,13 +283,13 @@ private fun ChatStorageRow(chat: StorageChat, showDivider: Boolean) {
                         .fillMaxWidth()
                         .height(4.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(SurfaceContainerHighest)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(chat.fillFraction)
                             .fillMaxHeight()
-                            .background(PrimaryContainer)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                     )
                 }
             }

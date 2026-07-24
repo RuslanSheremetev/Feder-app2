@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,19 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Background = Color(0xFF131313)
-private val Surface = Color(0xFF131313)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerLow = Color(0xFF1C1B1B)
-private val TonalLayer1 = Color(0xFF1E1F20)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val OnPrimary = Color(0xFF00325B)
-private val OnPrimaryContainer = Color(0xFF295483)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,16 +34,16 @@ fun HelpScreen(onBack: () -> Unit) {
     if (showChatWithUs) { ChatWithUsScreen(onBack = { showChatWithUs = false }); return }
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Help", color = Primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
+                title = { Text("Help", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Primary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Surface.copy(alpha = 0.8f))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             )
         }
     ) { paddingValues ->
@@ -69,7 +57,7 @@ fun HelpScreen(onBack: () -> Unit) {
         ) {
             Spacer(Modifier.height(16.dp))
 
-            Text("How can we help?", color = OnSurface, fontWeight = FontWeight.W600, fontSize = 28.sp)
+            Text("How can we help?", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 28.sp)
 
             Spacer(Modifier.height(16.dp))
 
@@ -77,15 +65,15 @@ fun HelpScreen(onBack: () -> Unit) {
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = { Text("Search for help topics...", color = OnSurfaceVariant) },
-                leadingIcon = { Icon(Icons.Filled.Search, null, tint = OnSurfaceVariant) },
+                placeholder = { Text("Search for help topics...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = SurfaceContainer,
-                    unfocusedContainerColor = SurfaceContainer,
-                    focusedBorderColor = Primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color.Transparent
                 )
             )
@@ -93,12 +81,12 @@ fun HelpScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Getting Started
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { },
-                color = TonalLayer1,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Row(
@@ -114,17 +102,17 @@ fun HelpScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(PrimaryContainer),
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Filled.RocketLaunch, null, tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.RocketLaunch, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
                         }
                         Column {
-                            Text("Getting Started", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                            Text("Setup your first chat room", color = OnSurfaceVariant, fontSize = 11.sp)
+                            Text("Getting Started", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                            Text("Setup your first chat room", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
                         }
                     }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                 }
             }
 
@@ -155,8 +143,8 @@ fun HelpScreen(onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Frequently Asked Questions", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                TextButton(onClick = {}) { Text("View all", color = Primary, fontWeight = FontWeight.W500, fontSize = 14.sp) }
+                Text("Frequently Asked Questions", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                TextButton(onClick = {}) { Text("View all", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 14.sp) }
             }
 
             Spacer(Modifier.height(8.dp))
@@ -168,24 +156,24 @@ fun HelpScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             // Contact Support
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = SecondaryContainer,
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Still need help?", color = OnSecondaryContainer, fontWeight = FontWeight.W500, fontSize = 22.sp)
+                    Text("Still need help?", color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.W500, fontSize = 22.sp)
                     Text(
                         "Our support team is available 24/7 to assist you with any technical issues.",
-                        color = OnSecondaryContainer.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                         fontSize = 14.sp
                     )
                     Spacer(Modifier.height(12.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
                             onClick = {},
-                            colors = ButtonDefaults.buttonColors(containerColor = Primary, contentColor = OnPrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                             shape = RoundedCornerShape(50)
                         ) {
                             Text("Chat with us", fontWeight = FontWeight.W500, fontSize = 14.sp)
@@ -193,9 +181,9 @@ fun HelpScreen(onBack: () -> Unit) {
                         OutlinedButton(
                             onClick = {},
                             shape = RoundedCornerShape(50),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, OnSecondaryContainer.copy(alpha = 0.3f))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.3f))
                         ) {
-                            Text("Email Support", color = OnSecondaryContainer, fontWeight = FontWeight.W500, fontSize = 14.sp)
+                            Text("Email Support", color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.W500, fontSize = 14.sp)
                         }
                     }
                 }
@@ -204,12 +192,12 @@ fun HelpScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(8.dp))
 
             // Legal
-            Surface(
+            MaterialTheme.colorScheme.surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { },
-                color = SurfaceContainerLow,
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Row(
@@ -221,13 +209,13 @@ fun HelpScreen(onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Icon(Icons.Filled.Policy, null, tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Filled.Policy, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
                         Column {
-                            Text("Terms and Privacy Policy", color = OnSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
-                            Text("Review our latest guidelines", color = OnSurfaceVariant, fontSize = 14.sp)
+                            Text("Terms and Privacy Policy", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 16.sp)
+                            Text("Review our latest guidelines", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                         }
                     }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                 }
             }
 
@@ -238,17 +226,17 @@ fun HelpScreen(onBack: () -> Unit) {
 
 @Composable
 private fun HelpGridCard(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier) {
-    Surface(
+    MaterialTheme.colorScheme.surface(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { },
-        color = TonalLayer1,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Icon(icon, null, tint = Primary, modifier = Modifier.size(24.dp))
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(8.dp))
-            Text(label, color = OnSurface, fontWeight = FontWeight.W500, fontSize = 14.sp)
+            Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W500, fontSize = 14.sp)
         }
     }
 }
@@ -257,13 +245,13 @@ private fun HelpGridCard(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 private fun FaqItem(question: String) {
     var expanded by remember { mutableStateOf(false) }
 
-    Surface(
+    MaterialTheme.colorScheme.surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable { expanded = !expanded },
-        color = if (expanded) SurfaceContainer else SurfaceContainerLow,
+        color = if (expanded) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surfaceContainerLow,
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -272,11 +260,11 @@ private fun FaqItem(question: String) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(question, color = OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                Text(question, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, modifier = Modifier.weight(1f))
                 Icon(
                     if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                     null,
-                    tint = if (expanded) Primary else OnSurfaceVariant,
+                    tint = if (expanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -284,7 +272,7 @@ private fun FaqItem(question: String) {
                 Spacer(Modifier.height(12.dp))
                 Text(
                     "Detailed answer goes here with step-by-step instructions.",
-                    color = OnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
             }
