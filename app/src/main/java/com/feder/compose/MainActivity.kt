@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +37,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.ui.theme.*
+import com.feder.compose.ui.theme.LocalDarkTheme
+import com.feder.compose.ui.theme.ThemeController
 import com.feder.compose.ui.screen.SettingsScreen
 import com.feder.compose.ui.screen.ContactProfileScreen
 import com.feder.compose.ui.screen.ChatScreen
@@ -136,21 +139,26 @@ class MainActivity : ComponentActivity() {
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
-            setContent { FederApp() }
+            setContent {
+        var isDarkMode by remember { mutableStateOf(true) }
+        CompositionLocalProvider(
+            LocalDarkTheme provides ThemeController(
+                isDark = isDarkMode,
+                onToggle = { isDarkMode = !isDarkMode }
+            )
+        ) {
+            FederTheme(darkTheme = isDarkMode) {
+                FederApp()
+            }
+        }
+    }
         }
         catch (e: Exception) { Toast.makeText(this, "Ошибка запуска", Toast.LENGTH_LONG).show() }
     }
 }
 
 @Composable
-@Composable
 fun FederApp() {
-    var isDarkMode by remember { mutableStateOf(true) }
-    FederAppContent(isDarkMode = isDarkMode, onToggleTheme = { isDarkMode = it })
-}
-
-@Composable
-fun FederAppContent() {
     val viewModel: ChatViewModel = viewModel()
     val context = LocalContext.current
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
@@ -176,7 +184,6 @@ fun FederAppContent() {
         return
     }
     
-    FederTheme(darkTheme = isDarkMode) {
     Scaffold(
         containerColor = Background,
         topBar = {

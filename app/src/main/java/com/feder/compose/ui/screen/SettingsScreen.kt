@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
+import com.feder.compose.ui.theme.LocalDarkTheme
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggleTheme: (Boolean) -> Unit = {}) {

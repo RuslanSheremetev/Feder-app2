@@ -1,7 +1,7 @@
 package com.feder.compose.ui.theme
 
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
 // Dark Theme Colors (оригинальные)
@@ -27,7 +27,7 @@ val DarkOutlineVariant = Color(0xFF404752)
 val DarkOnlineGreen = Color(0xFF41B35D)
 val DarkMuted = Color(0xFFFFB4AB)
 
-// Совместимость со старым кодом
+// Совместимость со старым кодом (всегда тёмные)
 val Background = DarkBackground
 val Surface = DarkSurface
 val SurfaceContainerLow = DarkSurfaceContainerLow
@@ -96,6 +96,10 @@ val LightColorScheme = lightColorScheme(
     surfaceVariant = LightSurfaceVariant, onSurfaceVariant = LightOnSurfaceVariant,
     outline = LightOutline, outlineVariant = LightOutlineVariant,
 )
+
+// CompositionLocal для доступа к теме из любого экрана
+data class ThemeController(val isDark: Boolean, val onToggle: () -> Unit)
+val LocalDarkTheme = staticCompositionLocalOf { ThemeController(true, {}) }
 
 @Composable
 fun FederTheme(darkTheme: Boolean = true, content: @Composable () -> Unit) {
