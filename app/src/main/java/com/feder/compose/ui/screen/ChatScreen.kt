@@ -129,7 +129,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         Column(modifier = Modifier.fillMaxSize()) {
             // Selection Bar
             if (selectionMode) {
-                Surface(color = SurfaceContainer, shadowElevation = 4.dp) {
+                Surface(color = Color(0xFF201F1F), shadowElevation = 4.dp) {
                     Row(
                         Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
