@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -85,7 +84,6 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                 Box(Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryContainer.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DarkMode, "dark", tint = Primary, modifier = Modifier.size(24.dp)) }
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) { Text("Appearance", color = OnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold); Text("Toggle dark mode", color = Secondary, fontSize = 11.sp) }
-                val context = LocalContext.current
                 val themeController = LocalDarkTheme.current
                 Switch(checked = themeController.isDark, onCheckedChange = { themeController.onToggle(); android.widget.Toast.makeText(context, "Theme: ${if (themeController.isDark) "Dark" else "Light"}", android.widget.Toast.LENGTH_SHORT).show() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
