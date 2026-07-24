@@ -72,7 +72,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
-    var selectedMessages by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
@@ -183,7 +183,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
                         val isMine = msg.from == myUsername
-                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg }, onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id })
+                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg }, onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time })
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }
@@ -472,6 +472,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
