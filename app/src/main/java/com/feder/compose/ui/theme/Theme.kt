@@ -1,7 +1,7 @@
 package com.feder.compose.ui.theme
 
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 // Dark Theme Colors (оригинальные)
@@ -73,57 +73,34 @@ val LightOutlineVariant = Color(0xFFC4C6D0)
 val LightOnlineGreen = Color(0xFF2E7D32)
 val LightMuted = Color(0xFFBA1A1A)
 
-private val DarkColorScheme = darkColorScheme(
-    primary = DarkPrimary,
-    onPrimary = DarkOnPrimary,
-    primaryContainer = DarkPrimaryContainer,
-    onPrimaryContainer = DarkOnPrimaryContainer,
-    secondary = DarkSecondary,
-    onSecondary = DarkOnSecondary,
+val DarkColorScheme = darkColorScheme(
+    primary = DarkPrimary, onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer, onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary, onSecondary = DarkOnSecondary,
     secondaryContainer = DarkSecondaryContainer,
-    tertiary = DarkTertiary,
-    error = DarkError,
-    background = DarkBackground,
-    onBackground = DarkOnSurface,
-    surface = DarkSurface,
-    onSurface = DarkOnSurface,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = DarkOnSurfaceVariant,
-    outline = DarkOutline,
-    outlineVariant = DarkOutlineVariant,
+    tertiary = DarkTertiary, error = DarkError,
+    background = DarkBackground, onBackground = DarkOnSurface,
+    surface = DarkSurface, onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant, onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline, outlineVariant = DarkOutlineVariant,
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = LightPrimary,
-    onPrimary = LightOnPrimary,
-    primaryContainer = LightPrimaryContainer,
-    onPrimaryContainer = LightOnPrimaryContainer,
-    secondary = LightSecondary,
-    onSecondary = LightOnSecondary,
+val LightColorScheme = lightColorScheme(
+    primary = LightPrimary, onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer, onPrimaryContainer = LightOnPrimaryContainer,
+    secondary = LightSecondary, onSecondary = LightOnSecondary,
     secondaryContainer = LightSecondaryContainer,
-    tertiary = LightTertiary,
-    error = LightError,
-    background = LightBackground,
-    onBackground = LightOnSurface,
-    surface = LightSurface,
-    onSurface = LightOnSurface,
-    surfaceVariant = LightSurfaceVariant,
-    onSurfaceVariant = LightOnSurfaceVariant,
-    outline = LightOutline,
-    outlineVariant = LightOutlineVariant,
+    tertiary = LightTertiary, error = LightError,
+    background = LightBackground, onBackground = LightOnSurface,
+    surface = LightSurface, onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant, onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline, outlineVariant = LightOutlineVariant,
 )
-
-// Theme state
-// Глобальное состояние темы
-var isDarkMode by mutableStateOf(true)
 
 @Composable
-fun FederTheme(content: @Composable () -> Unit) {
-    val dark = isDarkMode
-    val colorScheme = if (dark) DarkColorScheme else LightColorScheme
-
+fun FederTheme(darkTheme: Boolean = true, content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
         content = content
     )
 }

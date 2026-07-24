@@ -136,14 +136,21 @@ class MainActivity : ComponentActivity() {
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
-            setContent { FederTheme { FederApp() } }
+            setContent { FederApp() }
         }
         catch (e: Exception) { Toast.makeText(this, "Ошибка запуска", Toast.LENGTH_LONG).show() }
     }
 }
 
 @Composable
+@Composable
 fun FederApp() {
+    var isDarkMode by remember { mutableStateOf(true) }
+    FederAppContent(isDarkMode = isDarkMode, onToggleTheme = { isDarkMode = it })
+}
+
+@Composable
+fun FederAppContent() {
     val viewModel: ChatViewModel = viewModel()
     val context = LocalContext.current
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
@@ -169,6 +176,7 @@ fun FederApp() {
         return
     }
     
+    FederTheme(darkTheme = isDarkMode) {
     Scaffold(
         containerColor = Background,
         topBar = {

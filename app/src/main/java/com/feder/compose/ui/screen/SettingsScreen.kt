@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggleTheme: (Boolean) -> Unit = {}) {
     var showAccount by remember { mutableStateOf(false) }
     var showPrivacy by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
@@ -77,7 +77,7 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status", onClick = { showPrivacy = true })
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones", onClick = { showNotifications = true })
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download", onClick = { showDataStorage = true })
-        val isDarkMode = com.feder.compose.ui.theme.isDarkMode
+        
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
             Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryContainer.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DarkMode, "dark", tint = Primary, modifier = Modifier.size(24.dp)) }
