@@ -70,6 +70,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var replyMessage by remember { mutableStateOf<Message?>(null) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
@@ -156,6 +157,39 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 }
             }
 
+            // Reply Preview
+            if (replyMessage != null) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    color = SurfaceContainerLow,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.width(4.dp).height(40.dp).background(Primary, RoundedCornerShape(2.dp)))
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                replyMessage?.from_user ?: "",
+                                color = Primary,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                replyMessage?.text?.take(50) ?: "",
+                                color = OnSurfaceVariant,
+                                fontSize = 14.sp,
+                                maxLines = 1
+                            )
+                        }
+                        IconButton(onClick = { replyMessage = null }, modifier = Modifier.size(32.dp)) {
+                            Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                        }
+                    }
+                }
+            }
             // Input
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
@@ -293,7 +327,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
                     .padding(4.dp)
             ) {
-                MenuAction(Icons.Filled.Reply, "Ответить") { selectedMessage = null }
+                MenuAction(Icons.Filled.Reply, "Ответить") { replyMessage = selectedMessage; selectedMessage = null }
                 MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
                 MenuAction(Icons.Filled.Forward, "Переслать") { showForward = true }
                 HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 12.dp))
