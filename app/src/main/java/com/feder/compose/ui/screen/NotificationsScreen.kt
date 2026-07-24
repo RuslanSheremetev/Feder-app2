@@ -239,7 +239,7 @@ private fun SwitchItem(
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color(0xFF00325B),
                 checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                uncheckedThumbColor = Outline,
+                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
                 uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest
             )
         )
