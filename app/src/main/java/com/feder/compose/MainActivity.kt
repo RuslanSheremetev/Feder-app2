@@ -1,6 +1,7 @@
 package com.feder.compose
 
 import android.os.Bundle
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -141,11 +142,12 @@ class MainActivity : ComponentActivity() {
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
             setContent {
-        var isDarkMode by remember { mutableStateOf(true) }
+        val prefs = getSharedPreferences("feder_theme", Context.MODE_PRIVATE)
+        var isDarkMode by remember { mutableStateOf(prefs.getBoolean("dark_mode", true)) }
         CompositionLocalProvider(
             LocalDarkTheme provides ThemeController(
                 isDark = isDarkMode,
-                onToggle = { isDarkMode = !isDarkMode; com.feder.compose.ui.theme.updateThemeColors(isDarkMode) }
+                onToggle = { isDarkMode = !isDarkMode; com.feder.compose.ui.theme.updateThemeColors(isDarkMode); prefs.edit().putBoolean("dark_mode", isDarkMode).apply() }
             )
         ) {
             FederTheme(darkTheme = isDarkMode) {
