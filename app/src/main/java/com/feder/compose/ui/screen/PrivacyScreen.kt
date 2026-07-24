@@ -273,7 +273,7 @@ private fun EncryptionCard() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(SurfaceContainerHigh)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(24.dp)
     ) {
         Row(
