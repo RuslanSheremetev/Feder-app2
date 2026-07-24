@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
                 android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
             setContent {
-        val prefs = getSharedPreferences("feder_theme", Context.MODE_PRIVATE)
+        val prefs = this@MainActivity.getSharedPreferences("feder_theme", Context.MODE_PRIVATE)
         var isDarkMode by remember { mutableStateOf(prefs.getBoolean("dark_mode", true)) }
         CompositionLocalProvider(
             LocalDarkTheme provides ThemeController(
