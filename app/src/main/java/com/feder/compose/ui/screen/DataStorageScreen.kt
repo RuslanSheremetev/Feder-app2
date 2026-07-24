@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,19 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Background = Color(0xFF131313)
-private val SurfaceContainerLow = Color(0xFF1C1B1B)
-private val SurfaceContainer = Color(0xFF201F1F)
-private val SurfaceContainerHigh = Color(0xFF2A2A2A)
-private val SurfaceVariant = Color(0xFF353534)
-private val Primary = Color(0xFFD2E3FF)
-private val PrimaryContainer = Color(0xFFA1C9FF)
-private val OnSurface = Color(0xFFE5E2E1)
-private val OnSurfaceVariant = Color(0xFFC2C6D0)
-private val Secondary = Color(0xFFB5C8E2)
-private val SecondaryContainer = Color(0xFF36485E)
-private val OnSecondaryContainer = Color(0xFFA4B7D0)
-private val OutlineVariant = Color(0xFF42474F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +39,7 @@ fun DataStorageScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -61,7 +49,7 @@ fun DataStorageScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.W500,
                             fontSize = 22.sp
                         ),
-                        color = Primary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 navigationIcon = {
@@ -69,11 +57,11 @@ fun DataStorageScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Primary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLow)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
             )
         }
     ) { paddingValues ->
@@ -111,7 +99,7 @@ fun DataStorageScreen(onBack: () -> Unit) {
             Text(
                 "Voice messages are always auto-downloaded",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = OnSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
             Spacer(Modifier.height(8.dp))
@@ -144,7 +132,7 @@ private fun SectionHeader(title: String) {
             fontSize = 14.sp,
             letterSpacing = 2.sp
         ),
-        color = Primary,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
     )
 }
@@ -156,7 +144,7 @@ private fun StorageSummaryCard() {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
-        color = SurfaceContainerHigh
+        color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Column(
             modifier = Modifier
@@ -174,7 +162,7 @@ private fun StorageSummaryCard() {
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = OnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     "85% full",
@@ -183,7 +171,7 @@ private fun StorageSummaryCard() {
                         fontSize = 11.sp,
                         letterSpacing = 0.5.sp
                     ),
-                    color = Primary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -195,26 +183,26 @@ private fun StorageSummaryCard() {
                     .fillMaxWidth()
                     .height(16.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(SurfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(0.45f)
-                            .background(PrimaryContainer)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(0.25f)
-                            .background(Secondary)
+                            .background(MaterialTheme.colorScheme.secondary)
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(0.15f)
-                            .background(OutlineVariant)
+                            .background(MaterialTheme.colorScheme.outlineVariant)
                     )
                     Spacer(modifier = Modifier.weight(0.15f))
                 }
@@ -230,7 +218,7 @@ private fun StorageSummaryCard() {
                 Text(
                     "12.4 GB used of 15 GB",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                    color = OnSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(onClick = {}) {
                     Text(
@@ -239,7 +227,7 @@ private fun StorageSummaryCard() {
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp
                         ),
-                        color = Primary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -272,13 +260,13 @@ private fun SettingsItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(SecondaryContainer),
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = OnSecondaryContainer,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -289,7 +277,7 @@ private fun SettingsItem(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp
                     ),
-                    color = OnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     subtitle,
@@ -297,14 +285,14 @@ private fun SettingsItem(
                         fontSize = 14.sp,
                         letterSpacing = 0.25.sp
                     ),
-                    color = OnSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
         Icon(
             if (showDropdown) Icons.Filled.ExpandMore else Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = OnSurfaceVariant,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)
         )
     }
@@ -325,7 +313,7 @@ private fun SimpleItem(title: String, subtitle: String, onClick: () -> Unit = {}
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp
                 ),
-                color = OnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 subtitle,
@@ -333,7 +321,7 @@ private fun SimpleItem(title: String, subtitle: String, onClick: () -> Unit = {}
                     fontSize = 14.sp,
                     letterSpacing = 0.25.sp
                 ),
-                color = OnSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
