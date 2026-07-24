@@ -114,13 +114,13 @@ private val LightColorScheme = lightColorScheme(
 )
 
 // Theme state
-object ThemeState {
-    var isDarkMode by mutableStateOf(true)
-}
+// Глобальное состояние темы
+var isDarkMode by mutableStateOf(true)
 
 @Composable
 fun FederTheme(content: @Composable () -> Unit) {
-    val colorScheme = if (ThemeState.isDarkMode) DarkColorScheme else LightColorScheme
+    val dark = isDarkMode
+    val colorScheme = if (dark) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

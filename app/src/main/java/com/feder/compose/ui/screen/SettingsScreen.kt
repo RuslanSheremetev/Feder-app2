@@ -77,13 +77,13 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         SettingsCard(Icons.Filled.Lock, "Privacy", "Blocked contacts, status", onClick = { showPrivacy = true })
         SettingsCard(Icons.Filled.Notifications, "Notifications", "Message, group & call tones", onClick = { showNotifications = true })
         SettingsCard(Icons.Filled.DataUsage, "Data and Storage", "Network usage, auto-download", onClick = { showDataStorage = true })
-        var isDarkMode by remember { mutableStateOf(com.feder.compose.ui.theme.ThemeState.isDarkMode) }
+        val isDarkMode = com.feder.compose.ui.theme.isDarkMode
         Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
             Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryContainer.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DarkMode, "dark", tint = Primary, modifier = Modifier.size(24.dp)) }
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) { Text("Appearance", color = OnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold); Text("Toggle dark mode", color = Secondary, fontSize = 11.sp) }
-                Switch(checked = isDarkMode, onCheckedChange = { isDarkMode = it; com.feder.compose.ui.theme.ThemeState.isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
+                Switch(checked = isDarkMode, onCheckedChange = { com.feder.compose.ui.theme.isDarkMode = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us", onClick = { showHelp = true })
