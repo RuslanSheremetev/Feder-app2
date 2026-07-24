@@ -71,6 +71,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var showAttachSheet by remember { mutableStateOf(false) }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var selectionMode by remember { mutableStateOf(false) }
+    var selectedMessages by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
@@ -125,6 +127,36 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
+            // Selection Bar
+            if (selectionMode) {
+                Surface(color = SurfaceContainer, shadowElevation = 4.dp) {
+                    Row(
+                        Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { selectionMode = false; selectedMessages = emptySet() }) {
+                            Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp))
+                        }
+                        Text(
+                            "${selectedMessages.size} selected",
+                            color = OnSurface,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = { /* Forward */ }) {
+                            Icon(Icons.Filled.Forward, "forward", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        }
+                        IconButton(onClick = { /* Delete */ }) {
+                            Icon(Icons.Filled.Delete, "delete", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        }
+                        IconButton(onClick = { }) {
+                            Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                        }
+                    }
+                }
+            }
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
