@@ -208,7 +208,52 @@ fun FederApp() {
             }
             }
         },
-        bottomBar = {}
+        bottomBar = {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.9f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)),
+                    shadowElevation = 16.dp
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(
+                            "Chats" to Icons.Filled.ChatBubble,
+                            "Contacts" to Icons.Filled.Contacts,
+                            "Discovery" to Icons.Filled.Explore,
+                            "Settings" to Icons.Outlined.Settings
+                        ).forEachIndexed { i, (label, icon) ->
+                            val selected = viewModel.selectedTab == i
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { viewModel.selectedTab = i },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    icon,
+                                    contentDescription = label,
+                                    tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    label,
+                                    fontSize = 12.sp,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.W500,
+                                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
