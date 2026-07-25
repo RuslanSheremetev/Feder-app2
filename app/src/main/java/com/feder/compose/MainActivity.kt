@@ -334,7 +334,7 @@ fun FederApp() {
                     ) {
                         listOf(
                             "Chats" to Icons.Filled.Chat,
-                            "Stories" to Icons.Outlined.AutoAwesome,
+                            "Contacts" to Icons.Filled.Contacts,
                             "Contacts" to Icons.Outlined.Contacts,
                             "Settings" to Icons.Outlined.Settings
                         ).forEachIndexed { i, (label, icon) ->
