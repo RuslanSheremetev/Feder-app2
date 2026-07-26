@@ -33,13 +33,11 @@ fun AccountScreen(onBack: () -> Unit) {
     var showSecurity by remember { mutableStateOf(false) }
     var showTwoStep by remember { mutableStateOf(false) }
     var showChangeNumber by remember { mutableStateOf(false) }
-    var showRequestInfo by remember { mutableStateOf(false) }
     var showDeleteAccount by remember { mutableStateOf(false) }
 
     if (showSecurity) { SecurityScreen(onBack = { showSecurity = false }); return }
     if (showTwoStep) { TwoStepScreen(onBack = { showTwoStep = false }); return }
     if (showChangeNumber) { ChangeNumberScreen(onBack = { showChangeNumber = false }); return }
-    if (showRequestInfo) { RequestInfoScreen(onBack = { showRequestInfo = false }); return }
     if (showDeleteAccount) { DeleteAccountScreen(onBack = { showDeleteAccount = false }); return }
 
     Column(
@@ -65,7 +63,6 @@ fun AccountScreen(onBack: () -> Unit) {
                 onSecurity = { showSecurity = true },
                 onChangeNumber = { showChangeNumber = true },
                 onTwoStep = { showTwoStep = true },
-                onRequestInfo = { showRequestInfo = true },
                 onDeleteAccount = { showDeleteAccount = true }
             )
             Spacer(Modifier.height(24.dp))
@@ -82,10 +79,9 @@ private fun OptionsList(
     onDeleteAccount: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onSecurity)
+        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onSecurity)
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
-        SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onRequestInfo)
         DeleteOption(onDeleteAccount)
     }
 }
