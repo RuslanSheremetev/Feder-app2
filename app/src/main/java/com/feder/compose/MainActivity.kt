@@ -358,47 +358,7 @@ fun FederApp() {
                     }
                 }
             }
-// Floating pill
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .navigationBarsPadding()
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
-                    color = SurfaceContainerHigh.copy(alpha = 0.9f),
-                    shadowElevation = 4.dp
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(2.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        listOf(
-                            "Chats" to Icons.Filled.Chat,
-                            "Contacts" to Icons.Filled.Contacts,
-                            "Contacts" to Icons.Outlined.Contacts,
-                            "Settings" to Icons.Outlined.Settings
-                        ).forEachIndexed { i, (label, icon) ->
-                            val selected = viewModel.selectedTab == i
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(if (selected) Primary.copy(alpha = 0.2f) else Color.Transparent)
-                                    .clickable { viewModel.selectedTab = i }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(26.dp))
-                            }
-                        }
-                    }
-                }
-            }
+
         }
     }
 }
