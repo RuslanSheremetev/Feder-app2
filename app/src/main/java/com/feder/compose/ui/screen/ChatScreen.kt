@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -70,6 +72,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -183,7 +186,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
                         val isMine = msg.from == myUsername
+                        Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg }, onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time })
+                    }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }
