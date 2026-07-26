@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -355,11 +356,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 }
             }
             
-            // Actions menu — отдельно
+            // Actions menu — рядом с сообщением
+            val menuY = selectedMessageOffset.y
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.Center)
+                    .align(Alignment.TopStart)
+                    .offset(y = with(LocalDensity.current) { (menuY - 200f).coerceAtLeast(80f).toDp() })
                     .padding(horizontal = 32.dp)
                     .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
                     .padding(4.dp)
