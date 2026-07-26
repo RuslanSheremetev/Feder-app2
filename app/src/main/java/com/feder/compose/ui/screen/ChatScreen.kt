@@ -333,59 +333,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             }
         }
         
-        // Message action menu
-        if (selectedMessage != null && !showForward) {
-            // Backdrop
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false; showForward = false })
-            
-            // Reactions row — отдельная капсула
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = (-140).dp),
-                shape = RoundedCornerShape(40.dp),
-                color = SurfaceContainerHigh.copy(alpha = 0.9f),
-                shadowElevation = 8.dp
+        // Message action menu — DropdownMenu рядом с сообщением
+        Box {
+            DropdownMenu(
+                expanded = selectedMessage != null && !showForward,
+                onDismissRequest = { selectedMessage = null; showDeleteSub = false },
+                offset = androidx.compose.ui.unit.DpOffset(
+                    x = with(LocalDensity.current) { selectedMessageOffset.x.toDp() },
+                    y = with(LocalDensity.current) { selectedMessageOffset.y.toDp() }
+                )
             ) {
-                Row(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
-                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) {
-                            Text(emoji, fontSize = 20.sp)
-                        }
-                    }
-                }
-            }
-            
-            // Actions menu — рядом с сообщением
-            val menuY = selectedMessageOffset.y
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopStart)
-                    .offset(y = with(LocalDensity.current) { (menuY - 200f).coerceAtLeast(80f).toDp() })
-                    .padding(horizontal = 32.dp)
-                    .background(SurfaceContainerHigh, RoundedCornerShape(16.dp))
-                    .padding(4.dp)
-            ) {
-                MenuAction(Icons.Filled.Reply, "Ответить") { replyMessage = selectedMessage; selectedMessage = null }
-                MenuAction(Icons.Filled.ContentCopy, "Копировать") { selectedMessage = null }
-                MenuAction(Icons.Filled.Forward, "Переслать") { showForward = true }
-                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 12.dp))
-                Column {
-                    Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Delete, "delete", tint = Error, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("Удалить", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                        Icon(if (showDeleteSub) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, "expand", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
-                    }
-                    if (showDeleteSub) {
-                        MenuAction(null, "Удалить у меня", indent = true) { selectedMessage = null; showDeleteSub = false }
-                        MenuAction(null, "Удалить у всех", textColor = Error, indent = true) { selectedMessage = null; showDeleteSub = false }
-                    }
-                }
+                DropdownMenuItem(text = { Text("Ответить") }, onClick = { replyMessage = selectedMessage; selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.Reply, null) })
+                DropdownMenuItem(text = { Text("Копировать") }, onClick = { selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) })
+                DropdownMenuItem(text = { Text("Переслать") }, onClick = { showForward = true }, leadingIcon = { Icon(Icons.Filled.Forward, null) })
+                HorizontalDivider()
+                DropdownMenuItem(text = { Text("Удалить", color = MaterialTheme.colorScheme.error) }, onClick = { selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.Delete, null, tint = MaterialTheme.colorScheme.error) })
             }
         }
-        
         // Attach Sheet
         if (showAttachSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false })
