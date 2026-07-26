@@ -187,7 +187,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     item { Spacer(Modifier.height(16.dp)) }
                     items(messages) { msg ->
                         val isMine = msg.from == myUsername
-                        Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInWindow() }) {
+                        Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg }, onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time })
                     }
                     }
