@@ -31,10 +31,12 @@ import coil.compose.AsyncImage
 @Composable
 fun AccountScreen(onBack: () -> Unit) {
     var showSecurity by remember { mutableStateOf(false) }
+    var showName by remember { mutableStateOf(false) }
     var showTwoStep by remember { mutableStateOf(false) }
     var showChangeNumber by remember { mutableStateOf(false) }
     var showDeleteAccount by remember { mutableStateOf(false) }
 
+    if (showName) { NameScreen(onBack = { showName = false }); return }
     if (showSecurity) { SecurityScreen(onBack = { showSecurity = false }); return }
     if (showTwoStep) { TwoStepScreen(onBack = { showTwoStep = false }); return }
     if (showChangeNumber) { ChangeNumberScreen(onBack = { showChangeNumber = false }); return }
@@ -78,7 +80,7 @@ private fun OptionsList(
     onDeleteAccount: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onSecurity)
+        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onClick = { showName = true })
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
         DeleteOption(onDeleteAccount)
