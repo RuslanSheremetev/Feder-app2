@@ -42,29 +42,25 @@ fun AccountScreen(onBack: () -> Unit) {
     if (showRequestInfo) { RequestInfoScreen(onBack = { showRequestInfo = false }); return }
     if (showDeleteAccount) { DeleteAccountScreen(onBack = { showDeleteAccount = false }); return }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                title = { Text("Account", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.primary)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-            )
-        }
-    ) { paddingValues ->
-        Column(
+    Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            HeroSection()
-            Spacer(Modifier.height(24.dp))
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "back", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text("Account", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp)
+            }
+            Spacer(Modifier.height(16.dp))
+            
             OptionsList(
                 onSecurity = { showSecurity = true },
                 onChangeNumber = { showChangeNumber = true },
@@ -73,67 +69,7 @@ fun AccountScreen(onBack: () -> Unit) {
                 onDeleteAccount = { showDeleteAccount = true }
             )
             Spacer(Modifier.height(24.dp))
-            PrivacyTipCard()
-            Spacer(Modifier.height(32.dp))
-        }
-    }
-}
-
-@Composable
-private fun HeroSection() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(2f)
-                .height(112.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize().padding(24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    AsyncImage(
-                        model = "https://via.placeholder.com/80",
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp).clip(CircleShape).border(2.dp, MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Box(
-                        modifier = Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer).border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Verified, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(16.dp))
-                    }
-                }
-                Column {
-                    Text("Alex Rivera", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 24.sp)
-                    Text("+1 (555) 012-3456", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(112.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-                .clickable { },
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Filled.CloudDone, null, tint = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(36.dp))
-                Text("Cloud Sync", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
-                Text("Connected", color = MaterialTheme.colorScheme.primary, fontSize = 11.sp)
-            }
-        }
+            
     }
 }
 
@@ -150,7 +86,6 @@ private fun OptionsList(
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
         SettingsOption(Icons.Filled.Description, "Request account info", "Download your account report", onRequestInfo)
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
         DeleteOption(onDeleteAccount)
     }
 }

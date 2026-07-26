@@ -53,7 +53,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
             IconButton(onClick = onBack) {
                 Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant)
             }
-            Text("Settings", color = Primary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text("Settings", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp)
         }
         Spacer(Modifier.height(16.dp))
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

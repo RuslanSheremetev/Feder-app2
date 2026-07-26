@@ -205,6 +205,9 @@ fun FederApp() {
                 }) {
                     Icon(Icons.Filled.Search, "search", tint = Primary, modifier = Modifier.size(24.dp))
                 }
+                IconButton(onClick = { /* меню */ }) {
+                    Icon(Icons.Filled.MoreVert, "menu", tint = Primary, modifier = Modifier.size(24.dp))
+                }
             }
             }
         },
