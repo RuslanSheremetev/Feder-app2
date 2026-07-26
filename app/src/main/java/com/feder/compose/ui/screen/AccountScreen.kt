@@ -75,7 +75,6 @@ private fun OptionsList(
     onSecurity: () -> Unit,
     onChangeNumber: () -> Unit,
     onTwoStep: () -> Unit,
-    onRequestInfo: () -> Unit,
     onDeleteAccount: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
