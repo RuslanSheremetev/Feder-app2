@@ -80,7 +80,7 @@ private fun OptionsList(
     onDeleteAccount: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onClick = { showName = true })
+        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onSecurity)
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
         DeleteOption(onDeleteAccount)
