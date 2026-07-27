@@ -12,6 +12,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -30,7 +31,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -203,7 +207,26 @@ fun FederApp() {
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)).clickable { viewModel.showStories = !viewModel.showStories }, contentAlignment = Alignment.Center) {
-                    Icon(if (viewModel.showStories) Icons.Filled.Close else Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
+                    if (viewModel.showStories) {
+                    Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp))
+                } else {
+                    Canvas(modifier = Modifier.size(24.dp)) {
+                        val strokeWidth = 1.2.dp.toPx()
+                        val r = size.minDimension / 2 - strokeWidth / 2
+                        val center = Offset(size.width / 2, size.height / 2)
+                        // Пунктирный круг
+                        drawCircle(
+                            color = Color(0xFFAFC6FF),
+                            radius = r,
+                            center = center,
+                            style = Stroke(width = strokeWidth, pathEffect = PathEffect.dashPathEffect(floatArrayOf(3.dp.toPx(), 5.dp.toPx())))
+                        )
+                        // Плюс
+                        val plusLen = 7.dp.toPx()
+                        drawLine(Color(0xFFAFC6FF), Offset(center.x, center.y - plusLen/2), Offset(center.x, center.y + plusLen/2), strokeWidth = 1.5.dp.toPx())
+                        drawLine(Color(0xFFAFC6FF), Offset(center.x - plusLen/2, center.y), Offset(center.x + plusLen/2, center.y), strokeWidth = 1.5.dp.toPx())
+                    }
+                }
                 }
                 Spacer(Modifier.width(12.dp))
                 Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
