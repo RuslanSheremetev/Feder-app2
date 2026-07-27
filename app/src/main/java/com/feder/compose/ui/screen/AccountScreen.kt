@@ -62,6 +62,7 @@ fun AccountScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             
             OptionsList(
+                onName = { showName = true },
                 onSecurity = { showSecurity = true },
                 onChangeNumber = { showChangeNumber = true },
                 onTwoStep = { showTwoStep = true },
@@ -74,13 +75,14 @@ fun AccountScreen(onBack: () -> Unit) {
 
 @Composable
 private fun OptionsList(
+    onName: () -> Unit,
     onSecurity: () -> Unit,
     onChangeNumber: () -> Unit,
     onTwoStep: () -> Unit,
     onDeleteAccount: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onClick = { showName = true })
+        SettingsOption(Icons.Filled.Person, "Name", "Name, username, bio", onName)
         SettingsOption(Icons.Filled.Security, "Security", "Security notifications and encryption", onSecurity)
         SettingsOption(Icons.Filled.PhonelinkSetup, "Change Number", "Migrate account info & groups", onChangeNumber)
         TwoStepOption(onTwoStep)
