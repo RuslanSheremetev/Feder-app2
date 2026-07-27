@@ -194,7 +194,7 @@ fun FederApp() {
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Color.Transparent).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)).clickable { }, contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                 }
                 Spacer(Modifier.width(12.dp))
