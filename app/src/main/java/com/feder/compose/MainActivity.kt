@@ -317,6 +317,7 @@ fun FederApp() {
                         }
                         
             // Stories Block
+            item {
             AnimatedVisibility(
                 visible = viewModel.showStories && viewModel.selectedTab == 0,
                 enter = fadeIn() + expandVertically(),
@@ -370,6 +371,7 @@ fun FederApp() {
                         Spacer(Modifier.height(8.dp))
                     }
                 }
+            }
             }
 
                         // Список чатов
