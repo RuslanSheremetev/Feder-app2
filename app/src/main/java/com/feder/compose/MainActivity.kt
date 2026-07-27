@@ -8,8 +8,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -98,6 +102,7 @@ class ChatViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
+    var showStories by mutableStateOf(false)
     var isSearchVisible by mutableStateOf(false)
     var searchQuery by mutableStateOf("")
     
@@ -196,8 +201,8 @@ fun FederApp() {
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Color.Transparent).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)).clickable { viewModel.selectedTab = 1 }, contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
+                Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerLow.copy(alpha = 0.5f)).clickable { viewModel.showStories = !viewModel.showStories }, contentAlignment = Alignment.Center) {
+                    Icon(if (viewModel.showStories) Icons.Filled.Close else Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(24.dp))
                 }
                 Spacer(Modifier.width(12.dp))
                 Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
@@ -310,6 +315,63 @@ fun FederApp() {
                                 }
                             }
                         }
+                        
+            // Stories Block
+            AnimatedVisibility(
+                visible = viewModel.showStories && viewModel.selectedTab == 0,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.6f),
+                    shadowElevation = 8.dp
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Stories", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 20.sp)
+                            IconButton(onClick = { viewModel.showStories = false }, modifier = Modifier.size(32.dp)) {
+                                Icon(Icons.Filled.Close, "close", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // My Story
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Box(
+                                    modifier = Modifier.size(68.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest).border(2.dp, MaterialTheme.colorScheme.surfaceContainer, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+                                }
+                                Spacer(Modifier.height(4.dp))
+                                Text("My story", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            // Contact stories
+                            listOf(
+                                "Alex" to "https://lh3.googleusercontent.com/aida-public/AB6AXuB-7OGxpXvSOENmBkDwACF_n7xv-wYr4cX1No9LRD5MPy6AnJEWq62jhZb2V3J7qA2I5_v00YN5KMQ-ecv_ZeY2hOj1Pk9ZoPf0K9SNLp8BNF3e_YNJRQ2uVv_5S0AkYpPZMHBWqvHW0rZMXL1BaFBtOL3VrBQlSmli6O5gMDjAliZa58m6J1087jR9qfqKTzd4-r2MzHhwf8ybZ9gVp4pqZjUmOxXXjlmJ9LZ93MR7c3iF8v1lXORUheBe5EgGYEXNXwJUzZlqYF4",
+                                "Elena" to "https://lh3.googleusercontent.com/aida-public/AB6AXuCzdntS3OSTjRCd_WonMXkD6f7dnsy_jKn-FWZd2SdCPn88fJg6oexJDcK-FH313KXdTdALokEf042Q-_WsWp4FgknGk4DGyDUkLuLPUaDhrCTAsAxAl39H8dTuEFj6QWAXSxtIbM898_1igDHAKscdd0lHmL6GJmu59Ui1_7yG0gOKP6zQxqh5z0Mqo_YQmNPYA3iYxJ8hRgNWQVDE_wyHEurVt2r-96oZhFFZhf4gUwgiXKk4WBqkgRcH0swe4sIkZ1A9FvLNpbU",
+                                "Marcus" to "https://lh3.googleusercontent.com/aida-public/AB6AXuBnXXSStn8X5F3jR3jIhUKSH-ZxwlSP9Sph9Nda13HroL4saNlBJlakIvPB9W8sRBSLRlVW7KZ-ylD_qrOqaSzuQFKM4mZEZSzDwRDGuU5vjue5Qtd90QRGQhIdVEaFcVnTpDTXsr0PELAK089usKk58JGMutSG_tjqtgOSSMFij52cxSIHxbPflq3SQsNRjRQ6WBJQ3M7pbRM87LXKaTVPJXSbo-xmyFTtFOkUMzZDsebV7GhFoqe2cuBK7D9xGOqUgAVcEs94eXY"
+                            ).forEach { (name, url) ->
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    AsyncImage(model = url, contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape).border(3.dp, MaterialTheme.colorScheme.primary, CircleShape), contentScale = ContentScale.Crop)
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(name, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            }
+
                         // Список чатов
                         items(viewModel.filteredChats) { chat ->
                             val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
