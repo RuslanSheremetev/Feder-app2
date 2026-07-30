@@ -241,7 +241,7 @@ fun FederApp() {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(50),
                     color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.9f),
                     border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)),
