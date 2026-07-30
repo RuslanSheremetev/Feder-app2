@@ -189,7 +189,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     item { Spacer(Modifier.height(16.dp)) }
                     itemsIndexed(messages) { index, msg ->
                         val isMine = msg.from == myUsername
-                        val sameAsPrev = index > 0 && messages[index - 1].from == msg.from
+                        val prevMsg = if (index > 0) messages[index - 1] else null
+                        val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && 
+                            kotlin.math.abs((msg.time.toLongOrNull() ?: 0L) - (prevMsg.time.toLongOrNull() ?: 0L)) < 300
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
@@ -457,7 +459,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean, sameAsPrev: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
-    Column(Modifier.fillMaxWidth().padding(vertical = if (sameAsPrev) 0.dp else 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Column(Modifier.fillMaxWidth().padding(vertical = if (sameAsPrev) 1.dp else 4.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
