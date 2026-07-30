@@ -96,6 +96,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     .header("Authorization", "Bearer $token").build()).execute()
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
+                // Конвертируем строку времени в timeVal для группировки
+                messages = messages.map { msg ->
+                    val parsed = try {
+                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(msg.time)?.time?.div(1000) ?: 0L
+                    } catch (e: Exception) { 0L }
+                    msg.copy(timeVal = parsed)
+                }
             } catch (e: Exception) { }
             isLoading = false
         }
