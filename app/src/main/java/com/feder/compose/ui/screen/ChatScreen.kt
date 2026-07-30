@@ -57,7 +57,8 @@ data class MsgItem(
     val to: String,
     val text: String,
     val time: String,
-    var status: String = "sent"
+    var status: String = "sent",
+    val timeVal: Long = 0L
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -110,7 +111,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     else msg
                 }
             } else {
-                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received")
+                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received", timeVal)
             }
         }
         wsManager.onStatus { wsStatus = it }
@@ -126,7 +127,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         val text = inputText.trim()
         if (text.isEmpty()) return
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending")
+        messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000)
         inputText = ""
         wsManager.send("message", text, chatUsername)
     }
