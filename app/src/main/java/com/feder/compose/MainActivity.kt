@@ -396,6 +396,10 @@ fun FederApp() {
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)
                                         )
+                                    } else if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
+                                        Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                            Icon(Icons.Filled.Bookmarks, "saved", tint = avColor, modifier = Modifier.size(28.dp))
+                                        }
                                     } else {
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                             Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
