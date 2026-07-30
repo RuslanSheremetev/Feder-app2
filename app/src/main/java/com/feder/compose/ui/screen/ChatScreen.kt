@@ -208,6 +208,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && 
                             kotlin.math.abs(msg.timeVal - prevMsg.timeVal) < 300
+                        val nextMsg = if (index < messages.size - 1) messages[index + 1] else null
+                        val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs(nextMsg.timeVal - msg.timeVal) < 300
+                        val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
@@ -474,7 +477,15 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(text: String, time: String, isMine: Boolean, sameAsPrev: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
+@OptIn(ExperimentalFoundationApi::class)
+fun MessageBubble(text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
+    val topRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
+    val bottomRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
+    val vertPad = when (position) { 1 -> 0.dp; 2 -> 2.dp; else -> 4.dp }
+    val ts = if (isMine) 20.dp else topRadius
+    val te = if (isMine) topRadius else 20.dp
+    val bs = if (isMine) 20.dp else bottomRadius
+    val be = if (isMine) bottomRadius else 20.dp
     Column(Modifier.fillMaxWidth().padding(vertical = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
