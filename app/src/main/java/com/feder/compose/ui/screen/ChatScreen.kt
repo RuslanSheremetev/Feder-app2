@@ -137,6 +137,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         messages = messages + MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000)
         inputText = ""
         wsManager.send("message", text, chatUsername)
+        // HTTP отправка для сохранения на сервере
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val json = gson.toJson(mapOf("to" to chatUsername, "text" to text))
+                val body = json.toRequestBody("application/json".toMediaType())
+                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $token").post(body).build()).execute()
+            } catch (e: Exception) { }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -203,9 +211,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
-                            if (sameAsPrev) "" else msg.time.takeLast(8),
+                            if (position == 1 || position == 2) "" else msg.time.takeLast(8),
                             isMine,
-                            sameAsPrev = sameAsPrev,
+                            position = position,
                             onClick = { selectedMessage = msg },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
@@ -467,8 +475,8 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean, sameAsPrev: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
-    Column(Modifier.fillMaxWidth().padding(vertical = if (sameAsPrev) 1.dp else 4.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
-        Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+    Column(Modifier.fillMaxWidth().padding(vertical = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+        Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
         if (time.isNotEmpty()) Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
