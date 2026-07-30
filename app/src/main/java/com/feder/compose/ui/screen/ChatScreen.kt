@@ -67,6 +67,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
+    var isFirstNewMessage by remember { mutableStateOf(true) }
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val context = LocalContext.current
@@ -96,6 +97,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     .header("Authorization", "Bearer $token").build()).execute()
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
+                isFirstNewMessage = true
                 // Конвертируем строку времени в timeVal для группировки
                 messages = messages.map { msg ->
                     val parsed = try {
@@ -118,7 +120,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     else msg
                 }
             } else {
-                messages = messages + MsgItem(sender, myUsername, text, timeStr, "received", timeVal)
+                val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal + (if (isFirstNewMessage) 9999L else 0L) else System.currentTimeMillis() / 1000)
+                isFirstNewMessage = false
+                messages = messages + newMsg
             }
         }
         wsManager.onStatus { wsStatus = it }
