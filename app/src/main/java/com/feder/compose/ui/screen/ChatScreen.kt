@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -172,7 +173,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
                     }
                     IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
@@ -185,10 +186,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    items(messages) { msg ->
+                    itemsIndexed(messages) { index, msg ->
                         val isMine = msg.from == myUsername
+                        val sameAsPrev = index > 0 && messages[index - 1].from == msg.from
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
-                        MessageBubble(msg.text, msg.time.takeLast(8), msg.from == myUsername, onClick = { selectedMessage = msg }, onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time })
+                        MessageBubble(
+                            msg.text,
+                            if (sameAsPrev) "" else msg.time.takeLast(8),
+                            isMine,
+                            sameAsPrev = sameAsPrev,
+                            onClick = { selectedMessage = msg },
+                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
+                        )
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
@@ -446,11 +455,11 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(text: String, time: String, isMine: Boolean, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+fun MessageBubble(text: String, time: String, isMine: Boolean, sameAsPrev: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
+    Column(Modifier.fillMaxWidth().padding(vertical = if (sameAsPrev) 0.dp else 2.dp), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 340.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = if (isMine) RoundedCornerShape(20,20,4,20) else RoundedCornerShape(20,20,20,4), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
         }
-        Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
+        if (time.isNotEmpty()) Text(time, color = OnSurfaceVariant, fontSize = 11.sp, modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp))
     }
 }
