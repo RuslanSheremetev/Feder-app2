@@ -48,6 +48,7 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.Calendar
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -63,6 +64,27 @@ data class MsgItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+
+private fun isSameDay(t1: Long, t2: Long): Boolean {
+    val c1 = Calendar.getInstance().apply { timeInMillis = t1 * 1000 }
+    val c2 = Calendar.getInstance().apply { timeInMillis = t2 * 1000 }
+    return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
+           c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
+}
+
+private fun formatDateHeader(timestamp: Long): String {
+    val cal = Calendar.getInstance().apply { timeInMillis = timestamp * 1000 }
+    val today = Calendar.getInstance()
+    return when {
+        isSameDay(timestamp, today.timeInMillis / 1000) -> "Today"
+        isSameDay(timestamp, (today.timeInMillis / 1000) - 86400) -> "Yesterday"
+        else -> {
+            val sdf = SimpleDateFormat("MMMM d", Locale.getDefault())
+            sdf.format(cal.time)
+        }
+    }
+}
+
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
@@ -193,6 +215,24 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && 
                             kotlin.math.abs((msg.time.toLongOrNull() ?: 0L) - (prevMsg.time.toLongOrNull() ?: 0L)) < 300
+                        if (showDate) {
+                            item {
+                                Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                                    Surface(
+                                        shape = RoundedCornerShape(50),
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                    ) {
+                                        Text(
+                                            formatDateHeader(msg.timeVal),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
