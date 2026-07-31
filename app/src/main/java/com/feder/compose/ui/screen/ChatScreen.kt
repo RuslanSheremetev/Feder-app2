@@ -107,7 +107,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     LaunchedEffect(internalToken) {
-        if (token.isEmpty()) return@LaunchedEffect
+        if (internalToken.isEmpty()) return@LaunchedEffect
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             if (sender == myUsername) {
@@ -127,7 +127,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         wsManager.onStatus { wsStatus = it }
-        wsManager.connect(myUsername, token)
+        wsManager.connect(myUsername, internalToken)
     }
 
 
