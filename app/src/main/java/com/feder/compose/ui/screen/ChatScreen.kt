@@ -151,14 +151,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
         messages = messages + newMsg
         inputText = ""
         wsManager.send("message", text, chatUsername)
-        // HTTP отправка для сохранения на сервере
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val json = gson.toJson(mapOf("to" to chatUsername, "text" to text))
-                val body = json.toRequestBody("application/json".toMediaType())
-                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $token").post(body).build()).execute()
-            } catch (e: Exception) { }
-        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -207,8 +199,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
                     }
-                    IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                    IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    if (chatUsername != myUsername) {
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    }
                     IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 }
             }
@@ -228,7 +222,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
-                            if (position == 1 || position == 2) "" else msg.time.takeLast(8),
+                            if (position == 2 || position == 3) msg.time.takeLast(8) else "",
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
