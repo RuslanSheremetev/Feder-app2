@@ -103,10 +103,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isFirstNewMessage = true
             } catch (e: Exception) { }
             isLoading = false
-        }
-    }
-
-    LaunchedEffect(chatUsername) {
+        // WebSocket
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             if (sender == myUsername) {
@@ -127,8 +124,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
         wsManager.onStatus { wsStatus = it }
         if (internalToken.isNotEmpty()) { wsManager.connect(myUsername, internalToken) }
+        }
     }
-
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
