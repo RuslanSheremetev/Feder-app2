@@ -36,7 +36,6 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit) {
             IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = Primary) }
             Text("Contact Info", color = Primary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = { }) { Icon(Icons.Filled.Edit, "edit", tint = Primary) }
         }
         
         Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
