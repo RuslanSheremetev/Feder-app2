@@ -99,14 +99,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
                 isFirstNewMessage = true
                 // Конвертируем строку времени в timeVal для группировки
+                val sdf1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val sdf2 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault())
                 messages = messages.map { msg ->
-                    val parsed = try {
-                        try { SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault()).parse(msg.time)?.time?.div(1000) }
-                    catch (e: Exception) {
-                        try { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(msg.time)?.time?.div(1000) }
-                        catch (e2: Exception) { null }
-                    } ?: 0L
-                    } catch (e: Exception) { 0L }
+                    val timeStr = msg.time.trim().replace(Regex("\\.\\d+$"), "")
+                    val parsed = try { sdf1.parse(timeStr)?.time?.div(1000) ?: sdf2.parse(msg.time)?.time?.div(1000) } catch (e: Exception) { null } ?: 0L
                     msg.copy(timeVal = parsed)
                 }
             } catch (e: Exception) { }
