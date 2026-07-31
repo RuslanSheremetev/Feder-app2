@@ -71,7 +71,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     var isFirstNewMessage by remember { mutableStateOf(true) }
     var token by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
-    val context = LocalContext.current
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val wsManager = remember { WebSocketManager() }
