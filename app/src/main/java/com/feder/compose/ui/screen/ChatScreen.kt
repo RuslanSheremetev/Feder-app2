@@ -94,7 +94,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
                 isFirstNewMessage = true
-                }
             } catch (e: Exception) { }
             isLoading = false
         }
