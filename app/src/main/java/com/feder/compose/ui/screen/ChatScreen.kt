@@ -103,28 +103,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isFirstNewMessage = true
             } catch (e: Exception) { }
             isLoading = false
-        // WebSocket
+        }
+    }
+    // WebSocket отдельно
+    LaunchedEffect(internalToken) {
+        if (internalToken.isEmpty()) return@LaunchedEffect
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-            if (sender == myUsername) {
-                messages = messages.map { msg ->
-                    if (msg.from == myUsername && msg.text == text && msg.time == "pending") msg.copy(time = timeStr)
-                    else msg
-                }
-            } else {
-                val existing = messages.find { it.from == sender && it.text == text && it.status == "pending" }
-                if (existing != null) {
-                    messages = messages.map { if (it == existing) it.copy(time = timeStr, status = "received", timeVal = if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000) else it }
-                } else {
-                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal + (if (isFirstNewMessage) 9999L else 0L) else System.currentTimeMillis() / 1000)
-                    isFirstNewMessage = false
-                    messages = messages + newMsg
-                }
+            val existing = messages.find { it.from == sender && it.text == text }
+            if (existing == null) {
+                val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000)
+                messages = messages + newMsg
             }
         }
-        wsManager.onStatus { wsStatus = it }
-        if (internalToken.isNotEmpty()) { wsManager.connect(myUsername, internalToken) }
-        }
+        wsManager.connect(myUsername, internalToken)
     }
 
     LaunchedEffect(messages.size) {
