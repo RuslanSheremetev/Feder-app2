@@ -367,7 +367,7 @@ fun FederApp() {
                                 "Marcus" to "https://lh3.googleusercontent.com/aida-public/AB6AXuBnXXSStn8X5F3jR3jIhUKSH-ZxwlSP9Sph9Nda13HroL4saNlBJlakIvPB9W8sRBSLRlVW7KZ-ylD_qrOqaSzuQFKM4mZEZSzDwRDGuU5vjue5Qtd90QRGQhIdVEaFcVnTpDTXsr0PELAK089usKk58JGMutSG_tjqtgOSSMFij52cxSIHxbPflq3SQsNRjRQ6WBJQ3M7pbRM87LXKaTVPJXSbo-xmyFTtFOkUMzZDsebV7GhFoqe2cuBK7D9xGOqUgAVcEs94eXY"
                             ).forEach { (name, url) ->
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    AsyncImage(model = url, contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape).border(3.dp, MaterialTheme.colorScheme.primary, CircleShape), contentScale = ContentScale.Crop)
+                                    AsyncImage(model = url, contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                                     Spacer(Modifier.height(4.dp))
                                     Text(name, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
                                 }
