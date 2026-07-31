@@ -38,7 +38,7 @@ class WebSocketManager(
                             if (obj.get("type")?.asString == "message") {
                                 val sender = obj.get("from_user")?.asString ?: "unknown"
                                 val msgText = obj.get("text")?.asString ?: return
-                                val timeVal = obj.get("time")?.asLong ?: 0L
+                                val timeVal = obj.get("timeVal")?.asLong ?: obj.get("time")?.asLong ?: 0L
                                 onMessageCallback?.invoke(sender, msgText, timeVal)
                             }
                         } catch (e: Exception) { }
