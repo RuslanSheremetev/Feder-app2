@@ -103,7 +103,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 val sdf2 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", java.util.Locale.US)
                 messages = messages.map { msg ->
                     val timeStr = msg.time.trim().replace(Regex("\\.\\d+$"), "")
-                    val parsed = try { sdf1.parse(timeStr)?.time?.div(1000) ?: sdf2.parse(msg.time)?.time?.div(1000) } catch (e: Exception) { null } ?: 0L
+                    val parsed = try { val d = sdf1.parse(timeStr); if (d != null) d.time / 1000 else { val d2 = sdf2.parse(msg.time); if (d2 != null) d2.time / 1000 else 0L } } catch (e: Exception) { 0L }
                     msg.copy(timeVal = parsed)
                 }
             } catch (e: Exception) { }
