@@ -63,13 +63,13 @@ data class MsgItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var isFirstNewMessage by remember { mutableStateOf(true) }
-    var token by remember { mutableStateOf("") }
+    // token passed from MainActivity
     val listState = rememberLazyListState()
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
@@ -88,10 +88,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
-                val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
-                val body = authJson.toRequestBody("application/json".toMediaType())
-                val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(body).build()).execute()
-                token = JsonParser.parseString(resp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token").build()).execute()
