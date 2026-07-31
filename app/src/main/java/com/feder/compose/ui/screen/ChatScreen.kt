@@ -144,13 +144,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         inputText = ""
         // HTTP fallback если WebSocket не подключён
         if (wsStatus != "connected") {
-            thread {
-                try {
-                    val json = gson.toJson(mapOf("to" to chatUsername, "text" to text))
-                    val body = json.toRequestBody("application/json".toMediaType())
-                    val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(body).build()).execute()
-                } catch (e: Exception) { }
-            }
+            try {
+                val json = gson.toJson(mapOf("to" to chatUsername, "text" to text))
+                val body = json.toRequestBody("application/json".toMediaType())
+                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(body).build()).enqueue(object : okhttp3.Callback {
+                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
+                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                })
+            } catch (e: Exception) { }
         }
         wsManager.send("message", text, chatUsername)
     }
