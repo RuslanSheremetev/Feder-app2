@@ -120,9 +120,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                     else msg
                 }
             } else {
-                val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal + (if (isFirstNewMessage) 9999L else 0L) else System.currentTimeMillis() / 1000)
-                isFirstNewMessage = false
-                messages = messages + newMsg
+                val existing = messages.find { it.from == sender && it.text == text && it.status == "pending" }
+                if (existing != null) {
+                    messages = messages.map { if (it == existing) it.copy(time = timeStr, status = "received", timeVal = if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000) else it }
+                } else {
+                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal + (if (isFirstNewMessage) 9999L else 0L) else System.currentTimeMillis() / 1000)
+                    isFirstNewMessage = false
+                    messages = messages + newMsg
+                }
             }
         }
         wsManager.onStatus { wsStatus = it }
@@ -137,6 +142,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
+        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000)
+        messages = messages + newMsg
         inputText = ""
         wsManager.send("message", text, chatUsername)
         // HTTP отправка для сохранения на сервере
