@@ -101,7 +101,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, onBac
                 // Конвертируем строку времени в timeVal для группировки
                 messages = messages.map { msg ->
                     val parsed = try {
-                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(msg.time)?.time?.div(1000) ?: 0L
+                        try { SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault()).parse(msg.time)?.time?.div(1000) }
+                    catch (e: Exception) {
+                        try { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(msg.time)?.time?.div(1000) }
+                        catch (e2: Exception) { null }
+                    } ?: 0L
                     } catch (e: Exception) { 0L }
                     msg.copy(timeVal = parsed)
                 }
