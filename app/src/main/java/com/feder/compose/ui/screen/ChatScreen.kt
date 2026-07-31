@@ -88,6 +88,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
+                if (token.isEmpty()) {
+                    val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+                    val authBody = authJson.toRequestBody("application/json".toMediaType())
+                    val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
+                    token = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
+                }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $token").build()).execute()
