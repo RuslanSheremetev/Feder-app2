@@ -85,18 +85,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
 
+    var internalToken = token
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.IO) {
             try {
-                if (token.isEmpty()) {
+                if (internalToken.isEmpty()) {
                     val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
                     val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
-                    token = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
+                    internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $token").build()).execute()
+                    .header("Authorization", "Bearer $internalToken").build()).execute()
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 messages = gson.fromJson(msgResp.body?.string() ?: "[]", type)
                 isFirstNewMessage = true
@@ -105,7 +106,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
 
-    LaunchedEffect(token) {
+    LaunchedEffect(internalToken) {
         if (token.isEmpty()) return@LaunchedEffect
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
