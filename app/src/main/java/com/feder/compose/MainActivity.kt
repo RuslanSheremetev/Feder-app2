@@ -186,6 +186,7 @@ fun FederApp() {
                     chatUsername = viewModel.selectedChat ?: "",
                     myUsername = "demo",
                     token = viewModel.token,
+                    token = viewModel.token,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
                 )
