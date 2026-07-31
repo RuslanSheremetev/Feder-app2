@@ -68,7 +68,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
-    var debugText by remember { mutableStateOf("") }
     var isFirstNewMessage by remember { mutableStateOf(true) }
     // token passed from MainActivity
     val listState = rememberLazyListState()
@@ -96,7 +95,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
                     internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
                 }
-                debugText = "Requesting history for $chatUsername with token: ${internalToken.take(20)}..."
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $internalToken").build()).execute()
@@ -105,7 +103,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
                 messages = loaded
                 isFirstNewMessage = true
-            } catch (e: Exception) { debugText = "Error: ${e.message}" }
+            } catch (e: Exception) { messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L)) }
             isLoading = false
         }
     }
@@ -202,7 +200,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
             }
 
-            if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) { CircularProgressIndicator(color = Primary); Spacer(Modifier.height(8.dp)); Text(debugText, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp) } }
+            if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
