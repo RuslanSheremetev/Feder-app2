@@ -102,7 +102,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
-                messages = loaded
+                messages = loaded.reversed()
                 try {
                     val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
                     httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
