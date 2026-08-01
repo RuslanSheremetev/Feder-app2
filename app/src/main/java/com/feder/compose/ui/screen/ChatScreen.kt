@@ -300,7 +300,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 innerTextField()
                             })
                         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.AttachFile, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.EmojiEmotions, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
                         }
                         Spacer(Modifier.width(4.dp))
                         Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
