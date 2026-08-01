@@ -240,7 +240,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
-                            msg.time.takeLast(8),
+                            msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
@@ -504,8 +504,8 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
-    val topRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
-    val bottomRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
+    val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
+    val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
     val ts = if (isMine) 20.dp else topRadius
     val te = if (isMine) topRadius else 20.dp
@@ -513,11 +513,10 @@ fun MessageBubble(text: String, time: String, isMine: Boolean, position: Int = 3
     val be = if (isMine) bottomRadius else 20.dp
     Column(Modifier.fillMaxWidth().padding(vertical = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
-            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
-                Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
+            Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+                Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty()) {
-                    Spacer(Modifier.width(6.dp))
-                    Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp)
+                    Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.align(Alignment.End).padding(top = 2.dp))
                 }
             }
         }
