@@ -20,6 +20,7 @@ class WebSocketManager(
         .build()
     
     private var onMessageCallback: ((String, String, Long) -> Unit)? = null
+    private var onReceivedCallback: ((String) -> Unit)? = null
     private var onReadCallback: ((String) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -77,6 +78,7 @@ class WebSocketManager(
         onMessageCallback = callback
     }
     
+    fun onReceived(callback: (String) -> Unit) { onReceivedCallback = callback }
     fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
     fun onStatus(callback: (String) -> Unit) {
         onStatusCallback = callback
