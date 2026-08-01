@@ -87,6 +87,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     var internalToken = token
     LaunchedEffect(chatUsername) {
+        withContext(Dispatchers.Main) { Toast.makeText(context, "Chat opened: $chatUsername", Toast.LENGTH_SHORT).show() }
         withContext(Dispatchers.IO) {
             try {
                 if (internalToken.isEmpty()) {
