@@ -232,10 +232,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     itemsIndexed(messages) { index, msg ->
                         val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
-                        val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && 
+                        val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && kotlin.math.abs((msg.timeVal ?: 0) - (prevMsg.timeVal ?: 0)) < 300 && 
                             kotlin.math.abs(msg.timeVal - prevMsg.timeVal) < 300
                         val nextMsg = if (index < messages.size - 1) messages[index + 1] else null
-                        val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs(nextMsg.timeVal - msg.timeVal) < 300
+                        val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs((nextMsg.timeVal ?: 0) - (msg.timeVal ?: 0)) < 300
                         val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
