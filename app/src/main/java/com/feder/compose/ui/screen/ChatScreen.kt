@@ -129,10 +129,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (internalToken.isEmpty()) return@LaunchedEffect
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-            val existing = messages.find { it.from == sender && it.text == text }
-            if (existing == null) {
-                val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000)
-                messages = messages + newMsg
+            // Для своих сообщений - обновляем pending
+            if (sender == myUsername) {
+                messages = messages.map { msg ->
+                    if (msg.from == myUsername && msg.text == text && msg.status == "pending") msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal)
+                    else msg
+                }
+            } else {
+                val existing = messages.find { it.from == sender && it.text == text }
+                if (existing == null) {
+                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000)
+                    messages = messages + newMsg
+                }
             }
         }
         wsManager.connect(myUsername, internalToken)
