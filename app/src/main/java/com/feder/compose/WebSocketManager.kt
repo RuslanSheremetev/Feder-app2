@@ -36,7 +36,10 @@ class WebSocketManager(
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         try {
                             val obj = JsonParser.parseString(text).asJsonObject
-                            if (obj.get("type")?.asString == "read") {
+                            if (obj.get("type")?.asString == "received") {
+                                val from = obj.get("from")?.asString
+                                if (from != null) { onReceivedCallback?.invoke(from) }
+                            } else if (obj.get("type")?.asString == "read") {
                                 val from = obj.get("from")?.asString
                                 if (from != null) { onReadCallback?.invoke(from) }
                             } else if (obj.get("type")?.asString == "message") {
