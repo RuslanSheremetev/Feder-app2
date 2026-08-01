@@ -20,6 +20,7 @@ class WebSocketManager(
         .build()
     
     private var onMessageCallback: ((String, String, Long) -> Unit)? = null
+    private var onReadCallback: ((String) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     
@@ -35,7 +36,10 @@ class WebSocketManager(
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         try {
                             val obj = JsonParser.parseString(text).asJsonObject
-                            if (obj.get("type")?.asString == "message") {
+                            if (obj.get("type")?.asString == "read") {
+                                val from = obj.get("from")?.asString
+                                if (from != null) { onReadCallback?.invoke(from) }
+                            } else if (obj.get("type")?.asString == "message") {
                                 val sender = obj.get("from_user")?.asString ?: "unknown"
                                 val msgText = obj.get("text")?.asString ?: return
                                 val timeVal = obj.get("timeVal")?.asLong ?: obj.get("time")?.asLong ?: 0L
@@ -70,6 +74,7 @@ class WebSocketManager(
         onMessageCallback = callback
     }
     
+    fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
     fun onStatus(callback: (String) -> Unit) {
         onStatusCallback = callback
     }

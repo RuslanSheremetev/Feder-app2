@@ -111,6 +111,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     })
                 } catch (_: Exception) { }
                 isFirstNewMessage = true
+                // Отмечаем как прочитанные
+                try {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/mark_read/$chatUsername").header("Authorization", "Bearer $internalToken").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
+                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
+                        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                    })
+                } catch (_: Exception) { }
             } catch (e: Exception) {
                 messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L))
                 try {
@@ -127,6 +134,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // WebSocket отдельно
     LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
+        wsManager.onRead { from ->
+            messages = messages.map { msg ->
+                if (msg.from == myUsername && msg.to == from) msg.copy(status = "read") else msg
+            }
+        }
         wsManager.onMessage { sender, text, timeVal ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             // Для своих сообщений - обновляем pending
