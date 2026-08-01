@@ -192,13 +192,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         )
                         Spacer(Modifier.weight(1f))
                         IconButton(onClick = { /* Forward */ }) {
-                            Icon(Icons.Filled.Forward, "forward", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         IconButton(onClick = { /* Delete */ }) {
-                            Icon(Icons.Filled.Delete, "delete", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         IconButton(onClick = { }) {
-                            Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.MoreVert, "more", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
                 }
@@ -206,7 +206,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
                         Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                             Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -218,10 +218,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
                     }
                     if (chatUsername != myUsername) {
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     }
-                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
             }
 
@@ -290,7 +290,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true,
                             textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
@@ -300,7 +300,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 innerTextField()
                             })
                         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.EmojiEmotions, "attach", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         Spacer(Modifier.width(4.dp))
                         Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
@@ -318,7 +318,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ) {
                 // Header
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { showForward = false }) { Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = { showForward = false }) { Icon(Icons.Filled.Close, "close", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     Spacer(Modifier.width(8.dp))
                     Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                 }
@@ -448,7 +448,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
                     Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.EmojiEmotions, "emoji", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.EmojiEmotions, "emoji", tint = Color.White, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
                             BasicTextField(
                                 value = attachCaption,
