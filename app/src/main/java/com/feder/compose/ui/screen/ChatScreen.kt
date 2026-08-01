@@ -511,7 +511,7 @@ fun MessageBubble(text: String, time: String, isMine: Boolean, position: Int = 3
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.fillMaxWidth().padding(vertical = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Column(Modifier.fillMaxWidth().padding(top = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 Text("[$position] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
