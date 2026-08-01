@@ -240,7 +240,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
                         MessageBubble(
                             msg.text,
-                            if (position == 2 || position == 3) msg.time.takeLast(8) else "",
+                            msg.time.takeLast(8),
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
@@ -506,7 +506,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 fun MessageBubble(text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
     val topRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
-    val vertPad = when (position) { 0 -> 1.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
+    val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
     val ts = if (isMine) 20.dp else topRadius
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
