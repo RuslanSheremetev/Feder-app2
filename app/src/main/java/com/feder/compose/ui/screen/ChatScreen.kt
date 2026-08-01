@@ -198,7 +198,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         IconButton(onClick = { }) {
-                            Icon(Icons.Filled.MoreVert, "more", tint = Color.White, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
                         }
                     }
                 }
@@ -206,7 +206,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
                         Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                             Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -218,10 +218,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
                     }
                     if (chatUsername != myUsername) {
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = Color.White, modifier = Modifier.size(24.dp)) }
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     }
-                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 }
             }
 
