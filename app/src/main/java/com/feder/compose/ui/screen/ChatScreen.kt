@@ -518,6 +518,20 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                 Text("[$position] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
                 if (time.isNotEmpty()) {
                     Spacer(Modifier.width(6.dp))
+                    if (isMine) {
+                        val checkText = when (msg.status) {
+                            "pending" -> "✓"
+                            "sent" -> "✓"
+                            "received" -> "✓✓"
+                            else -> "✓"
+                        }
+                        val checkColor = when (msg.status) {
+                            "read" -> Color(0xFF4CAF50)
+                            else -> OnPrimaryContainer.copy(alpha = 0.6f)
+                        }
+                        Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                        Spacer(Modifier.width(2.dp))
+                    }
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                 }
             }
