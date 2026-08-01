@@ -98,7 +98,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $internalToken").build()).execute()
+                    .header("Authorization", "Bearer $internalToken").build()).execute(); withContext(Dispatchers.Main) { Toast.makeText(context, "Token: ${internalToken.take(20)}... Body: ${msgResp.body?.contentLength()}", Toast.LENGTH_SHORT).show() }
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
