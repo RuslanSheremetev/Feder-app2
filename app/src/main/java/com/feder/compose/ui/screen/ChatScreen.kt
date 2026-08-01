@@ -102,7 +102,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
-                messages = loaded; withContext(Dispatchers.Main) { val t1 = loaded.getOrNull(0)?.timeVal ?: 0; val t2 = loaded.getOrNull(1)?.timeVal ?: 0; Toast.makeText(context, "t1=$t1 t2=$t2 diff=${kotlin.math.abs(t2-t1)}", Toast.LENGTH_LONG).show() }
+                messages = loaded; withContext(Dispatchers.Main) { val m1 = loaded.getOrNull(0); val m2 = loaded.getOrNull(1); Toast.makeText(context, "f1=${m1?.from} f2=${m2?.from} tv1=${m1?.timeVal} tv2=${m2?.timeVal}", Toast.LENGTH_LONG).show() }
                 try {
                     val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
                     httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
