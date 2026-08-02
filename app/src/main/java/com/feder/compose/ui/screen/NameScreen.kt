@@ -20,6 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import okhttp3.*
+import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +34,29 @@ fun NameScreen(onBack: () -> Unit) {
     var bio by remember { mutableStateOf("Product designer at Feder. Passionate about creating seamless user experiences and deep-surface aesthetics. 🎨✨") }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+    var lastName by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var birthday by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/demo").build()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+            val body = response.body?.string()
+            if (body != null) {
+                val json = JsonParser.parseString(body).asJsonObject
+                val fullName = json.get("name")?.asString ?: ""
+                val parts = fullName.split(" ", limit = 2)
+                firstName = parts.getOrElse(0) { "" }
+                lastName = parts.getOrElse(1) { "" }
+                bio = json.get("bio")?.asString ?: ""
+                phone = json.get("phone")?.asString ?: ""
+                birthday = json.get("birthday")?.asString ?: ""
+            }
+        } catch (_: Exception) { }
+    }
         topBar = {
             TopAppBar(
                 title = { Text("Profile Settings", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 20.sp) },
@@ -147,9 +173,9 @@ fun NameScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.6f)
             ) {
                 Column {
-                    InfoRow(Icons.Filled.Call, "+1 (555) 012-3456", "Phone number")
-                    InfoRow(Icons.Filled.AlternateEmail, "@alex_feder", "Username")
-                    InfoRow(Icons.Filled.CalendarToday, "March 12, 1994", "Date of birth", last = true)
+                    InfoRow(Icons.Filled.Call, phone.ifEmpty { "Not set" }, "Phone number")
+                    InfoRow(Icons.Filled.AlternateEmail, "@demo", "Username")
+                    InfoRow(Icons.Filled.CalendarToday, birthday.ifEmpty { "Not set" }, "Date of birth", last = true)
                 }
             }
 
