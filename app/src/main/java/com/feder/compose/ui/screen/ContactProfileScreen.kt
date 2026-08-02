@@ -43,18 +43,13 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
         }
         
         Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.size(128.dp)) {
-                Box(Modifier.size(128.dp).clip(CircleShape).background(SurfaceContainerLow).border(4.dp, SurfaceContainerHigh, CircleShape)) {
-                    Box(Modifier.size(120.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(120.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         if (avatarUrl != null) {
                             AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                         } else {
                             Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(64.dp))
                         }
-                    }
                 }
-                Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF41B35D)).border(4.dp, Surface, CircleShape).align(Alignment.BottomEnd).offset(x = (-4).dp, y = (-4).dp))
-            }
             Spacer(Modifier.height(24.dp))
             Text(contactName, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Text("Available - Mobile: +1 (555) 012-3456", color = Secondary, fontSize = 15.sp)
