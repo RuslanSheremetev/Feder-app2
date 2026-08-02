@@ -191,7 +191,7 @@ fun FederApp() {
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
                 )
                 viewModel.selectedTab == 1 -> ContactsScreen(onBack = { viewModel.selectedTab = 0 })
-                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 })
+                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                 viewModel.selectedProfile != null -> ContactProfileScreen(
                     contactName = viewModel.selectedProfile ?: "",
                     onBack = { viewModel.selectedProfile = null }
@@ -407,7 +407,7 @@ fun FederApp() {
                                             Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                         }
                                     }
-                                    if (chat.online) {
+                                    if (chat.online && chat.username != "demo") {
                                         Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
                                     }
                                 }
