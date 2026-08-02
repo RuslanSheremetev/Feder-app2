@@ -52,7 +52,11 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 }
             Spacer(Modifier.height(24.dp))
             Text(contactName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text("@$contactName", color = Secondary, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("@$contactName", color = Secondary, fontSize = 14.sp)
+                Spacer(Modifier.width(8.dp))
+                Icon(Icons.Filled.QrCode, "qr", tint = Secondary, modifier = Modifier.size(18.dp))
+            }
             Text(phone, color = Secondary, fontSize = 15.sp)
             if (bio.isNotEmpty()) { Text(bio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
