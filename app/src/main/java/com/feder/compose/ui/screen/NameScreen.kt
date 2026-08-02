@@ -54,7 +54,6 @@ fun NameScreen(onBack: () -> Unit) {
         } catch (_: Exception) { }
     }
 
-    var bio by remember { mutableStateOf("Product designer at Feder. Passionate about creating seamless user experiences and deep-surface aesthetics. 🎨✨") }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
