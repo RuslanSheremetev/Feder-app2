@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 
 @Composable
-fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null) {
+fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null, phone: String = "", bio: String = "") {
     var isMuted by remember { mutableStateOf(false) }
     
     Column(
@@ -52,7 +52,8 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 }
             Spacer(Modifier.height(24.dp))
             Text(contactName, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text("Mobile: +1 (555) 012-3456", color = Secondary, fontSize = 15.sp)
+            Text(phone, color = Secondary, fontSize = 15.sp)
+            if (bio.isNotEmpty()) { Text(bio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 QuickAction(Icons.Filled.Chat, "Message")
