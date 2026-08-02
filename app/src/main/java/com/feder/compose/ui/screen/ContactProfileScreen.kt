@@ -35,6 +35,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
     var userBio by remember { mutableStateOf(bio) }
     var userBirthday by remember { mutableStateOf(birthday) }
     var userAvatar by remember { mutableStateOf(avatarUrl) }
+    var userName by remember { mutableStateOf(contactName) }
     
     LaunchedEffect(contactName) {
         try {
@@ -48,6 +49,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 userBio = json.get("bio")?.asString ?: bio
                 userBirthday = json.get("birthday")?.asString ?: birthday
                 userAvatar = json.get("avatar_url")?.asString ?: avatarUrl
+                userName = json.get("name")?.asString ?: contactName
             }
         } catch (_: Exception) { }
     }
@@ -73,7 +75,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                         }
                 }
             Spacer(Modifier.height(24.dp))
-            Text(contactName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(userName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("@$contactName", color = Secondary, fontSize = 14.sp)
                 Spacer(Modifier.width(8.dp))
