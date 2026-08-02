@@ -2,6 +2,7 @@ package com.feder.compose.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import kotlinx.coroutines.Dispatchers
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -41,7 +42,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
         try {
             val client = OkHttpClient()
             val request = Request.Builder().url("http://2.26.71.102:8002/api/user/$contactName").build()
-            val response = client.newCall(request).execute()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response.body?.string()
             if (body != null) {
                 val json = JsonParser.parseString(body).asJsonObject
