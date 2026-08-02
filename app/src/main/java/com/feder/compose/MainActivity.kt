@@ -195,9 +195,9 @@ fun FederApp() {
                 viewModel.selectedProfile != null -> ContactProfileScreen(
                     contactName = viewModel.chats.find { it.username == viewModel.selectedProfile }?.name ?: viewModel.selectedProfile ?: "",
                     avatarUrl = viewModel.chats.find { it.username == viewModel.selectedProfile }?.avatarUrl,
-                    phone = "+1 (555) 012-3456",
-                    bio = "Hey! I am using Feder Messenger",
-                    birthday = "August 15, 1995",
+                    phone = "",
+                    bio = "",
+                    birthday = "",
                     onBack = { viewModel.selectedProfile = null }
                 )
             }
