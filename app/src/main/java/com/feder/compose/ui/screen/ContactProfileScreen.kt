@@ -24,11 +24,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import okhttp3.*
+import com.google.gson.JsonParser
 import com.feder.compose.ui.theme.*
 
 @Composable
 fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null, phone: String = "", bio: String = "", birthday: String = "") {
     var isMuted by remember { mutableStateOf(false) }
+    var userPhone by remember { mutableStateOf(phone) }
+    var userBio by remember { mutableStateOf(bio) }
+    var userBirthday by remember { mutableStateOf(birthday) }
+    var userAvatar by remember { mutableStateOf(avatarUrl) }
+    
+    LaunchedEffect(contactName) {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/$contactName").build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            if (body != null) {
+                val json = JsonParser.parseString(body).asJsonObject
+                userPhone = json.get("phone")?.asString ?: phone
+                userBio = json.get("bio")?.asString ?: bio
+                userBirthday = json.get("birthday")?.asString ?: birthday
+                userAvatar = json.get("avatar_url")?.asString ?: avatarUrl
+            }
+        } catch (_: Exception) { }
+    }
     
     Column(
         modifier = Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState())
@@ -45,7 +67,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
         Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(120.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         if (avatarUrl != null) {
-                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(userAvatar ?: "").crossfade(true).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                         } else {
                             Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(64.dp))
                         }
@@ -57,8 +79,8 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 Spacer(Modifier.width(8.dp))
                 Icon(Icons.Filled.QrCode, "qr", tint = Secondary, modifier = Modifier.size(18.dp))
             }
-            Text(phone, color = Secondary, fontSize = 15.sp)
-            if (bio.isNotEmpty()) { Text(bio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
+            Text(userPhone, color = Secondary, fontSize = 15.sp)
+            if (userBio.isNotEmpty()) { Text(userBio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 QuickAction(Icons.Filled.Chat, "Message")
