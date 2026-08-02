@@ -52,7 +52,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 }
             Spacer(Modifier.height(24.dp))
             Text(contactName, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text("Available - Mobile: +1 (555) 012-3456", color = Secondary, fontSize = 15.sp)
+            Text("Mobile: +1 (555) 012-3456", color = Secondary, fontSize = 15.sp)
             Spacer(Modifier.height(32.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 QuickAction(Icons.Filled.Chat, "Message")
