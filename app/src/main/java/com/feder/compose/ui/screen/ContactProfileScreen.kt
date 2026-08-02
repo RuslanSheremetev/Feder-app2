@@ -51,7 +51,8 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                         }
                 }
             Spacer(Modifier.height(24.dp))
-            Text(contactName, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(contactName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, color = OnSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text("@$contactName", color = Secondary, fontSize = 14.sp)
             Text(phone, color = Secondary, fontSize = 15.sp)
             if (bio.isNotEmpty()) { Text(bio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
