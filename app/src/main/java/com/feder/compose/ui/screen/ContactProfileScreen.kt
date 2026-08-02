@@ -71,12 +71,10 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
             Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
                 Column(Modifier.padding(20.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Shared Media", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                        Text("See All", color = Primary, fontSize = 13.sp)
+                        Text("Media", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        repeat(3) { Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHighest)) }
                     }
                 }
             }
@@ -90,7 +88,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                         Switch(checked = isMuted, onCheckedChange = { isMuted = it }, colors = SwitchDefaults.colors(checkedTrackColor = Primary))
                     }
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.1f))
-                    ProfileRow(Icons.Filled.Star, "Starred Messages")
+                    ProfileRow(Icons.Filled.Image, "Media")
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.1f))
                     ProfileRow(Icons.Filled.Wallpaper, "Wallpaper & Sound")
                 }
