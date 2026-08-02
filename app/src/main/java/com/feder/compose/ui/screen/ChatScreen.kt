@@ -301,7 +301,7 @@ wsManager.send("message", text, chatUsername)
             }
             // Input
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
-                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow, shadowElevation = 4.dp) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                             Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
@@ -379,7 +379,7 @@ wsManager.send("message", text, chatUsername)
                 
                 // Input field like in chat
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
-                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow, shadowElevation = 4.dp) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             var forwardText by remember { mutableStateOf("") }
                             BasicTextField(
@@ -460,7 +460,7 @@ wsManager.send("message", text, chatUsername)
                 // Input like in chat
                 var attachCaption by remember { mutableStateOf("") }
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
-                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+                    Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow, shadowElevation = 4.dp) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.EmojiEmotions, "emoji", tint = Color.White, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
