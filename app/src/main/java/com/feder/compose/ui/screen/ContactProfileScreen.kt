@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 
 @Composable
-fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null, phone: String = "", bio: String = "") {
+fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null, phone: String = "", bio: String = "", birthday: String = "") {
     var isMuted by remember { mutableStateOf(false) }
     
     Column(

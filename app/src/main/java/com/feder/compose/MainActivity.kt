@@ -197,6 +197,7 @@ fun FederApp() {
                     avatarUrl = viewModel.chats.find { it.username == viewModel.selectedProfile }?.avatarUrl,
                     phone = "+1 (555) 012-3456",
                     bio = "Hey! I am using Feder Messenger",
+                    birthday = "August 15, 1995",
                     onBack = { viewModel.selectedProfile = null }
                 )
             }
