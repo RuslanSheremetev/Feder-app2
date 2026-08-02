@@ -80,6 +80,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 Icon(Icons.Filled.QrCode, "qr", tint = Secondary, modifier = Modifier.size(18.dp))
             }
             Text(userPhone, color = Secondary, fontSize = 15.sp)
+              Text(userBirthday, color = Secondary, fontSize = 15.sp)
             if (userBio.isNotEmpty()) { Text(userBio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -94,16 +95,6 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
         Spacer(Modifier.height(16.dp))
         
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
-                Column(Modifier.padding(20.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Media", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    }
-                }
-            }
             
             Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
                 Column {
