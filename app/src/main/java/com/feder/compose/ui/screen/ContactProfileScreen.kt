@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.feder.compose.ui.theme.*
 
 @Composable
-fun ContactProfileScreen(contactName: String, onBack: () -> Unit) {
+fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null) {
     var isMuted by remember { mutableStateOf(false) }
     
     Column(
@@ -42,7 +42,11 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit) {
             Box(Modifier.size(128.dp)) {
                 Box(Modifier.size(128.dp).clip(CircleShape).background(SurfaceContainerLow).border(4.dp, SurfaceContainerHigh, CircleShape)) {
                     Box(Modifier.size(120.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(64.dp))
+                        if (avatarUrl != null) {
+                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                        } else {
+                            Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(64.dp))
+                        }
                     }
                 }
                 Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF41B35D)).border(4.dp, Surface, CircleShape).align(Alignment.BottomEnd).offset(x = (-4).dp, y = (-4).dp))

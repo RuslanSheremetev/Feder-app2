@@ -194,6 +194,7 @@ fun FederApp() {
                 viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                 viewModel.selectedProfile != null -> ContactProfileScreen(
                     contactName = viewModel.selectedProfile ?: "",
+                    avatarUrl = viewModel.chats.find { it.username == viewModel.selectedProfile }?.avatarUrl,
                     onBack = { viewModel.selectedProfile = null }
                 )
             }
