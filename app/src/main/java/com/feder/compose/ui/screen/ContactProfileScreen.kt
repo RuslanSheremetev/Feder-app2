@@ -83,8 +83,8 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                 Spacer(Modifier.width(8.dp))
                 Icon(Icons.Filled.QrCode, "qr", tint = Secondary, modifier = Modifier.size(18.dp))
             }
-            if (userPhone.isNotEmpty()) { Text(userPhone, color = Secondary, fontSize = 15.sp)
-              if (userBirthday.isNotEmpty()) { Text(userBirthday, color = Secondary, fontSize = 15.sp)
+            if (userPhone.isNotEmpty()) { Text(userPhone, color = Secondary, fontSize = 15.sp) }
+            if (userBirthday.isNotEmpty()) { Text(userBirthday, color = Secondary, fontSize = 15.sp) }
             if (userBio.isNotEmpty()) { Text(userBio, color = OnSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
             Spacer(Modifier.height(32.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
