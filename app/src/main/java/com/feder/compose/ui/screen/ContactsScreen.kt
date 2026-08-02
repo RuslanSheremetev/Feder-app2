@@ -21,9 +21,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
+import okhttp3.*
+import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class Contact(
     val name: String,
+    val username: String,
     val status: String,
     val avatarUrl: String? = null,
     val initials: String? = null,
@@ -35,13 +42,30 @@ data class Contact(
 fun ContactsScreen(onBack: () -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
-    val contacts = listOf(
-        Contact("Adeline Vance", "online", "https://lh3.googleusercontent.com/aida-public/AB6AXuCocqYj4XRvJvH4qN7gaRnx_tP2okau1VDNO0xe2iNzCUeNgJQuob3TqPDyRMUXtytRz6MZ1KGdJrrhZ5Cj5PobRn9HBuPvBBXkucHPc6tU_CmevyMZO6KIzyQYqiI1M3SypaYmvKfKD5N78E_MhseFzEP8f4DVdxqxrWWtO5spHA7fqv34RCuoHOCoB5yarWw8Y5if4EsRhds7cJgLkWJpV4mt_jJToarYRmVtRSedVxc8KHRaCZGeNAFYRShFhX8D2MuF_HnWuQQ", online = true),
-        Contact("Arthur Shelby", "last seen 2h ago", initials = "AS"),
-        Contact("Beatrice Thorne", "last seen yesterday at 11:42 PM", "https://lh3.googleusercontent.com/aida-public/AB6AXuD8rJMpBCcb158M4nqX0R0t9nP7u3IaCRJb7yUFC-VwBuQUeQhKHrUBAo4TqgnQ2MuzI6LKUtliGDsvvNYoFKVYXR4FYcLiisS6lmOKkO4gwB2AJfmPYySjnv0mOFJeCXt40TFnpRmG_qX2ra-lyG-2cRpeu7w34JSJuUaxRxQCeXxpP1Xnf0R2mlHQ8r4dQjGBDevqvKV3C0q4cFbHi2DY4ihGeHpCZLNBC9oDNgVKpHqmX3iBJH-lQf7cx_AaW8HCmbIG7aLSmnQ"),
-        Contact("Cassian Wilde", "online", initials = "CW", online = true),
-        Contact("Cyrus Moen", "last seen 5m ago", "https://lh3.googleusercontent.com/aida-public/AB6AXuA7p9auMo6q_AjZ1JmUb_vKzSsATp8Vs_EJpEwypiU05zLI_T42TeBWb9aF7zIkO6ixZ3idXUuMqsZX3-47E8s2g_uNPW8P59oKw8-Z7JoF5CRe-3utZWghgHampKQ-pXzjAb88lcN7R6j55-0OZqLOgMfUlbpXHqifGGSM2JD4wOLi0L0IOdZj2Cs1qsO9VYv7epYJAcIHPo1UfaQbBR9JBMi1RBZ3UbcpOHCP2LFQPrSbRBnIDJST2hAqTHIoxssxZMlMEkiG96I")
-    )
+    var contacts by remember { mutableStateOf(listOf<Contact>()) }
+    
+    LaunchedEffect(Unit) {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=demo").build()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+            val body = response.body?.string()
+            if (body != null) {
+                val jsonArray = JsonParser.parseString(body).asJsonArray
+                val loaded = jsonArray.map { el ->
+                    val obj = el.asJsonObject
+                    val uname = obj.get("username")?.asString ?: ""
+                    val name = obj.get("name")?.asString ?: uname
+                    val avatar = obj.get("avatar_url")?.asString
+                    val online = obj.get("online")?.asBoolean ?: false
+                    val lastMsg = obj.get("last_message")?.asString ?: ""
+                    val status = if (online) "online" else if (lastMsg.isNotEmpty()) lastMsg else "offline"
+                    Contact(name = name, username = uname, status = status, avatarUrl = avatar, initials = name.take(2).uppercase(), online = online)
+                }
+                contacts = loaded.filter { it.username != "demo" && it.username != "123" }
+            }
+        } catch (_: Exception) { }
+    }
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
