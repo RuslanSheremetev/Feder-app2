@@ -29,11 +29,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun NameScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
-    var firstName by remember { mutableStateOf("Alexander") }
-    var lastName by remember { mutableStateOf("Federov") }
-    var bio by remember { mutableStateOf("Product designer at Feder. Passionate about creating seamless user experiences and deep-surface aesthetics. 🎨✨") }
-
-    Scaffold(
+    var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -57,6 +53,11 @@ fun NameScreen(onBack: () -> Unit) {
             }
         } catch (_: Exception) { }
     }
+
+    var bio by remember { mutableStateOf("Product designer at Feder. Passionate about creating seamless user experiences and deep-surface aesthetics. 🎨✨") }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text("Profile Settings", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.W600, fontSize = 20.sp) },
