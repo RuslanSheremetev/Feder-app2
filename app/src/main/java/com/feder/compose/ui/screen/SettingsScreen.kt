@@ -90,6 +90,8 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                         Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(48.dp))
                     }
                 }
+            }
+            Spacer(Modifier.height(12.dp))
             Text(displayName, color = OnSurface, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
             Text("$phone  |  @$login", color = Secondary, fontSize = 14.sp)
             if (birthday.isNotEmpty()) { Text(birthday, color = Secondary, fontSize = 14.sp) }
