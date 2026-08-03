@@ -77,12 +77,6 @@ fun NameScreen(onBack: () -> Unit) {
                     }
                 },
                 actions = {
-                    Box(
-                        modifier = Modifier.size(32.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Person, "profile", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(18.dp))
-                    }
                     Spacer(Modifier.width(8.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
