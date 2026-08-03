@@ -38,6 +38,26 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
     var showNotifications by remember { mutableStateOf(false) }
     var showDataStorage by remember { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(false) }
+    var displayName by remember { mutableStateOf(username) }
+    var phone by remember { mutableStateOf("") }
+    var login by remember { mutableStateOf(username) }
+    var birthday by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/demo").build()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+            val body = response.body?.string()
+            if (body != null) {
+                val json = JsonParser.parseString(body).asJsonObject
+                displayName = json.get("name")?.asString ?: username
+                phone = json.get("phone")?.asString ?: ""
+                login = json.get("username")?.asString ?: username
+                birthday = json.get("birthday")?.asString ?: ""
+            }
+        } catch (_: Exception) { }
+    }
 
     if (showAccount) { AccountScreen(onBack = { showAccount = false }); return }
     if (showPrivacy) { PrivacyScreen(onBack = { showPrivacy = false }); return }
