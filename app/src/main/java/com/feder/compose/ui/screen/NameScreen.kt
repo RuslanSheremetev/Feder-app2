@@ -3,6 +3,7 @@ package com.feder.compose.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import okhttp3.MediaType.Companion.toMediaType
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +58,7 @@ fun NameScreen(onBack: () -> Unit) {
         try {
             val client = OkHttpClient()
             val json = """{"username":"demo","first_name":"$firstName","last_name":"$lastName","bio":"$bio","phone":"$phone","birthday":"$birthday"}"""
-            val body = RequestBody.create(MediaType.parse("application/json"), json)
+            val body = RequestBody.create("application/json".toMediaType(), json)
             val request = Request.Builder().url("http://2.26.71.102:8002/api/user/update").put(body).build()
             val response = client.newCall(request).execute()
         } catch (_: Exception) { }
