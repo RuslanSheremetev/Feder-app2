@@ -90,9 +90,6 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                         Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(48.dp))
                     }
                 }
-                Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF41B35D)).border(4.dp, Background, CircleShape).align(Alignment.BottomEnd).offset(x = (-4).dp, y = (-4).dp))
-            }
-            Spacer(Modifier.height(12.dp))
             Text(displayName, color = OnSurface, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
             Text("$phone  |  @$login", color = Secondary, fontSize = 14.sp)
             if (birthday.isNotEmpty()) { Text(birthday, color = Secondary, fontSize = 14.sp) }
