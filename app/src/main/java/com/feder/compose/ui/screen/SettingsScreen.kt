@@ -21,6 +21,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import okhttp3.*
+import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +73,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                 Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF41B35D)).border(4.dp, Background, CircleShape).align(Alignment.BottomEnd).offset(x = (-4).dp, y = (-4).dp))
             }
             Spacer(Modifier.height(12.dp))
-            Text(username, color = OnSurface, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(displayName, color = OnSurface, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
             Text("Active now", color = Secondary, fontSize = 14.sp)
             Spacer(Modifier.height(12.dp))
             Surface(modifier = Modifier.clickable { }, shape = RoundedCornerShape(20.dp), color = Primary) {
