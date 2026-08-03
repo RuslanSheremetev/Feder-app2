@@ -53,6 +53,16 @@ fun NameScreen(onBack: () -> Unit) {
             }
         } catch (_: Exception) { }
     }
+    fun saveProfile() {
+        try {
+            val client = OkHttpClient()
+            val json = """{"username":"demo","first_name":"$firstName","last_name":"$lastName","bio":"$bio","phone":"$phone","birthday":"$birthday"}"""
+            val body = RequestBody.create(MediaType.parse("application/json"), json)
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/update").put(body).build()
+            val response = client.newCall(request).execute()
+        } catch (_: Exception) { }
+    }
+
 
 
     Scaffold(
@@ -145,7 +155,7 @@ fun NameScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     OutlinedTextField(
                         value = bio,
-                        onValueChange = { bio = it },
+                        onValueChange = { bio = it; saveProfile() },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                         colors = OutlinedTextFieldDefaults.colors(
