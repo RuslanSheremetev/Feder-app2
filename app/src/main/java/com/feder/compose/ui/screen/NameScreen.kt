@@ -107,7 +107,7 @@ fun NameScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     OutlinedTextField(
                         value = firstName,
-                        onValueChange = { firstName = it },
+                        onValueChange = { firstName = it; saveProfile() },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -127,7 +127,7 @@ fun NameScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     OutlinedTextField(
                         value = lastName,
-                        onValueChange = { lastName = it },
+                        onValueChange = { lastName = it; saveProfile() },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                         colors = OutlinedTextFieldDefaults.colors(
