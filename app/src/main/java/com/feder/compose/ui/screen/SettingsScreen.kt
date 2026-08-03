@@ -97,9 +97,6 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
             Text("$phone  |  @$login", color = Secondary, fontSize = 14.sp)
             if (birthday.isNotEmpty()) { Text(birthday, color = Secondary, fontSize = 14.sp) }
             Spacer(Modifier.height(12.dp))
-            Surface(modifier = Modifier.clickable { }, shape = RoundedCornerShape(20.dp), color = Primary) {
-                Text("Edit Profile", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
-            }
         }
         Spacer(Modifier.height(32.dp))
         SettingsCard(Icons.Filled.Person, "Account", "Security, change number", onClick = { showAccount = true })
