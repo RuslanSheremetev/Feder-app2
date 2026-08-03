@@ -118,7 +118,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
             }
             
             Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
-                Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().clickable { }.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Block, "block", tint = Error, modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(16.dp))
                     Text("Block $contactName", color = Error, fontSize = 17.sp, fontWeight = FontWeight.Medium)
