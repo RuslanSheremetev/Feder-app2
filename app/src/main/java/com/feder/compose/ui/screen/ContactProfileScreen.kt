@@ -33,6 +33,8 @@ import com.feder.compose.ui.theme.*
 @Composable
 fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: String? = null, phone: String = "", bio: String = "", birthday: String = "") {
     var isMuted by remember { mutableStateOf(false) }
+    var showMedia by remember { mutableStateOf(false) }
+    if (showMedia) { MediaScreen(onBack = { showMedia = false }); return }
     var userPhone by remember { mutableStateOf(phone) }
     var userBio by remember { mutableStateOf(bio) }
     var userBirthday by remember { mutableStateOf(birthday) }
@@ -109,14 +111,14 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
                         Switch(checked = isMuted, onCheckedChange = { isMuted = it }, colors = SwitchDefaults.colors(checkedTrackColor = Primary))
                     }
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.1f))
-                    ProfileRow(Icons.Filled.Image, "Media")
+                    ProfileRow(Icons.Filled.Image, "Media") { showMedia = true }
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.1f))
                     ProfileRow(Icons.Filled.Wallpaper, "Wallpaper & Sound")
                 }
             }
             
             Surface(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
-                Row(Modifier.fillMaxWidth().clickable { }.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Block, "block", tint = Error, modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(16.dp))
                     Text("Block $contactName", color = Error, fontSize = 17.sp, fontWeight = FontWeight.Medium)
@@ -147,8 +149,8 @@ fun QuickAction(icon: ImageVector, label: String) {
 }
 
 @Composable
-fun ProfileRow(icon: ImageVector, title: String) {
-    Row(Modifier.fillMaxWidth().clickable { }.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+fun ProfileRow(icon: ImageVector, title: String, onClick: () -> Unit = {}) {
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, title, tint = Secondary, modifier = Modifier.size(24.dp))
         Spacer(Modifier.width(16.dp))
         Text(title, color = OnSurface, fontSize = 17.sp, modifier = Modifier.weight(1f))
