@@ -73,7 +73,8 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
             }
             Spacer(Modifier.height(12.dp))
             Text(displayName, color = OnSurface, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-            Text("Active now", color = Secondary, fontSize = 14.sp)
+            Text("$phone  |  @$login", color = Secondary, fontSize = 14.sp)
+            if (birthday.isNotEmpty()) { Text(birthday, color = Secondary, fontSize = 14.sp) }
             Spacer(Modifier.height(12.dp))
             Surface(modifier = Modifier.clickable { }, shape = RoundedCornerShape(20.dp), color = Primary) {
                 Text("Edit Profile", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
