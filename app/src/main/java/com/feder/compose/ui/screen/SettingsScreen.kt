@@ -66,7 +66,6 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(96.dp)) {
                 Box(Modifier.size(96.dp).clip(CircleShape).background(SurfaceContainerLow).padding(4.dp)) {
-                    Box(Modifier.size(88.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(48.dp))
                     }
                 }
