@@ -38,6 +38,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
     var showNotifications by remember { mutableStateOf(false) }
     var showDataStorage by remember { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(false) }
+    var showAppearance by remember { mutableStateOf(false) }
     var displayName by remember { mutableStateOf(username) }
     var phone by remember { mutableStateOf("") }
     var login by remember { mutableStateOf(username) }
@@ -62,6 +63,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
     if (showAccount) { AccountScreen(onBack = { showAccount = false }); return }
     if (showPrivacy) { PrivacyScreen(onBack = { showPrivacy = false }); return }
     if (showNotifications) { NotificationsScreen(onBack = { showNotifications = false }); return }
+    if (showAppearance) { AppearanceScreen(onBack = { showAppearance = false }); return }
     if (showHelp) { HelpScreen(onBack = { showHelp = false }); return }
     if (showDataStorage) { DataStorageScreen(onBack = { showDataStorage = false }); return }
 
@@ -112,6 +114,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
                 Switch(checked = themeController.isDark, onCheckedChange = { themeController.onToggle() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary, uncheckedThumbColor = Color.White, uncheckedTrackColor = SurfaceContainerHighest))
             }
         }
+        SettingsCard(Icons.Filled.Palette, "Appearance", "Theme, wallpaper, text size", onClick = { showAppearance = true })
         SettingsCard(Icons.Filled.Help, "Help", "Help center, contact us", onClick = { showHelp = true })
         Spacer(Modifier.height(32.dp))
     }
