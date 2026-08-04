@@ -270,7 +270,6 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
-                            onPositioned = { pos -> selectedMessageOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
@@ -558,7 +557,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null) {
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -566,7 +565,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Column(Modifier.fillMaxWidth().padding(top = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 Text("[$position] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
