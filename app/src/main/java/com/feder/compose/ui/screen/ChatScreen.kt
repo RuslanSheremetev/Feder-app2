@@ -271,7 +271,7 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
-                            onPositioned = { pos -> if (selectedMessage == msg) clickedMsgOffset = pos },
+                            onPositioned = { pos -> clickedMsgOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
