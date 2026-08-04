@@ -67,7 +67,6 @@ data class MsgItem(
     val time: String,
     var status: String = "sent",
     val timeVal: Long = 0L,
-    val id: String = java.util.UUID.randomUUID().toString()
 )
 
 @OptIn(ExperimentalFoundationApi::class)
