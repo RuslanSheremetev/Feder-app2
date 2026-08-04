@@ -37,6 +37,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.toIntPx
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.window.Popup
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
@@ -85,6 +90,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectionMode by remember { mutableStateOf(false) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
+    var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
 
@@ -257,7 +263,7 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg },
+                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
@@ -404,21 +410,52 @@ wsManager.send("message", text, chatUsername)
             }
         }
         
-        // Message action menu — DropdownMenu рядом с сообщением
-        Box {
-            DropdownMenu(
-                expanded = selectedMessage != null && !showForward,
+        // Message action menu - Popup near message
+        if (selectedMessage != null && !showForward) {
+            Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
-                offset = androidx.compose.ui.unit.DpOffset(
-                    x = with(LocalDensity.current) { selectedMessageOffset.x.toDp() },
-                    y = with(LocalDensity.current) { selectedMessageOffset.y.toDp() }
+                alignment = Alignment.TopStart,
+                offset = IntOffset(
+                    with(LocalDensity.current) { clickedMsgOffset.x.toIntPx() },
+                    with(LocalDensity.current) { (clickedMsgOffset.y.toIntPx() - 300).coerceAtLeast(0) }
                 )
             ) {
-                DropdownMenuItem(text = { Text("Ответить") }, onClick = { replyMessage = selectedMessage; selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.Reply, null) })
-                DropdownMenuItem(text = { Text("Копировать") }, onClick = { selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) })
-                DropdownMenuItem(text = { Text("Переслать") }, onClick = { showForward = true }, leadingIcon = { Icon(Icons.Filled.Forward, null) })
-                HorizontalDivider()
-                DropdownMenuItem(text = { Text("Удалить", color = MaterialTheme.colorScheme.error) }, onClick = { selectedMessage = null }, leadingIcon = { Icon(Icons.Filled.Delete, null, tint = MaterialTheme.colorScheme.error) })
+                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
+                Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
+                    Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
+                                Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Column(Modifier.widthIn(min = 200.dp)) {
+                            Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.Reply, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
+                            }
+                            Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show(); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.ContentCopy, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
+                            }
+                            Row(Modifier.fillMaxWidth().clickable { showForward = true }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.Forward, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                                Surface(shape = RoundedCornerShape(12.dp), color = SecondaryContainer) { Text("Group", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), fontSize = 10.sp, color = Primary) }
+                            }
+                            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
+                            Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.Delete, null, tint = Error, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                                Icon(if (showDeleteSub) Icons.Filled.ExpandMore else Icons.Filled.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                            }
+                            if (showDeleteSub) {
+                                Column {
+                                    Row(Modifier.fillMaxWidth().clickable { messages = messages.filter { it != selectedMessage }; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for me", color = OnSurface, fontSize = 14.sp) }
+                                    Row(Modifier.fillMaxWidth().clickable { messages = messages.filter { it != selectedMessage }; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for all", color = Error, fontSize = 14.sp) }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         // Attach Sheet
