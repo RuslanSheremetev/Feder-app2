@@ -90,6 +90,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
+    var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
 
     var internalToken = token
