@@ -261,7 +261,7 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg },
+                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset },
                             onPositioned = { pos -> selectedMessageOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
@@ -415,8 +415,8 @@ wsManager.send("message", text, chatUsername)
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
                 offset = IntOffset(
-                    with(LocalDensity.current) { selectedMessageOffset.x.toInt() },
-                    with(LocalDensity.current) { (selectedMessageOffset.y.toInt() - 300).coerceAtLeast(0) }
+                    with(LocalDensity.current) { clickedMsgOffset.x.toInt() },
+                    with(LocalDensity.current) { (clickedMsgOffset.y.toInt() - 300).coerceAtLeast(0) }
                 )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
