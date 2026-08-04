@@ -65,7 +65,8 @@ data class MsgItem(
     val text: String,
     val time: String,
     var status: String = "sent",
-    val timeVal: Long = 0L
+    val timeVal: Long = 0L,
+    val id: String = java.util.UUID.randomUUID().toString()
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -254,7 +255,7 @@ wsManager.send("message", text, chatUsername)
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    itemsIndexed(messages, key = { _, m -> "${m.time}_${m.from}_${m.text}" }) { index, msg ->
+                    itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
                         val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && kotlin.math.abs((msg.timeVal ?: 0) - (prevMsg.timeVal ?: 0)) < 300 && 
