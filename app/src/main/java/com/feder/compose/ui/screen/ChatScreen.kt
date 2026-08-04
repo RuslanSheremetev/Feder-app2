@@ -261,7 +261,7 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset },
+                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset; Toast.makeText(context, "x=${selectedMessageOffset.x.toInt()} y=${selectedMessageOffset.y.toInt()}", Toast.LENGTH_SHORT).show() },
                             onPositioned = { pos -> selectedMessageOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
