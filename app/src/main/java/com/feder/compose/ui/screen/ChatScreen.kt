@@ -93,6 +93,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
 
+        LaunchedEffect(selectedMessage) {
+        selectedMessage?.let {
+            clickedMsgOffset = selectedMessageOffset
+        }
+    }
+
     var internalToken = token
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.Main) { Toast.makeText(context, "Chat opened: $chatUsername", Toast.LENGTH_SHORT).show() }
@@ -262,8 +268,8 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset; Toast.makeText(context, "x=${selectedMessageOffset.x.toInt()} y=${selectedMessageOffset.y.toInt()}", Toast.LENGTH_SHORT).show() },
-                            onPositioned = { pos -> if (selectedMessage == msg) { selectedMessageOffset = pos } },
+                            onClick = { selectedMessage = msg },
+                            onPositioned = { pos -> selectedMessageOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
