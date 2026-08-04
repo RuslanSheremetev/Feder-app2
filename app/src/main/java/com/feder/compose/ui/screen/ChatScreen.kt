@@ -60,6 +60,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class MsgItem(
+    val id: Int = 0,
     val from: String,
     val to: String,
     val text: String,
