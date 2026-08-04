@@ -66,7 +66,9 @@ data class MsgItem(
     val time: String,
     var status: String = "sent",
     val timeVal: Long = 0L,
-    val id: Int = 0
+    val id: Int = 0,
+    var x: Float = 0f,
+    var y: Float = 0f
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -271,7 +273,7 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = { selectedMessage = msg },
-                            onPositioned = { pos -> clickedMsgOffset = pos },
+                            onPositioned = { pos -> msg.x = pos.x; msg.y = pos.y },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
