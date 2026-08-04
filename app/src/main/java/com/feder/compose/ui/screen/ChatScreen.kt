@@ -425,7 +425,10 @@ wsManager.send("message", text, chatUsername)
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
-                // offset removed - centered
+                offset = IntOffset(
+                    with(LocalDensity.current) { (selectedMessage!!.x * density).toInt() },
+                    with(LocalDensity.current) { ((selectedMessage!!.y * density).toInt() - 300).coerceAtLeast(0) }
+                )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
