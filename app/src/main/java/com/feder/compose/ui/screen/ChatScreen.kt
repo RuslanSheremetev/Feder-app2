@@ -89,7 +89,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectionMode by remember { mutableStateOf(false) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
-    var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var showForward by remember { mutableStateOf(false) }
     var forwardSearch by remember { mutableStateOf("") }
 
@@ -262,7 +261,8 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg; clickedMsgOffset = selectedMessageOffset },
+                            onClick = { selectedMessage = msg },
+                            onPositioned = { pos -> selectedMessageOffset = pos },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
@@ -415,8 +415,8 @@ wsManager.send("message", text, chatUsername)
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
                 offset = IntOffset(
-                    with(LocalDensity.current) { clickedMsgOffset.x.toInt() },
-                    with(LocalDensity.current) { (clickedMsgOffset.y.toInt() - 300).coerceAtLeast(0) }
+                    with(LocalDensity.current) { selectedMessageOffset.x.toInt() },
+                    with(LocalDensity.current) { (selectedMessageOffset.y.toInt() - 300).coerceAtLeast(0) }
                 )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
@@ -553,7 +553,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null) {
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null) {
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -561,7 +561,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.fillMaxWidth().padding(top = vertPad), horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = { onClick(androidx.compose.ui.geometry.Offset.Zero) }, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 Text("[$position] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
