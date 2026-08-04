@@ -96,6 +96,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
             clickedMsgOffset = selectedMessageOffset
+            Toast.makeText(context, "OFFSET: x=${selectedMessageOffset.x.toInt()} y=${selectedMessageOffset.y.toInt()}", Toast.LENGTH_SHORT).show()
         }
     }
 
