@@ -135,7 +135,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     })
                 } catch (_: Exception) { }
             } catch (e: Exception) {
-                messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L))
+                messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0))
                 try {
                     val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
                     httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
@@ -171,7 +171,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             } else {
                 val existing = messages.find { it.from == sender && it.text == text }
                 if (existing == null) {
-                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000)
+                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
                     messages = messages + newMsg
                 }
             }
@@ -187,7 +187,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val text = inputText.trim()
         if (text.isEmpty()) return
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000)
+        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
         messages = messages + newMsg
         inputText = ""
 wsManager.send("message", text, chatUsername)
