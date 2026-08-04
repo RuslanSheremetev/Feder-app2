@@ -19,7 +19,7 @@ class WebSocketManager(
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
     
-    private var onMessageCallback: ((String, String, Long) -> Unit)? = null
+    private var onMessageCallback: ((String, String, Long, Int) -> Unit)? = null
     private var onReceivedCallback: ((String) -> Unit)? = null
     private var onReadCallback: ((String) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
@@ -47,7 +47,8 @@ class WebSocketManager(
                                 val sender = obj.get("from_user")?.asString ?: "unknown"
                                 val msgText = obj.get("text")?.asString ?: return
                                 val timeVal = obj.get("timeVal")?.asLong ?: obj.get("time")?.asLong ?: 0L
-                                onMessageCallback?.invoke(sender, msgText, timeVal)
+                                val msgId = obj.get("id")?.asInt ?: 0
+                                onMessageCallback?.invoke(sender, msgText, timeVal, msgId)
                             }
                         } catch (e: Exception) { }
                     }
@@ -74,7 +75,7 @@ class WebSocketManager(
         webSocket = null
     }
     
-    fun onMessage(callback: (String, String, Long) -> Unit) {
+    fun onMessage(callback: (String, String, Long, Int) -> Unit) {
         onMessageCallback = callback
     }
     

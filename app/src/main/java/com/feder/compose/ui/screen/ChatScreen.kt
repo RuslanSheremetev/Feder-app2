@@ -162,7 +162,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (msg.from == myUsername && msg.to == from) msg.copy(status = "received") else msg
             }
         }
-        wsManager.onMessage { sender, text, timeVal ->
+        wsManager.onMessage { sender, text, timeVal, msgId ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
