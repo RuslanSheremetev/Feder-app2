@@ -450,6 +450,7 @@ wsManager.send("message", text, chatUsername)
                 val rawY = selectedMessage!!.posY.toInt() - 300
                 val clampedY = rawY.coerceIn(80, screenHeight - 400)
                 val topPadding = with(LocalDensity.current) { clampedY.toDp() }
+                Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
                     Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -487,6 +488,7 @@ wsManager.send("message", text, chatUsername)
                 }
             }
         }
+                }
         // Attach Sheet
         if (showAttachSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false })
