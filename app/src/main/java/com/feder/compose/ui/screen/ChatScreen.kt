@@ -288,7 +288,8 @@ wsManager.send("message", text, chatUsername)
                                     val idx = messages.indexOf(msg)
                                     val vis = listState.layoutInfo.visibleItemsInfo.find { it.index == idx }
                                     if (vis != null) {
-                                        msg.posY = (vis.offset + vis.size / 2).toFloat()
+                                        msg.posX = vis.offset.toFloat()
+                                        msg.posY = (vis.offset + vis.size).toFloat()
                                     }
                                     selectedMessage = msg
                                 },
@@ -445,8 +446,8 @@ wsManager.send("message", text, chatUsername)
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
                 offset = IntOffset(
-                    with(LocalDensity.current) { (selectedMessage!!.posX * density).toInt() },
-                    with(LocalDensity.current) { ((selectedMessage!!.posY * density).toInt() - 300).coerceAtLeast(0) }
+                    selectedMessage!!.posX.toInt(),
+                    (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0)
                 )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
