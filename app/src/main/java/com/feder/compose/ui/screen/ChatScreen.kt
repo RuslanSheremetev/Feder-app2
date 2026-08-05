@@ -453,7 +453,7 @@ wsManager.send("message", text, chatUsername)
                 val topPadding = with(LocalDensity.current) { clampedY.toDp() }
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
-                    Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                    Surface(shape = if (showAllReactions) RoundedCornerShape(20.dp) else RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         var showAllReactions by remember { mutableStateOf(false) }
                         Column {
