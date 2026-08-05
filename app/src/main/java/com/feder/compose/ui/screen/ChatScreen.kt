@@ -452,6 +452,7 @@ wsManager.send("message", text, chatUsername)
                 )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
+                Text("x=${selectedMessage!!.posX.toInt()} y=${selectedMessage!!.posY.toInt()}", color = Color.White, fontSize = 20.sp, modifier = Modifier.padding(top = 100.dp))
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
                     Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
