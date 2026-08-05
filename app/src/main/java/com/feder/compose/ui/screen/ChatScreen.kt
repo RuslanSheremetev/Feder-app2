@@ -455,14 +455,14 @@ wsManager.send("message", text, chatUsername)
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
                     Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
-                        val showAllReactions = remember { mutableStateOf(false) }
+                        var showAllReactions by remember { mutableStateOf(false) }
                         Column {
                             Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                allReactions.take(if (showAllReactions.value) allReactions.size else 6).forEach { emoji ->
+                                allReactions.take(if (showAllReactions) allReactions.size else 6).forEach { emoji ->
                                     Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
                                 }
-                                if (!showAllReactions.value) {
-                                    Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions.value = true }, contentAlignment = Alignment.Center) {
+                                if (!showAllReactions) {
+                                    Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
                                         Text("›", color = OnSurfaceVariant, fontSize = 20.sp)
                                     }
                                 }
