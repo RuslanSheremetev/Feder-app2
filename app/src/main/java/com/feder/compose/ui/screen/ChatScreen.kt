@@ -488,6 +488,7 @@ wsManager.send("message", text, chatUsername)
                             }
                         }
                     }
+                    if (!showAllReactions) {
                     Spacer(Modifier.height(12.dp))
                     Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Column(Modifier.width(240.dp)) {
@@ -513,6 +514,7 @@ wsManager.send("message", text, chatUsername)
                                 }
                             }
                         }
+                    }
                     }
                 }
             }
