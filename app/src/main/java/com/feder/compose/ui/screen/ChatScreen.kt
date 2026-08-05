@@ -214,38 +214,17 @@ wsManager.send("message", text, chatUsername)
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Selection Bar
-            if (selectionMode) {
-                Surface(color = Color(0xFF201F1F), shadowElevation = 4.dp) {
-                    Row(
-                        Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { selectionMode = false; selectedMessages = emptySet() }) {
-                            Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp))
-                        }
-                        Text(
-                            "${selectedMessages.size} selected",
-                            color = OnSurface,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                        Spacer(Modifier.weight(1f))
-                        IconButton(onClick = { /* Forward */ }) {
-                            Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-                        IconButton(onClick = { /* Delete */ }) {
-                            Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                        }
-                    }
-                }
-            }
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
+            if (selectionMode) {
+                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { selectionMode = false; selectedMessages = emptySet() }) { Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp)) }
+                    Text("${selectedMessages.size} selected", color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
+                    Spacer(Modifier.weight(1f))
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                }
+            } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape)) {
@@ -269,6 +248,7 @@ wsManager.send("message", text, chatUsername)
                     IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                 }
             }
+                }
 
             if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
