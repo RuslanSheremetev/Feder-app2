@@ -292,7 +292,7 @@ wsManager.send("message", text, chatUsername)
                                     }
                                     selectedMessage = msg
                                 },
-                            onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y; if (msg.id > 0) saveMsgPosition(msg) },
+                            
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
