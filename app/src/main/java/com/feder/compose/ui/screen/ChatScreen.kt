@@ -287,7 +287,7 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = {
-                                    val pos = msgPositions[msg.id]
+                                    val pos = msgPositions[msg.id]; Toast.makeText(context, "id=${msg.id} pos=$pos mapSize=${msgPositions.size}", Toast.LENGTH_SHORT).show()
                                     if (pos != null) {
                                         msg.posX = pos.x
                                         msg.posY = pos.y
