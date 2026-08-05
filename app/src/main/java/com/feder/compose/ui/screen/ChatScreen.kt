@@ -426,8 +426,8 @@ wsManager.send("message", text, chatUsername)
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
                 offset = IntOffset(
-                    with(LocalDensity.current) { (selectedMessage!!.x * density).toInt() },
-                    with(LocalDensity.current) { ((selectedMessage!!.y * density).toInt() - 300).coerceAtLeast(0) }
+                    with(LocalDensity.current) { (selectedMessage!!.posX * density).toInt() },
+                    with(LocalDensity.current) { ((selectedMessage!!.posY * density).toInt() - 300).coerceAtLeast(0) }
                 )
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
