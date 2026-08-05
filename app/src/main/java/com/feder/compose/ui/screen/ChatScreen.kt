@@ -441,7 +441,12 @@ wsManager.send("message", text, chatUsername)
             }
         }
         
-        // Message action menu - Popup near message
+        // Message action menu
+        LaunchedEffect(selectedMessage) {
+            selectedMessage?.let {
+                Toast.makeText(context, "MENU at x=${it.posX.toInt()} y=${it.posY.toInt()}", Toast.LENGTH_SHORT).show()
+            }
+        } - Popup near message
         if (selectedMessage != null && !showForward) {
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
