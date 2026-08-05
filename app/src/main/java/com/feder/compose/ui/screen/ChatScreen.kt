@@ -444,10 +444,10 @@ wsManager.send("message", text, chatUsername)
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
             Popup(
-                onDismissRequest = { selectedMessage = null; showDeleteSub = false },
-                offset = IntOffset(48, 500)
+                onDismissRequest = { selectedMessage = null; showDeleteSub = false }
             ) {
-                Column(Modifier.fillMaxWidth().padding(end = 16.dp, top = 500.dp), horizontalAlignment = Alignment.End) {
+                val topPadding = with(LocalDensity.current) { (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0).toDp() }
+                Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
                     Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             listOf("👍", "❤️", "😂", "😮", "😢", "🙏").forEach { emoji ->
