@@ -446,10 +446,7 @@ wsManager.send("message", text, chatUsername)
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
-                offset = IntOffset(
-                    selectedMessage!!.posX.toInt(),
-                    (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0)
-                )
+                offset = IntOffset(48, 500)
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
                 Text("x=${selectedMessage!!.posX.toInt()} y=${selectedMessage!!.posY.toInt()}", color = Color.White, fontSize = 20.sp, modifier = Modifier.padding(top = 100.dp))
