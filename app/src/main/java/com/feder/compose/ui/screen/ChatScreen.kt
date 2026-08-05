@@ -103,6 +103,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
 
+    fun saveMsgPosition(msg: MsgItem) {
+        if (msg.id > 0 && msg.posY > 0f) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val json = """{"id":${msg.id},"x":${msg.posX},"y":${msg.posY}}"""
+                    val body = json.toRequestBody("application/json".toMediaType())
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/message_pos").header("Authorization", "Bearer $internalToken").post(body).build()).execute().close()
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
     var internalToken = token
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.Main) { Toast.makeText(context, "Chat opened: $chatUsername", Toast.LENGTH_SHORT).show() }
@@ -272,8 +284,16 @@ wsManager.send("message", text, chatUsername)
                             msg.time.takeLast(8).take(5),
                             isMine,
                             position = position,
-                            onClick = { selectedMessage = msg },
-                            onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y },
+                            onClick = {
+                                    selectedMessage = msg
+                                    val idx = messages.indexOf(msg)
+                                    val vis = listState.layoutInfo.visibleItemsInfo.find { it.index == idx }
+                                    if (vis != null) {
+                                        msg.posY = (vis.offset + vis.size / 2).toFloat()
+                                        Toast.makeText(context, "y=${msg.posY.toInt()}", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                            onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y; if (msg.id > 0) saveMsgPosition(msg) },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
                     }
