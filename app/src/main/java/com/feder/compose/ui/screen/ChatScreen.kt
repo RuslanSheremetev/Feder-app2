@@ -467,6 +467,7 @@ wsManager.send("message", text, chatUsername)
                                     }
                                 }
                             } else {
+                                Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                                 Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Text("Reactions", color = OnSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
@@ -482,6 +483,7 @@ wsManager.send("message", text, chatUsername)
                                             repeat(6 - row.size) { Spacer(Modifier.size(40.dp)) }
                                         }
                                     }
+                                }
                                 }
                             }
                         }
