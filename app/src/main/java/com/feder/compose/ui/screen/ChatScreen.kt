@@ -448,7 +448,7 @@ wsManager.send("message", text, chatUsername)
             ) {
                 val screenHeight = context.resources.displayMetrics.heightPixels
                 val rawY = selectedMessage!!.posY.toInt() - 300
-                val clampedY = rawY.coerceIn(80, screenHeight - 400)
+                val clampedY = rawY.coerceIn(80, screenHeight - 500)
                 val topPadding = with(LocalDensity.current) { clampedY.toDp() }
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
