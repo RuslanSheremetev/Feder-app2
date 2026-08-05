@@ -457,13 +457,30 @@ wsManager.send("message", text, chatUsername)
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         var showAllReactions by remember { mutableStateOf(false) }
                         Column {
-                            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                allReactions.take(if (showAllReactions) allReactions.size else 6).forEach { emoji ->
-                                    Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
-                                }
-                                if (!showAllReactions) {
+                            if (!showAllReactions) {
+                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    allReactions.take(6).forEach { emoji ->
+                                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
+                                    }
                                     Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
                                         Text("›", color = OnSurfaceVariant, fontSize = 20.sp)
+                                    }
+                                }
+                            } else {
+                                Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Reactions", color = OnSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
+                                        Box(Modifier.size(28.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = false }, contentAlignment = Alignment.Center) {
+                                            Text("✕", color = OnSurfaceVariant, fontSize = 14.sp)
+                                        }
+                                    }
+                                    allReactions.chunked(6).forEach { row ->
+                                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                                            row.forEach { emoji ->
+                                                Box(Modifier.size(40.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 24.sp) }
+                                            }
+                                            repeat(6 - row.size) { Spacer(Modifier.size(40.dp)) }
+                                        }
                                     }
                                 }
                             }
