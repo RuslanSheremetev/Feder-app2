@@ -446,7 +446,10 @@ wsManager.send("message", text, chatUsername)
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false }
             ) {
-                val topPadding = with(LocalDensity.current) { (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0).toDp() }
+                val screenHeight = context.resources.displayMetrics.heightPixels
+                val rawY = selectedMessage!!.posY.toInt() - 300
+                val clampedY = rawY.coerceIn(80, screenHeight - 400)
+                val topPadding = with(LocalDensity.current) { clampedY.toDp() }
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
                     Surface(shape = RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
