@@ -290,6 +290,9 @@ wsManager.send("message", text, chatUsername)
                                     if (vis != null) {
                                         msg.posX = vis.offset.toFloat()
                                         msg.posY = (vis.offset + vis.size).toFloat()
+                                        Toast.makeText(context, "offset=${vis.offset} size=${vis.size} index=$idx", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "NOT VISIBLE index=$idx", Toast.LENGTH_SHORT).show()
                                     }
                                     selectedMessage = msg
                                 },
