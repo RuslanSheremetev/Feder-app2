@@ -103,6 +103,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
 
+    val msgPositions = remember { mutableMapOf<Int, androidx.compose.ui.geometry.Offset>() }
+
     var internalToken = token
 
     fun saveMsgPosition(msg: MsgItem) {
@@ -277,7 +279,7 @@ wsManager.send("message", text, chatUsername)
                         val nextMsg = if (index < messages.size - 1) messages[index + 1] else null
                         val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs((nextMsg.timeVal ?: 0) - (msg.timeVal ?: 0)) < 300
                         val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
-                        Box(modifier = Modifier.onGloballyPositioned { selectedMessageOffset = it.positionInRoot() }) {
+                        Box(modifier = Modifier.onGloballyPositioned { coords -> msgPositions[msg.id] = coords.positionInRoot() }) {
                         MessageBubble(
                             msg,
                             msg.text,
@@ -285,14 +287,10 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = {
-                                    val idx = messages.indexOf(msg)
-                                    val vis = listState.layoutInfo.visibleItemsInfo.find { it.index == idx }
-                                    if (vis != null) {
-                                        msg.posX = vis.offset.toFloat()
-                                        msg.posY = (vis.offset + vis.size).toFloat()
-                                        Toast.makeText(context, "offset=${vis.offset} size=${vis.size} index=$idx", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(context, "NOT VISIBLE index=$idx", Toast.LENGTH_SHORT).show()
+                                    val pos = msgPositions[msg.id]
+                                    if (pos != null) {
+                                        msg.posX = pos.x
+                                        msg.posY = pos.y
                                     }
                                     selectedMessage = msg
                                 },
