@@ -67,8 +67,8 @@ data class MsgItem(
     var status: String = "sent",
     val timeVal: Long = 0L,
     val id: Int = 0,
-    var x: Float = 0f,
-    var y: Float = 0f
+    val posX: Float = 0f,
+    val posY: Float = 0f,
 )
 
 @OptIn(ExperimentalFoundationApi::class)
