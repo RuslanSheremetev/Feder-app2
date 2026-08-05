@@ -461,7 +461,7 @@ wsManager.send("message", text, chatUsername)
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         Column {
                             if (!showAllReactions) {
-                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                                     allReactions.take(6).forEach { emoji ->
                                         Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
                                     }
