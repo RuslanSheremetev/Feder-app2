@@ -285,13 +285,12 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = {
-                                    selectedMessage = msg
                                     val idx = messages.indexOf(msg)
                                     val vis = listState.layoutInfo.visibleItemsInfo.find { it.index == idx }
                                     if (vis != null) {
                                         msg.posY = (vis.offset + vis.size / 2).toFloat()
-                                        Toast.makeText(context, "y=${msg.posY.toInt()}", Toast.LENGTH_SHORT).show()
                                     }
+                                    selectedMessage = msg
                                 },
                             onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y; if (msg.id > 0) saveMsgPosition(msg) },
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
