@@ -454,7 +454,8 @@ wsManager.send("message", text, chatUsername)
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
                         var showAllReactions by remember { mutableStateOf(false) }
-                    Surface(shape = if (showAllReactions) RoundedCornerShape(20.dp) else RoundedCornerShape(50), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                    val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f))
+                    Surface(shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         Column {
                             if (!showAllReactions) {
