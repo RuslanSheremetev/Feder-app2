@@ -445,7 +445,6 @@ wsManager.send("message", text, chatUsername)
         if (selectedMessage != null && !showForward) {
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
-                alignment = Alignment.TopStart,
                 offset = IntOffset(48, 500)
             ) {
                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { selectedMessage = null; showDeleteSub = false })
