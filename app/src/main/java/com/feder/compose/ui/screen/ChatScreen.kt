@@ -270,12 +270,20 @@ wsManager.send("message", text, chatUsername)
                             isMine,
                             position = position,
                             onClick = {
-                                    val pos = msgPositions[msg.id]; Toast.makeText(context, "id=${msg.id} pos=$pos mapSize=${msgPositions.size}", Toast.LENGTH_SHORT).show()
-                                    if (pos != null) {
-                                        msg.posX = pos.x
-                                        msg.posY = pos.y
+                                    if (selectionMode) {
+                                        if (selectedMessages.contains(msg.time)) {
+                                            selectedMessages = selectedMessages - msg.time
+                                        } else {
+                                            selectedMessages = selectedMessages + msg.time
+                                        }
+                                    } else {
+                                        val pos = msgPositions[msg.id]
+                                        if (pos != null) {
+                                            msg.posX = pos.x
+                                            msg.posY = pos.y
+                                        }
+                                        selectedMessage = msg
                                     }
-                                    selectedMessage = msg
                                 },
                             
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
