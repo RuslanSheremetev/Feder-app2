@@ -614,7 +614,7 @@ wsManager.send("message", text, chatUsername)
             }
         }
         // Дата в овале — под шапкой по центру
-        if (dateInHeader.value.isNotEmpty()) {
+        if (dateInHeader.value.isNotEmpty() && listState.firstVisibleItemIndex > 0) {
             Box(Modifier.fillMaxWidth().padding(top = 100.dp), contentAlignment = Alignment.TopCenter) {
                 Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                     Text(dateInHeader.value, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
