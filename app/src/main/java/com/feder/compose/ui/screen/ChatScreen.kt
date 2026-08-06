@@ -219,7 +219,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             LaunchedEffect(listState.firstVisibleItemIndex) {
                 val idx = listState.firstVisibleItemIndex
                 if (idx >= 0 && idx < messages.size) {
-                    dateInHeader.value = formatHeaderDate(messages[idx].timeVal)
+                    val dt = formatHeaderDate(messages[idx].timeVal)
+                    dateInHeader.value = dt
+                    Toast.makeText(context, "Date: $dt idx=$idx", Toast.LENGTH_SHORT).show()
                 }
             }
             LaunchedEffect(messages.size) {
