@@ -76,6 +76,7 @@ data class MsgItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
