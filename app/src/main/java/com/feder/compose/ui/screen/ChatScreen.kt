@@ -108,6 +108,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     val msgPositions = remember { mutableMapOf<Int, androidx.compose.ui.geometry.Offset>() }
 
+    val dateInHeader = remember { mutableStateOf("") }
+    
+    // Функция для получения даты из timeVal
+    fun formatHeaderDate(timeVal: Long): String {
+        if (timeVal == 0L) return ""
+        val msgDate = java.util.Date(timeVal * 1000)
+        val today = java.util.Calendar.getInstance()
+        val msgCal = java.util.Calendar.getInstance().apply { time = msgDate }
+        return when {
+            today.get(java.util.Calendar.DAY_OF_YEAR) == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Сегодня"
+            today.get(java.util.Calendar.DAY_OF_YEAR) - 1 == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Вчера"
+            else -> SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).format(msgDate)
+        }
+    }
+
     var internalToken = token
 
     fun saveMsgPosition(msg: MsgItem) {
@@ -198,7 +215,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         wsManager.connect(myUsername, internalToken)
     }
 
-    LaunchedEffect(messages.size) {
+    // Обновляем дату в шапке при прокрутке
+            LaunchedEffect(listState.firstVisibleItemIndex) {
+                val idx = listState.firstVisibleItemIndex
+                if (idx >= 0 && idx < messages.size) {
+                    dateInHeader.value = formatHeaderDate(messages[idx].timeVal)
+                }
+            }
+            LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
     }
 
@@ -250,6 +274,14 @@ wsManager.send("message", text, chatUsername)
             }
                 }
 
+            // Дата в овале под шапкой
+            if (dateInHeader.value.isNotEmpty()) {
+                Box(Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.9f)) {
+                        Text(dateInHeader.value, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                    }
+                }
+            }
             if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
