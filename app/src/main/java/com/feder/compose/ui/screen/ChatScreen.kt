@@ -220,7 +220,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val idx = listState.firstVisibleItemIndex
                 if (idx >= 0 && idx < messages.size) {
                     val dt = formatHeaderDate(messages[idx].timeVal)
-                    dateInHeader.value = dt
+                    val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
+                    dateInHeader.value = if (dt == lastDate) "" else dt
                     Toast.makeText(context, "Date: $dt idx=$idx", Toast.LENGTH_SHORT).show()
                 }
             }
