@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.stickyHeader
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -280,7 +281,7 @@ wsManager.send("message", text, chatUsername)
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
+                    @OptIn(ExperimentalFoundationApi::class) itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
                         // Sticky header с датой
                         if (index == 0 || formatHeaderDate(msg.timeVal) != formatHeaderDate(messages[index - 1].timeVal)) {
                             this.stickyHeader(key = "sticky_date_${msg.timeVal}") {
