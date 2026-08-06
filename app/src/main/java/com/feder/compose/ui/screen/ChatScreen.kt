@@ -281,6 +281,16 @@ wsManager.send("message", text, chatUsername)
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
+                        // Sticky header с датой
+                        if (index == 0 || formatHeaderDate(msg.timeVal) != formatHeaderDate(messages[index - 1].timeVal)) {
+                            stickyHeader(key = "sticky_date_${msg.timeVal}") {
+                                Box(Modifier.fillMaxWidth().background(Background).padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
+                                    Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
+                                        Text(formatHeaderDate(msg.timeVal), color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                                    }
+                                }
+                            }
+                        }
                         val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && kotlin.math.abs((msg.timeVal ?: 0) - (prevMsg.timeVal ?: 0)) < 300 && 
