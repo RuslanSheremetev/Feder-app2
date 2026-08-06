@@ -221,7 +221,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (idx >= 0 && idx < messages.size) {
                     val dt = formatHeaderDate(messages[idx].timeVal)
                     val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                    dateInHeader.value = if (dt == lastDate) "" else dt
+                    dateInHeader.value = if (idx == 0 || dt == lastDate) "" else dt
                     Toast.makeText(context, "Date: $dt idx=$idx", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -614,8 +614,7 @@ wsManager.send("message", text, chatUsername)
             }
         }
         // Дата в овале — под шапкой по центру
-        android.widget.Toast.makeText(context, "OVAL: val=${dateInHeader.value} idx=${listState.firstVisibleItemIndex}", android.widget.Toast.LENGTH_SHORT).show()
-        if (dateInHeader.value.isNotEmpty() && listState.firstVisibleItemIndex > 0) {
+        if (dateInHeader.value.isNotEmpty()) {
             Box(Modifier.fillMaxWidth().padding(top = 100.dp), contentAlignment = Alignment.TopCenter) {
                 Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                     Text(dateInHeader.value, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
