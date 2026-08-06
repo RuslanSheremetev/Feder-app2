@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.stickyHeader
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -281,18 +280,20 @@ wsManager.send("message", text, chatUsername)
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    @OptIn(ExperimentalFoundationApi::class) itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
-                        // Sticky header с датой
-                        if (index == 0 || formatHeaderDate(msg.timeVal) != formatHeaderDate(messages[index - 1].timeVal)) {
-                            stickyHeader(key = "sticky_date_${msg.timeVal}") {
+                    val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
+                    grouped.forEach { (date, msgs) ->
+                        if (date.isNotEmpty()) {
+                            stickyHeader(key = "sticky_$date") {
                                 Box(Modifier.fillMaxWidth().background(Background).padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
-                                        Text(formatHeaderDate(msg.timeVal), color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                                        Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                                     }
                                 }
                             }
                         }
-                        val isMine = msg.from == myUsername
+                        items(msgs, key = { it.id }) { msg ->
+                            val index = messages.indexOf(msg)
+                            val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && kotlin.math.abs((msg.timeVal ?: 0) - (prevMsg.timeVal ?: 0)) < 300 && 
                             kotlin.math.abs(msg.timeVal - prevMsg.timeVal) < 300
@@ -326,6 +327,7 @@ wsManager.send("message", text, chatUsername)
                             
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
+                    }
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
