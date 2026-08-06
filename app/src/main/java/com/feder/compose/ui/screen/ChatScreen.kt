@@ -599,9 +599,9 @@ wsManager.send("message", text, chatUsername)
                 }
             }
         }
-        // Дата в овале — поверх чата
+        // Дата в овале — под шапкой по центру
         if (dateInHeader.value.isNotEmpty()) {
-            Box(Modifier.fillMaxWidth().padding(top = 60.dp).align(Alignment.TopCenter)) {
+            Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.TopCenter) {
                 Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                     Text(dateInHeader.value, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                 }
