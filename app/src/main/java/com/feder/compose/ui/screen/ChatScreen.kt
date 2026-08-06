@@ -76,7 +76,6 @@ data class MsgItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -284,7 +283,7 @@ wsManager.send("message", text, chatUsername)
                     itemsIndexed(messages, key = { _, m -> m.id }) { index, msg ->
                         // Sticky header с датой
                         if (index == 0 || formatHeaderDate(msg.timeVal) != formatHeaderDate(messages[index - 1].timeVal)) {
-                            stickyHeader(key = "sticky_date_${msg.timeVal}") {
+                            this.stickyHeader(key = "sticky_date_${msg.timeVal}") {
                                 Box(Modifier.fillMaxWidth().background(Background).padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                                         Text(formatHeaderDate(msg.timeVal), color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
