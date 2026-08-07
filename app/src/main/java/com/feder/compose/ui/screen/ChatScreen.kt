@@ -218,7 +218,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // Обновляем дату в шапке при прокрутке
             LaunchedEffect(listState.firstVisibleItemIndex) {
                 val idx = listState.firstVisibleItemIndex
-                if (prevIdx == -1) { prevIdx = idx; return@LaunchedEffect }
                 if (idx >= 0 && idx < messages.size) {
                     val dt = formatHeaderDate(messages[idx].timeVal)
                     val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
