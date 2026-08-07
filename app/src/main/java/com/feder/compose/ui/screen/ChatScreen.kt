@@ -298,7 +298,7 @@ wsManager.send("message", text, chatUsername)
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
                             stickyHeader(key = "sticky_$date") {
-                                Box(Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+                                Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                                         Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                                     }
@@ -448,7 +448,7 @@ wsManager.send("message", text, chatUsername)
                 // Chat list for forward
                 LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(listOf("Alex Rivera", "Sarah Jenkins", "David Miller", "Elena Rodriguez")) { name ->
-                        Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             }
