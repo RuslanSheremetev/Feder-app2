@@ -221,17 +221,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val items = listState.layoutInfo.visibleItemsInfo
                     if (items.isNotEmpty()) {
                         val firstVisibleIdx = items.first().index
-                        // Ищем границу группы: идём назад от первого видимого
-                        var headerDate = ""
-                        for (i in firstVisibleIdx downTo 0) {
+                        val firstDt = formatHeaderDate(messages[firstVisibleIdx].timeVal)
+                        // Ищем границу: идём вперёд пока дата не изменится
+                        var headerDate = firstDt
+                        for (i in firstVisibleIdx until messages.size) {
                             val dt = formatHeaderDate(messages[i].timeVal)
-                            if (dt.isNotEmpty()) {
-                                val prevDt = if (i > 0) formatHeaderDate(messages[i - 1].timeVal) else ""
-                                if (dt != prevDt || i == 0) {
-                                    // Нашли начало группы
-                                    headerDate = dt
-                                    break
-                                }
+                            if (dt.isNotEmpty() && dt != firstDt) {
+                                headerDate = dt
+                                break
                             }
                         }
                         val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
