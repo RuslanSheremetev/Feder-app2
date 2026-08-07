@@ -111,6 +111,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val dateInHeader = remember { mutableStateOf("") }
     
     // Функция для получения даты из timeVal
+    fun formatLastSeen(timestamp: Long): String {
+        val now = System.currentTimeMillis() / 1000
+        val diff = now - timestamp
+        return when {
+            diff < 60 -> "just now"
+            diff < 3600 -> "${diff / 60} min ago"
+            diff < 86400 -> "${diff / 3600} h ago"
+            diff < 172800 -> "yesterday"
+            diff < 604800 -> "${diff / 86400} d ago"
+            diff < 2592000 -> "${diff / 604800} wk ago"
+            else -> "long ago"
+        }
+    }
+
     fun formatHeaderDate(timeVal: Long): String {
         if (timeVal == 0L) return ""
         val msgDate = java.util.Date(timeVal * 1000)
@@ -282,7 +296,17 @@ wsManager.send("message", text, chatUsername)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                        Text(wsStatus.ifEmpty { "online" }, color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp)
+                        Text(
+                                when {
+                                    wsStatus.startsWith("error") -> wsStatus
+                                    wsStatus == "connected" -> "online"
+                                    else -> {
+                                        val lastSeen = try { wsStatus.toLongOrNull() } catch (e: Exception) { null }
+                                        if (lastSeen != null) formatLastSeen(lastSeen) else "online"
+                                    }
+                                },
+                                color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp
+                            )
                     }
                     if (chatUsername != myUsername) {
                         IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
