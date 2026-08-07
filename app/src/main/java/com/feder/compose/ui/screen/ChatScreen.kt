@@ -316,7 +316,8 @@ wsManager.send("message", text, chatUsername)
 
             if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
+                Box(Modifier.weight(1f)) {
+                LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 72.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
@@ -369,6 +370,20 @@ wsManager.send("message", text, chatUsername)
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
+                }
+                // Кнопка прокрутки вниз
+                if (listState.firstVisibleItemIndex > 0) {
+                    Box(Modifier.fillMaxSize().padding(end = 16.dp, bottom = 80.dp).align(Alignment.BottomEnd)) {
+                        FloatingActionButton(
+                            onClick = { listState.animateScrollToItem(0) },
+                            containerColor = SurfaceContainerHigh,
+                            contentColor = Primary,
+                            modifier = Modifier.size(40.dp),
+                            shape = CircleShape
+                        ) {
+                            Icon(Icons.Filled.KeyboardArrowDown, "scroll down", modifier = Modifier.size(24.dp))
+                        }
+                    }
                 }
             }
 
