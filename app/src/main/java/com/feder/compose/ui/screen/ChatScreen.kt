@@ -219,30 +219,24 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             LaunchedEffect(listState.isScrollInProgress, listState.firstVisibleItemIndex) {
                 if (listState.isScrollInProgress) {
                     val items = listState.layoutInfo.visibleItemsInfo
-                    var headerDate = ""
-                    var prevDate = ""
-                    for (item in items) {
-                        if (item.index in 0 until messages.size) {
-                            val dt = formatHeaderDate(messages[item.index].timeVal)
+                    if (items.isNotEmpty()) {
+                        val firstVisibleIdx = items.first().index
+                        // Ищем границу группы: идём назад от первого видимого
+                        var headerDate = ""
+                        for (i in firstVisibleIdx downTo 0) {
+                            val dt = formatHeaderDate(messages[i].timeVal)
                             if (dt.isNotEmpty()) {
-                                if (prevDate.isNotEmpty() && dt != prevDate) {
-                                    // Нашли границу — новая дата!
+                                val prevDt = if (i > 0) formatHeaderDate(messages[i - 1].timeVal) else ""
+                                if (dt != prevDt || i == 0) {
+                                    // Нашли начало группы
                                     headerDate = dt
                                     break
                                 }
-                                prevDate = dt
                             }
                         }
+                        val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
+                        dateInHeader.value = if (headerDate.isNotEmpty() && headerDate != lastDate) headerDate else ""
                     }
-                    // Если граница не найдена — дата первого элемента
-                    if (headerDate.isEmpty() && items.isNotEmpty()) {
-                        val idx = items.first().index
-                        if (idx in 0 until messages.size) {
-                            headerDate = formatHeaderDate(messages[idx].timeVal)
-                        }
-                    }
-                    val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                    dateInHeader.value = if (headerDate.isNotEmpty() && headerDate != lastDate) headerDate else ""
                 } else {
                     dateInHeader.value = ""
                 }
