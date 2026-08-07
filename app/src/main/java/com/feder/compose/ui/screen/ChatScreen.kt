@@ -297,7 +297,7 @@ wsManager.send("message", text, chatUsername)
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
-                            item(key = "date_$date") {
+                            stickyHeader(key = "sticky_$date") {
                                 Box(Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
                                         Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
@@ -627,13 +627,7 @@ wsManager.send("message", text, chatUsername)
             }
         }
         // Дата в овале — под шапкой по центру
-        if (dateInHeader.value.isNotEmpty()) {
-            Box(Modifier.fillMaxWidth().padding(top = 100.dp), contentAlignment = Alignment.TopCenter) {
-                Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
-                    Text(dateInHeader.value, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
-                }
-            }
-        }
+        
     }
 }
 
