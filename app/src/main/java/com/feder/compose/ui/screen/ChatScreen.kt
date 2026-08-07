@@ -657,7 +657,7 @@ wsManager.send("message", text, chatUsername)
         }
         // Дата в овале — под шапкой по центру
         // Кнопка прокрутки вниз
-        if (listState.firstVisibleItemIndex > 0) {
+        if (listState.firstVisibleItemIndex < messages.size - 3) {
             Box(Modifier.fillMaxSize().padding(end = 16.dp, bottom = 80.dp), contentAlignment = Alignment.BottomEnd) {
                 FloatingActionButton(
                     onClick = { scope.launch { listState.animateScrollToItem(messages.size - 1) } },
