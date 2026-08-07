@@ -303,7 +303,7 @@ wsManager.send("message", text, chatUsername)
                             stickyHeader(key = "sticky_$date") {
                                 Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
-                                        Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                                        Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
                                     }
                                 }
                             }
