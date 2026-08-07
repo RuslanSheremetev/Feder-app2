@@ -76,7 +76,7 @@ data class MsgItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
@@ -298,12 +298,11 @@ wsManager.send("message", text, chatUsername)
                         Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         Text(
                                 when {
-                                    wsStatus == "connected" -> "online"
+                                    isOnline -> "online"
                                     lastSeen > 0 -> formatLastSeen(lastSeen)
-                                    wsStatus.startsWith("error") -> wsStatus
                                     else -> "offline"
                                 },
-                                color = if (wsStatus.startsWith("error")) Error else Primary, fontSize = 11.sp
+                                color = Primary, fontSize = 11.sp
                             )
                     }
                     if (chatUsername != myUsername) {
