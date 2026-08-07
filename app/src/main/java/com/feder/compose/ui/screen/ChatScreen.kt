@@ -216,7 +216,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     // Обновляем дату в шапке при прокрутке
-            var prevIdx by remember { mutableStateOf(-1) }
             LaunchedEffect(listState.firstVisibleItemIndex) {
                 val idx = listState.firstVisibleItemIndex
                 if (prevIdx == -1) { prevIdx = idx; return@LaunchedEffect }
