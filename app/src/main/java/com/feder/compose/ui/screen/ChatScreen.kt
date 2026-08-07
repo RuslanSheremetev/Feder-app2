@@ -219,15 +219,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             LaunchedEffect(listState.isScrollInProgress, listState.firstVisibleItemIndex) {
                 if (listState.isScrollInProgress) {
                     val items = listState.layoutInfo.visibleItemsInfo
-                    if (items.isNotEmpty()) {
-                        // Берём последний видимый — он первый на новой дате при скролле вверх
-                        val idx = items.last().index
-                        if (idx in 0 until messages.size) {
-                            val dt = formatHeaderDate(messages[idx].timeVal)
-                            val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                            dateInHeader.value = if (dt.isNotEmpty() && dt != lastDate) dt else ""
+                    var headerDate = ""
+                    var prevDate = ""
+                    for (item in items) {
+                        if (item.index in 0 until messages.size) {
+                            val dt = formatHeaderDate(messages[item.index].timeVal)
+                            if (dt.isNotEmpty()) {
+                                if (prevDate.isNotEmpty() && dt != prevDate) {
+                                    // Нашли границу — новая дата!
+                                    headerDate = dt
+                                    break
+                                }
+                                prevDate = dt
+                            }
                         }
                     }
+                    // Если граница не найдена — дата первого элемента
+                    if (headerDate.isEmpty() && items.isNotEmpty()) {
+                        val idx = items.first().index
+                        if (idx in 0 until messages.size) {
+                            headerDate = formatHeaderDate(messages[idx].timeVal)
+                        }
+                    }
+                    val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
+                    dateInHeader.value = if (headerDate.isNotEmpty() && headerDate != lastDate) headerDate else ""
                 } else {
                     dateInHeader.value = ""
                 }
