@@ -116,12 +116,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val msgDate = java.util.Date(timeVal * 1000)
         val today = java.util.Calendar.getInstance()
         val msgCal = java.util.Calendar.getInstance().apply { time = msgDate }
+        val sdf = SimpleDateFormat("d MMMM", java.util.Locale("en"))
+        val sdfYear = SimpleDateFormat("d MMMM yyyy", java.util.Locale("en"))
         return when {
             today.get(java.util.Calendar.DAY_OF_YEAR) == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
-            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Сегодня"
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Today"
             today.get(java.util.Calendar.DAY_OF_YEAR) - 1 == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
-            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Вчера"
-            else -> SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).format(msgDate)
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Yesterday"
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> sdf.format(msgDate)
+            else -> sdfYear.format(msgDate)
         }
     }
 
