@@ -76,6 +76,7 @@ data class ChatItem(
     @SerializedName("avatar_url") val avatarUrl: String? = null,
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
+    @SerializedName("last_seen") val lastSeen: Long = 0,
     @SerializedName("last_message") val lastMessage: String? = null,
     val timestamp: String? = null
 )
