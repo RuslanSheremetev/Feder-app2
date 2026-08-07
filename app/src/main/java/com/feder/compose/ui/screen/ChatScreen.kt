@@ -302,7 +302,7 @@ wsManager.send("message", text, chatUsername)
                                     lastSeen > 0 -> formatLastSeen(lastSeen)
                                     else -> "offline"
                                 },
-                                color = Primary, fontSize = 11.sp
+                                color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
                             )
                     }
                     if (chatUsername != myUsername) {
