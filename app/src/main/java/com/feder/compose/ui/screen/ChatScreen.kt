@@ -654,16 +654,17 @@ wsManager.send("message", text, chatUsername)
         // Дата в овале — под шапкой по центру
         // Кнопка прокрутки вниз
         if (listState.firstVisibleItemIndex > 0) {
-            Box(Modifier.fillMaxSize().padding(end = 16.dp, bottom = 80.dp).align(Alignment.BottomEnd)) {
-                FloatingActionButton(
-                    onClick = { CoroutineScope(Dispatchers.Main).launch { listState.animateScrollToItem(0) } },
-                    containerColor = SurfaceContainerHigh,
-                    contentColor = Primary,
-                    modifier = Modifier.size(40.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Filled.KeyboardArrowDown, "scroll down", modifier = Modifier.size(24.dp))
-                }
+            FloatingActionButton(
+                onClick = { CoroutineScope(Dispatchers.Main).launch { listState.animateScrollToItem(0) } },
+                containerColor = SurfaceContainerHigh,
+                contentColor = Primary,
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 80.dp),
+                shape = CircleShape
+            ) {
+                Icon(Icons.Filled.KeyboardArrowDown, "scroll down", modifier = Modifier.size(24.dp))
             }
         }
 
