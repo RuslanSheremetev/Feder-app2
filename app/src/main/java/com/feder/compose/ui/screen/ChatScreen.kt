@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -80,6 +81,7 @@ data class MsgItem(
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
@@ -658,7 +660,7 @@ wsManager.send("message", text, chatUsername)
         if (listState.firstVisibleItemIndex > 0) {
             Box(Modifier.fillMaxSize().padding(end = 16.dp, bottom = 80.dp), contentAlignment = Alignment.BottomEnd) {
                 FloatingActionButton(
-                    onClick = { CoroutineScope(Dispatchers.Main).launch { listState.animateScrollToItem(0) } },
+                    onClick = { scope.launch { listState.animateScrollToItem(0) } },
                     containerColor = SurfaceContainerHigh,
                     contentColor = Primary,
                     modifier = Modifier.size(40.dp),
