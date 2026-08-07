@@ -216,13 +216,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     // Обновляем дату в шапке при прокрутке
-            LaunchedEffect(listState.firstVisibleItemIndex) {
-                val idx = listState.firstVisibleItemIndex
-                if (idx >= 0 && idx < messages.size) {
-                    val dt = formatHeaderDate(messages[idx].timeVal)
-                    val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                    dateInHeader.value = if (idx == 0 || dt == lastDate) "" else dt
-                    Toast.makeText(context, "Date: $dt idx=$idx", Toast.LENGTH_SHORT).show()
+            LaunchedEffect(listState.isScrollInProgress, listState.firstVisibleItemIndex) {
+                if (listState.isScrollInProgress) {
+                    val items = listState.layoutInfo.visibleItemsInfo
+                    if (items.isNotEmpty()) {
+                        // Берём последний видимый — он первый на новой дате при скролле вверх
+                        val idx = items.last().index
+                        if (idx in 0 until messages.size) {
+                            val dt = formatHeaderDate(messages[idx].timeVal)
+                            val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
+                            dateInHeader.value = if (dt.isNotEmpty() && dt != lastDate) dt else ""
+                        }
+                    }
+                } else {
+                    dateInHeader.value = ""
                 }
             }
             LaunchedEffect(messages.size) {
