@@ -660,7 +660,7 @@ wsManager.send("message", text, chatUsername)
         if (listState.firstVisibleItemIndex > 0) {
             Box(Modifier.fillMaxSize().padding(end = 16.dp, bottom = 80.dp), contentAlignment = Alignment.BottomEnd) {
                 FloatingActionButton(
-                    onClick = { scope.launch { listState.animateScrollToItem(0) } },
+                    onClick = { scope.launch { listState.animateScrollToItem(messages.size - 1) } },
                     containerColor = SurfaceContainerHigh,
                     contentColor = Primary,
                     modifier = Modifier.size(40.dp),
