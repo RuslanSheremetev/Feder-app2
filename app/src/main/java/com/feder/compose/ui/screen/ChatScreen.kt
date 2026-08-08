@@ -415,30 +415,7 @@ wsManager.send("message", text, chatUsername)
                     }
                 }
             }
-            // Input
-            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
-                Surface(shape = RoundedCornerShape(28.dp), color = Color.Transparent) {
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true,
-                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.weight(1f).padding(vertical = 10.dp),
-                            decorationBox = { innerTextField ->
-                                if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
-                                innerTextField()
-                            })
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-                        Spacer(Modifier.width(4.dp))
-                        Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
-                            Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
-                        }
-                    }
-                }
-            }
+
         }
 
         // Forward screen
@@ -661,6 +638,30 @@ wsManager.send("message", text, chatUsername)
             }
         }
         // Дата в овале — под шапкой по центру
+        // Поле ввода поверх сообщений
+        Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
+            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow.copy(alpha = 0.85f), shadowElevation = 4.dp) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
+                        Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
+                    }
+                    BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true,
+                        textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
+                        modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                        decorationBox = { innerTextField ->
+                            if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
+                            innerTextField()
+                        })
+                    IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
+                        Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
+                        Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                    }
+                }
+            }
+        }
         // Кнопка прокрутки вниз
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
