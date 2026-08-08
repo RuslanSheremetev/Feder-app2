@@ -201,7 +201,7 @@ fun FederApp() {
                     phone = "",
                     bio = "",
                     birthday = "",
-                    onBack = { viewModel.selectedProfile = null }
+                    onBack = { viewModel.selectedProfile = null; viewModel.selectedChat = viewModel.selectedProfile }
                 )
             }
         }
