@@ -325,7 +325,7 @@ wsManager.send("message", text, chatUsername)
 
             if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 100.dp)) {
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 0.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
