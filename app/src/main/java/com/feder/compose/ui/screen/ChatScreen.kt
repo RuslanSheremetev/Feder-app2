@@ -663,7 +663,7 @@ wsManager.send("message", text, chatUsername)
         // Дата в овале — под шапкой по центру
         // Кнопка прокрутки вниз
         AnimatedVisibility(
-            visible = listState.firstVisibleItemIndex > 0,
+            visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 80.dp),
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
