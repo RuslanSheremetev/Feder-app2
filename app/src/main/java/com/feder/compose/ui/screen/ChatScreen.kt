@@ -639,7 +639,7 @@ wsManager.send("message", text, chatUsername)
         }
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
-        Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
+        Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow.copy(alpha = 0.85f), shadowElevation = 4.dp) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
