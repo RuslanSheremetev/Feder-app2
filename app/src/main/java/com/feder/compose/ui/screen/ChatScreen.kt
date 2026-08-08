@@ -664,7 +664,7 @@ wsManager.send("message", text, chatUsername)
         // Кнопка прокрутки вниз
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 100.dp),
+            modifier = Modifier.padding(end = 16.dp, bottom = 100.dp).align(Alignment.BottomEnd),
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
         ) {
