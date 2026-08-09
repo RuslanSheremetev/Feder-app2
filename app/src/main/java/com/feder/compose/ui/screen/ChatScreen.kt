@@ -313,27 +313,6 @@ wsManager.send("message", text, chatUsername)
                     IconButton(onClick = { }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     IconButton(onClick = { }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
-            } else if (searchMode) {
-                // Search mode header
-                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { searchMode = false; searchQuery = "" }) { Icon(Icons.Filled.ArrowBack, "close search", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                    Spacer(Modifier.width(8.dp))
-                    BasicTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        singleLine = true,
-                        textStyle = TextStyle(color = OnSurface, fontSize = 16.sp),
-                        cursorBrush = SolidColor(Primary),
-                        modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh).padding(horizontal = 12.dp, vertical = 8.dp),
-                        decorationBox = { innerTextField ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Search, null, tint = Outline, modifier = Modifier.size(20.dp))
-                                Spacer(Modifier.width(8.dp))
-                                if (searchQuery.isEmpty()) Text("Search messages...", color = Outline, fontSize = 16.sp)
-                                innerTextField()
-                            }
-                        }
-                    )
                 }
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
