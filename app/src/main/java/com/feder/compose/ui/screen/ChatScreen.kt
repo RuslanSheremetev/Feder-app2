@@ -337,7 +337,7 @@ wsManager.send("message", text, chatUsername)
                 }
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = { if (searchMode) { searchMode = false; searchQuery = "" } else onBack() }) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape).clickable { onProfileClick() }) {
                         if (avatarUrl != null) {
                             AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
