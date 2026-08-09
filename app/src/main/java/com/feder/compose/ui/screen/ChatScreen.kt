@@ -6,6 +6,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.animation.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.offset
@@ -84,6 +89,21 @@ data class MsgItem(
 )
 
 @OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = Color(0xFFD1D5DB), modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = text, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = Color(0xFFD1D5DB), lineHeight = 17.sp)
+    }
+}
+
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
@@ -319,7 +339,34 @@ wsManager.send("message", text, chatUsername)
                         IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                         IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                     }
-                    IconButton(onClick = onProfileClick) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    var showMoreMenu by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(onClick = { showMoreMenu = true }) { Icon(Icons.Filled.MoreVert, "more", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        if (showMoreMenu) {
+                            Popup(
+                                alignment = Alignment.TopEnd,
+                                onDismissRequest = { showMoreMenu = false },
+                                properties = PopupProperties(focusable = true)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 56.dp, end = 12.dp)
+                                        .width(IntrinsicSize.Max)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(Color(0xFF2B2B36))
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Column {
+                                        MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false }
+                                        MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
+                                        MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
+                                        MenuRow("Add to folder", Icons.Filled.Folder) { showMoreMenu = false }
+                                        MenuRow("Send money", Icons.Filled.AccountBalanceWallet) { showMoreMenu = false }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
                 }
