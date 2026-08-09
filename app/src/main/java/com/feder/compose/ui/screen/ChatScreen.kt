@@ -360,7 +360,7 @@ wsManager.send("message", text, chatUsername)
                                         MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false }
                                         MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
                                         MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
-                                        MenuRow("Add to folder", Icons.Filled.Folder) { showMoreMenu = false }
+                                        MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
                                         MenuRow("Send money", Icons.Filled.AccountBalanceWallet) { showMoreMenu = false }
                                     }
                                 }
