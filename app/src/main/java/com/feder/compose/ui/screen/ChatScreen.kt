@@ -361,7 +361,6 @@ wsManager.send("message", text, chatUsername)
                                         MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
                                         MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
                                         MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
-                                        MenuRow("Send money", Icons.Filled.AccountBalanceWallet) { showMoreMenu = false }
                                     }
                                 }
                             }
