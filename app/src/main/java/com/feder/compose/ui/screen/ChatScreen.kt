@@ -378,6 +378,7 @@ wsManager.send("message", text, chatUsername)
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
+                @OptIn(ExperimentalFoundationApi::class)
                             stickyHeader(key = "sticky_$date") {
                                 Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh.copy(alpha = 0.95f), shadowElevation = 2.dp) {
