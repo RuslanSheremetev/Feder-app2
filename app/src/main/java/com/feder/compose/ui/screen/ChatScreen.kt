@@ -325,10 +325,29 @@ wsManager.send("message", text, chatUsername)
                             }
                         }
                     }
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                        Text(
+                    if (searchMode) {
+                        Spacer(Modifier.width(8.dp))
+                        BasicTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            singleLine = true,
+                            textStyle = TextStyle(color = OnSurface, fontSize = 16.sp),
+                            cursorBrush = SolidColor(Primary),
+                            modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh).padding(horizontal = 12.dp, vertical = 8.dp),
+                            decorationBox = { innerTextField ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Search, null, tint = Outline, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    if (searchQuery.isEmpty()) Text("Search messages...", color = Outline, fontSize = 16.sp)
+                                    innerTextField()
+                                }
+                            }
+                        )
+                    } else {
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(
                                 when {
                                     isOnline -> "online"
                                     lastSeen > 0 -> formatLastSeen(lastSeen)
@@ -336,6 +355,7 @@ wsManager.send("message", text, chatUsername)
                                 },
                                 color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
                             )
+                        }
                     }
                     if (chatUsername != myUsername) {
                         IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
