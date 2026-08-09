@@ -25,6 +25,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
@@ -119,6 +121,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val wsManager = remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
+    var searchMode by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
@@ -311,6 +315,28 @@ wsManager.send("message", text, chatUsername)
                     IconButton(onClick = { }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     IconButton(onClick = { }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
+            } else if (searchMode) {
+                // Search mode header
+                Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { searchMode = false; searchQuery = "" }) { Icon(Icons.Filled.ArrowBack, "close search", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                    Spacer(Modifier.width(8.dp))
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        singleLine = true,
+                        textStyle = TextStyle(color = OnSurface, fontSize = 16.sp),
+                        cursorBrush = SolidColor(Primary),
+                        modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh).padding(horizontal = 12.dp, vertical = 8.dp),
+                        decorationBox = { innerTextField ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.Search, null, tint = Outline, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(8.dp))
+                                if (searchQuery.isEmpty()) Text("Search messages...", color = Outline, fontSize = 16.sp)
+                                innerTextField()
+                            }
+                        }
+                    )
+                }
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
@@ -357,7 +383,7 @@ wsManager.send("message", text, chatUsername)
                                         .padding(vertical = 8.dp)
                                 ) {
                                     Column {
-                                        MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false }
+                                        MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false; searchMode = true }
                                         MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
                                         MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
                                         MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
