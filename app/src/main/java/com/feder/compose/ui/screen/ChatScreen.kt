@@ -353,7 +353,7 @@ wsManager.send("message", text, chatUsername)
                                         .padding(top = 48.dp, end = 12.dp)
                                         .width(IntrinsicSize.Max)
                                         .clip(RoundedCornerShape(16.dp))
-                                        .background(Color(0xFF2B2B36))
+                                        .background(Color(0xFF339DFF))
                                         .padding(vertical = 8.dp)
                                 ) {
                                     Column {
