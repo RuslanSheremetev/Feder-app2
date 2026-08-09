@@ -316,15 +316,6 @@ wsManager.send("message", text, chatUsername)
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { if (searchMode) { searchMode = false; searchQuery = "" } else onBack() }) { Icon(Icons.Filled.ArrowBack, "back", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                    Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape).clickable { onProfileClick() }) {
-                        if (avatarUrl != null) {
-                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-                        } else {
-                            Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                                Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
                     if (searchMode) {
                         Spacer(Modifier.width(8.dp))
                         BasicTextField(
@@ -344,6 +335,15 @@ wsManager.send("message", text, chatUsername)
                             }
                         )
                     } else {
+                        Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape).clickable { onProfileClick() }) {
+                            if (avatarUrl != null) {
+                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                            } else {
+                                Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                    Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -356,10 +356,10 @@ wsManager.send("message", text, chatUsername)
                                 color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
                             )
                         }
-                    }
-                    if (chatUsername != myUsername) {
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        if (chatUsername != myUsername) {
+                            IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                            IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                        }
                     }
                     var showMoreMenu by remember { mutableStateOf(false) }
                     Box {
