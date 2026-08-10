@@ -401,7 +401,7 @@ wsManager.send("message", text, chatUsername)
                         if (date.isNotEmpty()) {
                 @OptIn(ExperimentalFoundationApi::class)
                             stickyHeader(key = "sticky_$date") {
-                                Box(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 6.dp), contentAlignment = Alignment.Center) {
+                                Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh, shadowElevation = 2.dp) {
                                         Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
                                     }
@@ -507,7 +507,7 @@ wsManager.send("message", text, chatUsername)
                 // Chat list for forward
                 LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(listOf("Alex Rivera", "Sarah Jenkins", "David Miller", "Elena Rodriguez")) { name ->
-                        Row(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             }
