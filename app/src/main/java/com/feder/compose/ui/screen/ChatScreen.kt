@@ -680,18 +680,36 @@ wsManager.send("message", text, chatUsername)
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                 Column {
                     if (replyMessage != null) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                            color = SurfaceContainerHigh,
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Box(Modifier.width(4.dp).height(36.dp).background(Primary, RoundedCornerShape(2.dp)))
-                            Spacer(Modifier.width(8.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(replyMessage?.from ?: "", color = Primary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                                Text(replyMessage?.text?.take(50) ?: "", color = OnSurfaceVariant, fontSize = 13.sp, maxLines = 1)
-                            }
-                            IconButton(onClick = { replyMessage = null }, modifier = Modifier.size(28.dp)) {
-                                Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Box(Modifier.width(3.dp).height(40.dp).background(replyMessage?.from?.hashCode()?.let { Color.hsl(it % 360, 0.7f, 0.6f) } ?: Primary, RoundedCornerShape(2.dp)))
+                                Spacer(Modifier.width(10.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        replyMessage?.from ?: "",
+                                        color = replyMessage?.from?.hashCode()?.let { Color.hsl(it % 360, 0.7f, 0.6f) } ?: Primary,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(
+                                        replyMessage?.text?.take(80) ?: "",
+                                        color = OnSurfaceVariant,
+                                        fontSize = 13.sp,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                                IconButton(onClick = { replyMessage = null }, modifier = Modifier.size(24.dp)) {
+                                    Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                                }
                             }
                         }
                     }
