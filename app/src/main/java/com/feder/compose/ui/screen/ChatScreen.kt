@@ -510,7 +510,7 @@ wsManager.send("message", text, chatUsername)
                             }
                             Spacer(Modifier.width(12.dp))
                             Text(name, color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                            Icon(Icons.Filled.CheckCircle, "selected", tint = Primary, modifier = Modifier.size(24.dp))
+                            Spacer(Modifier.size(24.dp))
                         }
                     }
                 }
