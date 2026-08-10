@@ -372,7 +372,7 @@ wsManager.send("message", text, chatUsername)
                             ) {
                                 Surface(
                                     modifier = Modifier
-                                        .padding(top = 48.dp, end = 8.dp)
+                                        .padding(top = 48.dp, end = 16.dp)
                                         .width(IntrinsicSize.Max),
                                     shape = RoundedCornerShape(16.dp),
                                     color = SurfaceContainerHigh,
