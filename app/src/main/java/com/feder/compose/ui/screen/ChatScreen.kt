@@ -484,19 +484,6 @@ wsManager.send("message", text, chatUsername)
                     Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                 }
                 
-                // Search
-                Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp), RoundedCornerShape(28.dp), color = SurfaceContainerHigh) {
-                    Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        BasicTextField(value = forwardSearch, onValueChange = { forwardSearch = it }, singleLine = true,
-                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.weight(1f),
-                            decorationBox = { if (forwardSearch.isEmpty()) Text("Search chats...", color = Outline, fontSize = 14.sp); it() }
-                        )
-                    }
-                }
-                
                 Spacer(Modifier.height(8.dp))
                 Text("Recipients", color = OnSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 16.dp))
                 Spacer(Modifier.height(8.dp))
