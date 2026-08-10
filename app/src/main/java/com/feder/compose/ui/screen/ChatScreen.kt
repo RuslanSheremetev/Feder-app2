@@ -677,7 +677,7 @@ wsManager.send("message", text, chatUsername)
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
-            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow.copy(alpha = 0.85f), shadowElevation = 4.dp) {
+            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                 Column {
                     if (replyMessage != null) {
                         Row(
