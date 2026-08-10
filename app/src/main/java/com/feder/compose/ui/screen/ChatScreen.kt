@@ -417,8 +417,18 @@ wsManager.send("message", text, chatUsername)
                         val nextMsg = if (index < messages.size - 1) messages[index + 1] else null
                         val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs((nextMsg.timeVal ?: 0) - (msg.timeVal ?: 0)) < 300
                         val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
-                        Box(modifier = Modifier.onGloballyPositioned { coords -> msgPositions[msg.id] = coords.positionInRoot() }) {
-                        MessageBubble(
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (selectionMode) {
+                                Icon(
+                                    if (selectedMessages.contains(msg.time)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
+                                    contentDescription = "select",
+                                    tint = if (selectedMessages.contains(msg.time)) Primary else OutlineVariant,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            Box(modifier = Modifier.onGloballyPositioned { coords -> msgPositions[msg.id] = coords.positionInRoot() }) {
+                                MessageBubble(
                             msg,
                             msg.text,
                             msg.time.takeLast(8).take(5),
@@ -444,7 +454,8 @@ wsManager.send("message", text, chatUsername)
                             
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
                         )
-                    }
+                            }
+                        }
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
