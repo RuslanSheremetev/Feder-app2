@@ -130,6 +130,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var showForward by remember { mutableStateOf(false) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
+    var forwardContacts by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        try {
+            val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").header("Authorization", "Bearer $token").build()).execute()
+            val body = resp.body?.string() ?: ""
+            val type = object : com.google.gson.reflect.TypeToken<List<Map<String, String>>>() {}.type
+            forwardContacts = com.google.gson.Gson().fromJson(body, type)
+        } catch (_: Exception) {}
+    }
 
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
@@ -515,10 +524,16 @@ wsManager.send("message", text, chatUsername)
                 
                 // Chat list for forward
                 LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
-                    items(listOf("Alex Rivera", "Sarah Jenkins", "David Miller", "Elena Rodriguez")) { name ->
+                    items(forwardContacts) { contact ->
+                        val name = contact["name"] ?: contact["username"] ?: "User"
+                        val avatar = contact["avatar_url"] ?: ""
                         Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                                Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                if (avatar.isNotEmpty()) {
+                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatar).crossfade(true).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                } else {
+                                    Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                             Spacer(Modifier.width(12.dp))
                             Text(name, color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
