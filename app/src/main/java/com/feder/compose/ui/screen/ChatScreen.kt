@@ -588,6 +588,11 @@ wsManager.send("message", text, chatUsername)
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.Reply, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
+                            if (selectedMessage?.from == myUsername) {
+                                Row(Modifier.fillMaxWidth().clickable { /* edit mode */ selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Edit, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
+                                }
+                            }
                             Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show(); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.ContentCopy, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
                             }
