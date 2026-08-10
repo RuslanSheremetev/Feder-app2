@@ -484,15 +484,6 @@ wsManager.send("message", text, chatUsername)
                     Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                 }
                 
-                // Preview
-                Surface(Modifier.fillMaxWidth().padding(16.dp), RoundedCornerShape(12.dp), color = SurfaceContainerLow) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text("Preview", color = Primary, fontSize = 12.sp)
-                        Spacer(Modifier.height(4.dp))
-                        Text(selectedMessage!!.text, color = OnSurface, fontSize = 14.sp, maxLines = 2)
-                    }
-                }
-                
                 // Search
                 Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp), RoundedCornerShape(28.dp), color = SurfaceContainerHigh) {
                     Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
