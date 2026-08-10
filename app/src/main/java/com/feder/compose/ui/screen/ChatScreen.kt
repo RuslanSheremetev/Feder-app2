@@ -133,10 +133,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     LaunchedEffect(Unit) {
         try {
-            val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").header("Authorization", "Bearer $token").build()).execute()
-            val body = resp.body?.string() ?: ""
-            val type = object : com.google.gson.reflect.TypeToken<List<Map<String, Any?>>>() {}.type
-            forwardContacts = com.google.gson.Gson().fromJson(body, type)
+            val client = OkHttpClient()
+            val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").build()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+            val body = response.body?.string()
+            if (body != null) {
+                val jsonArray = JsonParser.parseString(body).asJsonArray
+                val loaded = jsonArray.map { el ->
+                    val obj = el.asJsonObject
+                    val uname = obj.get("username")?.asString ?: ""
+                    val name = obj.get("name")?.asString ?: uname
+                    val avatar = obj.get("avatar_url")?.asString ?: ""
+                    mapOf<String, Any?>("username" to uname, "name" to name, "avatar_url" to avatar)
+                }
+                forwardContacts = loaded
+            }
         } catch (_: Exception) {}
     }
 
