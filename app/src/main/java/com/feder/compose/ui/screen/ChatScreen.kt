@@ -423,7 +423,13 @@ wsManager.send("message", text, chatUsername)
                                     if (selectedMessages.contains(msg.time)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
                                     contentDescription = "select",
                                     tint = if (selectedMessages.contains(msg.time)) Primary else OutlineVariant,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp).clickable {
+                                        if (selectedMessages.contains(msg.time)) {
+                                            selectedMessages = selectedMessages - msg.time
+                                        } else {
+                                            selectedMessages = selectedMessages + msg.time
+                                        }
+                                    }
                                 )
                                 Spacer(Modifier.width(8.dp))
                             }
