@@ -482,6 +482,28 @@ wsManager.send("message", text, chatUsername)
                     IconButton(onClick = { showForward = false }) { Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     Spacer(Modifier.width(8.dp))
                     Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    var forwardSearchMode by remember { mutableStateOf(false) }
+                    if (!forwardSearchMode) {
+                        IconButton(onClick = { forwardSearchMode = true }) {
+                            Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
+                        }
+                    }
+                }
+                if (forwardSearchMode) {
+                    Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), RoundedCornerShape(28.dp), color = SurfaceContainerHigh) {
+                        Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { forwardSearchMode = false; forwardSearch = "" }) {
+                                Icon(Icons.Filled.ArrowBack, "close", tint = Outline, modifier = Modifier.size(20.dp))
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            BasicTextField(value = forwardSearch, onValueChange = { forwardSearch = it }, singleLine = true,
+                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
+                                modifier = Modifier.weight(1f),
+                                decorationBox = { if (forwardSearch.isEmpty()) Text("Search chats...", color = Outline, fontSize = 14.sp); it() }
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
                 
                 Spacer(Modifier.height(8.dp))
