@@ -484,10 +484,22 @@ wsManager.send("message", text, chatUsername)
                         Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
                     if (forwardSearchMode) {
-                        BasicTextField(value = forwardSearch, onValueChange = { forwardSearch = it }, singleLine = true,
-                            textStyle = TextStyle(color = OnSurface, fontSize = 16.sp), cursorBrush = SolidColor(Color.White),
-                            modifier = Modifier.weight(1f).padding(vertical = 4.dp),
-                            decorationBox = { if (forwardSearch.isEmpty()) Text("Search chats...", color = Outline, fontSize = 14.sp); it() }
+                        Spacer(Modifier.width(8.dp))
+                        BasicTextField(
+                            value = forwardSearch,
+                            onValueChange = { forwardSearch = it },
+                            singleLine = true,
+                            textStyle = TextStyle(color = OnSurface, fontSize = 16.sp),
+                            cursorBrush = SolidColor(Primary),
+                            modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh).padding(horizontal = 12.dp, vertical = 8.dp),
+                            decorationBox = { innerTextField ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Search, null, tint = Outline, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    if (forwardSearch.isEmpty()) Text("Search chats...", color = Outline, fontSize = 16.sp)
+                                    innerTextField()
+                                }
+                            }
                         )
                     } else {
                         Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
