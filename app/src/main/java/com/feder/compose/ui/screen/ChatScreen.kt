@@ -711,7 +711,24 @@ wsManager.send("message", text, chatUsername)
         // Поле ввода поверх сообщений
         Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerLow.copy(alpha = 0.85f), shadowElevation = 4.dp) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    if (replyMessage != null) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(Modifier.width(4.dp).height(36.dp).background(Primary, RoundedCornerShape(2.dp)))
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(replyMessage?.from ?: "", color = Primary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                Text(replyMessage?.text?.take(50) ?: "", color = OnSurfaceVariant, fontSize = 13.sp, maxLines = 1)
+                            }
+                            IconButton(onClick = { replyMessage = null }, modifier = Modifier.size(28.dp)) {
+                                Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
@@ -729,6 +746,7 @@ wsManager.send("message", text, chatUsername)
                     Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
+                }
                 }
             }
         }
