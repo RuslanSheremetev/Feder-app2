@@ -372,7 +372,7 @@ wsManager.send("message", text, chatUsername)
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .padding(top = 48.dp, end = 24.dp)
+                                        .padding(top = 48.dp, end = 8.dp)
                                         .width(IntrinsicSize.Max)
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(SurfaceContainerHigh)
