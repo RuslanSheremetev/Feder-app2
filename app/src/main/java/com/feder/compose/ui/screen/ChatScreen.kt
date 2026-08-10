@@ -130,12 +130,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var showForward by remember { mutableStateOf(false) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
-    var forwardContacts by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
+    var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     LaunchedEffect(Unit) {
         try {
             val resp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").header("Authorization", "Bearer $token").build()).execute()
             val body = resp.body?.string() ?: ""
-            val type = object : com.google.gson.reflect.TypeToken<List<Map<String, String>>>() {}.type
+            val type = object : com.google.gson.reflect.TypeToken<List<Map<String, Any?>>>() {}.type
             forwardContacts = com.google.gson.Gson().fromJson(body, type)
         } catch (_: Exception) {}
     }
@@ -525,8 +525,8 @@ wsManager.send("message", text, chatUsername)
                 // Chat list for forward
                 LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(forwardContacts) { contact ->
-                        val name = contact["name"] ?: contact["username"] ?: "User"
-                        val avatar = contact["avatar_url"] ?: ""
+                        val name = (contact["name"] ?: contact["username"] ?: "User") as String
+                        val avatar = (contact["avatar_url"] ?: "") as String
                         Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
