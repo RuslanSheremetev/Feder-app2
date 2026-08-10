@@ -477,11 +477,11 @@ wsManager.send("message", text, chatUsername)
             Column(
                 modifier = Modifier.fillMaxSize().background(Background)
             ) {
+                var forwardSearchMode by remember { mutableStateOf(false) }
                 // Header
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { showForward = false }) { Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     Spacer(Modifier.width(8.dp))
-                    var forwardSearchMode by remember { mutableStateOf(false) }
                     Text("Forward message", color = OnSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     if (!forwardSearchMode) {
                         IconButton(onClick = { forwardSearchMode = true }) {
