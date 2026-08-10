@@ -689,12 +689,12 @@ wsManager.send("message", text, chatUsername)
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                                 verticalAlignment = Alignment.Top
                             ) {
-                                Box(Modifier.width(3.dp).height(40.dp).background(replyMessage?.from?.hashCode()?.let { Color.hsl(it % 360, 0.7f, 0.6f) } ?: Primary, RoundedCornerShape(2.dp)))
+                                Box(Modifier.width(3.dp).height(40.dp).background(replyMessage?.from?.hashCode()?.let { Color.hsl((it % 360).toFloat(), 0.7f, 0.6f) } ?: Primary, RoundedCornerShape(2.dp)))
                                 Spacer(Modifier.width(10.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         replyMessage?.from ?: "",
-                                        color = replyMessage?.from?.hashCode()?.let { Color.hsl(it % 360, 0.7f, 0.6f) } ?: Primary,
+                                        color = replyMessage?.from?.hashCode()?.let { Color.hsl((it % 360).toFloat(), 0.7f, 0.6f) } ?: Primary,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
