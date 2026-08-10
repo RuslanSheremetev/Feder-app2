@@ -452,39 +452,6 @@ wsManager.send("message", text, chatUsername)
 
             }
 
-            // Reply Preview
-            if (replyMessage != null) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    color = SurfaceContainerLow,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(Modifier.width(4.dp).height(40.dp).background(Primary, RoundedCornerShape(2.dp)))
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                replyMessage?.from ?: "",
-                                color = Primary,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                replyMessage?.text?.take(50) ?: "",
-                                color = OnSurfaceVariant,
-                                fontSize = 14.sp,
-                                maxLines = 1
-                            )
-                        }
-                        IconButton(onClick = { replyMessage = null }, modifier = Modifier.size(32.dp)) {
-                            Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
-                        }
-                    }
-                }
-            }
 
         }
 
