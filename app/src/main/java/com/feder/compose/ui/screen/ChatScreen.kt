@@ -370,15 +370,15 @@ wsManager.send("message", text, chatUsername)
                                 onDismissRequest = { showMoreMenu = false },
                                 properties = PopupProperties(focusable = true)
                             ) {
-                                Box(
+                                Surface(
                                     modifier = Modifier
                                         .padding(top = 48.dp, end = 8.dp)
-                                        .width(IntrinsicSize.Max)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SurfaceContainerHigh)
-                                        .padding(vertical = 8.dp)
+                                        .width(IntrinsicSize.Max),
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = SurfaceContainerHigh,
+                                    shadowElevation = 8.dp
                                 ) {
-                                    Column {
+                                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                         MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false; searchMode = true }
                                         MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
                                         MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
