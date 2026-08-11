@@ -649,7 +649,6 @@ wsManager.send("message", text, chatUsername)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
                     .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                     .padding(16.dp)
                     .navigationBarsPadding()
@@ -707,7 +706,7 @@ wsManager.send("message", text, chatUsername)
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         if (!showForward) {
-            Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                 Column {
                     if (replyMessage != null) {
@@ -770,7 +769,7 @@ wsManager.send("message", text, chatUsername)
         // Кнопка прокрутки вниз
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
-            modifier = Modifier.padding(end = 28.dp, bottom = 76.dp).align(Alignment.BottomEnd),
+            modifier = Modifier.padding(end = 28.dp, bottom = 76.dp),
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
         ) {
