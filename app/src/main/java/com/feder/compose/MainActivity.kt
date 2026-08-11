@@ -147,7 +147,6 @@ class ChatViewModel : ViewModel() {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         try {
             // Прозрачные бары для Android 11+
             window.setFlags(
