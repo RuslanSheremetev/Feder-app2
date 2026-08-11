@@ -705,7 +705,6 @@ wsManager.send("message", text, chatUsername)
         }
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
-        if (!showForward) {
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
                 Column {
@@ -764,7 +763,6 @@ wsManager.send("message", text, chatUsername)
                 }
                 }
             }
-        }
         }
         // Кнопка прокрутки вниз
         AnimatedVisibility(
