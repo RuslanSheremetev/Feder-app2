@@ -786,7 +786,6 @@ wsManager.send("message", text, chatUsername)
 
         
     }
-}
 
 @Composable
 fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false) {
