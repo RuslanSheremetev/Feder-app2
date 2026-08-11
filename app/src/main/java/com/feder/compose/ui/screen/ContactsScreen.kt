@@ -87,7 +87,7 @@ fun ContactsScreen(onBack: () -> Unit) {
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
                 // Search
                 item {
                     OutlinedTextField(
