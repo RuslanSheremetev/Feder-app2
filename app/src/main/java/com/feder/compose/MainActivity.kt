@@ -293,7 +293,7 @@ fun FederApp() {
                 }
             }
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.padding(padding)) {
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
