@@ -304,7 +304,7 @@ fun FederApp() {
                     }
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(
