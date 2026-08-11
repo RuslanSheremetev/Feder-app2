@@ -131,6 +131,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
+    var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     LaunchedEffect(Unit) {
         try {
             val client = OkHttpClient()
@@ -538,7 +539,9 @@ wsManager.send("message", text, chatUsername)
                     items(forwardContacts) { contact ->
                         val name = (contact["name"] ?: contact["username"] ?: "User") as String
                         val avatar = (contact["avatar_url"] ?: "") as String
-                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).clickable { val uname = (contact["username"] ?: "") as String; if (forwardSelected.contains(uname)) forwardSelected = forwardSelected - uname else forwardSelected = forwardSelected + uname }, verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (forwardSelected.contains((contact["username"] ?: "") as String)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, contentDescription = "select", tint = if (forwardSelected.contains((contact["username"] ?: "") as String)) Primary else OutlineVariant, modifier = Modifier.size(24.dp))
+                            Spacer(Modifier.width(8.dp))
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
                                     AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatar).crossfade(true).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
