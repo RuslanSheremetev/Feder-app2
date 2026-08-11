@@ -212,7 +212,7 @@ fun FederApp() {
         containerColor = Background,
         topBar = {
             Box(
-                modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Color.Transparent).padding(horizontal = 16.dp, vertical = 6.dp)
+                modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Surface).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.showStories = !viewModel.showStories }) {
