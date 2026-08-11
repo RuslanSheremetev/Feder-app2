@@ -552,30 +552,6 @@ wsManager.send("message", text, chatUsername)
                         }
                     }
                 }
-                
-                // Input field like in chat
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding()) {
-                    Surface(shape = RoundedCornerShape(28.dp), color = Color.Transparent) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                            var forwardText by remember { mutableStateOf("") }
-                            BasicTextField(
-                                value = forwardText,
-                                onValueChange = { forwardText = it },
-                                singleLine = true,
-                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
-                                cursorBrush = SolidColor(Primary),
-                                modifier = Modifier.weight(1f).padding(vertical = 10.dp),
-                                decorationBox = { if (forwardText.isEmpty()) Text("Add comment...", color = OnSurfaceVariant, fontSize = 14.sp); it() }
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Box(
-                                Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { showForward = false; selectedMessage = null },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    }
                 }
             }
         }
