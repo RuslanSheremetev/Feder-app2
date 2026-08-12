@@ -104,6 +104,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
