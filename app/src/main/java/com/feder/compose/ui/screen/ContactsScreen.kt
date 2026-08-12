@@ -81,7 +81,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                         placeholder = { Text("Search contacts...", color = MaterialTheme.colorScheme.outline) },
                         leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.outline) },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(28.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -146,7 +146,7 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(28.dp))
             .clickable { }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
