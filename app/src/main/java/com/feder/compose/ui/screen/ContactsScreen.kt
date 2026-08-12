@@ -71,8 +71,8 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 96.dp)) {
-            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 80.dp)) {
+            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
                 // Search
                 item {
                     OutlinedTextField(
@@ -131,7 +131,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                 onClick = { },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 96.dp),
+                    .padding(end = 24.dp, bottom = 80.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape
