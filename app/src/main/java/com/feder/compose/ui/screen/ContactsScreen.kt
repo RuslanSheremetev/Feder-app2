@@ -71,7 +71,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 96.dp)) {
+    Box(modifier = Modifier.fillMaxWidth().padding(top = 64.dp, bottom = 96.dp)) {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
                 // Search
                 item {

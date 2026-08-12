@@ -69,7 +69,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
