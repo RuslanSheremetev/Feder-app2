@@ -130,13 +130,13 @@ fun ContactsScreen(onBack: () -> Unit) {
             FloatingActionButton(
                 onClick = { },
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.BottomEnd).size(40.dp)
                     .padding(end = 24.dp, bottom = 80.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape
             ) {
-                Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(28.dp))
+                Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(24.dp))
         }
     }
 }
@@ -198,7 +198,7 @@ private fun ContactRow(contact: Contact) {
                         .clip(CircleShape)
                         .background(Color(0xFF4CAF50))
                         .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomEnd).size(40.dp)
                 )
             }
         }
