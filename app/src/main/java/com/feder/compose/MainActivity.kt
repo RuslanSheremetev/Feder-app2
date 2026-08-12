@@ -149,10 +149,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         try {
             // Прозрачные бары для Android 11+
-            window.setFlags(
-                android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-            )
             setContent {
         val prefs = this@MainActivity.getSharedPreferences("feder_theme", Context.MODE_PRIVATE)
         var isDarkMode by remember { mutableStateOf(prefs.getBoolean("dark_mode", true)) }
