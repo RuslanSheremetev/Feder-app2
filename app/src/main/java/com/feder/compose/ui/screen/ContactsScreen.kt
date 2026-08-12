@@ -71,7 +71,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Box(modifier = Modifier.fillMaxWidth().padding(top = 64.dp, bottom = 96.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 64.dp)) {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
                 // Search
                 item {
@@ -137,6 +137,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                 shape = CircleShape
             ) {
                 Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(28.dp))
+            Spacer(Modifier.weight(1f))
         }
     }
 }
