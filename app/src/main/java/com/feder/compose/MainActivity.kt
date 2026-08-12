@@ -392,6 +392,7 @@ fun FederApp() {
                 }
             }
 
+            }
             // Bottom menu overlay
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
                 Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
