@@ -208,3 +208,4 @@ private fun ContactRow(contact: Contact) {
         }
     }
 }
+ 
