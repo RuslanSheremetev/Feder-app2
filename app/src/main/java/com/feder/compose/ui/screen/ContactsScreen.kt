@@ -130,8 +130,9 @@ fun ContactsScreen(onBack: () -> Unit) {
             FloatingActionButton(
                 onClick = { },
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 68.dp)
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth(0.875f)
+                    .padding(start = 0.dp, bottom = 84.dp)
                     .size(40.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
