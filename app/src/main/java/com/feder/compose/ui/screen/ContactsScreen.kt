@@ -212,3 +212,4 @@ private fun ContactRow(contact: Contact) {
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
 }
+ 
