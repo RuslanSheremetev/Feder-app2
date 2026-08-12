@@ -131,7 +131,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                 onClick = { },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 80.dp)
+                    .padding(end = 24.dp, bottom = 68.dp)
                     .size(40.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
