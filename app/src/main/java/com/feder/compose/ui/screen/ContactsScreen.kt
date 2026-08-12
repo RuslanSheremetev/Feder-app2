@@ -207,5 +207,4 @@ private fun ContactRow(contact: Contact) {
             Text(contact.status, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
         }
     }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
 }
