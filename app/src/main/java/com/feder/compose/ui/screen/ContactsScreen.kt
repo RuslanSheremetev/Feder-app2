@@ -44,9 +44,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     var contacts by remember { mutableStateOf(listOf<Contact>()) }
     
-    var refreshKey by remember { mutableStateOf(0) }
-    DisposableEffect(Unit) { refreshKey++; onDispose { } }
-    LaunchedEffect(refreshKey) {
+        LaunchedEffect(Unit) { {
         try {
             val client = OkHttpClient()
             val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=demo").build()
