@@ -148,6 +148,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+        window.statusBarColor = android.graphics.Color.parseColor("#1C1B1B")
             // Прозрачные бары для Android 11+
             setContent {
         val prefs = this@MainActivity.getSharedPreferences("feder_theme", Context.MODE_PRIVATE)
@@ -254,7 +255,7 @@ fun FederApp() {
                     }
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 80.dp, bottom = 80.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 68.dp, bottom = 80.dp)) {
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(
