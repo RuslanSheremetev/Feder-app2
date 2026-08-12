@@ -539,8 +539,8 @@ wsManager.send("message", text, chatUsername)
                     items(forwardContacts) { contact ->
                         val name = (contact["name"] ?: contact["username"] ?: "User") as String
                         val avatar = (contact["avatar_url"] ?: "") as String
-                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).clickable { val uname = (contact["username"] ?: "") as String; if (forwardSelected.contains(uname)) forwardSelected = forwardSelected - uname else forwardSelected = forwardSelected + uname }, verticalAlignment = Alignment.CenterVertically) {
-                            Icon(if (forwardSelected.contains((contact["username"] ?: "") as String)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, contentDescription = "select", tint = if (forwardSelected.contains((contact["username"] ?: "") as String)) Primary else OutlineVariant, modifier = Modifier.size(24.dp))
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).combinedClickable(onClick = { val uname = (contact["username"] ?: "") as String; if (forwardSelected.isNotEmpty()) { if (forwardSelected.contains(uname)) forwardSelected = forwardSelected - uname else forwardSelected = forwardSelected + uname } }, onLongClick = { val uname = (contact["username"] ?: "") as String; forwardSelected = setOf(uname) }), verticalAlignment = Alignment.CenterVertically) {
+                            if (forwardSelected.isNotEmpty()) { Icon(if (forwardSelected.contains((contact["username"] ?: "") as String)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, contentDescription = "select", tint = if (forwardSelected.contains((contact["username"] ?: "") as String)) Primary else OutlineVariant, modifier = Modifier.size(24.dp)) }
                             Spacer(Modifier.width(8.dp))
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
