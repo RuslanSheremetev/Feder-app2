@@ -249,7 +249,7 @@ fun FederApp() {
                 else -> {
                     // Если выбраны Contacts или Settings — показываем их
                     if (viewModel.selectedTab == 1) {
-                        ContactsScreen(onBack = { viewModel.selectedTab = 0 })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" }, onBack = { viewModel.selectedTab = 0 })
                     } else if (viewModel.selectedTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {

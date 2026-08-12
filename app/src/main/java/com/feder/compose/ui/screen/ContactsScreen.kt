@@ -39,7 +39,7 @@ data class Contact(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactsScreen(onBack: () -> Unit) {
+fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
     var contacts by remember { mutableStateOf(listOf<Contact>()) }
