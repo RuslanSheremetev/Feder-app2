@@ -71,22 +71,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = { Text("Contacts", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W500, fontSize = 22.sp) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onSurface)
-                    }
-                },
-
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-            )
-        }
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 96.dp)) {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
                 // Search
                 item {
@@ -152,7 +137,6 @@ fun ContactsScreen(onBack: () -> Unit) {
                 shape = CircleShape
             ) {
                 Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(28.dp))
-            }
         }
     }
 }
