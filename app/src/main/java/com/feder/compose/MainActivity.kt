@@ -220,6 +220,7 @@ fun FederApp() {
                         }
                     }
                 }
+                }
                 Spacer(Modifier.width(12.dp))
                 Text(if (viewModel.selectedTab == 1) "Contacts" else "Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
                 IconButton(onClick = {
