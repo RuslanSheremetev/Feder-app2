@@ -80,7 +80,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                         onValueChange = { searchText = it },
                         placeholder = { Text("Search contacts...", color = MaterialTheme.colorScheme.outline) },
                         leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.outline) },
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
                         shape = RoundedCornerShape(28.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -94,7 +94,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
                 // New Group, New Secret Chat, New Channel
                 item {
-                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
                         ActionButton(Icons.Filled.GroupAdd, "New Group")
                         ActionButton(Icons.Filled.Lock, "New Secret Chat")
                         ActionButton(Icons.Filled.Campaign, "New Channel")
@@ -114,7 +114,7 @@ fun ContactsScreen(onBack: () -> Unit) {
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.W600,
                                 letterSpacing = 2.sp,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                             )
                         }
                     }
