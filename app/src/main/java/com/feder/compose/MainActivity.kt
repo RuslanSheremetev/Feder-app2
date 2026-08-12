@@ -253,8 +253,8 @@ fun FederApp() {
                     } else if (viewModel.selectedTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
-                        item { Spacer(Modifier.height(64.dp)) }
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 72.dp)) {
+                        item { Spacer(Modifier.height(72.dp)) }
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(
