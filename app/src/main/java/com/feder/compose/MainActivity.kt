@@ -248,7 +248,6 @@ fun FederApp() {
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Surface).align(Alignment.TopCenter))
             when {
                 viewModel.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
                 viewModel.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -259,7 +258,7 @@ fun FederApp() {
                     }
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 80.dp, bottom = 80.dp)) {
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(
