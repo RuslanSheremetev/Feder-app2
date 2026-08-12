@@ -44,7 +44,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     var contacts by remember { mutableStateOf(listOf<Contact>()) }
     
-        LaunchedEffect(Unit) { {
+        LaunchedEffect(Unit) {
         try {
             val client = OkHttpClient()
             val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=demo").build()
