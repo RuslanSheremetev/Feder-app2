@@ -255,7 +255,7 @@ fun FederApp() {
                     }
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(
@@ -305,6 +305,7 @@ fun FederApp() {
                 Column {
 
                         Row(
+                        item { Spacer(Modifier.height(64.dp)) }
                             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
