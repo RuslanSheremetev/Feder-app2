@@ -127,7 +127,6 @@ fun ContactsScreen(onBack: () -> Unit) {
                     }
                 }
 
-                item { Spacer(Modifier.height(80.dp)) }
             }
 
             // FAB
