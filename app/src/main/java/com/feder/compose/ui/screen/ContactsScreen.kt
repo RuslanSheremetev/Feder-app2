@@ -25,6 +25,7 @@ import coil.request.ImageRequest
 import androidx.compose.ui.platform.LocalContext
 import okhttp3.*
 import com.google.gson.JsonParser
+import com.feder.compose.ChatItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
