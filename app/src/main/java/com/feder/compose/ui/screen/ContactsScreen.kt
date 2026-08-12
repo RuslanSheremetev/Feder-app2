@@ -71,8 +71,8 @@ fun ContactsScreen(onBack: () -> Unit) {
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 64.dp)) {
-            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 0.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 96.dp)) {
+            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 96.dp)) {
                 // Search
                 item {
                     OutlinedTextField(
@@ -125,9 +125,7 @@ fun ContactsScreen(onBack: () -> Unit) {
 
                 item { Spacer(Modifier.height(80.dp)) }
             }
-            Spacer(Modifier.weight(1f))
 
-            Box(modifier = Modifier.fillMaxWidth()) {
             // FAB
             FloatingActionButton(
                 onClick = { },
@@ -136,7 +134,6 @@ fun ContactsScreen(onBack: () -> Unit) {
                     .padding(end = 24.dp, bottom = 96.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-            }
                 shape = CircleShape
             ) {
                 Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(28.dp))
@@ -212,4 +209,3 @@ private fun ContactRow(contact: Contact) {
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
 }
- 
