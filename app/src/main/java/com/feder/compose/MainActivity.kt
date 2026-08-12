@@ -202,7 +202,8 @@ fun FederApp() {
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Surface).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.showStories = !viewModel.showStories }) {
+                if (viewModel.selectedTab == 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.showStories = !viewModel.showStories }) {
                     if (viewModel.showStories) {
                         Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp))
                     } else {
@@ -220,7 +221,7 @@ fun FederApp() {
                     }
                 }
                 Spacer(Modifier.width(12.dp))
-                Text("Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                Text(if (viewModel.selectedTab == 1) "Contacts" else "Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
                 IconButton(onClick = {
                     viewModel.isSearchVisible = !viewModel.isSearchVisible
                     if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
