@@ -176,7 +176,7 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedTab == 1 || viewModel.selectedTab == 3 || viewModel.selectedProfile != null) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
                 viewModel.selectedChat != null -> ChatScreen(
@@ -189,16 +189,6 @@ fun FederApp() {
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
-                )
-                viewModel.selectedTab == 1 -> ContactsScreen(onBack = { viewModel.selectedTab = 0 })
-                viewModel.selectedTab == 3 -> SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
-                viewModel.selectedProfile != null -> ContactProfileScreen(
-                    contactName = viewModel.selectedProfile ?: "",
-                    avatarUrl = viewModel.chats.find { it.username == viewModel.selectedProfile }?.avatarUrl,
-                    phone = "",
-                    bio = "",
-                    birthday = "",
-                    onBack = { viewModel.selectedProfile = null; viewModel.selectedChat = viewModel.selectedProfile }
                 )
             }
         }
@@ -255,6 +245,12 @@ fun FederApp() {
                     }
                 }
                 else -> {
+                    // Если выбраны Contacts или Settings — показываем их
+                    if (viewModel.selectedTab == 1) {
+                        ContactsScreen(onBack = { viewModel.selectedTab = 0 })
+                    } else if (viewModel.selectedTab == 3) {
+                        SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
+                    } else {
                     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
                         item { Spacer(Modifier.height(64.dp)) }
                         // Поиск — появляется по нажатию на лупу
