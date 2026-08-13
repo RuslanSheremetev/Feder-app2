@@ -301,13 +301,16 @@ fun FederApp() {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .pointerInput(Unit) {
-                                detectVerticalDragGestures(
-                                    onVerticalDrag = { _, dragAmount ->
-                                        if (dragAmount > 0) viewModel.showStories = true
+                            .nestedScroll(
+                                connection = object : NestedScrollConnection {
+                                    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                                        if (available.y > 200f && source == NestedScrollSource.Drag) {
+                                            viewModel.showStories = true
+                                        }
+                                        return Offset.Zero
                                     }
-                                )
-                            },
+                                }
+                            ),
                         contentPadding = PaddingValues(bottom = 72.dp)
                     ) {
                         item { Spacer(Modifier.height(72.dp)) }
