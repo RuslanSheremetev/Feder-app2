@@ -124,7 +124,7 @@ class ChatViewModel : ViewModel() {
         val ws = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
-            chats = chats.map { chat ->
+            val updatedChats = chats.map { chat ->
                 if (chat.username == sender) {
                     chat.copy(
                         lastMessage = msgText,
@@ -132,7 +132,17 @@ class ChatViewModel : ViewModel() {
                         unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
                     )
                 } else chat
-            }.sortedByDescending { it.timestamp }
+            }
+            // Перемещаем чат с новым сообщением наверх
+            val sortedChats = updatedChats.sortedByDescending { chat ->
+                if (chat.username == sender) timeVal * 1000
+                else chat.timestamp?.let { timestamp ->
+                    try {
+                        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(timestamp)?.time ?: 0L
+                    } catch (e: Exception) { 0L }
+                } ?: 0L
+            }
+            chats = sortedChats
         }
         ws.connect("demo", token)
     }
