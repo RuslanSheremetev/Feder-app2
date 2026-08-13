@@ -1,6 +1,7 @@
 package com.feder.compose.ui.screen
 
 import android.widget.Toast
+import com.feder.compose.ChatItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
