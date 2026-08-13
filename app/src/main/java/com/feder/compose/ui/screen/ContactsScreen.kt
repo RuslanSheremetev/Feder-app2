@@ -144,7 +144,7 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 }
 
 @Composable
-private fun ContactRow(contact: Contact) {
+private fun ContactRow(contact: ChatItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
