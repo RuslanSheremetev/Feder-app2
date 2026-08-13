@@ -303,7 +303,7 @@ fun FederApp() {
                             .nestedScroll(
                                 connection = object : NestedScrollConnection {
                                     override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                                        if (available.y > 200f && source == NestedScrollSource.Drag) {
+                                        if (available.y < -100f && source == NestedScrollSource.Drag) {
                                             viewModel.showStories = true
                                         }
                                         return Offset.Zero
