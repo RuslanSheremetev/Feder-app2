@@ -753,7 +753,7 @@ ws?.send("message", text, chatUsername)
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
-                    BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = true,
+                    BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = 4,
                         textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
                         modifier = Modifier.weight(1f).padding(vertical = 10.dp),
                         decorationBox = { innerTextField ->
