@@ -240,15 +240,15 @@ fun FederApp() {
                 }
                 }
                 Spacer(Modifier.width(12.dp))
-                Text(if (viewModel.selectedTab == 1) "Contacts" else "Feder", color = Primary, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                Text(if (viewModel.selectedTab == 1) "Contacts" else "Feder", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp, modifier = Modifier.weight(1f))
                 IconButton(onClick = {
                     viewModel.isSearchVisible = !viewModel.isSearchVisible
                     if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
                 }) {
-                    Icon(Icons.Filled.Search, "search", tint = Primary, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
                 IconButton(onClick = { /* меню */ }) {
-                    Icon(Icons.Filled.MoreVert, "menu", tint = Primary, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
             }
             }
