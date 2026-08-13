@@ -18,6 +18,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
@@ -293,7 +296,21 @@ fun FederApp() {
                     } else if (viewModel.selectedTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 72.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInput(Unit) {
+                                detectVerticalDragGestures(
+                                    onDragEnd = {
+                                        if (it < 0) viewModel.showStories = true
+                                    },
+                                    onVerticalDrag = { _, dragAmount ->
+                                        if (dragAmount > 0) viewModel.showStories = true
+                                    }
+                                )
+                            },
+                        contentPadding = PaddingValues(bottom = 72.dp)
+                    ) {
                         item { Spacer(Modifier.height(72.dp)) }
                         // Поиск — появляется по нажатию на лупу
                         item {
