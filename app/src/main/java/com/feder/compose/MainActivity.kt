@@ -87,11 +87,9 @@ fun formatTimestamp(timestamp: String): String {
         if (parts.size >= 2) {
             val time = parts[1].split(":")
             if (time.size >= 2) {
-                val hour = time[0].toInt()
+                val hour = time[0].padStart(2, '0')
                 val minute = time[1]
-                val ampm = if (hour >= 12) "PM" else "AM"
-                val hour12 = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-                "$hour12:$minute $ampm"
+                "$hour:$minute"
             } else timestamp.takeLast(8)
         } else timestamp.takeLast(8)
     } catch (e: Exception) { timestamp.takeLast(8) }
