@@ -688,7 +688,7 @@ ws?.send("message", text, chatUsername)
                 var attachCaption by remember { mutableStateOf("") }
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
                     Surface(shape = RoundedCornerShape(28.dp), color = Color.Transparent) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.Bottom) {
                             Icon(Icons.Filled.EmojiEmotions, "emoji", tint = Color.White, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
                             BasicTextField(
