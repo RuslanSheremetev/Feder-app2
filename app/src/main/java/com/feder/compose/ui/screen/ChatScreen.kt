@@ -89,6 +89,73 @@ data class MsgItem(
     var posY: Float = 0f,
 )
 
+@Composable
+fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
+                .background(if (selected) PrimaryContainer else SurfaceContainerHigh),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, label, tint = if (selected) OnPrimaryContainer else OnSurfaceVariant, modifier = Modifier.size(28.dp))
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(label, color = if (selected) Primary else OnSurfaceVariant, fontSize = 12.sp)
+    }
+}
+
+
+@Composable
+fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: String, textColor: Color = OnSurface, indent: Boolean = false, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp).padding(start = if (indent) 24.dp else 0.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(icon, text, tint = Primary, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.width(12.dp))
+        }
+        Text(text, color = textColor, fontSize = 16.sp)
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet()) {
+    val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
+    val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
+    val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
+    val ts = if (isMine) 20.dp else topRadius
+    val te = if (isMine) topRadius else 20.dp
+    val bs = if (isMine) 20.dp else bottomRadius
+    val be = if (isMine) bottomRadius else 20.dp
+    Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+        Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
+                Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
+                if (time.isNotEmpty()) {
+                    Spacer(Modifier.width(6.dp))
+                    Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                    if (isMine) {
+                        Spacer(Modifier.width(2.dp))
+                        val checkText = when (msg.status) {
+                            "pending" -> "✓"
+                            "sent" -> "✓"
+                            "received" -> "✓✓"
+                            else -> "✓"
+                        }
+                        val checkColor = when (msg.status) {
+                            "read" -> Color(0xFF4CAF50)
+                            else -> OnPrimaryContainer.copy(alpha = 0.6f)
+                        }
+                        Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
@@ -802,69 +869,3 @@ ws?.send("message", text, chatUsername)
     }
 }
 
-@Composable
-fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
-                .background(if (selected) PrimaryContainer else SurfaceContainerHigh),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, label, tint = if (selected) OnPrimaryContainer else OnSurfaceVariant, modifier = Modifier.size(28.dp))
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(label, color = if (selected) Primary else OnSurfaceVariant, fontSize = 12.sp)
-    }
-}
-
-
-@Composable
-fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: String, textColor: Color = OnSurface, indent: Boolean = false, onClick: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp).padding(start = if (indent) 24.dp else 0.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (icon != null) {
-            Icon(icon, text, tint = Primary, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.width(12.dp))
-        }
-        Text(text, color = textColor, fontSize = 16.sp)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet()) {
-    val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
-    val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
-    val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
-    val ts = if (isMine) 20.dp else topRadius
-    val te = if (isMine) topRadius else 20.dp
-    val bs = if (isMine) 20.dp else bottomRadius
-    val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
-        Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
-            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
-                Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
-                if (time.isNotEmpty()) {
-                    Spacer(Modifier.width(6.dp))
-                    Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
-                    if (isMine) {
-                        Spacer(Modifier.width(2.dp))
-                        val checkText = when (msg.status) {
-                            "pending" -> "✓"
-                            "sent" -> "✓"
-                            "received" -> "✓✓"
-                            else -> "✓"
-                        }
-                        val checkColor = when (msg.status) {
-                            "read" -> Color(0xFF4CAF50)
-                            else -> OnPrimaryContainer.copy(alpha = 0.6f)
-                        }
-                        Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
-                    }
-                }
-            }
-        }
-    }
-}
