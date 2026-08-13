@@ -117,7 +117,6 @@ class ChatViewModel : ViewModel() {
     
     init { 
         loginAndLoad()
-        connectWebSocket()
     }
 
     private fun connectWebSocket() {
@@ -155,6 +154,7 @@ class ChatViewModel : ViewModel() {
                 val response = client.newCall(request).execute()
                 token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 loadChats()
+                connectWebSocket()
             } catch (e: Exception) { error = "Сервер недоступен"; isLoading = false }
         }
     }
