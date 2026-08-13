@@ -772,13 +772,6 @@ ws?.send("message", text, chatUsername)
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    }
-                    if (inputText.contains("\n")) {
-                        IconButton(onClick = { expandInput = !expandInput }, modifier = Modifier.size(32.dp)) {
-                            Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
-                        }
-                    }
-                    Spacer(Modifier.width(4.dp))
                     Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
