@@ -258,17 +258,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // WebSocket отдельно
     LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
-        wsManager.onRead { from ->
+        ws.onRead { from ->
             messages = messages.map { msg ->
                 if (msg.from == myUsername && msg.to == from) msg.copy(status = "read") else msg
             }
         }
-        wsManager.onReceived { from ->
+        ws.onReceived { from ->
             messages = messages.map { msg ->
                 if (msg.from == myUsername && msg.to == from) msg.copy(status = "received") else msg
             }
         }
-        wsManager.onMessage { sender, text, timeVal, msgId ->
+        ws.onMessage { sender, text, timeVal, msgId ->
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
@@ -284,7 +284,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
             }
         }
-        wsManager.connect(myUsername, internalToken)
+        ws.connect(myUsername, internalToken)
     }
 
     // Обновляем дату в шапке при прокрутке
@@ -321,7 +321,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
         messages = messages + newMsg
         inputText = ""
-wsManager.send("message", text, chatUsername)
+ws?.send("message", text, chatUsername)
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
