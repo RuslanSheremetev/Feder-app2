@@ -697,7 +697,7 @@ ws?.send("message", text, chatUsername)
                                 singleLine = true,
                                 textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
                                 cursorBrush = SolidColor(Primary),
-                                modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                                modifier = Modifier.weight(1f).padding(vertical = 10.dp).heightIn(max = 120.dp),
                                 decorationBox = { if (attachCaption.isEmpty()) Text("Добавить подпись...", color = OnSurfaceVariant, fontSize = 14.sp); it() }
                             )
                             Spacer(Modifier.width(4.dp))
@@ -755,7 +755,7 @@ ws?.send("message", text, chatUsername)
                     }
                     BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = 4,
                         textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                        modifier = Modifier.weight(1f).padding(vertical = 10.dp),
+                        modifier = Modifier.weight(1f).padding(vertical = 10.dp).heightIn(max = 120.dp),
                         decorationBox = { innerTextField ->
                             if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
                             innerTextField()
