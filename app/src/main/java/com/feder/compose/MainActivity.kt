@@ -248,9 +248,12 @@ fun FederApp() {
                 }) {
                     Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
-                IconButton(onClick = { /* меню */ }) {
-                    Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.size(24.dp))
-                }
+                Icon(
+                    Icons.Filled.MoreVert,
+                    "menu",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp).clickable { /* меню */ }
+                )
             }
             }
         },
