@@ -129,6 +129,16 @@ class ChatViewModel : ViewModel() {
     private fun connectWebSocket() {
         wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
+        ws.onSend { toUser, msgText ->
+            chats = chats.map { chat ->
+                if (chat.username == toUser) {
+                    chat.copy(
+                        lastMessage = msgText,
+                        timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+                    )
+                } else chat
+            }
+        }
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
             val updatedChats = chats.map { chat ->
