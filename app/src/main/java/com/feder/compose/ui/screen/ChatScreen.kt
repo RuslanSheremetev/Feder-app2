@@ -749,7 +749,7 @@ ws?.send("message", text, chatUsername)
                             }
                         }
                     }
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
