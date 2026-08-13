@@ -106,7 +106,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -131,7 +131,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var showForward by remember { mutableStateOf(false) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
-    var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     LaunchedEffect(Unit) {
         try {
