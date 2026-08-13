@@ -274,7 +274,7 @@ fun FederApp() {
                     Icons.Filled.MoreVert,
                     "menu",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp).clickable { /* меню */ }
+                    modifier = Modifier.padding(start = 4.dp).size(24.dp).clickable { /* меню */ }
                 )
             }
             }
