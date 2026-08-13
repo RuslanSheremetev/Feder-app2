@@ -320,9 +320,9 @@ fun FederApp() {
                             }
                             // Contact stories
                             listOf(
-                                "Alex" to "https://lh3.googleusercontent.com/aida-public/AB6AXuB-7OGxpXvSOENmBkDwACF_n7xv-wYr4cX1No9LRD5MPy6AnJEWq62jhZb2V3J7qA2I5_v00YN5KMQ-ecv_ZeY2hOj1Pk9ZoPf0K9SNLp8BNF3e_YNJRQ2uVv_5S0AkYpPZMHBWqvHW0rZMXL1BaFBtOL3VrBQlSmli6O5gMDjAliZa58m6J1087jR9qfqKTzd4-r2MzHhwf8ybZ9gVp4pqZjUmOxXXjlmJ9LZ93MR7c3iF8v1lXORUheBe5EgGYEXNXwJUzZlqYF4",
-                                "Elena" to "https://lh3.googleusercontent.com/aida-public/AB6AXuCzdntS3OSTjRCd_WonMXkD6f7dnsy_jKn-FWZd2SdCPn88fJg6oexJDcK-FH313KXdTdALokEf042Q-_WsWp4FgknGk4DGyDUkLuLPUaDhrCTAsAxAl39H8dTuEFj6QWAXSxtIbM898_1igDHAKscdd0lHmL6GJmu59Ui1_7yG0gOKP6zQxqh5z0Mqo_YQmNPYA3iYxJ8hRgNWQVDE_wyHEurVt2r-96oZhFFZhf4gUwgiXKk4WBqkgRcH0swe4sIkZ1A9FvLNpbU",
-                                "Marcus" to "https://lh3.googleusercontent.com/aida-public/AB6AXuBnXXSStn8X5F3jR3jIhUKSH-ZxwlSP9Sph9Nda13HroL4saNlBJlakIvPB9W8sRBSLRlVW7KZ-ylD_qrOqaSzuQFKM4mZEZSzDwRDGuU5vjue5Qtd90QRGQhIdVEaFcVnTpDTXsr0PELAK089usKk58JGMutSG_tjqtgOSSMFij52cxSIHxbPflq3SQsNRjRQ6WBJQ3M7pbRM87LXKaTVPJXSbo-xmyFTtFOkUMzZDsebV7GhFoqe2cuBK7D9xGOqUgAVcEs94eXY"
+                                "Alex" to "http://2.26.71.102:8002/avatars/avatar_2.jpg",
+                                "Elena" to "http://2.26.71.102:8002/avatars/avatar_5.jpg",
+                                "Marcus" to "http://2.26.71.102:8002/avatars/avatar_1.jpg"
                             ).forEach { (name, url) ->
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     AsyncImage(model = url, contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
