@@ -689,7 +689,7 @@ ws?.send("message", text, chatUsername)
                 var attachCaption by remember { mutableStateOf("") }
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
                     Surface(shape = RoundedCornerShape(28.dp), color = Color.Transparent) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).border(0.1.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(horizontal = 4.dp), verticalAlignment = Alignment.Bottom) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).border(1.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(horizontal = 4.dp), verticalAlignment = Alignment.Bottom) {
                             Icon(Icons.Filled.EmojiEmotions, "emoji", tint = Color.White, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
                             BasicTextField(
@@ -750,7 +750,7 @@ ws?.send("message", text, chatUsername)
                             }
                         }
                     }
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).border(0.1.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(horizontal = 4.dp), verticalAlignment = Alignment.Bottom) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).border(1.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(horizontal = 4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
@@ -762,9 +762,16 @@ ws?.send("message", text, chatUsername)
                             innerTextField()
                         })
                     if (!inputText.contains("\n")) {
+                        if (!inputText.contains("\n")) {
                         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
                             Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
+                    }
+                    if (inputText.contains("\n")) {
+                        IconButton(onClick = { expandInput = !expandInput }, modifier = Modifier.size(32.dp)) {
+                            Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
+                        }
+                    }
                     }
                     if (inputText.contains("\n")) {
                         IconButton(onClick = { expandInput = !expandInput }, modifier = Modifier.size(32.dp)) {
