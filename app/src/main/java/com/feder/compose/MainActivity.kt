@@ -114,7 +114,27 @@ class ChatViewModel : ViewModel() {
         get() = if (searchQuery.isEmpty()) chats
                 else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
     
-    init { loginAndLoad() }
+    init { 
+        loginAndLoad()
+        connectWebSocket()
+    }
+
+    private fun connectWebSocket() {
+        val ws = WebSocketManager("demo", token, "ws://2.26.71.102:8002/ws/demo?token=$token")
+        ws.onMessage { sender, msgText, timeVal, msgId ->
+            // Обновляем список чатов при получении сообщения
+            chats = chats.map { chat ->
+                if (chat.username == sender) {
+                    chat.copy(
+                        lastMessage = msgText,
+                        timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
+                        unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
+                    )
+                } else chat
+            }.sortedByDescending { it.timestamp }
+        }
+        ws.connect()
+    }
     fun loginAndLoad() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
