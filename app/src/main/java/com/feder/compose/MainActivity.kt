@@ -120,7 +120,7 @@ class ChatViewModel : ViewModel() {
     }
 
     private fun connectWebSocket() {
-        val ws = WebSocketManager("demo", token, "ws://2.26.71.102:8002/ws/demo?token=$token")
+        val ws = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
             chats = chats.map { chat ->
@@ -133,7 +133,7 @@ class ChatViewModel : ViewModel() {
                 } else chat
             }.sortedByDescending { it.timestamp }
         }
-        ws.connect()
+        ws.connect("demo", token)
     }
     fun loginAndLoad() {
         CoroutineScope(Dispatchers.IO).launch {
