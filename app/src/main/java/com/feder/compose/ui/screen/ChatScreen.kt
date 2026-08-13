@@ -824,7 +824,7 @@ ws?.send("message", text, chatUsername)
                     Box(modifier = Modifier.weight(1f)) {
                         BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
                             textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp).padding(end = 32.dp).heightIn(max = if (expandInput) 400.dp else 120.dp),
+                            modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(vertical = 10.dp).padding(end = 32.dp).heightIn(max = if (expandInput) 1000.dp else 120.dp),
                             decorationBox = { innerTextField ->
                                 if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
                                 innerTextField()
