@@ -301,9 +301,6 @@ fun FederApp() {
                             .fillMaxSize()
                             .pointerInput(Unit) {
                                 detectVerticalDragGestures(
-                                    onDragEnd = {
-                                        if (it < 0) viewModel.showStories = true
-                                    },
                                     onVerticalDrag = { _, dragAmount ->
                                         if (dragAmount > 0) viewModel.showStories = true
                                     }
