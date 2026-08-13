@@ -166,7 +166,7 @@ private fun ContactRow(contact: ChatItem) {
                     modifier = Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(contact.initials ?: "", color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.W600, fontSize = 20.sp)
+                    Text(contact.name.take(2).uppercase() ?: "", color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.W600, fontSize = 20.sp)
                 }
             }
             if (contact.online) {
@@ -182,7 +182,7 @@ private fun ContactRow(contact: ChatItem) {
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(contact.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.W500)
-            Text(contact.status, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
+            Text(contact.lastMessage ?: "offline", color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
         }
     }
 }
