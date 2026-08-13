@@ -750,7 +750,7 @@ ws?.send("message", text, chatUsername)
                             }
                         }
                     }
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).border(1.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(horizontal = 4.dp), verticalAlignment = Alignment.Bottom) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
