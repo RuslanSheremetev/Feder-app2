@@ -132,16 +132,8 @@ class ChatViewModel : ViewModel() {
                     )
                 } else chat
             }
-            // Перемещаем чат с новым сообщением наверх
-            val sortedChats = updatedChats.sortedByDescending { chat ->
-                if (chat.username == sender) timeVal * 1000
-                else chat.timestamp?.let { timestamp ->
-                    try {
-                        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(timestamp)?.time ?: 0L
-                    } catch (e: Exception) { 0L }
-                } ?: 0L
-            }
-            chats = sortedChats
+            // Сервер уже сортирует чаты по last_time DESC
+            chats = updatedChats
         }
         ws.connect("demo", token)
     }
