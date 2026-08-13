@@ -138,6 +138,16 @@ class ChatViewModel : ViewModel() {
             // Сервер уже сортирует чаты по last_time DESC
             chats = updatedChats
         }
+        ws.onSend { toUser, msgText ->
+            chats = chats.map { chat ->
+                if (chat.username == toUser) {
+                    chat.copy(
+                        lastMessage = msgText,
+                        timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+                    )
+                } else chat
+            }
+        }
         ws.connect("demo", token)
     }
     fun loginAndLoad() {

@@ -23,6 +23,7 @@ class WebSocketManager(
     private var onReceivedCallback: ((String) -> Unit)? = null
     private var onReadCallback: ((String) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
+    private var onSendCallback: ((String, String) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     
     fun connect(username: String, token: String) {
@@ -68,6 +69,9 @@ class WebSocketManager(
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         webSocket?.send(json)
+        if (type == "message") {
+            onSendCallback?.invoke(toUser, text)
+        }
     }
     
     fun disconnect() {
@@ -83,5 +87,8 @@ class WebSocketManager(
     fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
     fun onStatus(callback: (String) -> Unit) {
         onStatusCallback = callback
+    }
+    fun onSend(callback: (String, String) -> Unit) {
+        onSendCallback = callback
     }
 }
