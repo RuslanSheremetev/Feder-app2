@@ -760,8 +760,10 @@ ws?.send("message", text, chatUsername)
                             if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
                             innerTextField()
                         })
-                    IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-                        Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                    if (!inputText.contains("\n")) {
+                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                        }
                     }
                     Spacer(Modifier.width(4.dp))
                     Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
