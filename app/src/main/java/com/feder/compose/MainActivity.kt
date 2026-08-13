@@ -119,8 +119,11 @@ class ChatViewModel : ViewModel() {
         loginAndLoad()
     }
 
+    var wsManager: WebSocketManager? = null
+
     private fun connectWebSocket() {
-        val ws = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
+        wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
+        val ws = wsManager!!
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
             val updatedChats = chats.map { chat ->
