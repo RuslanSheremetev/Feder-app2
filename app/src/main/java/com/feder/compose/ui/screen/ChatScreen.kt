@@ -821,13 +821,24 @@ ws?.send("message", text, chatUsername)
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
-                    BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
-                        textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                        modifier = Modifier.weight(1f).padding(vertical = 10.dp).heightIn(max = if (expandInput) 400.dp else 120.dp),
-                        decorationBox = { innerTextField ->
-                            if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
-                            innerTextField()
-                        })
+                    Box(modifier = Modifier.weight(1f)) {
+                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
+                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp).padding(end = 32.dp).heightIn(max = if (expandInput) 400.dp else 120.dp),
+                            decorationBox = { innerTextField ->
+                                if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
+                                innerTextField()
+                            })
+                        if (inputText.contains("\n")) {
+                            IconButton(
+                                onClick = { expandInput = !expandInput },
+                                modifier = Modifier.align(Alignment.TopEnd).size(28.dp)
+                            ) {
+                                Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                                    "expand", tint = Color.White, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
                     if (!inputText.contains("\n")) {
                         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
                             Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
