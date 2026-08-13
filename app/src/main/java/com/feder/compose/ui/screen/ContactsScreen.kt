@@ -43,36 +43,8 @@ data class Contact(
 fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
-    var contacts by remember { mutableStateOf(listOf<Contact>()) }
-    var refreshKey by remember { mutableIntStateOf(0) }
 
-    DisposableEffect(Unit) {
-        refreshKey++
-        onDispose { }
-    }
     
-        LaunchedEffect(refreshKey) {
-        try {
-            val client = OkHttpClient()
-            val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=demo").build()
-            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
-            val body = response.body?.string()
-            if (body != null) {
-                val jsonArray = JsonParser.parseString(body).asJsonArray
-                val loaded = jsonArray.map { el ->
-                    val obj = el.asJsonObject
-                    val uname = obj.get("username")?.asString ?: ""
-                    val name = obj.get("name")?.asString ?: uname
-                    val avatar = obj.get("avatar_url")?.asString
-                    val online = obj.get("online")?.asBoolean ?: false
-                    val lastMsg = obj.get("last_message")?.asString ?: ""
-                    val status = if (online) "online" else if (lastMsg.isNotEmpty()) lastMsg else "offline"
-                    Contact(name = name, username = uname, status = status, avatarUrl = avatar, initials = name.take(2).uppercase(), online = online)
-                }
-                contacts = loaded.filter { it.username != "demo" && it.username != "123" }
-            }
-        } catch (_: Exception) { }
-    }
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
