@@ -220,6 +220,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+}
 @Composable
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
@@ -493,6 +494,7 @@ fun FederApp() {
 
 }
     
+}
 @Composable
 fun MenuRow(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
     Row(
