@@ -3,6 +3,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
+import androidx.compose.foundation.BorderStroke
 
 import android.os.Bundle
 import android.content.Context
@@ -27,6 +28,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
