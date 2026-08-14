@@ -194,6 +194,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var editMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
@@ -684,7 +685,7 @@ ws?.send("message", text, chatUsername)
                                 Icon(Icons.Filled.Reply, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
                             if (selectedMessage?.from == myUsername) {
-                                Row(Modifier.fillMaxWidth().clickable { /* edit mode */ selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(Modifier.fillMaxWidth().clickable { editMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Filled.Edit, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
                                 }
                             }
@@ -783,6 +784,32 @@ ws?.send("message", text, chatUsername)
             Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(0.5.dp, Color(0xFF3A3A3A))) {
                 Column {
+                    if (editMessage != null) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                            color = SurfaceContainerHigh,
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Image, "media", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Tap to add media", color = OnSurfaceVariant, fontSize = 12.sp)
+                                }
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    editMessage?.text?.take(80) ?: "",
+                                    color = OnSurface,
+                                    fontSize = 14.sp,
+                                    maxLines = 2
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                IconButton(onClick = { editMessage = null; inputText = "" }, modifier = Modifier.size(20.dp)) {
+                                    Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
+                                }
+                            }
+                        }
+                    }
                     if (replyMessage != null) {
                         Surface(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
