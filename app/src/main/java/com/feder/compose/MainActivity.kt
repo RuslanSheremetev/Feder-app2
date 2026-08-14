@@ -292,7 +292,6 @@ fun FederApp() {
                         Popup(alignment = Alignment.TopEnd, onDismissRequest = { showMoreMenu = false }, properties = PopupProperties(focusable = true)) {
                             Surface(modifier = Modifier.padding(top = 48.dp, end = 16.dp).width(IntrinsicSize.Max), shape = RoundedCornerShape(16.dp), color = SurfaceContainerHigh, shadowElevation = 8.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                    MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false; viewModel.isSearchVisible = true }
                                     MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
                                     MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
                                     MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
