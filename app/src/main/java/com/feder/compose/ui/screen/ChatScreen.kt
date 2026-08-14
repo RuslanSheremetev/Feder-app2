@@ -798,10 +798,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Filled.Image, "media", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
-                                    Spacer(Modifier.width(4.dp))
-                                    Text("Tap to add media", color = OnSurfaceVariant, fontSize = 12.sp)
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Filled.Image, "media", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Tap to add media", color = OnSurfaceVariant, fontSize = 12.sp)
+                                    }
+                                    IconButton(onClick = { editMessage = null; inputText = "" }, modifier = Modifier.size(20.dp)) {
+                                        Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
+                                    }
                                 }
                                 Spacer(Modifier.height(4.dp))
                                 Text(
@@ -810,10 +815,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     fontSize = 14.sp,
                                     maxLines = 2
                                 )
-                                Spacer(Modifier.height(4.dp))
-                                IconButton(onClick = { editMessage = null; inputText = "" }, modifier = Modifier.size(20.dp)) {
-                                    Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
-                                }
                             }
                         }
                     }
