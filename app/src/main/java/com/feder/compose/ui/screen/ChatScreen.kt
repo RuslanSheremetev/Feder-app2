@@ -475,7 +475,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         .width(IntrinsicSize.Max),
                                     shape = RoundedCornerShape(16.dp),
                                     color = SurfaceContainerHigh,
-                                    shadowElevation = 8.dp
+                                    shadowElevation = 8.dp,
+                                    border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))
                                 ) {
                                     Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                         MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false; searchMode = true }
