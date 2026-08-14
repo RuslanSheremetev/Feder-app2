@@ -1,9 +1,8 @@
+package com.feder.compose
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.window.PopupProperties
-package com.feder.compose
 
 import android.os.Bundle
 import android.content.Context
@@ -30,14 +29,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
