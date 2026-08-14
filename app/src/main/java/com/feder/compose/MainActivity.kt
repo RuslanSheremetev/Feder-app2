@@ -1,3 +1,8 @@
+import androidx.compose.ui.window.Popup
+import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.window.PopupProperties
 package com.feder.compose
 
 import android.os.Bundle
@@ -280,12 +285,22 @@ fun FederApp() {
                 }) {
                     Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
-                Icon(
-                    Icons.Filled.MoreVert,
-                    "menu",
-                    tint = Color.White,
-                    modifier = Modifier.padding(start = 16.dp).size(24.dp).clickable { /* меню */ }
-                )
+                Box {
+                    var showMoreMenu by remember { mutableStateOf(false) }
+                    Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.padding(start = 16.dp).size(24.dp).clickable { showMoreMenu = true })
+                    if (showMoreMenu) {
+                        Popup(alignment = Alignment.TopEnd, onDismissRequest = { showMoreMenu = false }, properties = PopupProperties(focusable = true)) {
+                            Surface(modifier = Modifier.padding(top = 48.dp, end = 16.dp).width(IntrinsicSize.Max), shape = RoundedCornerShape(16.dp), color = SurfaceContainerHigh, shadowElevation = 8.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                                    MenuRow("Search", Icons.Filled.Search) { showMoreMenu = false; viewModel.isSearchVisible = true }
+                                    MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
+                                    MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
+                                    MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             }
         },
@@ -481,7 +496,16 @@ fun FederApp() {
             }
 
 }
+    
+@Composable
+fun MenuRow(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, text, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(text, color = OnSurface, fontSize = 14.sp)
     }
- 
- 
- 
+}
+}
