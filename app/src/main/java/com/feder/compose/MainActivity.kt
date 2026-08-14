@@ -289,9 +289,9 @@ fun FederApp() {
                         Popup(alignment = Alignment.TopEnd, onDismissRequest = { showMoreMenu = false }, properties = PopupProperties(focusable = true)) {
                             Surface(modifier = Modifier.padding(top = 48.dp, end = 16.dp).width(IntrinsicSize.Max), shape = RoundedCornerShape(16.dp), color = SurfaceContainerHigh, shadowElevation = 8.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                    MenuRow("Share contact", Icons.Filled.Share) { showMoreMenu = false }
-                                    MenuRow("Notifications", Icons.Filled.Notifications) { showMoreMenu = false }
-                                    MenuRow("Add to folder", Icons.Filled.CreateNewFolder) { showMoreMenu = false }
+                                    Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Share, "Share contact", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Share contact", color = OnSurface, fontSize = 14.sp) }
+                                    Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Notifications, "Notifications", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Notifications", color = OnSurface, fontSize = 14.sp) }
+                                    Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.CreateNewFolder, "Add to folder", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Add to folder", color = OnSurface, fontSize = 14.sp) }
                                 }
                             }
                         }
