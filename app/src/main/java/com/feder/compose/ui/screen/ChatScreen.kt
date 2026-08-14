@@ -789,7 +789,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Поле ввода поверх сообщений
         if (!showForward) {
             Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
-            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(0.5.dp, Color(0xFF3A3A3A))) {
+            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                 Column {
                     if (editMessage != null) {
                         Surface(
