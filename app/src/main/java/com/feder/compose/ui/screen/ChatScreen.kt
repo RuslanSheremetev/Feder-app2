@@ -386,11 +386,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     fun sendMessage() {
         val text = inputText.trim()
         if (text.isEmpty()) return
+        if (editMessage != null) {
+            // Отправляем edit
+            ws?.send("edit", text, chatUsername)
+            editMessage = null
+            inputText = ""
+            return
+        }
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
         messages = messages + newMsg
         inputText = ""
-ws?.send("message", text, chatUsername)
+        ws?.send("message", text, chatUsername)
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
