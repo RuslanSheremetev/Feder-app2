@@ -504,4 +504,3 @@ fun MenuRow(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector,
         Text(text, color = OnSurface, fontSize = 14.sp)
     }
 }
-}
