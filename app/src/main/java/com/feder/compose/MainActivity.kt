@@ -220,7 +220,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-}
 @Composable
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
