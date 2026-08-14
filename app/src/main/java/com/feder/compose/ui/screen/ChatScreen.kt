@@ -781,7 +781,7 @@ ws?.send("message", text, chatUsername)
         // Поле ввода поверх сообщений
         if (!showForward) {
             Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
-            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp) {
+            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(0.5.dp, Color(0xFF3A3A3A))) {
                 Column {
                     if (replyMessage != null) {
                         Surface(
@@ -817,7 +817,7 @@ ws?.send("message", text, chatUsername)
                             }
                         }
                     }
-                    Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(horizontal = 8.dp, vertical = 4.dp).border(0.5.dp, Color(0xFF3A3A3A), RoundedCornerShape(28.dp)).background(SurfaceContainerHigh, RoundedCornerShape(28.dp)).padding(4.dp), verticalAlignment = Alignment.Bottom) {
+                    Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(horizontal = 8.dp, vertical = 4.dp).padding(4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
