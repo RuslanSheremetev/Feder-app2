@@ -487,7 +487,7 @@ fun FederApp() {
                             val time = chat.timestamp ?: ""
                             
                             Row(
-                                modifier = Modifier.fillMaxWidth().clickable { viewModel.selectedChat = chat.username }.padding(horizontal = 16.dp, vertical = 12.dp),
+                                modifier = Modifier.fillMaxWidth().clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Аватар + онлайн-точка
