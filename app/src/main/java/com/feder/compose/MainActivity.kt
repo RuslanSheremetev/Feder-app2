@@ -154,6 +154,20 @@ class ChatViewModel : ViewModel() {
                 } else chat
             }
             chats = chats.sortedByDescending { it.timestamp }
+            // Сохраняем отправленное сообщение в Room
+            viewModelScope.launch {
+                repository?.saveMessage(
+                    com.feder.compose.data.entity.MessageEntity(
+                        id = System.currentTimeMillis(),
+                        fromUser = "demo",
+                        toUser = toUser,
+                        text = msgText,
+                        timeVal = System.currentTimeMillis() / 1000,
+                        isRead = false
+                    )
+                )
+                repository?.updateLastMessage(toUser, msgText, System.currentTimeMillis() / 1000)
+            }
         }
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
