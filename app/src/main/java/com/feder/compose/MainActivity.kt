@@ -295,7 +295,12 @@ class ChatViewModel : ViewModel() {
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
-    fun pullRefresh() { isRefreshing = true; if (token.isEmpty()) loginAndLoad() else loadChats(); isRefreshing = false }
+    fun pullRefresh() {
+        isRefreshing = true
+        android.util.Log.d("Feder", "Pull refresh triggered")
+        if (token.isEmpty()) loginAndLoad() else loadChats()
+        isRefreshing = false
+    }
     fun markChatRead(username: String) {
         viewModelScope.launch {
             repository?.markRead(username)
