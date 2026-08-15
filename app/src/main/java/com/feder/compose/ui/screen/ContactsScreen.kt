@@ -57,7 +57,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
                         onValueChange = { searchText = it },
                         placeholder = { Text("Search contacts...", color = MaterialTheme.colorScheme.outline) },
                         leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.outline) },
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 16.dp, vertical = 4.dp),
                         shape = RoundedCornerShape(28.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
