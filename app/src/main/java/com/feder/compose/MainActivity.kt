@@ -114,7 +114,7 @@ class ChatViewModel : ViewModel() {
     private val gson = Gson()
     private val server = "http://2.26.71.102:8002"
     private var database: FederDatabase? = null
-    private var repository: ChatRepository? = null
+    var repository: ChatRepository? = null
     
     fun initDatabase(context: android.content.Context) {
         if (database == null) {

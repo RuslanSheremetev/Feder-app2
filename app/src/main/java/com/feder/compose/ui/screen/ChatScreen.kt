@@ -301,7 +301,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
                                 status = if (entity.isRead) "read" else "sent",
                                 timeVal = entity.timeVal,
-                                id = entity.id,
+                                id = entity.id.toInt(),
                                 posX = entity.posX ?: 0f,
                                 posY = entity.posY ?: 0f
                             )
