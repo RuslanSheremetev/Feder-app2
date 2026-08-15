@@ -191,6 +191,24 @@ class ChatViewModel : ViewModel() {
                 val json = response.body?.string() ?: "[]"
                 val type = object : TypeToken<List<ChatItem>>() {}.type
                 chats = gson.fromJson(json, type)
+                // Сохраняем в Room
+                repository?.let { repo ->
+                    val chatEntities = chats.map { chat ->
+                        com.feder.compose.data.entity.ChatEntity(
+                            username = chat.username,
+                            name = chat.name,
+                            avatarUrl = chat.avatarUrl,
+                            avatarColor = chat.avatarColor,
+                            lastMessage = chat.lastMessage,
+                            lastTime = try { chat.timestamp?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(it)?.time } } catch (e: Exception) { null },
+                            unread = chat.unread,
+                            isMuted = chat.isMuted,
+                            online = chat.online,
+                            lastSeen = chat.lastSeen
+                        )
+                    }
+                    repo.saveChats(chatEntities)
+                }
                 isLoading = false
             } catch (e: Exception) { error = "Ошибка загрузки"; isLoading = false }
         }
