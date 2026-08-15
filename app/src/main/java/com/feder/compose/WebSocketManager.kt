@@ -45,17 +45,15 @@ class WebSocketManager(
                             } else if (obj.get("type")?.asString == "read") {
                                 val from = obj.get("from")?.asString
                                 if (from != null) { onReadCallback?.invoke(from) }
+                            } else if (obj.get("type")?.asString == "typing") {
+                                val from = obj.get("from_user")?.asString
+                                if (from != null) onTypingCallback?.invoke(from)
                             } else if (obj.get("type")?.asString == "message") {
                                 val sender = obj.get("from_user")?.asString ?: "unknown"
                                 val msgText = obj.get("text")?.asString ?: return
                                 val timeVal = obj.get("timeVal")?.asLong ?: obj.get("time")?.asLong ?: 0L
                                 val msgId = obj.get("id")?.asInt ?: 0
-                                if (json.has("type") && json.get("type").asString == "typing") {
-                                    val from = json.get("from_user")?.asString
-                                    if (from != null) onTypingCallback?.invoke(from)
-                                } else {
-                                    onMessageCallback?.invoke(sender, msgText, timeVal, msgId)
-                                }
+                                onMessageCallback?.invoke(sender, msgText, timeVal, msgId)
                             }
                         } catch (e: Exception) { }
                     }
