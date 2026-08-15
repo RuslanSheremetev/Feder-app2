@@ -282,31 +282,32 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     LaunchedEffect(chatUsername) {
         withContext(Dispatchers.Main) { Toast.makeText(context, "Chat opened: $chatUsername", Toast.LENGTH_SHORT).show() }
         withContext(Dispatchers.IO) {
+            // 1. Загружаем из Room (мгновенно, работает оффлайн)
+            repository?.let { repo ->
+                val cachedMessages = repo.getMessages(myUsername, chatUsername)
+                if (cachedMessages.isNotEmpty()) {
+                    messages = cachedMessages.map { entity ->
+                        MsgItem(
+                            from = entity.fromUser,
+                            to = entity.toUser,
+                            text = entity.text,
+                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
+                            status = if (entity.isRead) "read" else "sent",
+                            timeVal = entity.timeVal,
+                            id = entity.id.toInt(),
+                            posX = entity.posX ?: 0f,
+                            posY = entity.posY ?: 0f
+                        )
+                    }
+                }
+            }
+            // 2. Пробуем обновить с API (если интернет есть)
             try {
                 if (internalToken.isEmpty()) {
                     val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
                     val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
                     internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
-                }
-                // Загружаем из Room (мгновенно)
-                repository?.let { repo ->
-                    val cachedMessages = repo.getMessages(myUsername, chatUsername)
-                    if (cachedMessages.isNotEmpty()) {
-                        messages = cachedMessages.map { entity ->
-                            MsgItem(
-                                from = entity.fromUser,
-                                to = entity.toUser,
-                                text = entity.text,
-                                time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
-                                status = if (entity.isRead) "read" else "sent",
-                                timeVal = entity.timeVal,
-                                id = entity.id.toInt(),
-                                posX = entity.posX ?: 0f,
-                                posY = entity.posY ?: 0f
-                            )
-                        }
-                    }
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
