@@ -141,12 +141,13 @@ class ChatViewModel : ViewModel() {
     }
 
     var wsManager: WebSocketManager? = null
+    var wsStatus by mutableStateOf("")
 
     private fun connectWebSocket() {
         wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
         ws.onStatus { status ->
-            android.util.Log.d("WS", "Status: $status")
+            wsStatus = status
         }
         ws.onSend { toUser, msgText ->
             chats = chats.map { chat ->
@@ -387,6 +388,11 @@ fun FederApp() {
         cm.registerDefaultNetworkCallback(callback)
     }
     LaunchedEffect(Unit) { viewModel.initDatabase(context) }
+    LaunchedEffect(viewModel.wsStatus) {
+        if (viewModel.wsStatus.isNotEmpty()) {
+            Toast.makeText(context, "WS: ${viewModel.wsStatus}", Toast.LENGTH_SHORT).show()
+        }
+    }
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
