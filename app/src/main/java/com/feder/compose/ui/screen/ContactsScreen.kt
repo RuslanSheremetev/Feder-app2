@@ -119,6 +119,18 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
     }
 }
 
+fun formatLastSeen(timestamp: Long): String {
+    val now = System.currentTimeMillis() / 1000
+    val diff = now - timestamp
+    return when {
+        diff < 60 -> "just now"
+        diff < 3600 -> "${diff / 60} min ago"
+        diff < 86400 -> "${diff / 3600} h ago"
+        diff < 604800 -> "${diff / 86400} d ago"
+        else -> java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.US).format(java.util.Date(timestamp * 1000))
+    }
+}
+
 @Composable
 private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
     Row(
@@ -140,6 +152,18 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
             Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
         }
         Text(label, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.W500)
+    }
+}
+
+fun formatLastSeen(timestamp: Long): String {
+    val now = System.currentTimeMillis() / 1000
+    val diff = now - timestamp
+    return when {
+        diff < 60 -> "just now"
+        diff < 3600 -> "${diff / 60} min ago"
+        diff < 86400 -> "${diff / 3600} h ago"
+        diff < 604800 -> "${diff / 86400} d ago"
+        else -> java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.US).format(java.util.Date(timestamp * 1000))
     }
 }
 
@@ -182,8 +206,26 @@ private fun ContactRow(contact: ChatItem) {
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(contact.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.W500)
-            Text(contact.lastMessage ?: "offline", color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
+            Text(
+    if (contact.online) "online" 
+    else if (contact.lastSeen != null && contact.lastSeen > 0) formatLastSeen(contact.lastSeen)
+    else "offline",
+    color = if (contact.online) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline,
+    fontSize = 12.sp
+)
         }
+    }
+}
+
+fun formatLastSeen(timestamp: Long): String {
+    val now = System.currentTimeMillis() / 1000
+    val diff = now - timestamp
+    return when {
+        diff < 60 -> "just now"
+        diff < 3600 -> "${diff / 60} min ago"
+        diff < 86400 -> "${diff / 3600} h ago"
+        diff < 604800 -> "${diff / 86400} d ago"
+        else -> java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.US).format(java.util.Date(timestamp * 1000))
     }
 }
  
