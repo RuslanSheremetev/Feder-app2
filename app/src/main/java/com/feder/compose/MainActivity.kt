@@ -318,19 +318,8 @@ class ChatViewModel : ViewModel() {
 }
 
 class MainActivity : ComponentActivity() {
-    private fun registerNetworkCallback() {
-        val cm = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-        networkCallback = object : android.net.ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: android.net.Network) {
-                runOnUiThread { viewModel.pullRefresh() }
-            }
-        }
-        cm.registerDefaultNetworkCallback(networkCallback!!)
-    }
-    private var networkCallback: android.net.ConnectivityManager.NetworkCallback? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerNetworkCallback()
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
@@ -357,6 +346,15 @@ class MainActivity : ComponentActivity() {
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
     val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        val cm = context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val callback = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: android.net.Network) {
+                viewModel.pullRefresh()
+            }
+        }
+        cm.registerDefaultNetworkCallback(callback)
+    }
     LaunchedEffect(Unit) { viewModel.initDatabase(context) }
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
