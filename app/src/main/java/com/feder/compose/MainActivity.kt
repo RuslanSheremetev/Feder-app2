@@ -144,7 +144,6 @@ class ChatViewModel : ViewModel() {
                 } else chat
             }
             chats = chats.sortedByDescending { it.timestamp }
-            }
         }
         ws.onMessage { sender, msgText, timeVal, msgId ->
             // Обновляем список чатов при получении сообщения
