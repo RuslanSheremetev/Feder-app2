@@ -297,6 +297,8 @@ class ChatViewModel : ViewModel() {
     fun markChatRead(username: String) {
         viewModelScope.launch {
             repository?.markRead(username)
+            // Отправляем read на сервер
+            wsManager?.send("read", "", username)
             chats = chats.map { chat ->
                 if (chat.username == username) chat.copy(unread = 0) else chat
             }
