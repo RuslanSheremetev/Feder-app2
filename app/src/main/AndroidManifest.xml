@@ -5,8 +5,6 @@
     
     <application
         android:name=".FederApplication"
-        android:name=".FederApplication"
-        android:allowBackup="true"
         android:label="Feder Messenger"
         android:supportsRtl="true"
         android:theme="@style/Theme.Feder"
