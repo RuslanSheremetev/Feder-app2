@@ -20,6 +20,7 @@ class FederApplication : Application(), ImageLoaderFactory {
                     .maxSizePercent(0.05)
                     .build()
             }
+            .respectCacheHeaders(false)
             .crossfade(true)
             .build()
     }
