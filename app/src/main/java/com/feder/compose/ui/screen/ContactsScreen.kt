@@ -108,7 +108,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     // removed
-                    .padding(end = 48.dp, bottom = 84.dp)
+                    .padding(end = 28.dp, bottom = 100.dp)
                     .size(40.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
