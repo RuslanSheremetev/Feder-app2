@@ -315,6 +315,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
                 messages = loaded.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent") }.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent") }.map { it.copy(status = it.status.ifEmpty { "sent" }) }
+                // Сохраняем загруженные сообщения в Room
+                repository?.let { repo ->
+                    repo.saveMessages(loaded.map { msg ->
+                        com.feder.compose.data.entity.MessageEntity(
+                            id = msg.id.toLong(),
+                            fromUser = msg.from,
+                            toUser = msg.to,
+                            text = msg.text,
+                            timeVal = msg.timeVal,
+                            isRead = msg.status == "read",
+                            posX = msg.posX,
+                            posY = msg.posY
+                        )
+                    })
+                }
                 try {
                     val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
                     httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
