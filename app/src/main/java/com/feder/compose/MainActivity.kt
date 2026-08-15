@@ -167,6 +167,20 @@ class ChatViewModel : ViewModel() {
                 } else chat
             }
             chats = updatedChats.sortedByDescending { it.timestamp }
+            // Сохраняем сообщение в Room
+            repository?.let { repo ->
+                repo.saveMessage(
+                    com.feder.compose.data.entity.MessageEntity(
+                        id = msgId.toLong(),
+                        fromUser = sender,
+                        toUser = "demo",
+                        text = msgText,
+                        timeVal = timeVal,
+                        isRead = selectedChat == sender
+                    )
+                )
+                repo.updateLastMessage(sender, msgText, timeVal)
+            }
         }
         ws.connect("demo", token)
     }
@@ -185,6 +199,27 @@ class ChatViewModel : ViewModel() {
     }
     private fun loadChats() {
         CoroutineScope(Dispatchers.IO).launch {
+            // 1. Сначала загружаем из Room (мгновенно)
+            repository?.let { repo ->
+                val cachedChats = repo.getChats()
+                if (cachedChats.isNotEmpty()) {
+                    chats = cachedChats.map { entity ->
+                        ChatItem(
+                            username = entity.username,
+                            name = entity.name,
+                            unread = entity.unread,
+                            avatarColor = entity.avatarColor ?: "#FF6B6B",
+                            avatarUrl = entity.avatarUrl,
+                            online = entity.online,
+                            isMuted = entity.isMuted,
+                            lastSeen = entity.lastSeen ?: 0,
+                            lastMessage = entity.lastMessage,
+                            timestamp = entity.lastTime?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(it)) }
+                        )
+                    }
+                    isLoading = false
+                }
+            }
             try {
                 val request = Request.Builder().url("$server/api/chat_settings/all?me=demo").header("Authorization", "Bearer $token").build()
                 val response = client.newCall(request).execute()
@@ -214,6 +249,14 @@ class ChatViewModel : ViewModel() {
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
+    fun markChatRead(username: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            repository?.markRead(username)
+            chats = chats.map { chat ->
+                if (chat.username == username) chat.copy(unread = 0) else chat
+            }
+        }
+    }
 }
 
 class MainActivity : ComponentActivity() {
