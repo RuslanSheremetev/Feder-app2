@@ -155,15 +155,6 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
     }
 }
 
-fun formatLastSeen(timestamp: Long): String {
-    val now = System.currentTimeMillis() / 1000
-    val diff = now - timestamp
-    return when {
-        diff < 60 -> "just now"
-        diff < 3600 -> "${diff / 60} min ago"
-        diff < 86400 -> "${diff / 3600} h ago"
-        diff < 604800 -> "${diff / 86400} d ago"
-        else -> java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.US).format(java.util.Date(timestamp * 1000))
     }
 }
 
@@ -226,6 +217,3 @@ fun formatLastSeen(timestamp: Long): String {
         diff < 86400 -> "${diff / 3600} h ago"
         diff < 604800 -> "${diff / 86400} d ago"
         else -> java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.US).format(java.util.Date(timestamp * 1000))
-    }
-}
- 
