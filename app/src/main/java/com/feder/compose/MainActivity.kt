@@ -244,8 +244,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
-    LaunchedEffect(Unit) { viewModel.initDatabase(context) }
     val context = LocalContext.current
+    LaunchedEffect(Unit) { viewModel.initDatabase(context) }
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
