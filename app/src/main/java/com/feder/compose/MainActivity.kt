@@ -158,7 +158,6 @@ class ChatViewModel : ViewModel() {
             }
             chats = updatedChats.sortedByDescending { it.timestamp }
         }
-        }
         ws.connect("demo", token)
     }
     fun loginAndLoad() {
