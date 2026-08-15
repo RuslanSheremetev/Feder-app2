@@ -318,8 +318,19 @@ class ChatViewModel : ViewModel() {
 }
 
 class MainActivity : ComponentActivity() {
+    private fun registerNetworkCallback() {
+        val cm = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        networkCallback = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: android.net.Network) {
+                runOnUiThread { viewModel.pullRefresh() }
+            }
+        }
+        cm.registerDefaultNetworkCallback(networkCallback!!)
+    }
+    private var networkCallback: android.net.ConnectivityManager.NetworkCallback? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        registerNetworkCallback()
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
