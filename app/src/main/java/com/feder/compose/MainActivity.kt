@@ -526,7 +526,7 @@ fun FederApp() {
                                 "Marcus" to "http://2.26.71.102:8002/avatars/avatar_1.jpg"
                             ).forEach { (name, url) ->
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    AsyncImage(model = url, contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(url).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                                     Spacer(Modifier.height(4.dp))
                                     Text(name, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
                                 }
