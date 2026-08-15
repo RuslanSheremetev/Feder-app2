@@ -141,6 +141,7 @@ class ChatViewModel : ViewModel() {
                     chat.copy(
                         lastMessage = msgText,
                         timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+                    )
                 } else chat
             }
             chats = chats.sortedByDescending { it.timestamp }
