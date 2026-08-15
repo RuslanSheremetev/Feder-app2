@@ -297,8 +297,17 @@ class ChatViewModel : ViewModel() {
     fun markChatRead(username: String) {
         viewModelScope.launch {
             repository?.markRead(username)
-            // Отправляем read на сервер
-            wsManager?.send("read", "", username)
+            // Отправляем read на сервер через HTTP
+            try {
+                withContext(Dispatchers.IO) {
+                    val request = Request.Builder()
+                        .url("$server/api/mark_read/$username")
+                        .header("Authorization", "Bearer $token")
+                        .post("".toRequestBody("application/json".toMediaType()))
+                        .build()
+                    client.newCall(request).execute().close()
+                }
+            } catch (_: Exception) { }
             chats = chats.map { chat ->
                 if (chat.username == username) chat.copy(unread = 0) else chat
             }
