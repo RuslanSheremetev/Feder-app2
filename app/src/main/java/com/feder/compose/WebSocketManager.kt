@@ -28,7 +28,7 @@ class WebSocketManager(
     private val mainHandler = Handler(Looper.getMainLooper())
     
     fun connect(username: String, token: String) {
-        disconnect()
+        if (webSocket != null) return // Уже подключен
         val url = "ws://$serverUrl:$port/ws/$username?token=$token"
         mainHandler.post {
             try {
