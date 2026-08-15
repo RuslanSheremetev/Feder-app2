@@ -202,6 +202,28 @@ class ChatViewModel : ViewModel() {
     }
     fun loginAndLoad() {
         viewModelScope.launch {
+            // 1. Загружаем из Room (работает оффлайн)
+            repository?.let { repo ->
+                val cachedChats = repo.getChats()
+                if (cachedChats.isNotEmpty()) {
+                    chats = cachedChats.map { entity ->
+                        ChatItem(
+                            username = entity.username,
+                            name = entity.name,
+                            unread = entity.unread,
+                            avatarColor = entity.avatarColor ?: "#FF6B6B",
+                            avatarUrl = entity.avatarUrl,
+                            online = entity.online,
+                            isMuted = entity.isMuted,
+                            lastSeen = entity.lastSeen ?: 0,
+                            lastMessage = entity.lastMessage,
+                            timestamp = entity.lastTime?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(it)) }
+                        )
+                    }
+                    isLoading = false
+                }
+            }
+            // 2. Пробуем обновить с сервера
             try {
                 withContext(Dispatchers.IO) {
                     val json = gson.toJson(LoginRequest("demo", "demo"))
@@ -212,7 +234,10 @@ class ChatViewModel : ViewModel() {
                 }
                 loadChats()
                 connectWebSocket()
-            } catch (e: Exception) { error = "Сервер недоступен"; isLoading = false }
+            } catch (e: Exception) { 
+                if (chats.isEmpty()) error = "Сервер недоступен"
+                isLoading = false 
+            }
         }
     }
     private fun loadChats() {
