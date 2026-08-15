@@ -125,6 +125,7 @@ class ChatViewModel : ViewModel() {
     var token by mutableStateOf("")
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
+    var isRefreshing by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
     var showStories by mutableStateOf(false)
@@ -294,6 +295,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
+    fun pullRefresh() { isRefreshing = true; if (token.isEmpty()) loginAndLoad() else loadChats(); isRefreshing = false }
     fun markChatRead(username: String) {
         viewModelScope.launch {
             repository?.markRead(username)
