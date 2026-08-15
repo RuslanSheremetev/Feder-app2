@@ -182,6 +182,19 @@ class ChatViewModel : ViewModel() {
                 } else chat
             }
             chats = updatedChats.sortedByDescending { it.timestamp }
+            // Отправляем received на сервер
+            viewModelScope.launch {
+                try {
+                    withContext(Dispatchers.IO) {
+                        val request = Request.Builder()
+                            .url("$server/api/mark_received/$sender")
+                            .header("Authorization", "Bearer $token")
+                            .post("".toRequestBody("application/json".toMediaType()))
+                            .build()
+                        client.newCall(request).execute().close()
+                    }
+                } catch (_: Exception) { }
+            }
             // Сохраняем сообщение в Room
             viewModelScope.launch {
                 repository?.let { repo ->
