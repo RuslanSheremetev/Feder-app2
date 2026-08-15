@@ -168,18 +168,20 @@ class ChatViewModel : ViewModel() {
             }
             chats = updatedChats.sortedByDescending { it.timestamp }
             // Сохраняем сообщение в Room
-            repository?.let { repo ->
-                repo.saveMessage(
-                    com.feder.compose.data.entity.MessageEntity(
-                        id = msgId.toLong(),
-                        fromUser = sender,
-                        toUser = "demo",
-                        text = msgText,
-                        timeVal = timeVal,
-                        isRead = selectedChat == sender
+            CoroutineScope(Dispatchers.IO).launch {
+                repository?.let { repo ->
+                    repo.saveMessage(
+                        com.feder.compose.data.entity.MessageEntity(
+                            id = msgId.toLong(),
+                            fromUser = sender,
+                            toUser = "demo",
+                            text = msgText,
+                            timeVal = timeVal,
+                            isRead = selectedChat == sender
+                        )
                     )
-                )
-                repo.updateLastMessage(sender, msgText, timeVal)
+                    repo.updateLastMessage(sender, msgText, timeVal)
+                }
             }
         }
         ws.connect("demo", token)
