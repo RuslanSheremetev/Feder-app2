@@ -336,8 +336,18 @@ class ChatViewModel : ViewModel() {
 }
 
 class MainActivity : ComponentActivity() {
+    private fun scheduleSync() {
+        val request = androidx.work.PeriodicWorkRequestBuilder<SyncWorker>(15, java.util.concurrent.TimeUnit.MINUTES)
+            .build()
+        androidx.work.WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "sync_work",
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        scheduleSync()
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
