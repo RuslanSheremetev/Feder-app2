@@ -228,8 +228,7 @@ class ChatViewModel : ViewModel() {
                 withContext(Dispatchers.IO) {
                 val request = Request.Builder().url("$server/api/chat_settings/all?me=demo").header("Authorization", "Bearer $token").build()
                 val response = client.newCall(request).execute()
-                val json = response.body?.string() ?: "[]"
-                }
+                val json = response.body?.string() ?: "[]
                 val type = object : TypeToken<List<ChatItem>>() {}.type
                 chats = gson.fromJson(json, type)
                 }
