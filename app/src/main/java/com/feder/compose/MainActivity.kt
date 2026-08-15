@@ -232,6 +232,7 @@ class ChatViewModel : ViewModel() {
                 }
                 val type = object : TypeToken<List<ChatItem>>() {}.type
                 chats = gson.fromJson(json, type)
+                }
                 // Сохраняем в Room
                 repository?.let { repo ->
                     val chatEntities = chats.map { chat ->
