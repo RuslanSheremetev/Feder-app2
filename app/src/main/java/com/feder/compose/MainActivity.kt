@@ -143,7 +143,6 @@ class ChatViewModel : ViewModel() {
                         timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
                 } else chat
             }
-            chats = chats.sortedByDescending { it.timestamp }
             }
         }
         ws.onMessage { sender, msgText, timeVal, msgId ->
