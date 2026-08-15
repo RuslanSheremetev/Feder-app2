@@ -168,7 +168,7 @@ class ChatViewModel : ViewModel() {
             }
             chats = updatedChats.sortedByDescending { it.timestamp }
             // Сохраняем сообщение в Room
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch {
                 repository?.let { repo ->
                     repo.saveMessage(
                         com.feder.compose.data.entity.MessageEntity(
@@ -187,7 +187,7 @@ class ChatViewModel : ViewModel() {
         ws.connect("demo", token)
     }
     fun loginAndLoad() {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch {
             try {
                 val json = gson.toJson(LoginRequest("demo", "demo"))
                 val body = json.toRequestBody("application/json".toMediaType())
@@ -200,7 +200,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     private fun loadChats() {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch {
             // 1. Сначала загружаем из Room (мгновенно)
             repository?.let { repo ->
                 val cachedChats = repo.getChats()
@@ -252,7 +252,7 @@ class ChatViewModel : ViewModel() {
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
     fun markChatRead(username: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch {
             repository?.markRead(username)
             chats = chats.map { chat ->
                 if (chat.username == username) chat.copy(unread = 0) else chat
