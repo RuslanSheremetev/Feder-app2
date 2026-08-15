@@ -469,6 +469,13 @@ fun FederApp() {
                     } else if (viewModel.selectedTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {
+                    if (viewModel.isRefreshing) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.padding(top = 16.dp).align(androidx.compose.ui.Alignment.TopCenter),
+                            color = Primary,
+                            strokeWidth = 2.dp
+                        )
+                    }
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
