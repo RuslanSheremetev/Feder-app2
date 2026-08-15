@@ -7,6 +7,7 @@ import com.feder.compose.data.FederDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.OkHttpClient
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
 
