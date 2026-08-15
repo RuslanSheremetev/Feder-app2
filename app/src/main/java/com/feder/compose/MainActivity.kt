@@ -113,6 +113,15 @@ class ChatViewModel : ViewModel() {
     private val client = OkHttpClient()
     private val gson = Gson()
     private val server = "http://2.26.71.102:8002"
+    private var database: FederDatabase? = null
+    private var repository: ChatRepository? = null
+    
+    fun initDatabase(context: android.content.Context) {
+        if (database == null) {
+            database = FederDatabase.getInstance(context)
+            repository = ChatRepository(database!!.messageDao(), database!!.chatDao())
+        }
+    }
     var token by mutableStateOf("")
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
@@ -192,6 +201,7 @@ class ChatViewModel : ViewModel() {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.initDatabase(this)
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
