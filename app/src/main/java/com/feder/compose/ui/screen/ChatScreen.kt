@@ -380,7 +380,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
             }
             LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+        if (messages.isNotEmpty()) listState.scrollToItem(messages.size - 1)
     }
 
     fun sendMessage() {
