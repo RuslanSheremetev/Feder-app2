@@ -24,6 +24,7 @@ class WebSocketManager(
     private var onReadCallback: ((String) -> Unit)? = null
     private var onStatusCallback: ((String) -> Unit)? = null
     private var onSendCallback: ((String, String) -> Unit)? = null
+    private var onTypingCallback: ((String) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     
     fun connect(username: String, token: String) {
@@ -49,7 +50,12 @@ class WebSocketManager(
                                 val msgText = obj.get("text")?.asString ?: return
                                 val timeVal = obj.get("timeVal")?.asLong ?: obj.get("time")?.asLong ?: 0L
                                 val msgId = obj.get("id")?.asInt ?: 0
-                                onMessageCallback?.invoke(sender, msgText, timeVal, msgId)
+                                if (json.has("type") && json.get("type").asString == "typing") {
+                                    val from = json.get("from_user")?.asString
+                                    if (from != null) onTypingCallback?.invoke(from)
+                                } else {
+                                    onMessageCallback?.invoke(sender, msgText, timeVal, msgId)
+                                }
                             }
                         } catch (e: Exception) { }
                     }
@@ -66,6 +72,9 @@ class WebSocketManager(
         }
     }
     
+    fun sendTyping(toUser: String) {
+        send("typing", "", toUser)
+    }
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         webSocket?.send(json)
@@ -88,6 +97,7 @@ class WebSocketManager(
     fun onStatus(callback: (String) -> Unit) {
         onStatusCallback = callback
     }
+    fun onTyping(callback: (String) -> Unit) { onTypingCallback = callback }
     fun onSend(callback: (String, String) -> Unit) {
         onSendCallback = callback
     }
