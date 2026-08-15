@@ -189,11 +189,13 @@ class ChatViewModel : ViewModel() {
     fun loginAndLoad() {
         viewModelScope.launch {
             try {
-                val json = gson.toJson(LoginRequest("demo", "demo"))
-                val body = json.toRequestBody("application/json".toMediaType())
-                val request = Request.Builder().url("$server/api/login").post(body).build()
-                val response = client.newCall(request).execute()
-                token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
+                withContext(Dispatchers.IO) {
+                    val json = gson.toJson(LoginRequest("demo", "demo"))
+                    val body = json.toRequestBody("application/json".toMediaType())
+                    val request = Request.Builder().url("$server/api/login").post(body).build()
+                    val response = client.newCall(request).execute()
+                    token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
+                }
                 loadChats()
                 connectWebSocket()
             } catch (e: Exception) { error = "Сервер недоступен"; isLoading = false }
