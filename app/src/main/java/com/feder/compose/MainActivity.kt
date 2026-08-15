@@ -449,7 +449,7 @@ fun FederApp() {
                                 connection = object : NestedScrollConnection {
                                     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                                         if (available.y < -100f && source == NestedScrollSource.Drag) {
-                                            viewModel.showStories = true
+                                            viewModel.showStories = true; if (available.y < -300f) viewModel.pullRefresh()
                                         }
                                         return Offset.Zero
                                     }
