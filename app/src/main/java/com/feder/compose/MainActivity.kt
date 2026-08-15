@@ -219,7 +219,6 @@ class ChatViewModel : ViewModel() {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.initDatabase(this)
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
@@ -245,6 +244,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FederApp() {
     val viewModel: ChatViewModel = viewModel()
+    LaunchedEffect(Unit) { viewModel.initDatabase(context) }
     val context = LocalContext.current
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
