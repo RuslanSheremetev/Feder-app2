@@ -348,7 +348,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     })
                 } catch (_: Exception) { }
             } catch (e: Exception) {
-                messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0))
+                // Если уже есть сообщения из Room — не показываем ошибку
+                if (messages.isEmpty()) {
+                    messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0))
+                }
                 try {
                     val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
                     httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
