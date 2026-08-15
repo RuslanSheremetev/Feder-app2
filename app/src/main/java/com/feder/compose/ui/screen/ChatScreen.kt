@@ -174,7 +174,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: WebSocketManager? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: WebSocketManager? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -288,6 +288,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
                     val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
                     internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
+                }
+                // Загружаем из Room (мгновенно)
+                repository?.let { repo ->
+                    val cachedMessages = repo.getMessages(myUsername, chatUsername)
+                    if (cachedMessages.isNotEmpty()) {
+                        messages = cachedMessages.map { entity ->
+                            MsgItem(
+                                from = entity.fromUser,
+                                to = entity.toUser,
+                                text = entity.text,
+                                time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
+                                status = if (entity.isRead) "read" else "sent",
+                                timeVal = entity.timeVal,
+                                id = entity.id,
+                                posX = entity.posX ?: 0f,
+                                posY = entity.posY ?: 0f
+                            )
+                        }
+                    }
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")

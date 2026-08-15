@@ -311,6 +311,7 @@ fun FederApp() {
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
+                    repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
                 )
