@@ -145,6 +145,9 @@ class ChatViewModel : ViewModel() {
     private fun connectWebSocket() {
         wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
+        ws.onStatus { status ->
+            android.util.Log.d("WS", "Status: $status")
+        }
         ws.onSend { toUser, msgText ->
             chats = chats.map { chat ->
                 if (chat.username == toUser) {
