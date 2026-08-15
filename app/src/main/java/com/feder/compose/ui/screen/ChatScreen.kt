@@ -285,6 +285,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // 1. Загружаем из Room (мгновенно, работает оффлайн)
             repository?.let { repo ->
                 val cachedMessages = repo.getMessages(myUsername, chatUsername)
+                withContext(Dispatchers.Main) { Toast.makeText(context, "Room: ${cachedMessages.size} messages for $chatUsername", Toast.LENGTH_SHORT).show() }
                 if (cachedMessages.isNotEmpty()) {
                     messages = cachedMessages.map { entity ->
                         MsgItem(
