@@ -15,7 +15,7 @@ class FederApplication : Application(), ImageLoaderFactory {
                     .build()
             }
             .diskCache {
-                DiskCache.Builder(this)
+                DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))
                     .maxSizePercent(0.05)
                     .build()
