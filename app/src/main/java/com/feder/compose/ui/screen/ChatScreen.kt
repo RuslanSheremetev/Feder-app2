@@ -138,6 +138,42 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     val be = if (isMine) bottomRadius else 20.dp
     Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+            Column(Modifier.padding(4.dp)) {
+                if (msg.imageUrl != null) {
+                    Box {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${msg.imageUrl}").crossfade(true).build(),
+                            contentDescription = "photo",
+                            modifier = Modifier.widthIn(max = 250.dp).clip(RoundedCornerShape(16.dp)).border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        if (time.isNotEmpty()) {
+                            Surface(
+                                modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.Black.copy(alpha = 0.6f)
+                            ) {
+                                Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(time, color = Color.White, fontSize = 11.sp)
+                                    if (isMine) {
+                                        Spacer(Modifier.width(3.dp))
+                                        val checkText = when (msg.status) {
+                                            "read" -> "✓✓"
+                                            "received" -> "✓✓"
+                                            else -> "✓"
+                                        }
+                                        val checkColor = when (msg.status) {
+                                            "read" -> Color(0xFF4CAF50)
+                                            else -> Color.White
+                                        }
+                                        Text(checkText, color = checkColor, fontSize = 11.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
                 if (time.isNotEmpty()) {
