@@ -789,6 +789,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
             ) {
+                val context = LocalContext.current
+                val photos = remember { mutableStateListOf<android.net.Uri>() }
+                LaunchedEffect(Unit) {
+                    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    val projection = arrayOf(MediaStore.Images.Media._ID)
+                    context.contentResolver.query(uri, projection, null, null, "${MediaStore.Images.Media.DATE_ADDED} DESC")?.use { cursor ->
+                        val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                        while (cursor.moveToNext()) {
+                            val id = cursor.getLong(idCol)
+                            val contentUri = android.net.Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+                            photos.add(contentUri)
+                        }
+                    }
+                }
                 // Gallery grid
                 LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
@@ -796,20 +810,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
                         }
                     }, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val context = LocalContext.current
-                    val photos = remember { mutableStateListOf<android.net.Uri>() }
-                    LaunchedEffect(Unit) {
-                        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                        val projection = arrayOf(MediaStore.Images.Media._ID)
-                        context.contentResolver.query(uri, projection, null, null, "${MediaStore.Images.Media.DATE_ADDED} DESC")?.use { cursor ->
-                            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                            while (cursor.moveToNext()) {
-                                val id = cursor.getLong(idCol)
-                                val contentUri = android.net.Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
-                                photos.add(contentUri)
-                            }
-                        }
-                    }
                     items(photos.size) { i ->
                         AsyncImage(
                             model = photos[i],
