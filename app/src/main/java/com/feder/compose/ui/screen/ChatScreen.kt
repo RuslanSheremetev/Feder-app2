@@ -798,29 +798,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
                 Spacer(Modifier.height(16.dp))
 
-                // Input like in chat
-                var attachCaption by remember { mutableStateOf("") }
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp)) {
-                    Surface(shape = RoundedCornerShape(28.dp), color = Color.Transparent) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
-                            Icon(Icons.Filled.EmojiEmotions, "emoji", tint = Color.White, modifier = Modifier.size(24.dp))
-                            Spacer(Modifier.width(8.dp))
-                            BasicTextField(
-                                value = attachCaption,
-                                onValueChange = { attachCaption = it },
-                                singleLine = true,
-                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
-                                cursorBrush = SolidColor(Primary),
-                                modifier = Modifier.weight(1f).padding(vertical = 10.dp).heightIn(max = 120.dp),
-                                decorationBox = { if (attachCaption.isEmpty()) Text("Добавить подпись...", color = OnSurfaceVariant, fontSize = 14.sp); it() }
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { showAttachSheet = false }, contentAlignment = Alignment.Center) {
-                                Icon(Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    }
-                }
+
             }
         }
         // Дата в овале — под шапкой по центру
