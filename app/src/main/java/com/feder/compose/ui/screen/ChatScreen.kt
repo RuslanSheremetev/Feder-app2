@@ -797,7 +797,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                         }
                     ), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(6) { i ->
+                    items(60) { i ->
                         Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh), contentAlignment = Alignment.Center) {
                             if (i < 5) Icon(Icons.Filled.Image, "photo", tint = Outline, modifier = Modifier.size(32.dp))
                             else Icon(Icons.Filled.PhotoCamera, "camera", tint = Outline, modifier = Modifier.size(32.dp))
