@@ -1046,7 +1046,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
-                        Icon(if (inputText.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                        Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
                 }
