@@ -472,28 +472,33 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     fun sendMessage() {
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
-            val firstPhoto = selectedPhotos.first()
-            val filename = "photo_${System.currentTimeMillis()}.jpg"
-            // Загружаем на сервер
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val bytes = context.contentResolver.openInputStream(firstPhoto)?.readBytes()
-                    if (bytes != null) {
-                        val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-                        val json = gson.toJson(mapOf("data" to base64))
-                        val body = json.toRequestBody("application/json".toMediaType())
-                        val request = Request.Builder()
-                            .url("http://2.26.71.102:8002/api/upload")
-                            .header("Authorization", "Bearer $internalToken")
-                            .post(body)
-                            .build()
-                        val response = httpClient.newCall(request).execute()
-                        val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
-                        val url = respJson.get("url")?.asString ?: filename
+                    val urls = mutableListOf<String>()
+                    for (photo in selectedPhotos) {
+                        val bytes = context.contentResolver.openInputStream(photo)?.readBytes()
+                        if (bytes != null) {
+                            val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                            val json = gson.toJson(mapOf("data" to base64))
+                            val body = json.toRequestBody("application/json".toMediaType())
+                            val request = Request.Builder()
+                                .url("http://2.26.71.102:8002/api/upload")
+                                .header("Authorization", "Bearer $internalToken")
+                                .post(body)
+                                .build()
+                            val response = httpClient.newCall(request).execute()
+                            val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
+                            val url = respJson.get("url")?.asString
+                            if (url != null) urls.add(url)
+                        }
+                    }
+                    if (urls.isNotEmpty()) {
                         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                        val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrl = url)
+                        // Отправляем все фото в одном сообщении
+                        val combinedText = urls.joinToString(",")
+                        val newMsg = MsgItem(myUsername, chatUsername, combinedText, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrl = urls.first())
                         messages = messages + newMsg
-                        ws?.send("message", url, chatUsername)
+                        ws?.send("message", combinedText, chatUsername)
                         selectedPhotos = emptySet()
                         showAttachSheet = false
                     }
