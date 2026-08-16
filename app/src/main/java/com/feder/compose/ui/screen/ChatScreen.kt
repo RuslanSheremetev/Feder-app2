@@ -419,7 +419,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             id = msg.id.toLong(),
                             fromUser = msg.from,
                             toUser = msg.to,
-                            text = msg.text,
+                            text = if (msg.imageUrls.isNotEmpty()) msg.imageUrls.joinToString(",") else msg.text,
                             timeVal = msg.timeVal,
                             isRead = msg.status == "read",
                             posX = msg.posX,
