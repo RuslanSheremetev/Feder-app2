@@ -140,7 +140,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(4.dp)) {
-                if (msg.imageUrls.isNotEmpty() == true) {
+                if (msg.imageUrls.isNotEmpty()) {
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
@@ -149,7 +149,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .then(if ((msg.imageUrls.size ?: 0) > 1) Modifier.aspectRatio(1f) else Modifier)
+                                        .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
