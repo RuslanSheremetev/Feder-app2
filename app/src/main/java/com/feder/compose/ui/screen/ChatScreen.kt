@@ -776,8 +776,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     .navigationBarsPadding()
             ) {
                 // Gallery grid
-                Text("Недавние фото", color = OnSurface, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.height(12.dp))
                 LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(6) { i ->
                         Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh), contentAlignment = Alignment.Center) {
