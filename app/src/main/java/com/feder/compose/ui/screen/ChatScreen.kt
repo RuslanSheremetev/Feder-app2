@@ -796,7 +796,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     AttachOption(Icons.Filled.Person, "Контакт")
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(80.dp))
 
 
             }
