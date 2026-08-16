@@ -87,6 +87,7 @@ data class MsgItem(
     val from: String,
     val to: String,
     val text: String,
+    val imageUrl: String? = null,
     val time: String,
     var status: String = "sent",
     val timeVal: Long = 0L,
