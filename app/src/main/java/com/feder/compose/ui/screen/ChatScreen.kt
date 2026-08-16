@@ -516,6 +516,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     fun sendMessage() {
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
+            android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val urls = mutableListOf<String>()
