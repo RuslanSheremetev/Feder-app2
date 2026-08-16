@@ -87,14 +87,14 @@ data class MsgItem(
     val from: String,
     val to: String,
     val text: String,
-    val imageUrl: String? = null,
-    val imageUrls: List<String> = emptyList(),
     val time: String,
     var status: String = "sent",
     val timeVal: Long = 0L,
     val id: Int = 0,
     var posX: Float = 0f,
     var posY: Float = 0f,
+    val imageUrl: String? = null,
+    val imageUrls: List<String> = emptyList(),
 )
 
 @Composable
