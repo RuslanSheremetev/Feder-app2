@@ -94,7 +94,7 @@ data class MsgItem(
     var posX: Float = 0f,
     var posY: Float = 0f,
     val imageUrl: String? = null,
-    val imageUrls: List<String> = emptyList(),
+    val imageUrls: List<String>? = emptyList(),
 )
 
 @Composable
