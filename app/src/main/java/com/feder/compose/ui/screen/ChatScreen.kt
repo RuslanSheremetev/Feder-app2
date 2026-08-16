@@ -991,6 +991,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Box(modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).clickable {
                             val uri = photos[i]
                             selectedPhotos = if (uri in selectedPhotos) selectedPhotos - uri else selectedPhotos + uri
+                            android.widget.Toast.makeText(context, "Selected: ${selectedPhotos.size} photos", android.widget.Toast.LENGTH_SHORT).show()
                         }) {
                             AsyncImage(
                                 model = photos[i],
