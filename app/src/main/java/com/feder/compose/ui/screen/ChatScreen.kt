@@ -194,6 +194,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val ws = wsManager ?: remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
+    var showEmojiSheet by remember { mutableStateOf(false) }
+    var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var expandInput by remember { mutableStateOf(false) }
@@ -906,6 +908,44 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             }
         }
+        // Emoji Sheet
+        if (showEmojiSheet) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showEmojiSheet = false })
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (emojiExpanded) Modifier.fillMaxHeight() else Modifier)
+                    .align(Alignment.BottomCenter)
+                    .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+            ) {
+                // Drag handle
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                if (dragAmount < -50) emojiExpanded = true
+                                if (dragAmount > 50 && emojiExpanded) emojiExpanded = false
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(OnSurfaceVariant.copy(alpha = 0.5f))
+                    )
+                }
+                // Заглушка для эмодзи
+                Spacer(Modifier.height(200.dp))
+                Spacer(Modifier.height(80.dp))
+            }
+        }
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         if (!showForward) {
@@ -996,7 +1036,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     if (!inputText.contains("\n")) {
-                        IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
+                        IconButton(onClick = { showEmojiSheet = true }, modifier = Modifier.size(40.dp)) {
                             Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
