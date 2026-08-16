@@ -407,7 +407,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
-                messages = loaded.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent") }.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent") }.map { it.copy(status = it.status.ifEmpty { "sent" }) }
+                messages = loaded.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent", imageUrls = it.imageUrls ?: emptyList()) }.map { it.copy(status = it.status?.ifEmpty { "sent" } ?: "sent", imageUrls = it.imageUrls ?: emptyList()) }.map { it.copy(status = it.status.ifEmpty { "sent" }) }
                 // Сохраняем загруженные сообщения в Room
                 repository?.let { repo ->
                     repo.saveMessages(loaded.map { msg ->
@@ -459,12 +459,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (internalToken.isEmpty()) return@LaunchedEffect
         ws.onRead { from ->
             messages = messages.map { msg ->
-                if (msg.from == myUsername && msg.to == from) msg.copy(status = "read") else msg
+                if (msg.from == myUsername && msg.to == from) msg.copy(status = "read", imageUrls = msg.imageUrls ?: emptyList()) else msg
             }
         }
         ws.onReceived { from ->
             messages = messages.map { msg ->
-                if (msg.from == myUsername && msg.to == from) msg.copy(status = "received") else msg
+                if (msg.from == myUsername && msg.to == from) msg.copy(status = "received", imageUrls = msg.imageUrls ?: emptyList()) else msg
             }
         }
         ws.onMessage { sender, text, timeVal, msgId ->
@@ -472,7 +472,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
                 messages = messages.map { msg ->
-                    if (msg.from == myUsername && msg.text == text && msg.status == "pending") msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal)
+                    if (msg.from == myUsername && msg.text == text && msg.status == "pending") msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal, imageUrls = msg.imageUrls ?: emptyList())
                     else msg
                 }
             } else {
