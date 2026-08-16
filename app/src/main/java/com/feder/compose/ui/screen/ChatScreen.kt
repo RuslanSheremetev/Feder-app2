@@ -88,6 +88,7 @@ data class MsgItem(
     val to: String,
     val text: String,
     val imageUrl: String? = null,
+    val imageUrls: List<String> = emptyList(),
     val time: String,
     var status: String = "sent",
     val timeVal: Long = 0L,
@@ -139,7 +140,49 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(4.dp)) {
-                if (msg.imageUrl != null) {
+                if (msg.imageUrls.isNotEmpty()) {
+                    Column(Modifier.widthIn(max = 250.dp)) {
+                        msg.imageUrls.forEachIndexed { index, url ->
+                            Box {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}").crossfade(true).build(),
+                                    contentDescription = "photo",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
+                                        .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
+                                        .border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                                if (index == msg.imageUrls.lastIndex) {
+                                    Surface(
+                                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = Color.Black.copy(alpha = 0.6f)
+                                    ) {
+                                        Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                            Text(time, color = Color.White, fontSize = 11.sp)
+                                            if (isMine) {
+                                                Spacer(Modifier.width(3.dp))
+                                                val checkText = when (msg.status) {
+                                                    "read" -> "✓✓"
+                                                    "received" -> "✓✓"
+                                                    else -> "✓"
+                                                }
+                                                val checkColor = when (msg.status) {
+                                                    "read" -> Color(0xFF4CAF50)
+                                                    else -> Color.White
+                                                }
+                                                Text(checkText, color = checkColor, fontSize = 11.sp)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (index < msg.imageUrls.lastIndex) Spacer(Modifier.height(2.dp))
+                        }
+                    }
+                } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${msg.imageUrl}").crossfade(true).build(),
@@ -496,7 +539,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
                         // Отправляем все фото в одном сообщении
                         val combinedText = urls.joinToString(",")
-                        val newMsg = MsgItem(myUsername, chatUsername, combinedText, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrl = urls.first())
+                        val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
                         ws?.send("message", combinedText, chatUsername)
                         selectedPhotos = emptySet()
