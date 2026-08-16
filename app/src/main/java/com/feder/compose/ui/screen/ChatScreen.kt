@@ -379,6 +379,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (cachedMessages.isNotEmpty()) {
                     messages = cachedMessages.map { entity ->
                         MsgItem(
+                            imageUrls = emptyList(),
                             from = entity.fromUser,
                             to = entity.toUser,
                             text = entity.text,
@@ -440,7 +441,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             } catch (e: Exception) {
                 // Если уже есть сообщения из Room — не показываем ошибку
                 if (messages.isEmpty()) {
-                    messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0))
+                    messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0, imageUrls = emptyList()))
                 }
                 try {
                     val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
@@ -477,7 +478,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             } else {
                 val existing = messages.find { it.from == sender && it.text == text }
                 if (existing == null) {
-                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
+                    val newMsg = MsgItem(sender, myUsername, text, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
                     messages = messages + newMsg
                 }
             }
@@ -559,7 +560,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             return
         }
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
+        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
         ws?.send("message", text, chatUsername)
