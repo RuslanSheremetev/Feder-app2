@@ -786,7 +786,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
             ) {
                 // Gallery grid
-                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp).pointerInput(Unit) {
+                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
