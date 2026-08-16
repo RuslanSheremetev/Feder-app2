@@ -188,6 +188,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val ws = wsManager ?: remember { WebSocketManager() }
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
+    var attachExpanded by remember { mutableStateOf(false) }
     var expandInput by remember { mutableStateOf(false) }
     var searchMode by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -770,10 +771,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier)
                     .align(Alignment.BottomCenter)
                     .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                     .padding(16.dp)
                     .navigationBarsPadding()
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            if (dragAmount < -50) attachExpanded = true
+                            if (dragAmount > 50 && attachExpanded) attachExpanded = false
+                        }
+                    }
             ) {
                 // Gallery grid
                 LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxHeight(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
