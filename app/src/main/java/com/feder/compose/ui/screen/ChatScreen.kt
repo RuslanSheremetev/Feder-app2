@@ -544,10 +544,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
                         ws?.send("message", combinedText, chatUsername)
-                        selectedPhotos = emptySet()
-                        showAttachSheet = false
+                        withContext(Dispatchers.Main) {
+                            selectedPhotos = emptySet()
+                            showAttachSheet = false
+                        }
                     }
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                    android.util.Log.e("PhotoSend", "Error: ${e.message}", e)
+                }
             }
             return
         }
