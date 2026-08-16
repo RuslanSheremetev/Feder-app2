@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
+import android.provider.MediaStore
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
@@ -795,11 +796,27 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
                         }
                     }, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(60) { i ->
-                        Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh), contentAlignment = Alignment.Center) {
-                            if (i < 5) Icon(Icons.Filled.Image, "photo", tint = Outline, modifier = Modifier.size(32.dp))
-                            else Icon(Icons.Filled.PhotoCamera, "camera", tint = Outline, modifier = Modifier.size(32.dp))
+                    val context = LocalContext.current
+                    val photos = remember { mutableStateListOf<android.net.Uri>() }
+                    LaunchedEffect(Unit) {
+                        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                        val projection = arrayOf(MediaStore.Images.Media._ID)
+                        context.contentResolver.query(uri, projection, null, null, "${MediaStore.Images.Media.DATE_ADDED} DESC")?.use { cursor ->
+                            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                            while (cursor.moveToNext()) {
+                                val id = cursor.getLong(idCol)
+                                val contentUri = android.net.Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+                                photos.add(contentUri)
+                            }
                         }
+                    }
+                    items(photos.size) { i ->
+                        AsyncImage(
+                            model = photos[i],
+                            contentDescription = "photo",
+                            modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 }
 
