@@ -195,6 +195,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
+    var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var expandInput by remember { mutableStateOf(false) }
     var searchMode by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -789,6 +790,37 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
             ) {
+                // Selected photos preview
+                if (selectedPhotos.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        selectedPhotos.forEach { uri ->
+                            Box(modifier = Modifier.size(48.dp)) {
+                                AsyncImage(
+                                    model = uri,
+                                    contentDescription = "selected",
+                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .align(Alignment.TopEnd)
+                                        .background(PrimaryContainer, CircleShape)
+                                        .clickable { 
+                                            selectedPhotos = selectedPhotos - uri
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.Close, null, tint = OnPrimaryContainer, modifier = Modifier.size(12.dp))
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
                 // Drag handle
                 Box(
                     modifier = Modifier
@@ -832,12 +864,29 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(photos.size) { i ->
-                        AsyncImage(
-                            model = photos[i],
-                            contentDescription = "photo",
-                            modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
-                        )
+                        Box(modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).clickable {
+                            val uri = photos[i]
+                            selectedPhotos = if (uri in selectedPhotos) selectedPhotos - uri else selectedPhotos + uri
+                        }) {
+                            AsyncImage(
+                                model = photos[i],
+                                contentDescription = "photo",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                            if (photos[i] in selectedPhotos) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.TopEnd)
+                                        .padding(4.dp)
+                                        .background(PrimaryContainer, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.Check, null, tint = OnPrimaryContainer, modifier = Modifier.size(16.dp))
+                                }
+                            }
+                        }
                     }
                 }
 
