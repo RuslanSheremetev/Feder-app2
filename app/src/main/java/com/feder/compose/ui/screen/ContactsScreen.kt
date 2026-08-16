@@ -154,7 +154,6 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
         Text(label, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.W500)
     }
 }
-    }
 }
 
 @Composable
