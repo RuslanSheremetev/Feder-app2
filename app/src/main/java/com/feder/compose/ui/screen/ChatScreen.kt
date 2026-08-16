@@ -786,7 +786,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
             ) {
                 // Gallery grid
-                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp).pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            if (dragAmount < -50) attachExpanded = true
+                            if (dragAmount > 50 && attachExpanded) attachExpanded = false
+                        }
+                    }, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(6) { i ->
                         Box(Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh), contentAlignment = Alignment.Center) {
                             if (i < 5) Icon(Icons.Filled.Image, "photo", tint = Outline, modifier = Modifier.size(32.dp))
