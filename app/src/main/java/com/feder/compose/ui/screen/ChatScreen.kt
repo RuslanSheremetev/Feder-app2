@@ -179,7 +179,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                     }
                                 }
                             }
-                            if (index < msg.imageUrls?.lastIndex) Spacer(Modifier.height(2.dp))
+                            if (index < (msg.imageUrls?.lastIndex ?: 0)) Spacer(Modifier.height(2.dp))
                         }
                     }
                 } else if (msg.imageUrl != null) {
