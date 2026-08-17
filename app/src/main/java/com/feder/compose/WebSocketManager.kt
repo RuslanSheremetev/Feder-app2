@@ -94,16 +94,22 @@ class WebSocketManager(
     fun sendTyping(toUser: String) {
         send("typing", "", toUser)
     }
-    fun sendPhoto(imageUrls: List<String>, toUser: String) {
+    fun sendPhoto(imageUrls: List<String>, toUser: String, caption: String = "") {
+        val combinedText = if (caption.isNotEmpty()) {
+            caption + "\n" + imageUrls.joinToString(",")
+        } else {
+            imageUrls.joinToString(",")
+        }
         val json = gson.toJson(mapOf(
             "type" to "message",
-            "text" to imageUrls.joinToString(","),
+            "text" to combinedText,
             "to_user" to toUser,
-            "imageUrls" to imageUrls
+            "imageUrls" to imageUrls,
+            "caption" to caption
         ))
         webSocket?.send(json)
         android.util.Log.d("WS", "Photo sent via WS: $json")
-        onSendCallback?.invoke(toUser, imageUrls.joinToString(","))
+        onSendCallback?.invoke(toUser, combinedText)
     }
     
     fun send(type: String, text: String, toUser: String) {

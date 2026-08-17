@@ -200,6 +200,15 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             }
                             if (index < (msg.imageUrls.lastIndex ?: 0)) Spacer(Modifier.height(2.dp))
                         }
+                        // Подпись (текст) под фото
+                        if (msg.text.isNotEmpty()) {
+                            Text(
+                                msg.text,
+                                color = if (isMine) OnPrimaryContainer else OnSecondaryContainer,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 } else if (msg.imageUrl != null) {
                     Box {
@@ -590,11 +599,18 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     }
                     if (urls.isNotEmpty()) {
                         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                        // Отправляем все фото в одном сообщении
-                        val combinedText = urls.joinToString(",")
-                        val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
+                        // Берём текст из inputText (если есть)
+                        val caption = inputText.trim()
+                        // Отправляем все фото + подпись в одном сообщении
+                        val combinedText = if (caption.isNotEmpty()) {
+                            caption + "\n" + urls.joinToString(",")
+                        } else {
+                            urls.joinToString(",")
+                        }
+                        val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
-                        ws.sendPhoto(urls, chatUsername)
+                        ws.sendPhoto(urls, chatUsername, caption)
+                        inputText = ""
                         try {
                             val logJson = gson.toJson(mapOf("log" to "PhotoSend: ws.send text=$combinedText"))
                             val logBody = logJson.toRequestBody("application/json".toMediaType())
