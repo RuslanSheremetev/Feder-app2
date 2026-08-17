@@ -38,6 +38,13 @@ class WebSocketManager(
                 webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         android.util.Log.d("WS", "OPEN: ${response.code}")
+                        val logJson = gson.toJson(mapOf("log" to "WS_OPEN: code=${response.code}"))
+                        val logBody = logJson.toRequestBody("application/json".toMediaType())
+                        val httpClient = OkHttpClient()
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
+                            override fun onFailure(call: Call, e: java.io.IOException) {}
+                            override fun onResponse(call: Call, response: Response) { response.close() }
+                        })
                         onStatusCallback?.invoke("connected")
                     }
                     override fun onMessage(webSocket: WebSocket, text: String) {
@@ -63,6 +70,13 @@ class WebSocketManager(
                     }
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                         android.util.Log.e("WS", "FAIL: ${t.message}")
+                        val logJson = gson.toJson(mapOf("log" to "WS_FAIL: ${t.message}"))
+                        val logBody = logJson.toRequestBody("application/json".toMediaType())
+                        val httpClient = OkHttpClient()
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
+                            override fun onFailure(call: Call, e: java.io.IOException) {}
+                            override fun onResponse(call: Call, response: Response) { response.close() }
+                        })
                         onStatusCallback?.invoke("error: ${t.message}")
                     }
                     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -81,6 +95,13 @@ class WebSocketManager(
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         webSocket?.send(json)
+        val logJson = gson.toJson(mapOf("log" to "WS_SEND: type=$type text=$text to=$toUser socket=${webSocket != null}"))
+        val logBody = logJson.toRequestBody("application/json".toMediaType())
+        val httpClient = OkHttpClient()
+        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {}
+            override fun onResponse(call: Call, response: Response) { response.close() }
+        })
         if (type == "message") {
             onSendCallback?.invoke(toUser, text)
         }
