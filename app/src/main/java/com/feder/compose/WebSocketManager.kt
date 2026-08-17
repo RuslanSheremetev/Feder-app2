@@ -108,9 +108,22 @@ class WebSocketManager(
             "imageUrls" to imageUrls,
             "caption" to caption
         ))
-        webSocket?.send(json)
-        android.util.Log.d("WS", "PHOTO_SENT: $json (socket=${webSocket != null})")
-        onSendCallback?.invoke(toUser, combinedText)
+        if (webSocket != null) {
+            webSocket?.send(json)
+            android.util.Log.d("WS", "PHOTO_SENT: $json")
+            onSendCallback?.invoke(toUser, combinedText)
+        } else {
+            android.util.Log.e("WS", "WebSocket NULL in sendPhoto! Retrying...")
+            android.os.Handler(Looper.getMainLooper()).postDelayed({
+                if (webSocket != null) {
+                    webSocket?.send(json)
+                    android.util.Log.d("WS", "PHOTO_SENT after retry: $json")
+                    onSendCallback?.invoke(toUser, combinedText)
+                } else {
+                    android.util.Log.e("WS", "STILL NULL in sendPhoto")
+                }
+            }, 1000)
+        }
     }
     
     fun send(type: String, text: String, toUser: String) {
