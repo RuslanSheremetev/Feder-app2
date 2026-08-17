@@ -545,7 +545,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
-            android.widget.Toast.makeText(context, "Sending ${selectedPhotos.size} photos...", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "Send: ${selectedPhotos.size} photos, token=${internalToken.take(10)}..., ws=${if (ws != null) "OK" else "NULL"}", android.widget.Toast.LENGTH_LONG).show()
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val urls = mutableListOf<String>()
