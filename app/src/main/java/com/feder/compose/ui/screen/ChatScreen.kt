@@ -150,6 +150,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
+                                if (uploadingPhotos && msg.status == "pending") {
+                                    Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                                        CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+                                    }
+                                }
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}")
                                         .crossfade(true)
@@ -584,6 +589,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         withContext(Dispatchers.Main) {
                             selectedPhotos = emptySet()
                             showAttachSheet = false
+                            uploadingPhotos = false
                         }
                     }
                 } catch (e: Exception) {
