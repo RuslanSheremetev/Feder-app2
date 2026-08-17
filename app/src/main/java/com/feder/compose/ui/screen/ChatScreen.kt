@@ -567,6 +567,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val response = httpClient.newCall(request).execute()
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
+                            android.widget.Toast.makeText(context, "Uploaded: $url", android.widget.Toast.LENGTH_LONG).show()
                             if (url != null) urls.add(url)
                         }
                     }
