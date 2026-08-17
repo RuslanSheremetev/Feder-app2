@@ -150,9 +150,16 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             Box {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}")
+                                        .crossfade(true)
+                                        .diskCacheKey(url)
+                                        .memoryCacheKey(url)
+                                        .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                                        .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+                                        .build(),
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clickable { fullScreenPhoto = "http://2.26.71.102:8002/uploads/${url}" }
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(0.5.dp, OutlineVariant.copy(alpha = 0.15f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
