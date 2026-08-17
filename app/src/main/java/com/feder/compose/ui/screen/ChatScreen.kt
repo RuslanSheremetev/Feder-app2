@@ -577,6 +577,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
                             android.widget.Toast.makeText(context, "Uploaded: $url", android.widget.Toast.LENGTH_LONG).show()
+                            try {
+                                val logJson = gson.toJson(mapOf("log" to "PhotoSend: url=$url"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
                             if (url != null) urls.add(url)
                         }
                     }
@@ -587,6 +595,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
                         ws.send("message", combinedText, chatUsername)
+                        try {
+                            val logJson = gson.toJson(mapOf("log" to "PhotoSend: ws.send text=$combinedText"))
+                            val logBody = logJson.toRequestBody("application/json".toMediaType())
+                            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                            })
+                        } catch (_: Exception) {}
                         withContext(Dispatchers.Main) {
                             selectedPhotos = emptySet()
                             showAttachSheet = false
