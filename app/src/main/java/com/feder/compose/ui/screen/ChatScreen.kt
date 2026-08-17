@@ -130,6 +130,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
     }
 }
 
+}
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet()) {
@@ -253,13 +254,10 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                         Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
                         }
                     }
-                    }
                 }
             }
         }
-    }
 }
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
