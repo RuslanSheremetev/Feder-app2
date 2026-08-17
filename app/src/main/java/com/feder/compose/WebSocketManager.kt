@@ -39,6 +39,7 @@ class WebSocketManager(
             try {
                 webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
+                        this@WebSocketManager.webSocket = webSocket
                         android.util.Log.d("WS", "OPEN: ${response.code}")
                         val logJson = gson.toJson(mapOf("log" to "WS_OPEN: code=${response.code}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
