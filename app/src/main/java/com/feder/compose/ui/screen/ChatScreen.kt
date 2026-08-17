@@ -87,6 +87,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 var fullScreenPhoto: String? = null
+var uploadingPhotos: Boolean = false
 
 data class MsgItem(
     val from: String,
