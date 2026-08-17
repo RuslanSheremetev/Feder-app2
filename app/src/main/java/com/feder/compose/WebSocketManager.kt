@@ -114,10 +114,23 @@ class WebSocketManager(
     
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
-        webSocket?.send(json)
-        android.util.Log.d("WS", "SENT: $json (socket=${webSocket != null})")
-        if (type == "message") {
-            onSendCallback?.invoke(toUser, text)
+        if (webSocket != null) {
+            webSocket?.send(json)
+            android.util.Log.d("WS", "SENT: $json")
+            if (type == "message") {
+                onSendCallback?.invoke(toUser, text)
+            }
+        } else {
+            android.util.Log.e("WS", "WebSocket is NULL! Cannot send: $json")
+            // Пробуем переподключиться и отправить
+            android.os.Handler(Looper.getMainLooper()).postDelayed({
+                if (webSocket != null) {
+                    webSocket?.send(json)
+                    android.util.Log.d("WS", "SENT after retry: $json")
+                } else {
+                    android.util.Log.e("WS", "STILL NULL after retry")
+                }
+            }, 1000)
         }
     }
     
