@@ -295,6 +295,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
+    var fullScreenPhoto by remember { mutableStateOf<String?>(null) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10)
     ) { uris ->
