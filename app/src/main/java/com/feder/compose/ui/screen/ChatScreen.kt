@@ -585,7 +585,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val response = httpClient.newCall(request).execute()
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
-                            android.widget.Toast.makeText(context, "Uploaded: $url", android.widget.Toast.LENGTH_LONG).show()
+                            android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PhotoSend: url=$url"))
                                 val logBody = logJson.toRequestBody("application/json".toMediaType())
