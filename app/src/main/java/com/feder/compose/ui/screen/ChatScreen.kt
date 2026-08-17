@@ -609,10 +609,8 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         }
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
-                        withContext(Dispatchers.Main) {
-                            ws.sendPhoto(urls, chatUsername, caption)
-                            inputText = ""
-                        }
+                        ws.sendPhoto(urls, chatUsername, caption)
+                        inputText = ""
                         try {
                             val logJson = gson.toJson(mapOf("log" to "PhotoSend: ws.send text=$combinedText"))
                             val logBody = logJson.toRequestBody("application/json".toMediaType())
