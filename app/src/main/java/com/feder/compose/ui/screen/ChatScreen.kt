@@ -255,7 +255,6 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                     }
                 }
                 }
-                }
             }
         }
 }
