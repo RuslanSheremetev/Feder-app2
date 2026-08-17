@@ -150,6 +150,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             Box {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}")
+                                        .build(),
+                                    contentDescription = "photo",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { fullScreenPhoto = "http://2.26.71.102:8002/uploads/${url}" }
                                         .crossfade(true)
                                         .diskCacheKey(url)
                                         .memoryCacheKey(url)
@@ -313,6 +318,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
+    var fullScreenPhoto by remember { mutableStateOf<String?>(null) }
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
@@ -1213,6 +1219,26 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         }
         }
         // Кнопка прокрутки вниз
+        // Полноэкранный просмотр
+        if (fullScreenPhoto != null) {
+            androidx.compose.ui.window.Dialog(onDismissRequest = { fullScreenPhoto = null }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        .clickable { fullScreenPhoto = null },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = fullScreenPhoto,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+            }
+        }
+
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
             modifier = Modifier.padding(end = 28.dp, bottom = 76.dp).align(Alignment.BottomEnd),
