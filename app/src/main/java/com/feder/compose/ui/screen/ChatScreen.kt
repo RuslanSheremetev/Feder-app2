@@ -161,7 +161,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                         .fillMaxWidth()
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
-                                        .border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
+                                        .border(0.5.dp, OutlineVariant.copy(alpha = 0.15f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                                 if (index == msg.imageUrls.lastIndex) {
@@ -203,7 +203,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.widthIn(max = 250.dp).clip(RoundedCornerShape(16.dp)).border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
+                            modifier = Modifier.widthIn(max = 250.dp).clip(RoundedCornerShape(16.dp)).border(0.5.dp, OutlineVariant.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty()) {
