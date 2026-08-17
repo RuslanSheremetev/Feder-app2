@@ -1230,7 +1230,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { sendMessage() }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { android.widget.Toast.makeText(context, "CLICKED send", android.widget.Toast.LENGTH_SHORT).show(); sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
