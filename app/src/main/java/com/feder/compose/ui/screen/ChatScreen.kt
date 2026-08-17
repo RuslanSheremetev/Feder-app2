@@ -57,6 +57,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -98,10 +101,10 @@ data class MsgItem(
 )
 
 @Composable
-fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false) {
+fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, selected: Boolean = false, onClick: () -> Unit = {}) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
+            Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = onClick)
                 .background(if (selected) PrimaryContainer else SurfaceContainerHigh),
             contentAlignment = Alignment.Center
         ) {
@@ -146,7 +149,13 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}").crossfade(true).build(),
+                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}")
+                                        .crossfade(true)
+                                        .diskCacheKey(url)
+                                        .memoryCacheKey(url)
+                                        .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                                        .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+                                        .build(),
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -186,7 +195,13 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${msg.imageUrl}").crossfade(true).build(),
+                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${msg.imageUrl}")
+                            .crossfade(true)
+                            .diskCacheKey(msg.imageUrl ?: "")
+                            .memoryCacheKey(msg.imageUrl ?: "")
+                            .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                            .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+                            .build(),
                             contentDescription = "photo",
                             modifier = Modifier.widthIn(max = 250.dp).clip(RoundedCornerShape(16.dp)).border(1.dp, OutlineVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
@@ -219,7 +234,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                 }
             }
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
-                Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
+                if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
                 if (time.isNotEmpty()) {
                     Spacer(Modifier.width(6.dp))
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
@@ -236,6 +251,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             else -> OnPrimaryContainer.copy(alpha = 0.6f)
                         }
                         Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                        }
+                    }
                     }
                 }
             }
@@ -279,6 +296,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            selectedPhotos = uris.toSet()
+            showAttachSheet = true
+        }
+    }
     var expandInput by remember { mutableStateOf(false) }
     var searchMode by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -549,7 +574,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val combinedText = urls.joinToString(",")
                         val newMsg = MsgItem(myUsername, chatUsername, "", now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
-                        ws?.send("message", combinedText, chatUsername)
+                        ws.send("message", combinedText, chatUsername)
                         withContext(Dispatchers.Main) {
                             selectedPhotos = emptySet()
                             showAttachSheet = false
@@ -1025,7 +1050,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
                 // Attach options
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                    AttachOption(Icons.Filled.Image, "Галерея", true)
+                    AttachOption(Icons.Filled.Image, "Галерея", true) {
+    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+}
                     AttachOption(Icons.Filled.PhotoCamera, "Камера")
                     AttachOption(Icons.Filled.Description, "Файл")
                     AttachOption(Icons.Filled.LocationOn, "Локация")
