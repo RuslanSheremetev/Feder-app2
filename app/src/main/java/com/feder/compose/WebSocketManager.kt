@@ -108,20 +108,14 @@ class WebSocketManager(
             "caption" to caption
         ))
         webSocket?.send(json)
-        android.util.Log.d("WS", "Photo sent via WS: $json")
+        android.util.Log.d("WS", "PHOTO_SENT: $json (socket=${webSocket != null})")
         onSendCallback?.invoke(toUser, combinedText)
     }
     
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         webSocket?.send(json)
-        val logJson = gson.toJson(mapOf("log" to "WS_SEND: type=$type text=$text to=$toUser socket=${webSocket != null}"))
-        val logBody = logJson.toRequestBody("application/json".toMediaType())
-        val httpClient = OkHttpClient()
-        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: java.io.IOException) {}
-            override fun onResponse(call: Call, response: Response) { response.close() }
-        })
+        android.util.Log.d("WS", "SENT: $json (socket=${webSocket != null})")
         if (type == "message") {
             onSendCallback?.invoke(toUser, text)
         }
