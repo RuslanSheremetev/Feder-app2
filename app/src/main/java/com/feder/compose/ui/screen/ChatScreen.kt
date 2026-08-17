@@ -204,7 +204,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                         if (msg.text.isNotEmpty()) {
                             Text(
                                 msg.text,
-                                color = if (isMine) OnPrimaryContainer else OnSecondaryContainer,
+                                color = if (isMine) OnPrimaryContainer else OnSurfaceVariant,
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
