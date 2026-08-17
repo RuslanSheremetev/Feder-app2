@@ -644,6 +644,20 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
+        // Отправляем через HTTP API (WebSocket не работает для отправки)
+        try {
+            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to text))
+            val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+            val sendRequest = Request.Builder()
+                .url("http://2.26.71.102:8002/api/chat/send")
+                .header("Authorization", "Bearer $internalToken")
+                .post(sendBody)
+                .build()
+            httpClient.newCall(sendRequest).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
         ws?.send("message", text, chatUsername)
     }
 
