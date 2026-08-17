@@ -144,7 +144,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(4.dp)) {
                 if (msg.imageUrls.isNotEmpty()) {
-                    android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}")
+                    android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}"); android.widget.Toast.makeText(LocalContext.current, "Photo: ${msg.imageUrls.first()}", android.widget.Toast.LENGTH_LONG).show()
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
