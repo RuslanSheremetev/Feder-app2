@@ -1218,21 +1218,19 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         // Кнопка прокрутки вниз
         // Полноэкранный просмотр
         if (fullScreenPhoto != null) {
-            androidx.compose.ui.window.Dialog(onDismissRequest = { fullScreenPhoto = null }) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
-                        .clickable { fullScreenPhoto = null },
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        model = fullScreenPhoto,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .clickable { fullScreenPhoto = null },
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = fullScreenPhoto,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
 
