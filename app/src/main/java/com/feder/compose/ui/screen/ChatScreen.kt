@@ -500,8 +500,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
                 messages = messages.map { msg ->
-                    if (msg.from == myUsername && msg.text == text && msg.status == "pending") msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal, imageUrls = msg.imageUrls ?: emptyList())
-                    else msg
+                    val isPhotoMsg = msg.imageUrls.isNotEmpty() && text.contains(".jpg")
+                    if (msg.from == myUsername && (msg.text == text || isPhotoMsg) && msg.status == "pending") {
+                        msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal, imageUrls = msg.imageUrls)
+                    } else msg
                 }
             } else {
                 val existing = messages.find { it.from == sender && it.text == text }
