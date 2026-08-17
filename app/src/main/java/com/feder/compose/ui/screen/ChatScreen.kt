@@ -315,7 +315,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
-    var fullScreenPhoto by remember { mutableStateOf<String?>(null) }
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
