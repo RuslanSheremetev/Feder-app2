@@ -37,6 +37,7 @@ class WebSocketManager(
             try {
                 webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
+                        android.util.Log.d("WS", "OPEN: ${response.code}")
                         onStatusCallback?.invoke("connected")
                     }
                     override fun onMessage(webSocket: WebSocket, text: String) {
@@ -61,6 +62,7 @@ class WebSocketManager(
                         } catch (e: Exception) { }
                     }
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        android.util.Log.e("WS", "FAIL: ${t.message}")
                         onStatusCallback?.invoke("error: ${t.message}")
                     }
                     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
