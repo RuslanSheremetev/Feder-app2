@@ -561,7 +561,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     dateInHeader.value = ""
                 }
             }
-            LaunchedEffect(messages.size) {
+            LaunchedEffect(chatUsername) {
         if (messages.isNotEmpty()) listState.scrollToItem(messages.size - 1)
     }
 
