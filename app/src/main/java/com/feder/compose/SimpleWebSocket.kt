@@ -164,10 +164,17 @@ class SimpleWebSocket(
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected json=$json")
         try {
             val payload = json.toByteArray()
-            val frame = ByteArray(payload.size + 2)
+            val mask = byteArrayOf(0x12, 0x34, 0x56, 0x78) // Постоянная маска
+            
+            val frame = ByteArray(payload.size + 6)
             frame[0] = 0x81.toByte() // FIN + text
-            frame[1] = payload.size.toByte()
-            System.arraycopy(payload, 0, frame, 2, payload.size)
+            frame[1] = (0x80 or payload.size).toByte() // Mask + length
+            System.arraycopy(mask, 0, frame, 2, 4) // Mask key
+            
+            // Маскируем данные
+            for (i in payload.indices) {
+                frame[6 + i] = (payload[i].toInt() xor mask[i % 4].toInt()).toByte()
+            }
             
             output?.write(frame)
             output?.flush()
