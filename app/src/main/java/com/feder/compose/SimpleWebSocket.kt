@@ -58,12 +58,15 @@ class SimpleWebSocket(
         logToServer("SW_SOCKET_CONNECT: username=$username")
         thread {
             try {
+                logToServer("SW_SOCKET_CREATE: connecting...")
                 socket = Socket(serverUrl, port)
+                logToServer("SW_SOCKET_CREATE: connected to $serverUrl:$port")
                 socket?.soTimeout = 0
                 socket?.tcpNoDelay = true
                 socket?.keepAlive = true
                 input = socket?.getInputStream()
                 output = socket?.getOutputStream()
+                logToServer("SW_SOCKET_CREATE: input=${input != null} output=${output != null}")
                 
                 // Генерируем ключ
                 val keyBytes = ByteArray(16)
@@ -81,8 +84,10 @@ class SimpleWebSocket(
                     append("\r\n")
                 }
                 
+                logToServer("SW_SOCKET_HANDSHAKE_SEND: ${handshake.length} bytes")
                 output?.write(handshake.toByteArray())
                 output?.flush()
+                logToServer("SW_SOCKET_HANDSHAKE_SENT")
                 
                 // Читаем ответ
                 val response = StringBuilder()
@@ -159,6 +164,7 @@ class SimpleWebSocket(
                 }
             } catch (e: Exception) {
                 isConnected = false
+                logToServer("SW_SOCKET_CONNECT_ERROR: ${e.message} cause=${e.cause}")
                 onStatusCallback?.invoke("error: ${e.message}")
             }
         }
@@ -190,7 +196,7 @@ class SimpleWebSocket(
             output?.flush()
             logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes written")
         } catch (e: Exception) {
-            logToServer("SW_SOCKET_SEND_ERROR: ${e.message}")
+            logToServer("SW_SOCKET_SEND_ERROR: msg=${e.message} cause=${e.cause} socket=${socket?.isConnected} closed=${socket?.isClosed}")
             onStatusCallback?.invoke("error: ${e.message}")
         }
     }
