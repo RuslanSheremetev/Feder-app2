@@ -111,6 +111,12 @@ class SimpleWebSocket(
     }
     
     fun send(json: String) {
+        thread {
+            sendInternal(json)
+        }
+    }
+    
+    private fun sendInternal(json: String) {
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected output=${output != null}")
         try {
             val out = output
