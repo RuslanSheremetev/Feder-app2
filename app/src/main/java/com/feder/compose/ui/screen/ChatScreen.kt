@@ -320,6 +320,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (uris.isNotEmpty()) {
             selectedPhotos = uris.toSet()
             showAttachSheet = true
+            try {
+                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: ${uris.size} photos"))
+                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                })
+            } catch (_: Exception) {}
         }
     }
     var expandInput by remember { mutableStateOf(false) }
@@ -600,6 +608,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val url = respJson.get("url")?.asString
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
+                                val logJson = gson.toJson(mapOf("log" to "PHOTO_UPLOADED: $url"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
+                            try {
                                 val logJson = gson.toJson(mapOf("log" to "PhotoSend: url=$url"))
                                 val logBody = logJson.toRequestBody("application/json".toMediaType())
                                 httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
@@ -624,6 +640,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         messages = messages + newMsg
                         val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else urls.joinToString(",")
                         // Отправляем через HTTP API
+                        try {
+                            val logJson = gson.toJson(mapOf("log" to "PHOTO_SEND_HTTP: to=$chatUsername text=$photoText"))
+                            val logBody = logJson.toRequestBody("application/json".toMediaType())
+                            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                            })
+                        } catch (_: Exception) {}
                         try {
                             val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to photoText))
                             val sendBody = sendJson.toRequestBody("application/json".toMediaType())
