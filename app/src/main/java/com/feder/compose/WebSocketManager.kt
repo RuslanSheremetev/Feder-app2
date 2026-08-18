@@ -30,7 +30,23 @@ class WebSocketManager(
     private var onTypingCallback: ((String) -> Unit)? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     
+    private fun logToServer(message: String) {
+        try {
+            val logJson = gson.toJson(mapOf("log" to message))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            val logRequest = Request.Builder()
+                .url("http://$serverUrl:$port/api/logs")
+                .post(logBody)
+                .build()
+            client.newCall(logRequest).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: java.io.IOException) {}
+                override fun onResponse(call: Call, response: Response) { response.close() }
+            })
+        } catch (_: Exception) {}
+    }
+    
     fun connect(username: String, token: String) {
+        logToServer("WS_CONNECT: username=$username token=${token.take(20)}...")
         if (webSocket != null) {
             webSocket?.close(1000, "reconnect")
             webSocket = null
@@ -42,6 +58,7 @@ class WebSocketManager(
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         this@WebSocketManager.webSocket = webSocket
                         isConnected = true
+                        logToServer("WS_OPEN: code=${response.code}")
                         android.util.Log.d("WS", "OPEN: ${response.code}")
                         val logJson = gson.toJson(mapOf("log" to "WS_OPEN: code=${response.code}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
@@ -74,6 +91,7 @@ class WebSocketManager(
                         } catch (e: Exception) { }
                     }
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        logToServer("WS_FAIL: ${t.message} response=${response?.code}")
                         android.util.Log.e("WS", "FAIL: ${t.message}")
                         val logJson = gson.toJson(mapOf("log" to "WS_FAIL: ${t.message}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
@@ -98,6 +116,7 @@ class WebSocketManager(
         send("typing", "", toUser)
     }
     fun sendPhoto(imageUrls: List<String>, toUser: String, caption: String = "") {
+        logToServer("WS_SEND_PHOTO: images=${imageUrls.size} to=$toUser caption=$caption isConnected=$isConnected socket=${webSocket != null}")
         val combinedText = if (caption.isNotEmpty()) {
             caption + "\n" + imageUrls.joinToString(",")
         } else {
@@ -130,6 +149,7 @@ class WebSocketManager(
     
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
+        logToServer("WS_SEND: isConnected=$isConnected socket=${webSocket != null} json=$json")
         if (isConnected && webSocket != null) {
             webSocket?.send(json)
             android.util.Log.d("WS", "SENT: $json")
