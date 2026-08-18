@@ -612,9 +612,18 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
                         val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else urls.joinToString(",")
-                        android.util.Log.d("WS", "ChatScreen: sending photoText='$photoText' to='$chatUsername' urls=$urls")
+                        // Отправляем через HTTP API
+                        try {
+                            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to photoText))
+                            val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+                            val sendRequest = Request.Builder()
+                                .url("http://2.26.71.102:8002/api/chat/send")
+                                .header("Authorization", "Bearer $internalToken")
+                                .post(sendBody)
+                                .build()
+                            httpClient.newCall(sendRequest).execute()
+                        } catch (_: Exception) {}
                         withContext(Dispatchers.Main) {
-                            ws.send("message", photoText, chatUsername)
                             inputText = ""
                         }
                         try {
