@@ -408,7 +408,7 @@ fun FederApp() {
                     lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
-                    wsManager = viewModel.wsManager,
+                    wsManager = wsManager,
                     repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
