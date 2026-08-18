@@ -436,7 +436,7 @@ fun FederApp() {
                     lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
-                    wsManager = null, // wsManager not visible here
+                    wsManager = viewModel.wsManager, // wsManager not visible here
                     // ChatScreen will create own WebSocketManager
                     repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
