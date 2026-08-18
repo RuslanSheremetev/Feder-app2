@@ -86,7 +86,7 @@ class SimpleWebSocket(
                 
                 logToServer("SW_SOCKET_HANDSHAKE_SEND: ${handshake.length} bytes")
                 output?.write(handshake.toByteArray())
-                out.flush()
+                output?.flush()
                 logToServer("SW_SOCKET_HANDSHAKE_SENT")
                 
                 // Читаем ответ
