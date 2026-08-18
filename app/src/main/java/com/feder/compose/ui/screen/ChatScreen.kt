@@ -612,7 +612,10 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                     override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                                 })
                             } catch (_: Exception) {}
-                            if (url != null) urls.add(url)
+                            if (url != null) {
+                                urls.add(url)
+                                android.util.Log.d("PhotoSend", "Added URL: $url, total: ${urls.size}")
+                            }
                         }
                     }
                     if (urls.isNotEmpty()) {
