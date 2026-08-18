@@ -148,7 +148,7 @@ class WebSocketManager(
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
         logToServer("WS_SEND: isConnected=$isConnected socket=${webSocket != null} json=$json")
-        if (isConnected && webSocket != null) {
+        if (webSocket != null) {
             webSocket?.send(json)
             android.util.Log.d("WS", "SENT: $json")
             if (type == "message") {

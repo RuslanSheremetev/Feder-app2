@@ -144,7 +144,14 @@ class ChatViewModel : ViewModel() {
     var wsStatus by mutableStateOf("")
 
     private fun connectWebSocket() {
-        android.util.Log.d("WS_MAIN", "connectWebSocket called, token=${token.take(20)}")
+        try {
+            val logJson = gson.toJson(mapOf("log" to "WS_MAIN: connectWebSocket called, token=${token.take(20)}"))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            client.newCall(Request.Builder().url("$server/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
         wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
         ws.onStatus { status ->
@@ -217,7 +224,14 @@ class ChatViewModel : ViewModel() {
                 }
             }
         }
-        android.util.Log.d("WS_MAIN", "ws.connect called, ws=$ws, token=${token.take(20)}")
+        try {
+            val logJson = gson.toJson(mapOf("log" to "WS_MAIN: ws.connect called, token=${token.take(20)}"))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            client.newCall(Request.Builder().url("$server/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
         ws.connect("demo", token)
     }
     fun loginAndLoad() {
