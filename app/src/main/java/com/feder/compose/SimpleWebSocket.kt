@@ -164,6 +164,12 @@ class SimpleWebSocket(
     fun send(json: String) {
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected json=$json")
         try {
+            if (output == null) {
+                logToServer("SW_SOCKET_SEND_ERROR: output is NULL!")
+                onStatusCallback?.invoke("error: output is null")
+                return
+            }
+            
             val payload = json.toByteArray()
             val mask = byteArrayOf(0x12, 0x34, 0x56, 0x78) // Постоянная маска
             
@@ -179,7 +185,9 @@ class SimpleWebSocket(
             
             output?.write(frame)
             output?.flush()
+            logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes written")
         } catch (e: Exception) {
+            logToServer("SW_SOCKET_SEND_ERROR: ${e.message}")
             onStatusCallback?.invoke("error: ${e.message}")
         }
     }
