@@ -574,7 +574,16 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 try {
                     val urls = mutableListOf<String>()
                     for (photo in selectedPhotos) {
-                        val bytes = context.contentResolver.openInputStream(photo)?.readBytes()
+                        val originalBytes = context.contentResolver.openInputStream(photo)?.readBytes()
+                        val bytes = try {
+                            val bitmap = android.graphics.BitmapFactory.decodeByteArray(originalBytes, 0, originalBytes?.size ?: 0)
+                            if (bitmap != null) {
+                                val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, 800, 800, true)
+                                val output = java.io.ByteArrayOutputStream()
+                                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 70, output)
+                                output.toByteArray()
+                            } else originalBytes
+                        } catch (_: Exception) { originalBytes }
                         if (bytes != null) {
                             val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
                             val json = gson.toJson(mapOf("data" to base64))
