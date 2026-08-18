@@ -662,7 +662,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         // Отправляем через HTTP API (WebSocket не работает для отправки)
         android.util.Log.d("WS", "ChatScreen: sending text='$text' to='$chatUsername'")
         android.util.Log.d("WS", "Send text: ws=${ws != null} text=$text")
-        ws?.send("message", text, chatUsername)
+        ws?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to_user" to chatUsername)))
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {

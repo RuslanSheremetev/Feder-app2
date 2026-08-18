@@ -16,6 +16,20 @@ class SimpleWebSocket(
     var isConnected = false
     var onMessageCallback: ((String) -> Unit)? = null
     var onStatusCallback: ((String) -> Unit)? = null
+    var onReceivedCallback: ((String) -> Unit)? = null
+    var onReadCallback: ((String) -> Unit)? = null
+    var onSendCallback: ((String, String) -> Unit)? = null
+    
+    fun onMessage(callback: (String, String, Long, Int) -> Unit) {
+        onMessageCallback = { json ->
+            // Простая обработка
+            callback("unknown", json, System.currentTimeMillis() / 1000, 0)
+        }
+    }
+    fun onStatus(callback: (String) -> Unit) { onStatusCallback = callback }
+    fun onReceived(callback: (String) -> Unit) { onReceivedCallback = callback }
+    fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
+    fun onSend(callback: (String, String) -> Unit) { onSendCallback = callback }
     
     fun connect(username: String, token: String) {
         thread {
