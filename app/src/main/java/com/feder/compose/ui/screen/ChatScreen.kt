@@ -1230,7 +1230,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     Box(modifier = Modifier.weight(1f).then(if (expandInput) Modifier.fillMaxHeight() else Modifier)) {
                         BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
                             textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(vertical = 10.dp).padding(end = 32.dp).heightIn(max = if (expandInput) 1000.dp else 120.dp),
+                            modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(vertical = 6.dp).padding(end = 32.dp).heightIn(max = if (expandInput) 1000.dp else 80.dp),
                             decorationBox = { innerTextField ->
                                 if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
                                 innerTextField()
