@@ -576,12 +576,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     for (photo in selectedPhotos) {
                         val originalBytes = context.contentResolver.openInputStream(photo)?.readBytes()
                         val bytes = try {
-                            val bitmap = android.graphics.BitmapFactory.decodeByteArray(originalBytes, 0, originalBytes?.size ?: 0)
-                            if (bitmap != null) {
-                                val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, 800, 800, true)
-                                val output = java.io.ByteArrayOutputStream()
-                                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 70, output)
-                                output.toByteArray()
+                            if (originalBytes != null && originalBytes.size > 10000) {
+                                val bitmap = android.graphics.BitmapFactory.decodeByteArray(originalBytes, 0, originalBytes.size)
+                                if (bitmap != null) {
+                                    val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, 800, 800, true)
+                                    val output = java.io.ByteArrayOutputStream()
+                                    scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 70, output)
+                                    output.toByteArray()
+                                } else originalBytes
                             } else originalBytes
                         } catch (_: Exception) { originalBytes }
                         if (bytes != null) {
