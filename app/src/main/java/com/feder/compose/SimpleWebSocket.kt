@@ -45,7 +45,16 @@ class SimpleWebSocket(
     
     fun onMessage(callback: (String, String, Long, Int) -> Unit) {
         onMessageCallback = { json ->
-            callback("unknown", json, System.currentTimeMillis() / 1000, 0)
+            try {
+                val obj = gson.fromJson(json, Map::class.java)
+                val sender = obj["from_user"] as? String ?: "unknown"
+                val msgText = obj["text"] as? String ?: ""
+                val timeVal = (obj["time"] as? Double)?.toLong() ?: System.currentTimeMillis() / 1000
+                val msgId = (obj["id"] as? Double)?.toInt() ?: 0
+                callback(sender, msgText, timeVal, msgId)
+            } catch (e: Exception) {
+                callback("unknown", json, System.currentTimeMillis() / 1000, 0)
+            }
         }
     }
     fun onStatus(callback: (String) -> Unit) { onStatusCallback = callback }
