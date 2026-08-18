@@ -59,6 +59,9 @@ class SimpleWebSocket(
         thread {
             try {
                 socket = Socket(serverUrl, port)
+                socket?.soTimeout = 0
+                socket?.tcpNoDelay = true
+                socket?.keepAlive = true
                 input = socket?.getInputStream()
                 output = socket?.getOutputStream()
                 
