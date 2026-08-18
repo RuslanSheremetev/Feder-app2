@@ -220,7 +220,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.widthIn(max = 250.dp).clip(RoundedCornerShape(16.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(16.dp)),
+                            modifier = Modifier.widthIn(max = 250.dp).aspectRatio(1f).clip(RoundedCornerShape(16.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty()) {
