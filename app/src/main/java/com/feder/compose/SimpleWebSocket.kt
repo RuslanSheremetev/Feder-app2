@@ -110,6 +110,28 @@ class SimpleWebSocket(
                     isConnected = true
                     logToServer("SW_SOCKET_OPEN")
                     onStatusCallback?.invoke("connected")
+                    
+                    // Читаем сообщения от сервера
+                    while (isConnected) {
+                        val firstByte = input?.read() ?: break
+                        val secondByte = input?.read() ?: break
+                        
+                        val msgLen = secondByte and 0x7F
+                        
+                        val msgBytes = ByteArray(msgLen)
+                        var bytesRead = 0
+                        while (bytesRead < msgLen) {
+                            val read = input?.read(msgBytes, bytesRead, msgLen - bytesRead) ?: break
+                            if (read == -1) break
+                            bytesRead += read
+                        }
+                        
+                        if (bytesRead > 0) {
+                            val message = String(msgBytes, 0, bytesRead)
+                            logToServer("SW_SOCKET_RECV: $message")
+                            onMessageCallback?.invoke(message)
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 isConnected = false
