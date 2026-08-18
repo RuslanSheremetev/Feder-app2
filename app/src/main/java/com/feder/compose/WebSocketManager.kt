@@ -14,6 +14,7 @@ class WebSocketManager(
     private val port: Int = 8002
 ) {
     private var webSocket: WebSocket? = null
+    private var isConnected = false
     private val gson = Gson()
     private val client = OkHttpClient.Builder()
         .pingInterval(30, TimeUnit.SECONDS)
@@ -40,6 +41,7 @@ class WebSocketManager(
                 webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         this@WebSocketManager.webSocket = webSocket
+                        isConnected = true
                         android.util.Log.d("WS", "OPEN: ${response.code}")
                         val logJson = gson.toJson(mapOf("log" to "WS_OPEN: code=${response.code}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
@@ -128,7 +130,7 @@ class WebSocketManager(
     
     fun send(type: String, text: String, toUser: String) {
         val json = gson.toJson(mapOf("type" to type, "text" to text, "to_user" to toUser))
-        if (webSocket != null) {
+        if (isConnected && webSocket != null) {
             webSocket?.send(json)
             android.util.Log.d("WS", "SENT: $json")
             if (type == "message") {
