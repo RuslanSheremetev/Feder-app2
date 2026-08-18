@@ -304,7 +304,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val listState = rememberLazyListState()
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
-    val ws = wsManager ?: remember { WebSocketManager() }
+    val ws = wsManager ?: remember {
+        WebSocketManager().also { it.connect("demo", token) }
+    }
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var showEmojiSheet by remember { mutableStateOf(false) }
