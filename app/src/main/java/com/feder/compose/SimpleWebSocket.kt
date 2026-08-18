@@ -170,16 +170,10 @@ class SimpleWebSocket(
         }
     }
     
-    @Synchronized
     fun send(json: String) {
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected output=${output != null} socket=${socket?.isConnected}")
         try {
-            val out = output
-            if (out == null) {
-                logToServer("SW_SOCKET_SEND_ERROR: output is NULL!")
-                onStatusCallback?.invoke("error: output is null")
-                return
-            }
+
             
             val payload = json.toByteArray()
             val mask = ByteArray(4)
@@ -195,8 +189,8 @@ class SimpleWebSocket(
                 frame[6 + i] = (payload[i].toInt() xor mask[i % 4].toInt()).toByte()
             }
             
-            out.write(frame)
-            out.flush()
+            output?.write(frame)
+            output?.flush()
             logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes written")
         } catch (e: Exception) {
             logToServer("SW_SOCKET_SEND_ERROR: msg=${e.message} cause=${e.cause} socket=${socket?.isConnected} closed=${socket?.isClosed}")
