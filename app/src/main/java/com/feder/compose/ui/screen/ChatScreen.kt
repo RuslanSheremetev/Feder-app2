@@ -1,6 +1,5 @@
 package com.feder.compose.ui.screen
 
-import android.widget.Toast
 import com.feder.compose.ChatItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -358,7 +357,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
             clickedMsgOffset = selectedMessageOffset
-            Toast.makeText(context, "OFFSET: x=${selectedMessageOffset.x.toInt()} y=${selectedMessageOffset.y.toInt()}", Toast.LENGTH_SHORT).show()
+            android.util.Log.d("ChatScreen", "OFFSET: x=${selectedMessageOffset.x.toInt()} y=${selectedMessageOffset.y.toInt()}")
         }
     }
 
@@ -412,12 +411,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
     LaunchedEffect(chatUsername) {
-        withContext(Dispatchers.Main) { Toast.makeText(context, "Chat opened: $chatUsername", Toast.LENGTH_SHORT).show() }
+        android.util.Log.d("ChatScreen", "Chat opened: $chatUsername")
         withContext(Dispatchers.IO) {
             // 1. Загружаем из Room (мгновенно, работает оффлайн)
             repository?.let { repo ->
                 val cachedMessages = repo.getMessages(myUsername, chatUsername)
-                withContext(Dispatchers.Main) { Toast.makeText(context, "Room: ${cachedMessages.size} messages for $chatUsername", Toast.LENGTH_SHORT).show() }
+                android.util.Log.d("ChatScreen", "Room: ${cachedMessages.size} messages for $chatUsername")
                 if (cachedMessages.isNotEmpty()) {
                     messages = cachedMessages.map { entity ->
                         MsgItem(
@@ -445,7 +444,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8002/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $internalToken").build()).execute(); withContext(Dispatchers.Main) { Toast.makeText(context, "Token: ${internalToken.take(20)}... Body: ${msgResp.body?.contentLength()}", Toast.LENGTH_SHORT).show() }
+                    .header("Authorization", "Bearer $internalToken").build()).execute(); android.util.Log.d("ChatScreen", "Token: ${internalToken.take(20)}...")
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
@@ -567,7 +566,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
-            android.widget.Toast.makeText(context, "Send: ${selectedPhotos.size} photos, token=${internalToken.take(10)}..., ws=${if (ws != null) "OK" else "NULL"}", android.widget.Toast.LENGTH_LONG).show()
+            android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos, ws=${if (ws != null) "OK" else "NULL"}")
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val urls = mutableListOf<String>()
@@ -948,7 +947,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                     Icon(Icons.Filled.Edit, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
                                 }
                             }
-                            Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show(); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); android.util.Log.d("ChatScreen", "Copied"); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.ContentCopy, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
                             }
                             Row(Modifier.fillMaxWidth().clickable { showForward = true }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1071,7 +1070,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         Box(modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).clickable {
                             val uri = photos[i]
                             selectedPhotos = if (uri in selectedPhotos) selectedPhotos - uri else selectedPhotos + uri
-                            android.widget.Toast.makeText(context, "Selected: ${selectedPhotos.size} photos", android.widget.Toast.LENGTH_SHORT).show()
+                            android.util.Log.d("ChatScreen", "Selected: ${selectedPhotos.size} photos")
                         }) {
                             AsyncImage(
                                 model = photos[i],
@@ -1250,7 +1249,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { android.widget.Toast.makeText(context, "CLICKED send", android.widget.Toast.LENGTH_SHORT).show(); sendMessage() }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
