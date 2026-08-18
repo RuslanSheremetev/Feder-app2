@@ -611,6 +611,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         messages = messages + newMsg
                         val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else urls.joinToString(",")
+                        android.util.Log.d("WS", "ChatScreen: sending photoText='$photoText' to='$chatUsername' urls=$urls")
                         withContext(Dispatchers.Main) {
                             ws.send("message", photoText, chatUsername)
                             inputText = ""
@@ -649,6 +650,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         messages = messages + newMsg
         inputText = ""
         // Отправляем через HTTP API (WebSocket не работает для отправки)
+        android.util.Log.d("WS", "ChatScreen: sending text='$text' to='$chatUsername'")
         ws?.send("message", text, chatUsername)
     }
 
