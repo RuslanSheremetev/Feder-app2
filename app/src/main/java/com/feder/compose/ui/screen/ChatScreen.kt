@@ -626,7 +626,9 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             urls.joinToString(",")
                         }
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
-                        messages = messages + newMsg
+                        withContext(Dispatchers.Main) {
+                            messages = messages + newMsg
+                        }
                         val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else urls.joinToString(",")
                         // Отправляем через HTTP API
                         try {
