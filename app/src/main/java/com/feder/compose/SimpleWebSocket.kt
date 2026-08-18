@@ -171,27 +171,44 @@ class SimpleWebSocket(
     }
     
     fun send(json: String) {
-        logToServer("SW_SOCKET_SEND: isConnected=$isConnected output=${output != null} socket=${socket?.isConnected}")
+        logToServer("SW_SOCKET_SEND: isConnected=$isConnected output=${output != null}")
         try {
-
-            
             val payload = json.toByteArray()
             val mask = ByteArray(4)
             java.util.Random().nextBytes(mask)
             
-            val frame = ByteArray(payload.size + 6)
-            frame[0] = 0x81.toByte() // FIN + text
-            frame[1] = (0x80 or payload.size).toByte() // Mask + length
-            System.arraycopy(mask, 0, frame, 2, 4) // Mask key
+            val headerSize: Int
+            val frame: ByteArray
+            if (payload.size < 126) {
+                headerSize = 2
+                frame = ByteArray(payload.size + headerSize + 4)
+                frame[0] = 0x81.toByte()
+                frame[1] = (0x80 or payload.size).toByte()
+            } else if (payload.size < 65536) {
+                headerSize = 4
+                frame = ByteArray(payload.size + headerSize + 4)
+                frame[0] = 0x81.toByte()
+                frame[1] = (0x80 or 126).toByte()
+                frame[2] = ((payload.size shr 8) and 0xFF).toByte()
+                frame[3] = (payload.size and 0xFF).toByte()
+            } else {
+                headerSize = 10
+                frame = ByteArray(payload.size + headerSize + 4)
+                frame[0] = 0x81.toByte()
+                frame[1] = (0x80 or 127).toByte()
+                for (i in 0 until 8) {
+                    frame[2 + i] = ((payload.size shr (56 - i * 8)) and 0xFF).toByte()
+                }
+            }
             
-            // Маскируем данные
+            System.arraycopy(mask, 0, frame, headerSize, 4)
             for (i in payload.indices) {
-                frame[6 + i] = (payload[i].toInt() xor mask[i % 4].toInt()).toByte()
+                frame[headerSize + 4 + i] = (payload[i].toInt() xor mask[i % 4].toInt()).toByte()
             }
             
             output?.write(frame)
             output?.flush()
-            logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes written")
+            logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes")
         } catch (e: Exception) {
             logToServer("SW_SOCKET_SEND_ERROR: msg=${e.message} cause=${e.cause} socket=${socket?.isConnected} closed=${socket?.isClosed}")
             onStatusCallback?.invoke("error: ${e.message}")
