@@ -166,9 +166,10 @@ class ChatViewModel : ViewModel() {
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
             })
         } catch (_: Exception) {}
-        if (wsManager == null) {
-            wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
+        if (wsManager != null) {
+            wsManager?.disconnect()
         }
+        wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
         ws.onStatus { status ->
             wsStatus = status
