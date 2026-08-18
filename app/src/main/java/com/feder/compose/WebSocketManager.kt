@@ -52,9 +52,8 @@ class WebSocketManager(
             webSocket = null
         }
         val url = "ws://$serverUrl:$port/ws/$username?token=$token"
-        mainHandler.post {
-            try {
-                webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+        try {
+            webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         this@WebSocketManager.webSocket = webSocket
                         isConnected = true
@@ -106,9 +105,8 @@ class WebSocketManager(
                         webSocket.close(1000, null)
                     }
                 })
-            } catch (e: Exception) {
-                onStatusCallback?.invoke("error: ${e.message}")
-            }
+        } catch (e: Exception) {
+            onStatusCallback?.invoke("error: ${e.message}")
         }
     }
     
