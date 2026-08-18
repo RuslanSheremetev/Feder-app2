@@ -134,6 +134,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     var token by mutableStateOf("")
+    var wsManager: WebSocketManager? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
     var isRefreshing by mutableStateOf(false)
