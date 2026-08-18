@@ -1,6 +1,10 @@
 package com.feder.compose
 
 import java.io.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import com.google.gson.Gson
 import java.net.Socket
 import java.security.MessageDigest
 import java.util.Base64
@@ -16,6 +20,21 @@ class SimpleWebSocket(
     var isConnected = false
     var onMessageCallback: ((String) -> Unit)? = null
     var onStatusCallback: ((String) -> Unit)? = null
+    
+    private fun logToServer(message: String) {
+        try {
+            val logJson = gson.toJson(mapOf("log" to message))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            val logRequest = Request.Builder()
+                .url("http://$serverUrl:$port/api/logs")
+                .post(logBody)
+                .build()
+            client.newCall(logRequest).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
+    }
     var onReceivedCallback: ((String) -> Unit)? = null
     var onReadCallback: ((String) -> Unit)? = null
     var onSendCallback: ((String, String) -> Unit)? = null
@@ -31,7 +50,11 @@ class SimpleWebSocket(
     fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
     fun onSend(callback: (String, String) -> Unit) { onSendCallback = callback }
     
+    private val gson = Gson()
+    private val client = OkHttpClient()
+    
     fun connect(username: String, token: String) {
+        logToServer("SW_SOCKET_CONNECT: username=$username")
         thread {
             try {
                 socket = Socket(serverUrl, port)
@@ -69,8 +92,10 @@ class SimpleWebSocket(
                     if (response.contains("\r\n\r\n")) break
                 }
                 
+                logToServer("SW_SOCKET_HANDSHAKE: response=${response.take(50)}")
                 if (response.contains("101")) {
                     isConnected = true
+                    logToServer("SW_SOCKET_OPEN")
                     onStatusCallback?.invoke("connected")
                     
                     // Читаем сообщения
@@ -136,6 +161,7 @@ class SimpleWebSocket(
     }
     
     fun send(json: String) {
+        logToServer("SW_SOCKET_SEND: isConnected=$isConnected json=$json")
         try {
             val payload = json.toByteArray()
             val frame = ByteArray(payload.size + 2)
