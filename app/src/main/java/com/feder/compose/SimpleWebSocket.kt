@@ -120,8 +120,9 @@ class SimpleWebSocket(
             }
             
             val payload = json.toByteArray()
-            val mask = ByteArray(4)
-            java.util.Random().nextBytes(mask)
+            val mask = ByteArray(4) { 
+                (java.util.Random().nextInt(256) - 128).toByte() 
+            }
             
             val headerSize: Int
             val frame: ByteArray
