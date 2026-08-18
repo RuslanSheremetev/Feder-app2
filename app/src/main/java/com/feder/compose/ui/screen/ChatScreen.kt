@@ -69,7 +69,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.feder.compose.WebSocketManager
+import com.feder.compose.SimpleWebSocket
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -293,7 +293,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: WebSocketManager? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: SimpleWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -305,7 +305,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val ws = wsManager ?: remember(token) {
-        WebSocketManager().also { it.connect("demo", token) }
+        SimpleWebSocket().also { it.connect("demo", token) }
     }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
@@ -650,7 +650,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         if (text.isEmpty()) return
         if (editMessage != null) {
             // Отправляем edit
-            ws?.send("edit", text, chatUsername)
+            ws?.send(gson.toJson(mapOf("type" to "edit", "text" to text, "to_user" to chatUsername)))
             editMessage = null
             inputText = ""
             return

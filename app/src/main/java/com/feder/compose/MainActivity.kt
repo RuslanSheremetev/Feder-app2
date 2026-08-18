@@ -134,7 +134,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     var token by mutableStateOf("")
-    var wsManager: WebSocketManager? = null
+    var wsManager: SimpleWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
     var isRefreshing by mutableStateOf(false)
@@ -167,7 +167,7 @@ class ChatViewModel : ViewModel() {
             })
         } catch (_: Exception) {}
         if (wsManager == null) {
-            wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
+            wsManager = SimpleWebSocket(serverUrl = "2.26.71.102", port = 8002)
         }
         val ws = wsManager!!
         ws.onStatus { status ->
