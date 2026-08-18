@@ -170,6 +170,7 @@ class SimpleWebSocket(
         }
     }
     
+    @Synchronized
     fun send(json: String) {
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected json=$json")
         try {
