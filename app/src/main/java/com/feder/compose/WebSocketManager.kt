@@ -20,6 +20,13 @@ class WebSocketManager(
         .pingInterval(30, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val original = chain.request()
+            val newRequest = original.newBuilder()
+                .header("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits")
+                .build()
+            chain.proceed(newRequest)
+        }
         .build()
     
     private var onMessageCallback: ((String, String, Long, Int) -> Unit)? = null
