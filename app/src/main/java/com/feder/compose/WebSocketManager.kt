@@ -61,7 +61,6 @@ class WebSocketManager(
         val url = "ws://$serverUrl:$port/ws/$username?token=$token"
         val request = Request.Builder()
             .url(url)
-            .header("Sec-WebSocket-Extensions", "")
             .build()
         try {
             webSocket = client.newWebSocket(request, object : WebSocketListener() {
