@@ -1,14 +1,14 @@
 package com.feder.compose
 
 import java.io.*
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import com.google.gson.Gson
 import java.net.Socket
 import java.security.MessageDigest
 import java.util.Base64
 import kotlin.concurrent.thread
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import com.google.gson.Gson
 
 class SimpleWebSocket(
     private val serverUrl: String = "2.26.71.102",
@@ -21,6 +21,12 @@ class SimpleWebSocket(
     var isConnected = false
     var onMessageCallback: ((String) -> Unit)? = null
     var onStatusCallback: ((String) -> Unit)? = null
+    var onReceivedCallback: ((String) -> Unit)? = null
+    var onReadCallback: ((String) -> Unit)? = null
+    var onSendCallback: ((String, String) -> Unit)? = null
+    
+    private val gson = Gson()
+    private val client = OkHttpClient()
     
     private fun logToServer(message: String) {
         try {
@@ -30,19 +36,15 @@ class SimpleWebSocket(
                 .url("http://$serverUrl:$port/api/logs")
                 .post(logBody)
                 .build()
-            client.newCall(logRequest).enqueue(object : okhttp3.Callback {
-                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
-                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            client.newCall(logRequest).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: java.io.IOException) {}
+                override fun onResponse(call: Call, response: Response) { response.close() }
             })
         } catch (_: Exception) {}
     }
-    var onReceivedCallback: ((String) -> Unit)? = null
-    var onReadCallback: ((String) -> Unit)? = null
-    var onSendCallback: ((String, String) -> Unit)? = null
     
     fun onMessage(callback: (String, String, Long, Int) -> Unit) {
         onMessageCallback = { json ->
-            // Простая обработка
             callback("unknown", json, System.currentTimeMillis() / 1000, 0)
         }
     }
@@ -51,16 +53,12 @@ class SimpleWebSocket(
     fun onRead(callback: (String) -> Unit) { onReadCallback = callback }
     fun onSend(callback: (String, String) -> Unit) { onSendCallback = callback }
     
-    private val gson = Gson()
-    private val client = OkHttpClient()
-    
     fun connect(username: String, token: String) {
-        logToServer("SW_SOCKET_CONNECT: username=$username")
+        logToServer("SW_SOCKET_CREATE: connecting...")
         thread {
             try {
-                logToServer("SW_SOCKET_CREATE: connecting...")
                 socket = Socket(serverUrl, port)
-                logToServer("SW_SOCKET_CREATE: connected to $serverUrl:$port")
+                logToServer("SW_SOCKET_CREATE: connected")
                 socket?.soTimeout = 0
                 socket?.tcpNoDelay = true
                 socket?.keepAlive = true
@@ -68,12 +66,10 @@ class SimpleWebSocket(
                 output = socket?.getOutputStream()
                 logToServer("SW_SOCKET_CREATE: input=${input != null} output=${output != null}")
                 
-                // Генерируем ключ
                 val keyBytes = ByteArray(16)
                 java.util.Random().nextBytes(keyBytes)
                 val key = Base64.getEncoder().encodeToString(keyBytes)
                 
-                // Handshake
                 val handshake = buildString {
                     append("GET /ws/$username?token=$token HTTP/1.1\r\n")
                     append("Host: $serverUrl:$port\r\n")
@@ -89,7 +85,6 @@ class SimpleWebSocket(
                 output?.flush()
                 logToServer("SW_SOCKET_HANDSHAKE_SENT")
                 
-                // Читаем ответ
                 val response = StringBuilder()
                 val buffer = ByteArray(1024)
                 var totalRead = 0
@@ -106,65 +101,10 @@ class SimpleWebSocket(
                     isConnected = true
                     logToServer("SW_SOCKET_OPEN")
                     onStatusCallback?.invoke("connected")
-                    
-                    // Читаем сообщения
-                    while (isConnected) {
-                        val firstByte = input?.read() ?: break
-                        if (firstByte == -1) break
-                        
-                        val secondByte = input?.read() ?: break
-                        if (secondByte == -1) break
-                        
-                        var msgLen = secondByte and 0x7F
-                        var pos = 2
-                        
-                        if (msgLen == 126) {
-                            val b1 = input?.read() ?: break
-                            val b2 = input?.read() ?: break
-                            msgLen = (b1 shl 8) or b2
-                            pos = 4
-                        } else if (msgLen == 127) {
-                            msgLen = 0
-                            for (i in 0 until 8) {
-                                val b = input?.read() ?: break
-                                msgLen = (msgLen shl 8) or b
-                            }
-                            pos = 10
-                        }
-                        
-                        // Проверяем mask bit
-                        val masked = (secondByte and 0x80) != 0
-                        val mask = ByteArray(4)
-                        if (masked) {
-                            for (i in 0 until 4) {
-                                mask[i] = (input?.read() ?: break).toByte()
-                            }
-                            pos += 4
-                        }
-                        
-                        val msgBytes = ByteArray(msgLen)
-                        var bytesRead = 0
-                        while (bytesRead < msgLen) {
-                            val read = input?.read(msgBytes, bytesRead, msgLen - bytesRead) ?: break
-                            if (read == -1) break
-                            bytesRead += read
-                        }
-                        
-                        if (masked) {
-                            for (i in 0 until msgLen) {
-                                msgBytes[i] = (msgBytes[i].toInt() xor mask[i % 4].toInt()).toByte()
-                            }
-                        }
-                        
-                        val message = String(msgBytes)
-                        onMessageCallback?.invoke(message)
-                    }
-                } else {
-                    onStatusCallback?.invoke("error: handshake failed")
                 }
             } catch (e: Exception) {
                 isConnected = false
-                logToServer("SW_SOCKET_CONNECT_ERROR: ${e.message} cause=${e.cause}")
+                logToServer("SW_SOCKET_CONNECT_ERROR: msg=${e.message} cause=${e.cause}")
                 onStatusCallback?.invoke("error: ${e.message}")
             }
         }
@@ -173,6 +113,12 @@ class SimpleWebSocket(
     fun send(json: String) {
         logToServer("SW_SOCKET_SEND: isConnected=$isConnected output=${output != null}")
         try {
+            val out = output
+            if (out == null) {
+                logToServer("SW_SOCKET_SEND_ERROR: output is NULL")
+                return
+            }
+            
             val payload = json.toByteArray()
             val mask = ByteArray(4)
             java.util.Random().nextBytes(mask)
@@ -206,9 +152,10 @@ class SimpleWebSocket(
                 frame[headerSize + 4 + i] = (payload[i].toInt() xor mask[i % 4].toInt()).toByte()
             }
             
-            output?.write(frame)
-            output?.flush()
+            out.write(frame)
+            out.flush()
             logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes")
+            onSendCallback?.invoke("", "")
         } catch (e: Exception) {
             logToServer("SW_SOCKET_SEND_ERROR: msg=${e.message} cause=${e.cause} socket=${socket?.isConnected} closed=${socket?.isClosed}")
             onStatusCallback?.invoke("error: ${e.message}")
