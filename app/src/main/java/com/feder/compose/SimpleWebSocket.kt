@@ -16,6 +16,7 @@ class SimpleWebSocket(
 ) {
     private var socket: Socket? = null
     private var input: InputStream? = null
+    @Volatile
     private var output: OutputStream? = null
     var isConnected = false
     var onMessageCallback: ((String) -> Unit)? = null
