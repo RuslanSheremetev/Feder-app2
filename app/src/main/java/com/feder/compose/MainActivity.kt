@@ -144,6 +144,7 @@ class ChatViewModel : ViewModel() {
     var wsStatus by mutableStateOf("")
 
     private fun connectWebSocket() {
+        android.util.Log.d("WS_MAIN", "connectWebSocket called, token=${token.take(20)}")
         wsManager = WebSocketManager(serverUrl = "2.26.71.102", port = 8002)
         val ws = wsManager!!
         ws.onStatus { status ->
@@ -216,6 +217,7 @@ class ChatViewModel : ViewModel() {
                 }
             }
         }
+        android.util.Log.d("WS_MAIN", "ws.connect called, ws=$ws, token=${token.take(20)}")
         ws.connect("demo", token)
     }
     fun loginAndLoad() {
@@ -408,7 +410,8 @@ fun FederApp() {
                     lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
-                    wsManager = null,
+                    wsManager = null, // wsManager not visible here
+                    // ChatScreen will create own WebSocketManager
                     repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }

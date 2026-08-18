@@ -305,8 +305,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val ws = wsManager ?: remember {
+        android.util.Log.d("WS_CHAT", "Creating new WebSocketManager, token=${token.take(20)}")
         WebSocketManager().also { it.connect("demo", token) }
     }
+    android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
     var showAttachSheet by remember { mutableStateOf(false) }
     var showEmojiSheet by remember { mutableStateOf(false) }
