@@ -180,7 +180,8 @@ class SimpleWebSocket(
             }
             
             val payload = json.toByteArray()
-            val mask = byteArrayOf(0x12, 0x34, 0x56, 0x78) // Постоянная маска
+            val mask = ByteArray(4)
+            java.util.Random().nextBytes(mask)
             
             val frame = ByteArray(payload.size + 6)
             frame[0] = 0x81.toByte() // FIN + text
