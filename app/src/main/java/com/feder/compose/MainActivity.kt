@@ -154,7 +154,10 @@ class ChatViewModel : ViewModel() {
 
     var wsStatus by mutableStateOf("")
 
+    private var wsConnected = false
     private fun connectWebSocket() {
+        if (wsConnected) return
+        wsConnected = true
         try {
             val logJson = gson.toJson(mapOf("log" to "WS_MAIN: connectWebSocket called, token=${token.take(20)}"))
             val logBody = logJson.toRequestBody("application/json".toMediaType())
