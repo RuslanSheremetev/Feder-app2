@@ -52,8 +52,12 @@ class WebSocketManager(
             webSocket = null
         }
         val url = "ws://$serverUrl:$port/ws/$username?token=$token"
+        val request = Request.Builder()
+            .url(url)
+            .header("Sec-WebSocket-Extensions", "")
+            .build()
         try {
-            webSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+            webSocket = client.newWebSocket(request, object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         this@WebSocketManager.webSocket = webSocket
                         isConnected = true
