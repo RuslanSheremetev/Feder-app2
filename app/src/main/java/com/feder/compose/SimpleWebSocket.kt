@@ -158,7 +158,7 @@ class SimpleWebSocket(
             logToServer("SW_SOCKET_SEND_OK: ${frame.size} bytes")
             onSendCallback?.invoke("", "")
         } catch (e: Exception) {
-            logToServer("SW_SOCKET_SEND_ERROR: msg=${e.message} cause=${e.cause} socket=${socket?.isConnected} closed=${socket?.isClosed}")
+            logToServer("SW_SOCKET_SEND_ERROR: class=${e.javaClass.simpleName} msg=${e.message} cause=${e.cause} stack=${e.stackTrace.take(2).joinToString { it.methodName }}")
             onStatusCallback?.invoke("error: ${e.message}")
         }
     }
