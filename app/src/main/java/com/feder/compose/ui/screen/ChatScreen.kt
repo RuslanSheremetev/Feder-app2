@@ -709,6 +709,13 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("PhotoSend", "Error: ${e.message}", e)
+                    logToDb("PHOTO_SEND_ERROR: ${e.message}")
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        selectedPhotos = emptySet()
+                        showAttachSheet = false
+                        uploadingPhotos = false
+                    }
                 }
             }
             return
