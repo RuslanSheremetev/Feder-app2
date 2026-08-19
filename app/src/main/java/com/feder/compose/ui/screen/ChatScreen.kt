@@ -393,7 +393,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     fun formatHeaderDate(timeVal: Long): String {
         if (timeVal == 0L) return ""
-        val msgDate = java.util.Date(timeVal * 1000)
+        val msgDate = java.util.Date(timeVal)
         val today = java.util.Calendar.getInstance()
         val msgCal = java.util.Calendar.getInstance().apply { time = msgDate }
         val sdf = SimpleDateFormat("d MMMM", java.util.Locale("en"))
@@ -435,7 +435,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             from = entity.fromUser,
                             to = entity.toUser,
                             text = if (entity.text.contains(".jpg") || entity.text.contains(",")) "" else entity.text,
-                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
+                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal)),
                             status = if (entity.isRead) "read" else "sent",
                             timeVal = entity.timeVal,
                             id = entity.id.toInt(),
@@ -525,7 +525,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         ws.onMessage { sender, text, timeVal, msgId ->
-            val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
+            val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal)) else "now"
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
                 messages = messages.map { msg ->
