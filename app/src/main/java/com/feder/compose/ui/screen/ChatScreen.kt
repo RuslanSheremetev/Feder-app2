@@ -584,22 +584,10 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     for (photo in selectedPhotos) {
                         val bytes = context.contentResolver.openInputStream(photo)?.readBytes()
                         if (bytes != null) {
-                            // Multipart form-data
-                            val boundary = "boundary${System.currentTimeMillis()}"
-                            val mediaType = "multipart/form-data; boundary=$boundary".toMediaType()
-                            val bodyBuilder = StringBuilder()
-                            bodyBuilder.append("--$boundary\r\n")
-                            bodyBuilder.append("Content-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\n")
-                            bodyBuilder.append("Content-Type: image/jpeg\r\n\r\n")
-                            val headerBytes = bodyBuilder.toString().toByteArray()
-                            val footerBytes = "\r\n--$boundary--\r\n".toByteArray()
-                            
-                            val multipart = ByteArray(headerBytes.size + bytes.size + footerBytes.size)
-                            System.arraycopy(headerBytes, 0, multipart, 0, headerBytes.size)
-                            System.arraycopy(bytes, 0, multipart, headerBytes.size, bytes.size)
-                            System.arraycopy(footerBytes, 0, multipart, headerBytes.size + bytes.size, footerBytes.size)
-                            
-                            val body = multipart.toRequestBody(mediaType)
+                            val body = okhttp3.MultipartBody.Builder()
+                                .setType(okhttp3.MultipartBody.FORM)
+                                .addFormDataPart("file", "photo.jpg", bytes.toRequestBody("image/jpeg".toMediaType()))
+                                .build()
                             val request = Request.Builder()
                                 .url("http://2.26.71.102:8002/api/upload")
                                 .header("Authorization", "Bearer $internalToken")
