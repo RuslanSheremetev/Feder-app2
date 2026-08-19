@@ -321,6 +321,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            android.widget.Toast.makeText(context, "Нужно разрешение на фото", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
