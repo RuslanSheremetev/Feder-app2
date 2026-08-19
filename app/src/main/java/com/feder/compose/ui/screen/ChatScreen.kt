@@ -321,15 +321,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        } else {
-            android.widget.Toast.makeText(context, "Нужно разрешение на фото", android.widget.Toast.LENGTH_LONG).show()
-        }
-    }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -1256,18 +1247,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 // Attach options
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     AttachOption(Icons.Filled.Image, "Галерея", true) {
-    // Проверяем разрешение
-    val permission = if (android.os.Build.VERSION.SDK_INT >= 33) {
-        android.Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        android.Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-    
-    if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-        photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-    } else {
-        permissionLauncher.launch(permission)
-    }
+    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
 }
                     AttachOption(Icons.Filled.PhotoCamera, "Камера")
                     AttachOption(Icons.Filled.Description, "Файл")
