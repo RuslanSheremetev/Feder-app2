@@ -670,7 +670,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 })
                             } catch (_: Exception) {}
                         }
-                        val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else urls.joinToString(",")
+                        val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else ""
                         // Отправляем через HTTP API
                         try {
                             val logJson = gson.toJson(mapOf("log" to "PHOTO_SEND_HTTP: to=$chatUsername text=$photoText"))
