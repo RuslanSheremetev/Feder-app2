@@ -615,11 +615,15 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     val urls = mutableListOf<String>()
                     for (photo in selectedPhotos) {
                         val bytes = try {
-                            appContext.contentResolver.openInputStream(photo)?.readBytes()
-                        } catch (_: Exception) {
+                            val inputStream = appContext.contentResolver.openInputStream(photo)
+                            val byteArray = inputStream?.readBytes()
+                            android.util.Log.d("PhotoSend", "Bytes read: ${byteArray?.size ?: 0} from $photo")
+                            byteArray
+                        } catch (e: Exception) {
+                            android.util.Log.e("PhotoSend", "Failed to read photo: ${e.message}", e)
                             null
                         }
-                        if (bytes != null) {
+                        if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
                             val body = okhttp3.MultipartBody.Builder()
                                 .setType(okhttp3.MultipartBody.FORM)
