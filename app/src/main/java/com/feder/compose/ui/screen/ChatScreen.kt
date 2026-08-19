@@ -697,7 +697,11 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 withContext(Dispatchers.Main) {
                                     messages = messages.map { msg ->
                                         if (msg.from == myUsername && msg.imageUrls == urls && msg.status == "pending") {
-                                            msg.copy(status = "sent")
+                                            msg.copy(
+                                                status = "sent",
+                                                time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                                                timeVal = System.currentTimeMillis() / 1000
+                                            )
                                         } else msg
                                     }
                                 }
