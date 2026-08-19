@@ -172,6 +172,13 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                         .border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
                                 )
+                                // Информация о фото
+                                Text(
+                                    text = "Фото: ${url}\nID: ${msg.id} | От: ${msg.from} | Кому: ${msg.to}\nСтатус: ${msg.status} | Время: ${msg.time}",
+                                    color = OnSurfaceVariant,
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.padding(4.dp)
+                                )
                                 if (index == msg.imageUrls.lastIndex) {
                                     Surface(
                                         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
