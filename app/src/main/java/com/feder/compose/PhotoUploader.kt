@@ -1,10 +1,20 @@
 package com.feder.compose
 
-import java.io.DataOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.concurrent.TimeUnit
 
 object PhotoUploader {
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
+
     private fun logToServer(message: String) {
         try {
             val logUrl = URL("http://2.26.71.102:8002/api/logs")
@@ -21,82 +31,40 @@ object PhotoUploader {
             conn.responseCode
             conn.disconnect()
         } catch (e: Exception) {
-            android.util.Log.e("PhotoUploader", "Cannot log to server: ${e.message}")
+            android.util.Log.e("PhotoUploader", "Cannot log: ${e.message}")
         }
     }
 
     fun uploadPhoto(bytes: ByteArray, token: String): String? {
-        val boundary = "----FederBoundary${System.currentTimeMillis()}"
-        val url = URL("http://2.26.71.102:8002/api/upload")
-        
-        logToServer("=== UPLOAD START ===")
-        logToServer("Bytes size: ${bytes.size}")
-        logToServer("Token: ${token.take(10)}...")
-        
-        val connection = url.openConnection() as HttpURLConnection
-        
         try {
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Authorization", "Bearer $token")
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-            connection.setRequestProperty("Connection", "close")
-            connection.doOutput = true
-            connection.useCaches = false
-            connection.connectTimeout = 60000
-            connection.readTimeout = 60000
+            logToServer("OKHTTP_UPLOAD_START: ${bytes.size} bytes")
             
-            // Вычисляем точный размер
-            val headerPart1 = "--$boundary\r\n"
-            val headerPart2 = "Content-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\n"
-            val headerPart3 = "Content-Type: image/jpeg\r\n\r\n"
-            val footer = "\r\n--$boundary--\r\n"
-            
-            val headerBytes = (headerPart1 + headerPart2 + headerPart3).toByteArray(Charsets.UTF_8)
-            val footerBytes = footer.toByteArray(Charsets.UTF_8)
-            val totalSize = headerBytes.size + bytes.size + footerBytes.size
-            
-            logToServer("Total body size: $totalSize")
-            
-            connection.setFixedLengthStreamingMode(totalSize)
-            
-            val output = connection.outputStream
-            val writer = DataOutputStream(output)
-            
-            logToServer("Writing header: ${headerBytes.size} bytes")
-            writer.write(headerBytes)
-            
-            logToServer("Writing file: ${bytes.size} bytes")
-            writer.write(bytes)
-            
-            logToServer("Writing footer: ${footerBytes.size} bytes")
-            writer.write(footerBytes)
-            
-            writer.flush()
-            writer.close()
-            
-            logToServer("Body sent, reading response...")
-            
-            val responseCode = connection.responseCode
-            logToServer("Response code: $responseCode")
-            
-            val responseBody = if (responseCode in 200..299) {
-                connection.inputStream.bufferedReader().readText()
-            } else {
-                connection.errorStream?.bufferedReader()?.readText() ?: "{}"
+            val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", "photo.jpg", bytes.toRequestBody("image/jpeg".toMediaType()))
+                .build()
+
+            val request = Request.Builder()
+                .url("http://2.26.71.102:8002/api/upload")
+                .header("Authorization", "Bearer $token")
+                .post(body)
+                .build()
+
+            logToServer("OKHTTP_SENDING...")
+            client.newCall(request).execute().use { response ->
+                logToServer("OKHTTP_RESPONSE: ${response.code}")
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string() ?: "{}"
+                    logToServer("OKHTTP_BODY: $responseBody")
+                    val json = org.json.JSONObject(responseBody)
+                    return json.optString("url", null)
+                } else {
+                    logToServer("OKHTTP_ERROR: ${response.code} ${response.message}")
+                    return null
+                }
             }
-            
-            logToServer("Response body: $responseBody")
-            
-            connection.disconnect()
-            
-            val json = org.json.JSONObject(responseBody)
-            val result = json.optString("url", null)
-            logToServer("Result: $result")
-            return result
-            
         } catch (e: Exception) {
-            logToServer("ERROR: ${e.javaClass.simpleName}: ${e.message}")
-            connection.disconnect()
+            logToServer("OKHTTP_EXCEPTION: ${e.javaClass.simpleName}: ${e.message}")
             return null
         }
     }
