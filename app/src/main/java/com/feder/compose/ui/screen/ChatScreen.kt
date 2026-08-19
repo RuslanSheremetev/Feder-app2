@@ -633,6 +633,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             messages = messages + newMsg
                             android.util.Log.d("PhotoSend", "NEW_MSG imageUrls=${newMsg.imageUrls} text=${newMsg.text} total=${messages.size}")
                             try {
+                                val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}'"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
+                            try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: imageUrls=${newMsg.imageUrls} text=${newMsg.text}"))
                                 val logBody = logJson.toRequestBody("application/json".toMediaType())
                                 httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
