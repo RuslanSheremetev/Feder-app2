@@ -661,7 +661,6 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 withContext(Dispatchers.Main) {
                                     android.widget.Toast.makeText(context, "❌ Ошибка загрузки фото", android.widget.Toast.LENGTH_SHORT).show()
                                 }
-                            } else {
                                 android.util.Log.e("PhotoSend", "URL is NULL after upload! Response body was: ${respJson}")
                             }
                         }
