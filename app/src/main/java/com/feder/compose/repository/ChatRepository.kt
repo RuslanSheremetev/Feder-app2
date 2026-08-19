@@ -42,3 +42,8 @@ class ChatRepository(
         messageDao.markRead(username, username)
     }
 }
+
+    
+    suspend fun clearMessages() {
+        messageDao.clearAll()
+    }

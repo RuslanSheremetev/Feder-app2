@@ -445,8 +445,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                 }
             }
-            // 2. Пробуем обновить с API (если интернет есть)
+            // 2. Очищаем Room и загружаем свежие из API
             try {
+                repository?.let { repo ->
+                    repo.clearMessages()
+                }
                 if (internalToken.isEmpty()) {
                     val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
