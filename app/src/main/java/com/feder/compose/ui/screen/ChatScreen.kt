@@ -596,6 +596,9 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
     }
     
     fun sendMessage() {
+        // Toast с информацией
+        val info = "Photos: ${selectedPhotos.size}\nToken: ${internalToken.take(20)}\nChat: $chatUsername\nInput: '$inputText'"
+        android.widget.Toast.makeText(context, info, android.widget.Toast.LENGTH_LONG).show()
         android.util.Log.d("PhotoSend", "=== sendMessage START ===")
         android.util.Log.d("PhotoSend", "selectedPhotos: ${selectedPhotos.size}")
         android.util.Log.d("PhotoSend", "internalToken: ${internalToken.take(10)}...")
@@ -651,6 +654,13 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             if (url != null) {
                                 urls.add(url)
                                 android.util.Log.d("PhotoSend", "Added URL: $url, total: ${urls.size}")
+                                withContext(Dispatchers.Main) {
+                                    android.widget.Toast.makeText(context, "✅ Фото загружено: $url (${urls.size}/${selectedPhotos.size})", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    android.widget.Toast.makeText(context, "❌ Ошибка загрузки фото", android.widget.Toast.LENGTH_SHORT).show()
+                                }
                             } else {
                                 android.util.Log.e("PhotoSend", "URL is NULL after upload! Response body was: ${respJson}")
                             }
