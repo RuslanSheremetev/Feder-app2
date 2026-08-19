@@ -431,10 +431,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (cachedMessages.isNotEmpty()) {
                     messages = cachedMessages.map { entity ->
                         MsgItem(
-                            imageUrls = if (entity.text.contains(".jpg")) listOf(entity.text) else if (entity.text.contains(",")) entity.text.split(",") else emptyList(),
+                            imageUrls = entity.imageUrls?.split(",")?.filter { it.isNotBlank() } ?: emptyList(),
                             from = entity.fromUser,
                             to = entity.toUser,
-                            text = if (entity.text.contains(".jpg") || entity.text.contains(",")) "" else entity.text,
+                            text = if (entity.imageUrls.isNullOrEmpty()) entity.text else "",
                             time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal)),
                             status = if (entity.isRead) "read" else "sent",
                             timeVal = entity.timeVal,
