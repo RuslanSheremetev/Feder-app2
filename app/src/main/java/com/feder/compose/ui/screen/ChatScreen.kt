@@ -578,11 +578,12 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         if (selectedPhotos.isNotEmpty()) {
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos, ws=${if (ws != null) "OK" else "NULL"}")
+            val appContext = context.applicationContext
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val urls = mutableListOf<String>()
                     for (photo in selectedPhotos) {
-                        val bytes = context.contentResolver.openInputStream(photo)?.readBytes()
+                        val bytes = appContext.contentResolver.openInputStream(photo)?.readBytes()
                         if (bytes != null) {
                             val body = okhttp3.MultipartBody.Builder()
                                 .setType(okhttp3.MultipartBody.FORM)
