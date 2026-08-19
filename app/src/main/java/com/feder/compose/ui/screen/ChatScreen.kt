@@ -573,9 +573,21 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         if (messages.isNotEmpty()) listState.scrollToItem(messages.size - 1)
     }
 
+    fun logToDb(message: String) {
+        try {
+            val logJson = gson.toJson(mapOf("log" to message))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
+    }
+    
     fun sendMessage() {
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
+            logToDb("SEND_PHOTO_START: count=${selectedPhotos.size} token=${internalToken.take(10)}")
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos, ws=${if (ws != null) "OK" else "NULL"}")
             val appContext = context.applicationContext
@@ -602,6 +614,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val response = httpClient.newCall(request).execute()
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
+                            logToDb("PHOTO_UPLOADED: $url")
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_UPLOADED: $url"))
@@ -638,6 +651,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         withContext(Dispatchers.Main) {
                             messages = messages + newMsg
+                            logToDb("PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}' total=${messages.size}")
                             android.util.Log.d("PhotoSend", "NEW_MSG imageUrls=${newMsg.imageUrls} text=${newMsg.text} total=${messages.size}")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}'"))
@@ -1317,7 +1331,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { logToDb("SEND_BUTTON_CLICKED: photos=${selectedPhotos.size} text='${inputText}'"); android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
