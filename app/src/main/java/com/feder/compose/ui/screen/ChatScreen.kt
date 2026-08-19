@@ -640,7 +640,6 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 withContext(Dispatchers.Main) {
                                     android.widget.Toast.makeText(context, "❌ Загрузка: ${e.javaClass.simpleName}: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
                                 }
-                                throw e
                             }
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
