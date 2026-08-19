@@ -638,7 +638,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             val request = Request.Builder()
                                 .url("http://2.26.71.102:8002/api/upload")
                                 .header("Authorization", "Bearer $internalToken")
-                                .header("Expect", "")
+                                
                                 .post(body)
                                 .build()
                             var response: okhttp3.Response? = null
