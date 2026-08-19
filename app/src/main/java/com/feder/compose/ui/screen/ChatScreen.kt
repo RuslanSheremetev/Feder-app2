@@ -634,7 +634,14 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 .header("Authorization", "Bearer $internalToken")
                                 .post(body)
                                 .build()
-                            val response = httpClient.newCall(request).execute()
+                            val response = try {
+                                httpClient.newCall(request).execute()
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    android.widget.Toast.makeText(context, "❌ Загрузка: ${e.javaClass.simpleName}: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                                }
+                                throw e
+                            }
                             val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
                             logToDb("PHOTO_UPLOADED: $url")
@@ -1240,7 +1247,18 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 // Attach options
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     AttachOption(Icons.Filled.Image, "Галерея", true) {
-    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    // Проверяем разрешение
+    val permission = if (android.os.Build.VERSION.SDK_INT >= 33) {
+        android.Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        android.Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+    
+    if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+        photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    } else {
+        permissionLauncher.launch(permission)
+    }
 }
                     AttachOption(Icons.Filled.PhotoCamera, "Камера")
                     AttachOption(Icons.Filled.Description, "Файл")
