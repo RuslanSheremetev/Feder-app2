@@ -626,22 +626,10 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
                             val url = PhotoUploader.uploadPhoto(bytes, internalToken)
-                            if (url != null) {
-                                urls.add(url)
-                            }
-                            val url = respJson.get("url")?.asString
                             logToDb("PHOTO_UPLOADED: $url")
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_UPLOADED: $url"))
-                                val logBody = logJson.toRequestBody("application/json".toMediaType())
-                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
-                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
-                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
-                                })
-                            } catch (_: Exception) {}
-                            try {
-                                val logJson = gson.toJson(mapOf("log" to "PhotoSend: url=$url"))
                                 val logBody = logJson.toRequestBody("application/json".toMediaType())
                                 httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
                                     override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
@@ -658,7 +646,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 withContext(Dispatchers.Main) {
                                     android.widget.Toast.makeText(context, "❌ Ошибка загрузки фото", android.widget.Toast.LENGTH_SHORT).show()
                                 }
-                                android.util.Log.e("PhotoSend", "URL is NULL after upload! Response body was: ${respJson}")
+                                android.util.Log.e("PhotoSend", "URL is NULL after upload!")
                             }
                         }
                     }
