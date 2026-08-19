@@ -460,7 +460,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
                 messages = loaded.map { msg ->
-                    val urls = if (msg.text.contains(".jpg")) listOf(msg.text) else if (msg.text.contains(",")) msg.text.split(",") else emptyList()
+                    val urls = if (msg.imageUrls.isNotEmpty()) msg.imageUrls else if (msg.text.contains(".jpg")) listOf(msg.text) else if (msg.text.contains(",")) msg.text.split(",") else emptyList()
                     val cleanText = if (urls.isNotEmpty()) "" else msg.text
                     msg.copy(status = msg.status?.ifEmpty { "sent" } ?: "sent", imageUrls = urls, text = cleanText)
                 }
