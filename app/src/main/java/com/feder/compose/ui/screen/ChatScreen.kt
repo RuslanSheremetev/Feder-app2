@@ -589,6 +589,11 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
     }
     
     fun sendMessage() {
+        android.util.Log.d("PhotoSend", "=== sendMessage START ===")
+        android.util.Log.d("PhotoSend", "selectedPhotos: ${selectedPhotos.size}")
+        android.util.Log.d("PhotoSend", "internalToken: ${internalToken.take(10)}...")
+        android.util.Log.d("PhotoSend", "chatUsername: $chatUsername")
+        android.util.Log.d("PhotoSend", "myUsername: $myUsername")
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
             logToDb("SEND_PHOTO_START: count=${selectedPhotos.size} token=${internalToken.take(10)}")
@@ -639,6 +644,8 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             if (url != null) {
                                 urls.add(url)
                                 android.util.Log.d("PhotoSend", "Added URL: $url, total: ${urls.size}")
+                            } else {
+                                android.util.Log.e("PhotoSend", "URL is NULL after upload! Response body was: ${respJson}")
                             }
                         }
                     }
@@ -652,9 +659,12 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         } else {
                             urls.joinToString(",")
                         }
+                        android.util.Log.d("PhotoSend", "Creating newMsg: urls=$urls caption='$caption' now=$now")
                         val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                         withContext(Dispatchers.Main) {
+                            android.util.Log.d("PhotoSend", "Before add: messages.size=${messages.size}")
                             messages = messages + newMsg
+                            android.util.Log.d("PhotoSend", "After add: messages.size=${messages.size}")
                             logToDb("PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}' total=${messages.size}")
                             android.util.Log.d("PhotoSend", "NEW_MSG imageUrls=${newMsg.imageUrls} text=${newMsg.text} total=${messages.size}")
                             try {
@@ -729,7 +739,8 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         }
                     }
                 } catch (e: Exception) {
-                    android.util.Log.e("PhotoSend", "Error: ${e.message}", e)
+                    android.util.Log.e("PhotoSend", "ERROR: ${e.message}", e)
+                    android.util.Log.e("PhotoSend", "Stack trace:", e)
                     logToDb("PHOTO_SEND_ERROR: ${e.message}")
                 } finally {
                     withContext(Dispatchers.Main) {
