@@ -669,7 +669,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             })
                         } catch (_: Exception) {}
                         try {
-                            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to photoText))
+                            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to photoText, "imageUrls" to urls))
                             val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                             val sendRequest = Request.Builder()
                                 .url("http://2.26.71.102:8002/api/chat/send")
