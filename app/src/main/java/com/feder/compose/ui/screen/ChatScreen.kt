@@ -323,12 +323,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
-    ) { uris ->
-        if (uris.isNotEmpty()) {
-            selectedPhotos = uris.toSet()
+    ) { uri ->
+        if (uri != null) {
+            selectedPhotos = setOf(uri)
             showAttachSheet = true
             try {
-                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: ${uris.size} photos"))
+                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: 1 photo"))
                 val logBody = logJson.toRequestBody("application/json".toMediaType())
                 httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
                     override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
