@@ -614,10 +614,16 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 try {
                     val urls = mutableListOf<String>()
                     for (photo in selectedPhotos) {
+                        withContext(Dispatchers.Main) {
+                            android.widget.Toast.makeText(context, "Читаю: $photo", android.widget.Toast.LENGTH_SHORT).show()
+                        }
                         val bytes = try {
                             val inputStream = appContext.contentResolver.openInputStream(photo)
                             val byteArray = inputStream?.readBytes()
                             android.util.Log.d("PhotoSend", "Bytes read: ${byteArray?.size ?: 0} from $photo")
+                            withContext(Dispatchers.Main) {
+                                android.widget.Toast.makeText(context, "Прочитано: ${byteArray?.size ?: 0} байт", android.widget.Toast.LENGTH_SHORT).show()
+                            }
                             byteArray
                         } catch (e: Exception) {
                             android.util.Log.e("PhotoSend", "Failed to read photo: ${e.message}", e)
