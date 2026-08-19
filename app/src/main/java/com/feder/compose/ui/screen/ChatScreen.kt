@@ -70,6 +70,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.SimpleWebSocket
+import com.feder.compose.PhotoUploader
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
 import com.google.gson.JsonParser
