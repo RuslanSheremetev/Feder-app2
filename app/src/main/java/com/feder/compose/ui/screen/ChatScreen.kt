@@ -147,14 +147,6 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
             Column(Modifier.padding(4.dp)) {
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
-                    try {
-                        val logJson = gson.toJson(mapOf("log" to "PHOTO_RENDER: urls=${msg.imageUrls}"))
-                        val logBody = logJson.toRequestBody("application/json".toMediaType())
-                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
-                            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
-                            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
-                        })
-                    } catch (_: Exception) {}
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
