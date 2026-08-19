@@ -357,7 +357,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val client = OkHttpClient()
             val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").build()
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
-            val body = response.body?.string()
+            val body = response?.body?.string()
             if (body != null) {
                 val jsonArray = JsonParser.parseString(body).asJsonArray
                 val loaded = jsonArray.map { el ->
@@ -640,14 +640,15 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 .header("Authorization", "Bearer $internalToken")
                                 .post(body)
                                 .build()
-                            val response = try {
-                                httpClient.newCall(request).execute()
+                            var response: okhttp3.Response? = null
+                            try {
+                                response = httpClient.newCall(request).execute()
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
                                     android.widget.Toast.makeText(context, "❌ Загрузка: ${e.javaClass.simpleName}: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
                                 }
                             }
-                            val respJson = JsonParser.parseString(response.body?.string() ?: "{}").asJsonObject
+                            val respJson = JsonParser.parseString(response?.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
                             logToDb("PHOTO_UPLOADED: $url")
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
