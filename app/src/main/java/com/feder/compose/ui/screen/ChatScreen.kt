@@ -145,8 +145,16 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
     Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(4.dp)) {
-                if (msg.imageUrls.isNotEmpty()) {
-                    android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}")
+                if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
+                    android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
+                    try {
+                        val logJson = gson.toJson(mapOf("log" to "PHOTO_RENDER: urls=${msg.imageUrls}"))
+                        val logBody = logJson.toRequestBody("application/json".toMediaType())
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                        })
+                    } catch (_: Exception) {}
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
