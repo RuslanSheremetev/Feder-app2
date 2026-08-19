@@ -688,7 +688,20 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                                 .header("Authorization", "Bearer $internalToken")
                                 .post(sendBody)
                                 .build()
-                            httpClient.newCall(sendRequest).execute()
+                            val sendResponse = httpClient.newCall(sendRequest).execute()
+                            val sendRespBody = sendResponse.body?.string() ?: ""
+                            sendResponse.close()
+                            
+                            // Обновляем статус на "sent"
+                            if (sendRespBody.contains("\"status\":\"ok\"")) {
+                                withContext(Dispatchers.Main) {
+                                    messages = messages.map { msg ->
+                                        if (msg.from == myUsername && msg.imageUrls == urls && msg.status == "pending") {
+                                            msg.copy(status = "sent")
+                                        } else msg
+                                    }
+                                }
+                            }
                         } catch (_: Exception) {}
                         withContext(Dispatchers.Main) {
                             inputText = ""
