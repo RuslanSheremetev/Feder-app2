@@ -317,6 +317,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
+    
+    fun logToDb(message: String) {
+        try {
+            val logJson = gson.toJson(mapOf("log" to message))
+            val logBody = logJson.toRequestBody("application/json".toMediaType())
+            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
+        } catch (_: Exception) {}
+    }
     var showAttachSheet by remember { mutableStateOf(false) }
     var showEmojiSheet by remember { mutableStateOf(false) }
     var emojiExpanded by remember { mutableStateOf(false) }
@@ -590,16 +601,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         if (messages.isNotEmpty()) listState.scrollToItem(messages.size - 1)
     }
 
-    fun logToDb(message: String) {
-        try {
-            val logJson = gson.toJson(mapOf("log" to message))
-            val logBody = logJson.toRequestBody("application/json".toMediaType())
-            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
-                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
-                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
-            })
-        } catch (_: Exception) {}
-    }
+
     
     fun sendMessage() {
         // Toast с информацией
