@@ -15,6 +15,8 @@ object PhotoUploader {
         connection.requestMethod = "POST"
         connection.setRequestProperty("Authorization", "Bearer $token")
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+        connection.setRequestProperty("Connection", "close")
+        connection.setFixedLengthStreamingMode(bytes.size + 200)  // Приблизительный размер
         connection.doOutput = true
         connection.connectTimeout = 30000
         connection.readTimeout = 30000
