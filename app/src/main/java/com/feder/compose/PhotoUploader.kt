@@ -5,14 +5,33 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object PhotoUploader {
+    private fun logToServer(message: String) {
+        try {
+            val logUrl = URL("http://2.26.71.102:8002/api/logs")
+            val conn = logUrl.openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Content-Type", "application/json")
+            conn.doOutput = true
+            conn.connectTimeout = 5000
+            conn.readTimeout = 5000
+            val json = """{"log":"$message"}"""
+            val body = json.toByteArray(Charsets.UTF_8)
+            conn.setFixedLengthStreamingMode(body.size)
+            conn.outputStream.use { it.write(body) }
+            conn.responseCode
+            conn.disconnect()
+        } catch (e: Exception) {
+            android.util.Log.e("PhotoUploader", "Cannot log to server: ${e.message}")
+        }
+    }
+
     fun uploadPhoto(bytes: ByteArray, token: String): String? {
         val boundary = "----FederBoundary${System.currentTimeMillis()}"
         val url = URL("http://2.26.71.102:8002/api/upload")
         
-        android.util.Log.d("PhotoUploader", "=== START UPLOAD ===")
-        android.util.Log.d("PhotoUploader", "Bytes: ${bytes.size}")
-        android.util.Log.d("PhotoUploader", "Token: ${token.take(10)}...")
-        android.util.Log.d("PhotoUploader", "URL: $url")
+        logToServer("=== UPLOAD START ===")
+        logToServer("Bytes size: ${bytes.size}")
+        logToServer("Token: ${token.take(10)}...")
         
         val connection = url.openConnection() as HttpURLConnection
         
@@ -26,7 +45,7 @@ object PhotoUploader {
             connection.connectTimeout = 60000
             connection.readTimeout = 60000
             
-            // Вычисляем точный размер body
+            // Вычисляем точный размер
             val headerPart1 = "--$boundary\r\n"
             val headerPart2 = "Content-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\n"
             val headerPart3 = "Content-Type: image/jpeg\r\n\r\n"
@@ -36,31 +55,29 @@ object PhotoUploader {
             val footerBytes = footer.toByteArray(Charsets.UTF_8)
             val totalSize = headerBytes.size + bytes.size + footerBytes.size
             
-            android.util.Log.d("PhotoUploader", "Total body size: $totalSize")
+            logToServer("Total body size: $totalSize")
             
-            // Устанавливаем точный размер
             connection.setFixedLengthStreamingMode(totalSize)
             
             val output = connection.outputStream
             val writer = DataOutputStream(output)
             
-            android.util.Log.d("PhotoUploader", "Writing header...")
+            logToServer("Writing header: ${headerBytes.size} bytes")
             writer.write(headerBytes)
             
-            android.util.Log.d("PhotoUploader", "Writing file data: ${bytes.size} bytes")
+            logToServer("Writing file: ${bytes.size} bytes")
             writer.write(bytes)
             
-            android.util.Log.d("PhotoUploader", "Writing footer...")
+            logToServer("Writing footer: ${footerBytes.size} bytes")
             writer.write(footerBytes)
             
             writer.flush()
             writer.close()
-            output.close()
             
-            android.util.Log.d("PhotoUploader", "Body sent, reading response...")
+            logToServer("Body sent, reading response...")
             
             val responseCode = connection.responseCode
-            android.util.Log.d("PhotoUploader", "Response code: $responseCode")
+            logToServer("Response code: $responseCode")
             
             val responseBody = if (responseCode in 200..299) {
                 connection.inputStream.bufferedReader().readText()
@@ -68,29 +85,17 @@ object PhotoUploader {
                 connection.errorStream?.bufferedReader()?.readText() ?: "{}"
             }
             
-            android.util.Log.d("PhotoUploader", "Response body: $responseBody")
+            logToServer("Response body: $responseBody")
             
             connection.disconnect()
             
             val json = org.json.JSONObject(responseBody)
             val result = json.optString("url", null)
-            android.util.Log.d("PhotoUploader", "Result URL: $result")
+            logToServer("Result: $result")
             return result
             
         } catch (e: Exception) {
-            android.util.Log.e("PhotoUploader", "ERROR: ${e.javaClass.simpleName}: ${e.message}", e)
-            
-            // Пробуем получить больше информации
-            try {
-                val errorStream = connection.errorStream
-                if (errorStream != null) {
-                    val errorBody = errorStream.bufferedReader().readText()
-                    android.util.Log.e("PhotoUploader", "Error body: $errorBody")
-                }
-            } catch (e2: Exception) {
-                android.util.Log.e("PhotoUploader", "Cannot read error stream: ${e2.message}")
-            }
-            
+            logToServer("ERROR: ${e.javaClass.simpleName}: ${e.message}")
             connection.disconnect()
             return null
         }
