@@ -13,5 +13,6 @@ data class MessageEntity(
     val isRead: Boolean = false,
     val isStarred: Boolean = false,
     val posX: Float? = null,
-    val posY: Float? = null
+    val posY: Float? = null,
+    val imageUrls: String? = null
 )

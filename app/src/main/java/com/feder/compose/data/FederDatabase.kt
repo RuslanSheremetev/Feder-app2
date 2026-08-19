@@ -9,7 +9,7 @@ import com.feder.compose.data.entity.MessageEntity
 
 @Database(
     entities = [MessageEntity::class, ChatEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class FederDatabase : RoomDatabase() {

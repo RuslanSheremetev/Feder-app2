@@ -475,7 +475,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             timeVal = msg.timeVal,
                             isRead = msg.status == "read",
                             posX = msg.posX,
-                            posY = msg.posY
+                            posY = msg.posY,
+                            imageUrls = msg.imageUrls.joinToString(",")
                         )
                     })
                 }
