@@ -625,25 +625,10 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         }
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
-                            val body = okhttp3.MultipartBody.Builder()
-                                .setType(okhttp3.MultipartBody.FORM)
-                                .addFormDataPart("file", "photo.jpg", bytes.toRequestBody("image/jpeg".toMediaType()))
-                                .build()
-                            val request = Request.Builder()
-                                .url("http://2.26.71.102:8002/api/upload")
-                                .header("Authorization", "Bearer $internalToken")
-                                
-                                .post(body)
-                                .build()
-                            var response: okhttp3.Response? = null
-                            try {
-                                response = httpClient.newCall(request).execute()
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    android.widget.Toast.makeText(context, "❌ Загрузка: ${e.javaClass.simpleName}: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
-                                }
+                            val url = PhotoUploader.uploadPhoto(bytes, internalToken)
+                            if (url != null) {
+                                urls.add(url)
                             }
-                            val respJson = JsonParser.parseString(response?.body?.string() ?: "{}").asJsonObject
                             val url = respJson.get("url")?.asString
                             logToDb("PHOTO_UPLOADED: $url")
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
