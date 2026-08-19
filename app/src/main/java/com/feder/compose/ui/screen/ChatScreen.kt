@@ -328,14 +328,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (uri != null) {
             selectedPhotos = setOf(uri)
             showAttachSheet = true
+            android.util.Log.d("PhotoSend", "PHOTO_SELECT: 1 photo, uri=$uri")
+            logToDb("PHOTO_SELECT: uri=$uri")
             try {
-                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: 1 photo"))
+                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: uri=$uri"))
                 val logBody = logJson.toRequestBody("application/json".toMediaType())
                 httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
                     override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
                     override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                 })
             } catch (_: Exception) {}
+        } else {
+            android.util.Log.e("PhotoSend", "PHOTO_SELECT: NULL uri")
+            logToDb("PHOTO_SELECT: NULL uri")
         }
     }
     var expandInput by remember { mutableStateOf(false) }
@@ -614,14 +619,18 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val urls = mutableListOf<String>()
+                    logToDb("SEND_LOOP: selectedPhotos=${selectedPhotos.size}")
                     for (photo in selectedPhotos) {
+                        logToDb("SEND_LOOP: processing $photo")
                         val bytes = try {
                             val inputStream = appContext.contentResolver.openInputStream(photo)
                             val byteArray = inputStream?.readBytes()
                             android.util.Log.d("PhotoSend", "Bytes read: ${byteArray?.size ?: 0} from $photo")
+                            logToDb("READ: ${byteArray?.size ?: 0} bytes from $photo")
                             byteArray
                         } catch (e: Exception) {
                             android.util.Log.e("PhotoSend", "Failed to read photo: ${e.message}", e)
+                            logToDb("READ_ERROR: ${e.message}")
                             null
                         }
                         if (bytes != null && bytes.isNotEmpty()) {
