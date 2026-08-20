@@ -7,6 +7,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <time.h>
+#include <errno.h>
+#include <android/log.h>
+#define LOG_TAG "JNI_UPLOAD"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 JNIEXPORT jstring JNICALL
 Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz, jbyteArray photoBytes, jstring token) {
@@ -17,6 +22,7 @@ Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz
     // Получаем токен
     const char *tokenStr = (*env)->GetStringUTFChars(env, token, NULL);
     
+    LOGI("Starting upload: %d bytes", len);
     // Создаём сокет
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) return (*env)->NewStringUTF(env, NULL);
@@ -27,6 +33,7 @@ Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz
     inet_pton(AF_INET, "2.26.71.102", &addr.sin_addr);
     
     if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        LOGE("Connect failed: %s", strerror(errno));
         close(sock);
         return (*env)->NewStringUTF(env, NULL);
     }
@@ -57,6 +64,7 @@ Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz
     
     // Отправляем multipart body
     send(sock, part1, p1, 0);
+    LOGI("Sending %d bytes...", len);
     send(sock, bytes, len, 0);
     send(sock, part2, p2, 0);
     
