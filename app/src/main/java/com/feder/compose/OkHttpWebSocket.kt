@@ -10,6 +10,12 @@ class OkHttpWebSocket {
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(0, TimeUnit.MILLISECONDS) // Бесконечно для WS
+        .addInterceptor(Interceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .removeHeader("Sec-WebSocket-Extensions")
+                .build()
+            chain.proceed(newRequest)
+        })
         .build()
     
     private var webSocket: WebSocket? = null
@@ -49,7 +55,6 @@ class OkHttpWebSocket {
             .build()
         val request = Request.Builder()
             .url("ws://2.26.71.102:8002/ws/$username?token=$token")
-            .header("Sec-WebSocket-Extensions", "")  // Пустая строка вместо permessage-deflate
             .build()
         
         webSocket = freshClient.newWebSocket(request, object : WebSocketListener() {
