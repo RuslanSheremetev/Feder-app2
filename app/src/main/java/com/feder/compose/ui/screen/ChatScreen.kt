@@ -69,7 +69,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.feder.compose.SimpleWebSocket
+import com.feder.compose.OkHttpWebSocket
 import com.feder.compose.PhotoUploader
 import com.feder.compose.ui.theme.*
 import com.google.gson.Gson
@@ -313,7 +313,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val ws = wsManager ?: remember(token) {
-        SimpleWebSocket().also { it.connect("demo", token) }
+        OkHttpWebSocket().also { it.connect("demo", token) }
     }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
