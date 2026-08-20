@@ -589,7 +589,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 }
             }
         }
-        ws.connect(myUsername, internalToken)
+        // ws уже подключен из ViewModel
     }
 
     // Обновляем дату в шапке при прокрутке
