@@ -49,7 +49,7 @@ class OkHttpWebSocket {
             .build()
         val request = Request.Builder()
             .url("ws://2.26.71.102:8002/ws/$username?token=$token")
-            .removeHeader("Sec-WebSocket-Extensions")
+            .header("Sec-WebSocket-Extensions", "")  // Пустая строка вместо permessage-deflate
             .build()
         
         webSocket = freshClient.newWebSocket(request, object : WebSocketListener() {
