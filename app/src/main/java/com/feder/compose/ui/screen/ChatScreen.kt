@@ -565,11 +565,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // WebSocket отдельно
     LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
-        ws.onRead { from ->
-            messages = messages.map { msg ->
-                if (msg.from == myUsername && msg.to == from) msg.copy(status = "read", imageUrls = msg.imageUrls ?: emptyList()) else msg
-            }
-        }
         ws.onMessage = { json ->
             val sender = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("from_user")?.asString ?: "unknown" } catch (e: Exception) { "unknown" }
             val text = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("text")?.asString ?: "" } catch (e: Exception) { "" }
