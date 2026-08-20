@@ -25,7 +25,10 @@ class OkHttpWebSocket {
                 .url("http://2.26.71.102:8002/api/logs")
                 .post(body)
                 .build()
-            client.newCall(logRequest).execute().close()
+            client.newCall(logRequest).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
         } catch (_: Exception) {}
     }
 
