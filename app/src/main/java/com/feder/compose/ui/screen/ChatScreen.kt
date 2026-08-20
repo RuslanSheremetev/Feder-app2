@@ -622,6 +622,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
 
     
     fun sendMessage() {
+        logToDb("SEND_MSG_CALLED: isSending=$isSending, inputText='$inputText', photos=${selectedPhotos.size}")
         if (isSending) {
             android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
             return
