@@ -361,7 +361,10 @@ class MainActivity : ComponentActivity() {
                 .url("$server/api/logs")
                 .post(body)
                 .build()
-            client.newCall(request).execute().close()
+            client.newCall(request).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+            })
         } catch (_: Exception) {}
     }
 
