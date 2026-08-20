@@ -401,7 +401,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response?.body?.string()
             if (body != null) {
-                val jsonArray = JsonParser.parseString(body).asJsonArray
+                val jsonElement = JsonParser.parseString(body)
+                val jsonArray = if (jsonElement.isJsonArray) jsonElement.asJsonArray else com.google.gson.JsonArray()
                 val loaded = jsonArray.map { el ->
                     val obj = el.asJsonObject
                     val uname = obj.get("username")?.asString ?: ""
