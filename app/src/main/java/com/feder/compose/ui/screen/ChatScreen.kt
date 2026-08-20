@@ -333,6 +333,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var emojiExpanded by remember { mutableStateOf(false) }
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
+    var isSending by remember { mutableStateOf(false) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -604,6 +605,11 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
 
     
     fun sendMessage() {
+        if (isSending) {
+            android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        isSending = true
         // Toast с информацией
         val info = "Photos: ${selectedPhotos.size}\nToken: ${internalToken.take(20)}\nChat: $chatUsername\nInput: '$inputText'"
         android.widget.Toast.makeText(context, info, android.widget.Toast.LENGTH_LONG).show()
@@ -662,6 +668,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             }
                         }
                     }
+                    isSending = false
                     if (urls.isNotEmpty()) {
                         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
                         // Берём текст из inputText (если есть)
