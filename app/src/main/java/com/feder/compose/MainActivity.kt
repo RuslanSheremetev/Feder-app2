@@ -350,6 +350,9 @@ class MainActivity : ComponentActivity() {
             request
         )
     }
+    private val server = "http://2.26.71.102:8002"
+    private val client = OkHttpClient()
+
     private fun logToDb(message: String) {
         try {
             val logJson = """{"log":"$message"}"""
