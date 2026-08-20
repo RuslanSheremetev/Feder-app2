@@ -171,45 +171,41 @@ class ChatViewModel : ViewModel() {
         }
         val ws = wsManager!!
         ws.onMessage = { json ->
-            // Обновляем список чатов при получении сообщения
-            val updatedChats = chats.map { chat ->
-                if (chat.username == sender) {
-                    chat.copy(
-                        lastMessage = msgText,
-                        timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
-                        unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
-                    )
-                } else chat
-            }
-            chats = updatedChats.sortedByDescending { it.timestamp }
-            // Отправляем received на сервер
-            viewModelScope.launch {
-                try {
-                    withContext(Dispatchers.IO) {
-                        val request = Request.Builder()
-                            .url("$server/api/mark_received/$sender")
-                            .header("Authorization", "Bearer $token")
-                            .post("".toRequestBody("application/json".toMediaType()))
-                            .build()
-                        client.newCall(request).execute().close()
-                    }
-                } catch (_: Exception) { }
-            }
-            // Сохраняем сообщение в Room
-            viewModelScope.launch {
-                repository?.let { repo ->
-                    repo.saveMessage(
-                        com.feder.compose.data.entity.MessageEntity(
-                            id = msgId.toLong(),
-                            fromUser = sender,
-                            toUser = "demo",
-                            text = msgText,
-                            timeVal = timeVal,
-                            isRead = selectedChat == sender
+            try {
+                val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
+                val sender = obj.get("from_user")?.asString ?: "unknown"
+                val msgText = obj.get("text")?.asString ?: ""
+                val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
+                val msgId = obj.get("id")?.asInt ?: 0
+                
+                val updatedChats = chats.map { chat ->
+                    if (chat.username == sender) {
+                        chat.copy(
+                            lastMessage = msgText,
+                            timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
+                            unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
                         )
-                    )
-                    repo.updateLastMessage(sender, msgText, timeVal)
+                    } else chat
                 }
+                chats = updatedChats.sortedByDescending { it.timestamp }
+                
+                viewModelScope.launch {
+                    repository?.let { repo ->
+                        repo.saveMessage(
+                            com.feder.compose.data.entity.MessageEntity(
+                                id = msgId.toLong(),
+                                fromUser = sender,
+                                toUser = "demo",
+                                text = msgText,
+                                timeVal = timeVal,
+                                isRead = selectedChat == sender
+                            )
+                        )
+                        repo.updateLastMessage(sender, msgText, timeVal)
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "WS message parse error: ${e.message}")
             }
         }
         try {
