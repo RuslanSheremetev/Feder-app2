@@ -170,35 +170,7 @@ class ChatViewModel : ViewModel() {
             wsManager = OkHttpWebSocket()
         }
         val ws = wsManager!!
-        ws.onStatus { status ->
-            wsStatus = status
-        }
-        ws.onSend { toUser, msgText ->
-            chats = chats.map { chat ->
-                if (chat.username == toUser) {
-                    chat.copy(
-                        lastMessage = msgText,
-                        timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
-                    )
-                } else chat
-            }
-            chats = chats.sortedByDescending { it.timestamp }
-            // Сохраняем отправленное сообщение в Room
-            viewModelScope.launch {
-                repository?.saveMessage(
-                    com.feder.compose.data.entity.MessageEntity(
-                        id = System.currentTimeMillis(),
-                        fromUser = "demo",
-                        toUser = toUser,
-                        text = msgText,
-                        timeVal = System.currentTimeMillis() / 1000,
-                        isRead = false
-                    )
-                )
-                repository?.updateLastMessage(toUser, msgText, System.currentTimeMillis() / 1000)
-            }
-        }
-        ws.onMessage { sender, msgText, timeVal, msgId ->
+        ws.onMessage = { json ->
             // Обновляем список чатов при получении сообщения
             val updatedChats = chats.map { chat ->
                 if (chat.username == sender) {
