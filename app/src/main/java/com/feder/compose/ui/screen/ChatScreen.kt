@@ -334,12 +334,37 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var isSending by remember { mutableStateOf(false) }
+    var isSending by remember { mutableStateOf(false) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
             selectedPhotos = setOf(uri)
-            showAttachSheet = true
+            showAttachSheet = false
+            // Сразу добавляем фото в диалог с индикатором
+            val tempUrl = "uploading_${System.currentTimeMillis()}"
+            val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
+            messages = messages + newMsg
+            // Запускаем загрузку
+            CoroutineScope(Dispatchers.IO).launch {
+                isSending = true
+                val bytes = try {
+                    context.applicationContext.contentResolver.openInputStream(uri)?.readBytes()
+                } catch (e: Exception) { null }
+                val uploadedUrl = if (bytes != null) PhotoUploader.uploadPhoto(bytes, internalToken) else null
+                isSending = false
+                // Обновляем сообщение
+                if (uploadedUrl != null) {
+                    messages = messages.map { msg ->
+                        if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg
+                    }
+                } else {
+                    messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                    withContext(Dispatchers.Main) {
+                        android.widget.Toast.makeText(context, "❌ Ошибка загрузки", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
             android.util.Log.d("PhotoSend", "PHOTO_SELECT: 1 photo, uri=$uri")
             logToDb("PHOTO_SELECT: uri=$uri")
             try {
