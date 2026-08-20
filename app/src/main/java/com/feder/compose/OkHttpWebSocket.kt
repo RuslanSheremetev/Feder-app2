@@ -20,7 +20,7 @@ class OkHttpWebSocket {
     private fun logToServer(message: String) {
         try {
             val logJson = """{"log":"$message"}"""
-            val body = logJson.toRequestBody(okhttp3.MediaType.Companion.toMediaType("application/json"))
+            val body = logJson.toRequestBody("application/json".toMediaType())
             val logRequest = Request.Builder()
                 .url("http://2.26.71.102:8002/api/logs")
                 .post(body)
