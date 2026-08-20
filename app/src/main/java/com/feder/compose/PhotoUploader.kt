@@ -74,6 +74,7 @@ object PhotoUploader {
             val request = Request.Builder()
                 .url("http://2.26.71.102:8002/api/upload")
                 .header("Authorization", "Bearer $token")
+                .header("Connection", "close")
                 .post(body)
                 .build()
 
