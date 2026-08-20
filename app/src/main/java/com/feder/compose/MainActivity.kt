@@ -134,7 +134,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     var token by mutableStateOf("")
-    private var wsManager: OkHttpWebSocket? = null
+    var wsManager: OkHttpWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
     var isRefreshing by mutableStateOf(false)
@@ -410,7 +410,7 @@ fun FederApp() {
                     lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
-                    wsManager = wsManager,
+                    wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
