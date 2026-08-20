@@ -312,9 +312,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val listState = rememberLazyListState()
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
-    val ws = wsManager ?: remember(token) {
-        wsManager
-    }
+    val ws = remember(token) { wsManager ?: OkHttpWebSocket() }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
     
@@ -570,11 +568,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         ws.onRead { from ->
             messages = messages.map { msg ->
                 if (msg.from == myUsername && msg.to == from) msg.copy(status = "read", imageUrls = msg.imageUrls ?: emptyList()) else msg
-            }
-        }
-        ws.onReceived { from ->
-            messages = messages.map { msg ->
-                if (msg.from == myUsername && msg.to == from) msg.copy(status = "received", imageUrls = msg.imageUrls ?: emptyList()) else msg
             }
         }
         ws.onMessage = { json ->
