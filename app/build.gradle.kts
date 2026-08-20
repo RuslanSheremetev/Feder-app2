@@ -10,6 +10,14 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
         applicationId = "com.feder.compose"
         minSdk = 26
         targetSdk = 34
@@ -17,6 +25,12 @@ android {
         versionName = "2.0.0"
     }
 
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
     buildFeatures { compose = true }
 
     compileOptions {
