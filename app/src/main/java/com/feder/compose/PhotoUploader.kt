@@ -4,16 +4,42 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Interceptor
+import okhttp3.Response
 import java.util.concurrent.TimeUnit
+import okio.Buffer
 
 object PhotoUploader {
+    private val loggingInterceptor = Interceptor { chain ->
+        val request = chain.request()
+        
+        logToServer("=== OKHTTP REQUEST ===")
+        logToServer("URL: ${request.url}")
+        logToServer("METHOD: ${request.method}")
+        logToServer("HEADERS: ${request.headers}")
+        
+        val requestBody = request.body
+        if (requestBody != null) {
+            logToServer("BODY_TYPE: ${requestBody.contentType()}")
+            logToServer("BODY_LENGTH: ${requestBody.contentLength()}")
+        }
+        
+        val response = chain.proceed(request)
+        
+        logToServer("=== OKHTTP RESPONSE ===")
+        logToServer("CODE: ${response.code}")
+        logToServer("MESSAGE: ${response.message}")
+        logToServer("HEADERS: ${response.headers}")
+        
+        response
+    }
+    
     private val client = OkHttpClient.Builder()
         .connectTimeout(120, TimeUnit.SECONDS)
         .writeTimeout(120, TimeUnit.SECONDS)
         .readTimeout(120, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
+        .addInterceptor(loggingInterceptor)
         .build()
 
     private fun logToServer(message: String) {
@@ -38,42 +64,34 @@ object PhotoUploader {
 
     fun uploadPhoto(bytes: ByteArray, token: String): String? {
         try {
-            logToServer("MULTIPART_START: ${bytes.size} bytes, token=${token.take(10)}")
+            logToServer("UPLOAD_START: ${bytes.size} bytes")
             
-            // Создаём multipart с явным contentLength
-            val fileBody = bytes.toRequestBody("image/jpeg".toMediaType())
-            
-            val multipartBody = MultipartBody.Builder()
+            val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "photo.jpg", fileBody)
+                .addFormDataPart("file", "photo.jpg", bytes.toRequestBody("image/jpeg".toMediaType()))
                 .build()
-            
-            logToServer("MULTIPART_BODY_SIZE: ${multipartBody.contentLength()}")
-            
+
             val request = Request.Builder()
                 .url("http://2.26.71.102:8002/api/upload")
                 .header("Authorization", "Bearer $token")
-                .header("Connection", "close")
-                .post(multipartBody)
+                .post(body)
                 .build()
-            
-            logToServer("MULTIPART_SENDING...")
-            val response = client.newCall(request).execute()
-            logToServer("MULTIPART_RESPONSE_CODE: ${response.code}")
-            
-            if (response.isSuccessful) {
-                val responseBody = response.body?.string() ?: "{}"
-                logToServer("MULTIPART_RESPONSE_BODY: $responseBody")
-                response.close()
-                val json = org.json.JSONObject(responseBody)
-                return json.optString("url", null)
-            } else {
-                logToServer("MULTIPART_ERROR: ${response.code} ${response.message}")
-                response.close()
-                return null
+
+            logToServer("EXECUTING_REQUEST...")
+            client.newCall(request).execute().use { response ->
+                logToServer("GOT_RESPONSE: ${response.code}")
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string() ?: "{}"
+                    logToServer("RESPONSE_BODY: $responseBody")
+                    val json = org.json.JSONObject(responseBody)
+                    return json.optString("url", null)
+                } else {
+                    logToServer("HTTP_ERROR: ${response.code}")
+                    return null
+                }
             }
         } catch (e: Exception) {
-            logToServer("MULTIPART_EXCEPTION: ${e.javaClass.simpleName}: ${e.message}")
+            logToServer("EXCEPTION: ${e.javaClass.simpleName}: ${e.message}")
             return null
         }
     }
