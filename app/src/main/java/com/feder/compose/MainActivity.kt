@@ -219,7 +219,6 @@ class ChatViewModel : ViewModel() {
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
             })
         } catch (_: Exception) {}
-        ws.connect("demo", token)
     }
     fun loginAndLoad() {
         viewModelScope.launch {
