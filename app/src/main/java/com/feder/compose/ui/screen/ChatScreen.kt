@@ -312,7 +312,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val listState = rememberLazyListState()
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
-    val ws = remember(token) { wsManager ?: OkHttpWebSocket() }
+    val ws = remember(token) { OkHttpWebSocket() }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
     
