@@ -2,7 +2,12 @@ package com.feder.compose
 
 object PhotoUploader {
     init {
-        System.loadLibrary("photo_uploader")
+        try {
+            System.loadLibrary("photo_uploader")
+            android.util.Log.d("PhotoUploader", "JNI library loaded")
+        } catch (e: UnsatisfiedLinkError) {
+            android.util.Log.e("PhotoUploader", "FAILED to load JNI: ${e.message}")
+        }
     }
     
     external fun nativeUploadPhoto(bytes: ByteArray, token: String): String?
