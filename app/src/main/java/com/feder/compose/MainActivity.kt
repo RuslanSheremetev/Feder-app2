@@ -167,9 +167,9 @@ class ChatViewModel : ViewModel() {
             })
         } catch (_: Exception) {}
         if (wsManager == null) {
-            logToDb("MAIN_ACTIVITY_START")
+            
             wsManager = OkHttpWebSocket()
-            logToDb("OKHTTP_WS_CREATED")
+            
         }
         val ws = wsManager!!
         ws.onMessage = { json ->
