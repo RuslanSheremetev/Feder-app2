@@ -34,17 +34,24 @@ class OkHttpWebSocket {
 
     fun connect(username: String, token: String) {
         logToServer("OKHTTP_WS_CONNECT: $username")
-        // Закрываем старое соединение если есть
+        // Полный сброс
         if (webSocket != null) {
             logToServer("OKHTTP_WS_CLOSING_OLD")
-            webSocket?.close(1000, "Reconnect")
+            try {
+                webSocket?.cancel()
+            } catch (_: Exception) {}
             webSocket = null
         }
+        // Создаём новый client с чистым состоянием
+        val freshClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .build()
         val request = Request.Builder()
             .url("ws://2.26.71.102:8002/ws/$username?token=$token")
             .build()
         
-        webSocket = client.newWebSocket(request, object : WebSocketListener() {
+        webSocket = freshClient.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 android.util.Log.d("OkHttpWS", "Connected")
                 logToServer("OKHTTP_WS_OPEN")
