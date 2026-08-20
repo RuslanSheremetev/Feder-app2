@@ -4,9 +4,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.concurrent.TimeUnit
 
 object PhotoUploader {
@@ -19,8 +18,8 @@ object PhotoUploader {
 
     private fun logToServer(message: String) {
         try {
-            val logUrl = URL("http://2.26.71.102:8002/api/logs")
-            val conn = logUrl.openConnection() as HttpURLConnection
+            val logUrl = java.net.URL("http://2.26.71.102:8002/api/logs")
+            val conn = logUrl.openConnection() as java.net.HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
             conn.doOutput = true
@@ -39,34 +38,42 @@ object PhotoUploader {
 
     fun uploadPhoto(bytes: ByteArray, token: String): String? {
         try {
-            logToServer("OKHTTP_UPLOAD_START: ${bytes.size} bytes")
+            logToServer("MULTIPART_START: ${bytes.size} bytes, token=${token.take(10)}")
             
-            val body = MultipartBody.Builder()
+            // Создаём multipart с явным contentLength
+            val fileBody = bytes.toRequestBody("image/jpeg".toMediaType())
+            
+            val multipartBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "photo.jpg", bytes.toRequestBody("image/jpeg".toMediaType()))
+                .addFormDataPart("file", "photo.jpg", fileBody)
                 .build()
-
+            
+            logToServer("MULTIPART_BODY_SIZE: ${multipartBody.contentLength()}")
+            
             val request = Request.Builder()
                 .url("http://2.26.71.102:8002/api/upload")
                 .header("Authorization", "Bearer $token")
-                .post(body)
+                .header("Connection", "close")
+                .post(multipartBody)
                 .build()
-
-            logToServer("OKHTTP_SENDING...")
-            client.newCall(request).execute().use { response ->
-                logToServer("OKHTTP_RESPONSE: ${response.code}")
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string() ?: "{}"
-                    logToServer("OKHTTP_BODY: $responseBody")
-                    val json = org.json.JSONObject(responseBody)
-                    return json.optString("url", null)
-                } else {
-                    logToServer("OKHTTP_ERROR: ${response.code} ${response.message}")
-                    return null
-                }
+            
+            logToServer("MULTIPART_SENDING...")
+            val response = client.newCall(request).execute()
+            logToServer("MULTIPART_RESPONSE_CODE: ${response.code}")
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: "{}"
+                logToServer("MULTIPART_RESPONSE_BODY: $responseBody")
+                response.close()
+                val json = org.json.JSONObject(responseBody)
+                return json.optString("url", null)
+            } else {
+                logToServer("MULTIPART_ERROR: ${response.code} ${response.message}")
+                response.close()
+                return null
             }
         } catch (e: Exception) {
-            logToServer("OKHTTP_EXCEPTION: ${e.javaClass.simpleName}: ${e.message}")
+            logToServer("MULTIPART_EXCEPTION: ${e.javaClass.simpleName}: ${e.message}")
             return null
         }
     }
