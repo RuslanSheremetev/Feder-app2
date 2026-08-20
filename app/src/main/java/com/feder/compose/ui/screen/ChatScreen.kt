@@ -635,6 +635,24 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         android.util.Log.d("PhotoSend", "internalToken: ${internalToken.take(10)}...")
         android.util.Log.d("PhotoSend", "chatUsername: $chatUsername")
         android.util.Log.d("PhotoSend", "myUsername: $myUsername")
+        // Отправка текста через WebSocket
+        if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
+            val msgJson = gson.toJson(mapOf(
+                "type" to "message",
+                "text" to inputText.trim(),
+                "to_user" to chatUsername
+            ))
+            logToDb("WS_SEND_TEXT: $msgJson")
+            ws.send(msgJson)
+            // Добавляем сообщение в UI
+            val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
+            messages = messages + newMsg
+            inputText = ""
+            isSending = false
+            return
+        }
+
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
             logToDb("SEND_PHOTO_START: count=${selectedPhotos.size} token=${internalToken.take(10)}")
