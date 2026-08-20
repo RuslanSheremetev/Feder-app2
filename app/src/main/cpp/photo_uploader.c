@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <time.h>
 
 JNIEXPORT jstring JNICALL
 Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz, jbyteArray photoBytes, jstring token) {
