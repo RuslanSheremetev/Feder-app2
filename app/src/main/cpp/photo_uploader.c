@@ -35,6 +35,12 @@ Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz
     char boundary[64];
     snprintf(boundary, sizeof(boundary), "----JNI%d", (int)time(NULL));
     
+    // Вычисляем точный размер multipart body
+    char part1[256], part2[256];
+    int p1 = snprintf(part1, sizeof(part1), "--%s\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n", boundary);
+    int p2 = snprintf(part2, sizeof(part2), "\r\n--%s--\r\n", boundary);
+    long totalBodyLen = p1 + len + p2;
+    
     char header[4096];
     int headerLen = snprintf(header, sizeof(header),
         "POST /api/upload HTTP/1.1\r\n"
@@ -44,20 +50,14 @@ Java_com_feder_compose_PhotoUploader_nativeUploadPhoto(JNIEnv *env, jobject thiz
         "Content-Length: %ld\r\n"
         "Connection: close\r\n"
         "\r\n",
-        tokenStr, boundary,
-        (long)(strlen(boundary) * 2 + strlen(tokenStr) + len + 200));
+        tokenStr, boundary, totalBodyLen);
     
     // Отправляем header
     send(sock, header, headerLen, 0);
     
     // Отправляем multipart body
-    char part1[256];
-    int p1 = snprintf(part1, sizeof(part1), "--%s\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n", boundary);
     send(sock, part1, p1, 0);
     send(sock, bytes, len, 0);
-    
-    char part2[256];
-    int p2 = snprintf(part2, sizeof(part2), "\r\n--%s--\r\n", boundary);
     send(sock, part2, p2, 0);
     
     // Читаем ответ
