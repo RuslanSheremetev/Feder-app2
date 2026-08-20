@@ -252,7 +252,7 @@ class ChatViewModel : ViewModel() {
                     token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 }
                 loadChats()
-                connectWebSocket()
+                // connectWebSocket() — отключено, WS подключается в ChatScreen
             } catch (e: Exception) { 
                 if (chats.isEmpty()) error = "Сервер недоступен"
                 isLoading = false 
