@@ -31,6 +31,12 @@ class OkHttpWebSocket {
 
     fun connect(username: String, token: String) {
         logToServer("OKHTTP_WS_CONNECT: $username")
+        // Закрываем старое соединение если есть
+        if (webSocket != null) {
+            logToServer("OKHTTP_WS_CLOSING_OLD")
+            webSocket?.close(1000, "Reconnect")
+            webSocket = null
+        }
         val request = Request.Builder()
             .url("ws://2.26.71.102:8002/ws/$username?token=$token")
             .build()
