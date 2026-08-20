@@ -57,8 +57,14 @@ class OkHttpWebSocket {
     }
     
     fun send(text: String): Boolean {
-        logToServer("OKHTTP_WS_SEND: $text")
-        return webSocket?.send(text) ?: false
+        logToServer("OKHTTP_WS_SEND: webSocket=${webSocket != null}")
+        if (webSocket == null) {
+            logToServer("OKHTTP_WS_SEND_ERROR: webSocket is NULL")
+            return false
+        }
+        val result = webSocket!!.send(text)
+        logToServer("OKHTTP_WS_SEND_RESULT: $result")
+        return result
     }
     
     fun close() {
