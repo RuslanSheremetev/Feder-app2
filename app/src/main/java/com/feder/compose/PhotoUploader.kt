@@ -44,7 +44,7 @@ object PhotoUploader {
 
     private fun logToServer(message: String) {
         try {
-            val logUrl = java.net.URL("http://2.26.71.102:8002/api/logs")
+            val logUrl = java.net.URL("http://2.26.71.102:8003/api/logs")
             val conn = logUrl.openConnection() as java.net.HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
@@ -72,7 +72,7 @@ object PhotoUploader {
                 .build()
 
             val request = Request.Builder()
-                .url("http://2.26.71.102:8002/api/upload")
+                .url("http://2.26.71.102:8003/api/upload")
                 .header("Authorization", "Bearer $token")
                 .header("Connection", "close")
                 .post(body)
