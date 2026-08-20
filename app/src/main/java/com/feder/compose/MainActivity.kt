@@ -351,8 +351,21 @@ class MainActivity : ComponentActivity() {
             request
         )
     }
+    private fun logToDb(message: String) {
+        try {
+            val logJson = """{"log":"$message"}"""
+            val body = logJson.toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$server/api/logs")
+                .post(body)
+                .build()
+            client.newCall(request).execute().close()
+        } catch (_: Exception) {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logToDb("MAIN_ACTIVITY_CREATED")
         scheduleSync()
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
