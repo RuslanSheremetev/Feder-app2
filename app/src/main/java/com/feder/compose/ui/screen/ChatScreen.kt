@@ -334,7 +334,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var isSending by remember { mutableStateOf(false) }
-    var isSending by remember { mutableStateOf(false) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -351,7 +350,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val bytes = try {
                     context.applicationContext.contentResolver.openInputStream(uri)?.readBytes()
                 } catch (e: Exception) { null }
-                val uploadedUrl = if (bytes != null) PhotoUploader.uploadPhoto(bytes, internalToken) else null
+                val uploadedUrl = if (bytes != null) PhotoUploader.uploadPhoto(bytes, token) else null
                 isSending = false
                 // Обновляем сообщение
                 if (uploadedUrl != null) {
@@ -668,7 +667,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         }
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
-                            val url = PhotoUploader.uploadPhoto(bytes, internalToken)
+                            val url = PhotoUploader.uploadPhoto(bytes, token)
                             logToDb("PHOTO_UPLOADED: $url")
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
