@@ -169,6 +169,7 @@ class ChatViewModel : ViewModel() {
         if (wsManager == null) {
             
             wsManager = OkHttpWebSocket()
+            wsManager?.connect("demo", token)
             
         }
         val ws = wsManager!!
