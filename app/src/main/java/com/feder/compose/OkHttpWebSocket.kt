@@ -14,6 +14,8 @@ class OkHttpWebSocket {
         .build()
     
     private var webSocket: WebSocket? = null
+    @Volatile
+    private var isOpen = false
     var onMessage: ((String) -> Unit)? = null
     var onOpen: (() -> Unit)? = null
     var onError: ((String) -> Unit)? = null
@@ -62,6 +64,7 @@ class OkHttpWebSocket {
         webSocket = freshClient.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 android.util.Log.d("OkHttpWS", "Connected")
+                isOpen = true
                 logToServer("OKHTTP_WS_OPEN")
                 onOpen?.invoke()
             }
@@ -74,6 +77,7 @@ class OkHttpWebSocket {
             
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 android.util.Log.e("OkHttpWS", "Error: ${t.message}")
+                isOpen = false
                 logToServer("OKHTTP_WS_ERROR: ${t.message}")
                 onError?.invoke(t.message ?: "unknown")
             }
@@ -82,8 +86,8 @@ class OkHttpWebSocket {
     
     fun send(text: String): Boolean {
         logToServer("WS_SEND_CALLED: socket=${webSocket != null}, text=$text")
-        if (webSocket == null) {
-            logToServer("OKHTTP_WS_SEND_ERROR: webSocket is NULL")
+        if (webSocket == null || !isOpen) {
+            logToServer("OKHTTP_WS_SEND_ERROR: socket=${webSocket != null}, isOpen=$isOpen")
             return false
         }
         val result = webSocket!!.send(text)
