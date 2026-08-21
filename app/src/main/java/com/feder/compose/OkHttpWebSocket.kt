@@ -5,6 +5,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.util.concurrent.TimeUnit
+import okhttp3.Interceptor
 
 class OkHttpWebSocket {
     private val client = OkHttpClient.Builder()
@@ -46,7 +47,12 @@ class OkHttpWebSocket {
         val freshClient = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
-            .perMessageDeflate(false)
+            .addInterceptor(Interceptor { chain ->
+                val newRequest = chain.request().newBuilder()
+                    .removeHeader("Sec-WebSocket-Extensions")
+                    .build()
+                chain.proceed(newRequest)
+            })
             .build()
         
         val request = Request.Builder()
