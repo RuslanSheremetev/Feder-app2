@@ -636,7 +636,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
         isSending = true
         // Toast с информацией
         val info = "Photos: ${selectedPhotos.size}\nToken: ${internalToken.take(20)}\nChat: $chatUsername\nInput: '$inputText'"
-        android.widget.Toast.makeText(context, info, android.widget.Toast.LENGTH_LONG).show()
+        
         android.util.Log.d("PhotoSend", "=== sendMessage START ===")
         android.util.Log.d("PhotoSend", "selectedPhotos: ${selectedPhotos.size}")
         android.util.Log.d("PhotoSend", "internalToken: ${internalToken.take(10)}...")
@@ -649,7 +649,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                 "text" to inputText.trim(),
                 "to_user" to chatUsername
             ))
-            logToDb("WS_SEND_TEXT: $msgJson")
+            
             ws.send(msgJson)
             // Добавляем сообщение в UI
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
@@ -728,7 +728,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             android.util.Log.d("PhotoSend", "Before add: messages.size=${messages.size}")
                             messages = messages + newMsg
                             android.util.Log.d("PhotoSend", "After add: messages.size=${messages.size}")
-                            logToDb("PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}' total=${messages.size}")
+                            
                             android.util.Log.d("PhotoSend", "NEW_MSG imageUrls=${newMsg.imageUrls} text=${newMsg.text} total=${messages.size}")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}'"))
