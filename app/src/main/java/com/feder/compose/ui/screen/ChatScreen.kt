@@ -628,7 +628,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
 
     
     fun sendMessage() {
-        logToDb("SEND_MSG_CALLED: isSending=$isSending, inputText='$inputText', photos=${selectedPhotos.size}")
+        
         if (isSending) {
             android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
             return
@@ -662,7 +662,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
 
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
-            logToDb("SEND_PHOTO_START: count=${selectedPhotos.size} token=${internalToken.take(10)}")
+            
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
             android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos, ws=${if (ws != null) "OK" else "NULL"}")
             val appContext = context.applicationContext
@@ -686,7 +686,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
                             val url = PhotoUploader.uploadPhoto(bytes, token)
-                            logToDb("PHOTO_UPLOADED: $url")
+                            
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
                                 val logJson = gson.toJson(mapOf("log" to "PHOTO_UPLOADED: $url"))
@@ -1433,7 +1433,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { logToDb("SEND_BUTTON_CLICKED: photos=${selectedPhotos.size} text='${inputText}'"); android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { ; android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
