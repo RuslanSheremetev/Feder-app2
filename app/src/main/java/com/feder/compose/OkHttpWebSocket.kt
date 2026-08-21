@@ -46,8 +46,9 @@ class OkHttpWebSocket {
         val freshClient = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
+            .perMessageDeflate(false)
             .build()
-        freshClient.perMessageDeflate(false)
+        
         val request = Request.Builder()
             .url("ws://2.26.71.102:8002/ws/$username?token=$token")
             .build()
