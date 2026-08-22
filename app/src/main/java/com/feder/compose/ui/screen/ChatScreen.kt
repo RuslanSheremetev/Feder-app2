@@ -362,6 +362,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages = messages.map { msg ->
                         if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg
                     }
+                    uploadingPhotos = false
                 } else {
                     messages = messages.map { if (it.imageUrls == listOf(tempUrl)) it.copy(status = "error") else it }
                     uploadingPhotos = false
