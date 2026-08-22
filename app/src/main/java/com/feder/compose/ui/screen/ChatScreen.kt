@@ -87,7 +87,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 var fullScreenPhoto: String? = null
-var uploadingPhotos: Boolean = false
+val uploadingPhotos = mutableStateOf(false)
 
 data class MsgItem(
     val from: String,
@@ -151,7 +151,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                     Column(Modifier.widthIn(max = 250.dp)) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
-                                if (uploadingPhotos && msg.status == "pending") {
+                                if (uploadingPhotos.value && msg.status == "pending") {
                                     Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
                                         CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
                                     }
@@ -346,7 +346,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             showAttachSheet = false
             // Сразу добавляем фото в диалог с индикатором
             val tempUrl = "uploading_${System.currentTimeMillis()}"
-                        uploadingPhotos = true
+                        uploadingPhotos.value = true
             val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
             messages = messages + newMsg
             // Запускаем загрузку
@@ -362,10 +362,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages = messages.map { msg ->
                         if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg
                     }
-                    uploadingPhotos = false
+                    uploadingPhotos.value = false
                 } else {
                     messages = messages.map { if (it.imageUrls == listOf(tempUrl)) it.copy(status = "error") else it }
-                    uploadingPhotos = false
+                    uploadingPhotos.value = false
                     withContext(Dispatchers.Main) {
                         android.widget.Toast.makeText(context, "❌ Ошибка загрузки", android.widget.Toast.LENGTH_SHORT).show()
                     }
@@ -801,7 +801,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         withContext(Dispatchers.Main) {
                             selectedPhotos = emptySet()
                             showAttachSheet = false
-                            uploadingPhotos = false
+                            uploadingPhotos.value = false
                         }
                     }
                 } catch (e: Exception) {
@@ -812,7 +812,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     withContext(Dispatchers.Main) {
                         selectedPhotos = emptySet()
                         showAttachSheet = false
-                        uploadingPhotos = false
+                        uploadingPhotos.value = false
                     }
                 }
             }
