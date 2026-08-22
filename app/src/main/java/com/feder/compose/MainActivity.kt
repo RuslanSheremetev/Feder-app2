@@ -123,7 +123,7 @@ class ChatViewModel : ViewModel() {
         } catch (_: Exception) {}
     }
     private val gson = Gson()
-    private val server = "http://2.26.71.102:8002"
+    private val server = "http://2.26.71.102:8004"
     private var database: FederDatabase? = null
     var repository: ChatRepository? = null
     
@@ -350,7 +350,7 @@ class MainActivity : ComponentActivity() {
             request
         )
     }
-    private val server = "http://2.26.71.102:8002"
+    private val server = "http://2.26.71.102:8004"
     private val client = OkHttpClient()
 
     private fun logToDb(message: String) {
@@ -596,9 +596,9 @@ fun FederApp() {
                             }
                             // Contact stories
                             listOf(
-                                "Alex" to "http://2.26.71.102:8002/avatars/avatar_2.jpg",
-                                "Elena" to "http://2.26.71.102:8002/avatars/avatar_5.jpg",
-                                "Marcus" to "http://2.26.71.102:8002/avatars/avatar_1.jpg"
+                                "Alex" to "http://2.26.71.102:8004/avatars/avatar_2.jpg",
+                                "Elena" to "http://2.26.71.102:8004/avatars/avatar_5.jpg",
+                                "Marcus" to "http://2.26.71.102:8004/avatars/avatar_1.jpg"
                             ).forEach { (name, url) ->
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(url).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
