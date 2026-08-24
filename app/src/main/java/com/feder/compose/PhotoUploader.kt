@@ -19,7 +19,7 @@ object PhotoUploader {
             try {
                 val body = object : RequestBody() {
                     override fun contentType() = "image/jpeg".toMediaType()
-                    override fun contentLength() = -1L  // Неизвестная длина — потоковая передача
+                    override fun contentLength() = bytes.size.toLong()  // Неизвестная длина — потоковая передача
                     override fun writeTo(sink: okio.BufferedSink) {
                         inputStream.use { input ->
                             val buffer = ByteArray(64 * 1024)
