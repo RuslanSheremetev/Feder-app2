@@ -353,10 +353,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             uploadingPhotos = true
             CoroutineScope(Dispatchers.IO).launch {
                 isSending = true
-                val bytes = try {
-                    context.applicationContext.contentResolver.openInputStream(uri)?.readBytes()
+                val uploadedUrl = try {
+                    val input = context.applicationContext.contentResolver.openInputStream(uri)
+                    if (input != null) {
+                        PhotoUploader.uploadPhoto(input, "photo.jpg", token)
+                    } else null
                 } catch (e: Exception) { null }
-                val uploadedUrl = if (bytes != null) PhotoUploader.uploadPhoto(bytes, token) else null
                 isSending = false
                 uploadingPhotos = false
                 // Обновляем сообщение
