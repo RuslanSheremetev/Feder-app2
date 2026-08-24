@@ -343,6 +343,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     ) { uri ->
         if (uri != null) {
             selectedPhotos = setOf(uri)
+            // НЕ закрываем окно — показываем индикатор загрузки
             showAttachSheet = false
             // Сразу добавляем фото в диалог с индикатором
             val tempUrl = "uploading_${System.currentTimeMillis()}"
