@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit
 
 object PhotoUploader {
     private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(0, TimeUnit.SECONDS)
+        .readTimeout(0, TimeUnit.SECONDS)
         .build()
 
     private fun detectMimeType(bytes: ByteArray): String {
@@ -56,7 +56,20 @@ object PhotoUploader {
                 return null
             }
         } catch (e: Exception) {
-            android.util.Log.e("PhotoUploader", "Error: ${e.message}")
+            android.util.Log.e("PhotoUploader", "Error: ${e.message}", e)
+            // Логируем в БД
+            try {
+                val logJson = """{"log":"PHOTO_ERROR: ${e.javaClass.simpleName}: ${e.message}"}"""
+                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                val logClient = OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).build()
+                logClient.newCall(Request.Builder()
+                    .url("http://2.26.71.102:8004/api/logs")
+                    .post(logBody)
+                    .build()).enqueue(object : okhttp3.Callback {
+                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                    })
+            } catch (_: Exception) {}
             return null
         }
     }
