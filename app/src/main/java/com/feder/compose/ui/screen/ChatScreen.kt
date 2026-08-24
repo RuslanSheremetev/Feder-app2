@@ -668,27 +668,35 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
 
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
-            
-            android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos")
-            android.util.Log.d("PhotoSend", "Sending ${selectedPhotos.size} photos, ws=${if (ws != null) "OK" else "NULL"}")
+            uploadingPhotos = true
+            val tempUrl = "uploading_${System.currentTimeMillis()}"
+            val pendingMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
+            messages = messages + pendingMsg
             val appContext = context.applicationContext
             CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val urls = mutableListOf<String>()
-                    
-                    for (photo in selectedPhotos) {
-                        
-                        val bytes = try {
-                            val inputStream = appContext.contentResolver.openInputStream(photo)
-                            val byteArray = inputStream?.readBytes()
-                            android.util.Log.d("PhotoSend", "Bytes read: ${byteArray?.size ?: 0} from $photo")
-                            
-                            byteArray
-                        } catch (e: Exception) {
-                            android.util.Log.e("PhotoSend", "Failed to read photo: ${e.message}", e)
-                            
-                            null
-                        }
+                val urls = mutableListOf<String>()
+                for (photo in selectedPhotos) {
+                    val url = try {
+                        val input = appContext.contentResolver.openInputStream(photo)
+                        if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                    } catch (e: Exception) { null }
+                    if (url != null) urls.add(url)
+                }
+                withContext(Dispatchers.Main) {
+                    uploadingPhotos = false
+                    isSending = false
+                    if (urls.isNotEmpty()) {
+                        messages = messages.map { if (it.id == pendingMsg.id) it.copy(imageUrls = urls, status = "sent") else it }
+                        selectedPhotos = emptySet()
+                        android.widget.Toast.makeText(context, "✅ Фото отправлено", android.widget.Toast.LENGTH_SHORT).show()
+                    } else {
+                        messages = messages.filter { it.id != pendingMsg.id }
+                        android.widget.Toast.makeText(context, "❌ Ошибка", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            return
+        }
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
                             val url = try {
