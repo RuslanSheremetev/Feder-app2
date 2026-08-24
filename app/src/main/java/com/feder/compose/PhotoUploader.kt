@@ -10,8 +10,8 @@ import org.json.JSONObject
 object PhotoUploader {
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build()
 
@@ -28,6 +28,7 @@ object PhotoUploader {
                 val request = Request.Builder()
                     .url("http://2.26.71.102:8004/api/upload")
                     .header("Authorization", "Bearer $token")
+                    .header("Expect", "")
                     .post(requestBody)
                     .build()
                 
