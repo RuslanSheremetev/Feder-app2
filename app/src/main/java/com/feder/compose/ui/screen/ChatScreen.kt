@@ -690,7 +690,10 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         }
                         if (bytes != null && bytes.isNotEmpty()) {
                             android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
-                            val url = PhotoUploader.uploadPhoto(bytes, token)
+                            val url = try {
+                                val input = context.applicationContext.contentResolver.openInputStream(uri)
+                                if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                            } catch (e: Exception) { null }
                             
                             android.util.Log.d("PhotoSend", "Uploaded: $url")
                             try {
