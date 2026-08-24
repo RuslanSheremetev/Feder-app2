@@ -12,7 +12,6 @@ object PhotoUploader {
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(120, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
         .build()
 
     fun uploadPhoto(inputStream: InputStream, fileName: String, token: String): String? {
