@@ -350,6 +350,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
             messages = messages + newMsg
             // Запускаем загрузку
+            uploadingPhotos = true
             CoroutineScope(Dispatchers.IO).launch {
                 isSending = true
                 val bytes = try {
@@ -357,6 +358,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 } catch (e: Exception) { null }
                 val uploadedUrl = if (bytes != null) PhotoUploader.uploadPhoto(bytes, token) else null
                 isSending = false
+                uploadingPhotos = false
                 // Обновляем сообщение
                 if (uploadedUrl != null) {
                     messages = messages.map { msg ->
