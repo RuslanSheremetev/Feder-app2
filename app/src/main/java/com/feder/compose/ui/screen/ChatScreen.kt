@@ -360,8 +360,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     } else null
                 } catch (e: Exception) { null }
                 isSending = false
-                messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
-                            uploadingPhotos = false
                 // Обновляем сообщение
                 if (uploadedUrl != null) {
                     messages = messages.map { msg ->
