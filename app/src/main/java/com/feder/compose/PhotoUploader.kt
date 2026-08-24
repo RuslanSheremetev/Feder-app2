@@ -9,8 +9,8 @@ import org.json.JSONObject
 object PhotoUploader {
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build()
 
@@ -19,7 +19,7 @@ object PhotoUploader {
             try {
                 val body = object : RequestBody() {
                     override fun contentType() = "image/jpeg".toMediaType()
-                    override fun contentLength() = bytes.size.toLong()  // Неизвестная длина — потоковая передача
+                    override fun contentLength() = -1L
                     override fun writeTo(sink: okio.BufferedSink) {
                         inputStream.use { input ->
                             val buffer = ByteArray(64 * 1024)
@@ -31,19 +31,19 @@ object PhotoUploader {
                         }
                     }
                 }
-                
+
                 val requestBody = MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("file", fileName, body)
                     .build()
-                
+
                 val request = Request.Builder()
                     .url("http://2.26.71.102:8004/api/upload")
                     .header("Authorization", "Bearer $token")
-                .header("Connection", "close")
+                    .header("Connection", "close")
                     .post(requestBody)
                     .build()
-                
+
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
                         val responseBody = response.body?.string() ?: "{}"
