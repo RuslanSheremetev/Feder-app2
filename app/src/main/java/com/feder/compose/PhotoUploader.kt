@@ -36,7 +36,21 @@ object PhotoUploader {
             
             val body = okhttp3.MultipartBody.Builder()
                 .setType(okhttp3.MultipartBody.FORM)
-                .addFormDataPart("file", extension, bytes.toRequestBody(mimeType.toMediaType()))
+                .addFormDataPart("file", extension, object : okhttp3.RequestBody() {
+                        override fun contentType() = mimeType.toMediaType()
+                        override fun contentLength() = bytes.size.toLong()
+                        override fun writeTo(sink: okio.BufferedSink) {
+                            // Отправляем частями по 64KB
+                            val chunk = 64 * 1024
+                            var offset = 0
+                            while (offset < bytes.size) {
+                                val len = minOf(chunk, bytes.size - offset)
+                                sink.write(bytes, offset, len)
+                                sink.flush()
+                                offset += len
+                            }
+                        }
+                    })
                 .build()
             
             val request = Request.Builder()
