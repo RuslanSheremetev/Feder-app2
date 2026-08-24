@@ -360,7 +360,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     } else null
                 } catch (e: Exception) { null }
                 isSending = false
-                uploadingPhotos = false
+                messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
+                            uploadingPhotos = false
                 // Обновляем сообщение
                 if (uploadedUrl != null) {
                     messages = messages.map { msg ->
@@ -806,6 +807,7 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         withContext(Dispatchers.Main) {
                             selectedPhotos = emptySet()
                             showAttachSheet = false
+                            messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
                             uploadingPhotos = false
                         }
                     }
@@ -817,7 +819,8 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                     withContext(Dispatchers.Main) {
                         selectedPhotos = emptySet()
                         showAttachSheet = false
-                        uploadingPhotos = false
+                        messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
+                            uploadingPhotos = false
                     }
                 }
             }
