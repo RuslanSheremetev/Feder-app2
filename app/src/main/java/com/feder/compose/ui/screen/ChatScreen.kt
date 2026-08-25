@@ -690,6 +690,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         
                         // Отправляем через HTTP API
                         try {
+                            android.util.Log.d("PhotoSend", "SEND_HTTP: token=${internalToken.take(20)}, caption='$caption', urls=$urls")
                             val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to caption, "imageUrls" to urls))
                             val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                             val sendRequest = Request.Builder()
@@ -698,9 +699,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .post(sendBody)
                                 .build()
                             val sendResponse = httpClient.newCall(sendRequest).execute()
+                            val respBody = sendResponse.body?.string() ?: ""
+                            android.util.Log.d("PhotoSend", "SEND_RESPONSE: code=${sendResponse.code} body=$respBody")
                             sendResponse.close()
+                            if (respBody.contains("\"status\":\"ok\"")) {
+                                messages = messages.map { msg ->
+                                    if (msg.id == newMsg.id) msg.copy(status = "sent") else msg
+                                }
+                            }
                         } catch (e: Exception) {
-                            android.util.Log.e("PhotoSend", "HTTP send error: ${e.message}")
+                            android.util.Log.e("PhotoSend", "HTTP send error: ${e.message}", e)
                         }
                     } else {
                         messages = messages.filter { it.id != pendingMsg.id }
