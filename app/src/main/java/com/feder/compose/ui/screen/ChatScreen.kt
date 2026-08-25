@@ -594,7 +594,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (existing == null) {
                     val urls = if (text.contains(".jpg")) listOf(text) else if (text.contains(",")) text.split(",") else emptyList()
                     val cleanText = if (urls.isNotEmpty()) "" else text
-val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
+                    val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
                     messages = messages + newMsg
                 }
             }
