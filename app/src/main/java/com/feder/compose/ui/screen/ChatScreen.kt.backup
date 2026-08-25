@@ -632,12 +632,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     
     fun sendMessage() {
+        
         if (isSending) {
             android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
             return
         }
         isSending = true
+        // Toast с информацией
+        val info = "Photos: ${selectedPhotos.size}\nToken: ${internalToken.take(20)}\nChat: $chatUsername\nInput: '$inputText'"
         
+        android.util.Log.d("PhotoSend", "=== sendMessage START ===")
+        android.util.Log.d("PhotoSend", "selectedPhotos: ${selectedPhotos.size}")
+        android.util.Log.d("PhotoSend", "internalToken: ${internalToken.take(10)}...")
+        android.util.Log.d("PhotoSend", "chatUsername: $chatUsername")
+        android.util.Log.d("PhotoSend", "myUsername: $myUsername")
         // Отправка текста через WebSocket
         if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
             val msgJson = gson.toJson(mapOf(
@@ -645,7 +653,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 "text" to inputText.trim(),
                 "to_user" to chatUsername
             ))
-            ws?.send(msgJson)
+            
+            ws.send(msgJson)
+            // Добавляем сообщение в UI
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
             val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
             messages = messages + newMsg
@@ -653,67 +663,179 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             isSending = false
             return
         }
-        
+
         // Отправка выбранных фото
         if (selectedPhotos.isNotEmpty()) {
             uploadingPhotos = true
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             val pendingMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
             messages = messages + pendingMsg
-            
+            val appContext = context.applicationContext
             CoroutineScope(Dispatchers.IO).launch {
                 val urls = mutableListOf<String>()
                 for (photo in selectedPhotos) {
-                    try {
-                        val input = context.applicationContext.contentResolver.openInputStream(photo)
-                        if (input != null) {
-                            val url = PhotoUploader.uploadPhoto(input, "photo.jpg", token)
-                            if (url != null) urls.add(url)
-                        }
-                    } catch (e: Exception) {
-                        android.util.Log.e("PhotoSend", "Upload error: ${e.message}")
-                    }
+                    val url = try {
+                        val input = appContext.contentResolver.openInputStream(photo)
+                        if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                    } catch (e: Exception) { null }
+                    if (url != null) urls.add(url)
                 }
-                
                 withContext(Dispatchers.Main) {
                     uploadingPhotos = false
                     isSending = false
-                    
                     if (urls.isNotEmpty()) {
-                        val caption = inputText.trim()
-                        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                        val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
-                        messages = messages.filter { it.id != pendingMsg.id } + newMsg
+                        messages = messages.map { if (it.id == pendingMsg.id) it.copy(imageUrls = urls, status = "sent") else it }
                         selectedPhotos = emptySet()
-                        showAttachSheet = false
-                        inputText = ""
-                        
-                        // Отправляем через HTTP API
-                        try {
-                            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to caption, "imageUrls" to urls))
-                            val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                            val sendRequest = Request.Builder()
-                                .url("http://2.26.71.102:8004/api/chat/send")
-                                .header("Authorization", "Bearer $internalToken")
-                                .post(sendBody)
-                                .build()
-                            val sendResponse = httpClient.newCall(sendRequest).execute()
-                            sendResponse.close()
-                        } catch (e: Exception) {
-                            android.util.Log.e("PhotoSend", "HTTP send error: ${e.message}")
-                        }
+                        android.widget.Toast.makeText(context, "✅ Фото отправлено", android.widget.Toast.LENGTH_SHORT).show()
                     } else {
                         messages = messages.filter { it.id != pendingMsg.id }
-                        android.widget.Toast.makeText(context, "❌ Ошибка загрузки фото", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context, "❌ Ошибка", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
             }
             return
         }
-        
+                        if (bytes != null && bytes.isNotEmpty()) {
+                            android.util.Log.d("PhotoSend", "Read ${bytes.size} bytes from $photo")
+                            val url = try {
+                                val input = context.applicationContext.contentResolver.openInputStream(photo)
+                                if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                            } catch (e: Exception) { null }
+                            
+                            android.util.Log.d("PhotoSend", "Uploaded: $url")
+                            try {
+                                val logJson = gson.toJson(mapOf("log" to "PHOTO_UPLOADED: $url"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
+                            if (url != null) {
+                                urls.add(url)
+                                android.util.Log.d("PhotoSend", "Added URL: $url, total: ${urls.size}")
+                                withContext(Dispatchers.Main) {
+                                    android.widget.Toast.makeText(context, "✅ Фото загружено: $url (${urls.size}/${selectedPhotos.size})", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    android.widget.Toast.makeText(context, "❌ Ошибка загрузки фото", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                                android.util.Log.e("PhotoSend", "URL is NULL after upload!")
+                            }
+                        }
+                    }
+                    isSending = false
+                    logToDb("PHOTO_SEND_DONE: urls=$urls")
+                    if (urls.isNotEmpty()) {
+                        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                        // Берём текст из inputText (если есть)
+                        val caption = inputText.trim()
+                        // Отправляем все фото + подпись в одном сообщении
+                        val combinedText = if (caption.isNotEmpty()) {
+                            caption + "\n" + urls.joinToString(",")
+                        } else {
+                            urls.joinToString(",")
+                        }
+                        android.util.Log.d("PhotoSend", "Creating newMsg: urls=$urls caption='$caption' now=$now")
+                        val newMsg = MsgItem(myUsername, chatUsername, caption, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
+                        withContext(Dispatchers.Main) {
+                            android.util.Log.d("PhotoSend", "Before add: messages.size=${messages.size}")
+                            messages = messages + newMsg
+                            android.util.Log.d("PhotoSend", "After add: messages.size=${messages.size}")
+                            
+                            android.util.Log.d("PhotoSend", "NEW_MSG imageUrls=${newMsg.imageUrls} text=${newMsg.text} total=${messages.size}")
+                            try {
+                                val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: urls=${newMsg.imageUrls} text='${newMsg.text}'"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
+                            try {
+                                val logJson = gson.toJson(mapOf("log" to "PHOTO_NEW_MSG: imageUrls=${newMsg.imageUrls} text=${newMsg.text}"))
+                                val logBody = logJson.toRequestBody("application/json".toMediaType())
+                                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                                })
+                            } catch (_: Exception) {}
+                        }
+                        val photoText = if (caption.isNotEmpty()) caption + "\n" + urls.joinToString(",") else ""
+                        // Отправляем через HTTP API
+                        try {
+                            val logJson = gson.toJson(mapOf("log" to "PHOTO_SEND_HTTP: to=$chatUsername text=$photoText"))
+                            val logBody = logJson.toRequestBody("application/json".toMediaType())
+                            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                            })
+                        } catch (_: Exception) {}
+                        try {
+                            val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to photoText, "imageUrls" to urls))
+                            val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+                            val sendRequest = Request.Builder()
+                                .url("http://2.26.71.102:8002/api/chat/send")
+                                .header("Authorization", "Bearer $internalToken")
+                                .post(sendBody)
+                                .build()
+                            val sendResponse = httpClient.newCall(sendRequest).execute()
+                            val sendRespBody = sendResponse.body?.string() ?: ""
+                            sendResponse.close()
+                            
+                            // Обновляем статус на "sent"
+                            if (sendRespBody.contains("\"status\":\"ok\"")) {
+                                withContext(Dispatchers.Main) {
+                                    messages = messages.map { msg ->
+                                        if (msg.from == myUsername && msg.imageUrls == urls && msg.status == "pending") {
+                                            msg.copy(
+                                                status = "sent",
+                                                time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                                                timeVal = System.currentTimeMillis() / 1000
+                                            )
+                                        } else msg
+                                    }
+                                }
+                            }
+                        } catch (_: Exception) {}
+                        withContext(Dispatchers.Main) {
+                            inputText = ""
+                        }
+                        try {
+                            val logJson = gson.toJson(mapOf("log" to "PhotoSend: ws.send text=$combinedText"))
+                            val logBody = logJson.toRequestBody("application/json".toMediaType())
+                            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                            })
+                        } catch (_: Exception) {}
+                        withContext(Dispatchers.Main) {
+                            selectedPhotos = emptySet()
+                            showAttachSheet = false
+                            messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
+                            uploadingPhotos = false
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("PhotoSend", "ERROR: ${e.message}", e)
+                    android.util.Log.e("PhotoSend", "Stack trace:", e)
+                    logToDb("PHOTO_SEND_ERROR: ${e.message}")
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        selectedPhotos = emptySet()
+                        showAttachSheet = false
+                        messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
+                            uploadingPhotos = false
+                    }
+                }
+            }
+            return
+        }
         val text = inputText.trim()
         if (text.isEmpty()) return
         if (editMessage != null) {
+            // Отправляем edit
             ws?.send(gson.toJson(mapOf("type" to "edit", "text" to text, "to_user" to chatUsername)))
             editMessage = null
             inputText = ""
@@ -723,9 +845,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
+        // Отправляем через HTTP API (WebSocket не работает для отправки)
+        android.util.Log.d("WS", "ChatScreen: sending text='$text' to='$chatUsername'")
+        android.util.Log.d("WS", "Send text: ws=${ws != null} text=$text")
         ws?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to_user" to chatUsername)))
     }
-
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
