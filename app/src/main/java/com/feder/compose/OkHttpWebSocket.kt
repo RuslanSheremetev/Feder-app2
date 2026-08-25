@@ -25,7 +25,7 @@ class OkHttpWebSocket {
             val logJson = """{"log":"$message"}"""
             val body = logJson.toRequestBody("application/json".toMediaType())
             val logRequest = Request.Builder()
-                .url("http://2.26.71.102:8002/api/logs")
+                .url("http://2.26.71.102:8004/api/logs")
                 .post(body)
                 .build()
             client.newCall(logRequest).enqueue(object : okhttp3.Callback {

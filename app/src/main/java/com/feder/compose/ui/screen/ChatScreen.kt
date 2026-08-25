@@ -157,7 +157,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                     }
                                 }
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${url}")
+                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8004/uploads/${url}")
                                         .crossfade(true)
                                         .diskCacheKey(url)
                                         .memoryCacheKey(url)
@@ -167,7 +167,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { fullScreenPhoto = "http://2.26.71.102:8002/uploads/${url}" }
+                                        .clickable { fullScreenPhoto = "http://2.26.71.102:8004/uploads/${url}" }
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
@@ -220,7 +220,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, pos
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8002/uploads/${msg.imageUrl}")
+                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8004/uploads/${msg.imageUrl}")
                             .crossfade(true)
                             .diskCacheKey(msg.imageUrl ?: "")
                             .memoryCacheKey(msg.imageUrl ?: "")
@@ -326,7 +326,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         try {
             val logJson = gson.toJson(mapOf("log" to message))
             val logBody = logJson.toRequestBody("application/json".toMediaType())
-            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+            httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
                 override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
             })
@@ -377,7 +377,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             try {
                 val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: uri=$uri"))
                 val logBody = logJson.toRequestBody("application/json".toMediaType())
-                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
                     override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
                     override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                 })
@@ -405,7 +405,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     LaunchedEffect(Unit) {
         try {
             val client = OkHttpClient()
-            val request = Request.Builder().url("http://2.26.71.102:8002/api/chat_settings/all?me=$myUsername").build()
+            val request = Request.Builder().url("http://2.26.71.102:8004/api/chat_settings/all?me=$myUsername").build()
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response?.body?.string()
             if (body != null) {
@@ -474,7 +474,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 try {
                     val json = """{"id":${msg.id},"x":${msg.posX},"y":${msg.posY}}"""
                     val body = json.toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/message_pos").header("Authorization", "Bearer $internalToken").post(body).build()).execute().close()
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/message_pos").header("Authorization", "Bearer $internalToken").post(body).build()).execute().close()
                 } catch (_: Exception) {}
             }
         }
@@ -511,11 +511,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (internalToken.isEmpty()) {
                     val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
-                    val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/login").post(authBody).build()).execute()
+                    val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/login").post(authBody).build()).execute()
                     internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
-                    .url("http://2.26.71.102:8002/api/messages/$chatUsername")
+                    .url("http://2.26.71.102:8004/api/messages/$chatUsername")
                     .header("Authorization", "Bearer $internalToken").build()).execute(); android.util.Log.d("ChatScreen", "Token: ${internalToken.take(20)}...")
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
@@ -543,7 +543,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 try {
                     val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
@@ -551,7 +551,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isFirstNewMessage = true
                 // Отмечаем как прочитанные
                 try {
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/mark_read/$chatUsername").header("Authorization", "Bearer $internalToken").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/mark_read/$chatUsername").header("Authorization", "Bearer $internalToken").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
@@ -563,7 +563,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 try {
                     val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
