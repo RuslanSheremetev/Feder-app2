@@ -1497,4 +1497,3 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
     }
 }
-
