@@ -826,7 +826,6 @@ val newMsg = MsgItem(sender, myUsername, cleanText, timeStr, "received", if (tim
                         selectedPhotos = emptySet()
                         showAttachSheet = false
                         messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl) && urls.isNotEmpty()) msg.copy(imageUrls = urls, status = "sent") else msg }
-                            uploadingPhotos = false
                     }
                 }
             }
