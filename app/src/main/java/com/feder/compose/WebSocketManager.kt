@@ -72,7 +72,7 @@ class WebSocketManager(
                         val logJson = gson.toJson(mapOf("log" to "WS_OPEN: code=${response.code}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
                         val httpClient = OkHttpClient()
-                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/logs").post(logBody).build()).enqueue(object : Callback {
                             override fun onFailure(call: Call, e: java.io.IOException) {}
                             override fun onResponse(call: Call, response: Response) { response.close() }
                         })
@@ -105,7 +105,7 @@ class WebSocketManager(
                         val logJson = gson.toJson(mapOf("log" to "WS_FAIL: ${t.message}"))
                         val logBody = logJson.toRequestBody("application/json".toMediaType())
                         val httpClient = OkHttpClient()
-                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8002/api/logs").post(logBody).build()).enqueue(object : Callback {
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/logs").post(logBody).build()).enqueue(object : Callback {
                             override fun onFailure(call: Call, e: java.io.IOException) {}
                             override fun onResponse(call: Call, response: Response) { response.close() }
                         })

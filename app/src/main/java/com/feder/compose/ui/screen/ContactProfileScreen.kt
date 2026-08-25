@@ -44,7 +44,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
     LaunchedEffect(contactName) {
         try {
             val client = OkHttpClient()
-            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/$contactName").build()
+            val request = Request.Builder().url("http://2.26.71.102:8004/api/user/$contactName").build()
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response.body?.string()
             if (body != null) {

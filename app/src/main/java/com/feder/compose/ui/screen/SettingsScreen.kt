@@ -47,7 +47,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, isDarkMode: Boolean = true, onToggle
     LaunchedEffect(Unit) {
         try {
             val client = OkHttpClient()
-            val request = Request.Builder().url("http://2.26.71.102:8002/api/user/demo").build()
+            val request = Request.Builder().url("http://2.26.71.102:8004/api/user/demo").build()
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response.body?.string()
             if (body != null) {

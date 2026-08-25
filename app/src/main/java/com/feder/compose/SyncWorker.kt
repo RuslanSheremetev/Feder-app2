@@ -22,7 +22,7 @@ class SyncWorker(
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .build()
             val gson = Gson()
-            val server = "http://2.26.71.102:8002"
+            val server = "http://2.26.71.102:8004"
             
             // Логин
             val loginJson = gson.toJson(mapOf("username" to "demo", "password" to "demo"))
