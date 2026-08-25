@@ -373,7 +373,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                         val sendRequest = Request.Builder()
                             .url("http://2.26.71.102:8004/api/chat/send")
-                            .header("Authorization", "Bearer $internalToken")
+                            .header("Authorization", "Bearer $token")
                             .post(sendBody)
                             .build()
                         val sendResponse = httpClient.newCall(sendRequest).execute()
@@ -498,7 +498,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 try {
                     val json = """{"id":${msg.id},"x":${msg.posX},"y":${msg.posY}}"""
                     val body = json.toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/message_pos").header("Authorization", "Bearer $internalToken").post(body).build()).execute().close()
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/message_pos").header("Authorization", "Bearer $token").post(body).build()).execute().close()
                 } catch (_: Exception) {}
             }
         }
@@ -540,7 +540,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 val msgResp = httpClient.newCall(Request.Builder()
                     .url("http://2.26.71.102:8004/api/messages/$chatUsername")
-                    .header("Authorization", "Bearer $internalToken").build()).execute(); android.util.Log.d("ChatScreen", "Token: ${internalToken.take(20)}...")
+                    .header("Authorization", "Bearer $token").build()).execute(); android.util.Log.d("ChatScreen", "Token: ${internalToken.take(20)}...")
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
@@ -567,7 +567,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 try {
                     val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(logBody).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
@@ -575,7 +575,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isFirstNewMessage = true
                 // Отмечаем как прочитанные
                 try {
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/mark_read/$chatUsername").header("Authorization", "Bearer $internalToken").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/mark_read/$chatUsername").header("Authorization", "Bearer $token").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
@@ -587,7 +587,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 try {
                     val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $internalToken").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(logBody).build()).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
