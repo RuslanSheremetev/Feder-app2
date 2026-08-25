@@ -343,8 +343,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     ) { uri ->
         if (uri != null) {
             selectedPhotos = setOf(uri)
-            // НЕ закрываем окно — показываем индикатор загрузки
             showAttachSheet = false
+            uploadingPhotos = true
             // Сразу добавляем фото в диалог с индикатором
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
@@ -360,6 +360,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     } else null
                 } catch (e: Exception) { null }
                 isSending = false
+                uploadingPhotos = false
                 // Обновляем сообщение
                 if (uploadedUrl != null) {
                     messages = messages.map { msg ->
@@ -390,6 +391,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         android.util.Log.e("PhotoSend", "HTTP send error: ${e.message}", e)
                     }
                 } else {
+                    uploadingPhotos = false
                     messages = messages.filter { it.imageUrls != listOf(tempUrl) }
                     withContext(Dispatchers.Main) {
                         android.widget.Toast.makeText(context, "❌ Ошибка загрузки", android.widget.Toast.LENGTH_SHORT).show()
