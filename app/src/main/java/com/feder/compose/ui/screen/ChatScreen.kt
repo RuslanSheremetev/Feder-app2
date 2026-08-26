@@ -658,10 +658,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     
     fun sendMessage() {
-        if (selectedPhotos.isNotEmpty()) {
-            // Фото уже загружается — не блокируем
-            return
-        }
         if (isSending) {
             android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
             return
