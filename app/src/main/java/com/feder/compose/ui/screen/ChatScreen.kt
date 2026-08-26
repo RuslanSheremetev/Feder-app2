@@ -669,7 +669,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val msgJson = gson.toJson(mapOf(
                 "type" to "message",
                 "text" to inputText.trim(),
-                "to_user" to chatUsername
+                "to" to chatUsername
             ))
             ws?.send(msgJson)
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
@@ -684,7 +684,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val text = inputText.trim()
         if (text.isEmpty()) return
         if (editMessage != null) {
-            ws?.send(gson.toJson(mapOf("type" to "edit", "text" to text, "to_user" to chatUsername)))
+            ws?.send(gson.toJson(mapOf("type" to "edit", "text" to text, "to" to chatUsername)))
             editMessage = null
             inputText = ""
             return
@@ -693,7 +693,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
-        ws?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to_user" to chatUsername)))
+        ws?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to" to chatUsername)))
     }
 
 
