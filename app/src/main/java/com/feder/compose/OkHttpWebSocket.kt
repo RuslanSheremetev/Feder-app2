@@ -58,7 +58,7 @@ class OkHttpWebSocket {
             .build()
         
         val request = Request.Builder()
-            .url("ws://2.26.71.102:8004/ws/$username?token=$token")
+            .url("ws://2.26.71.102:8002/ws/$username?token=$token")
             .build()
         
         webSocket = freshClient.newWebSocket(request, object : WebSocketListener() {

@@ -306,6 +306,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
     var inputText by remember { mutableStateOf("") }
+    var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+    var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+    var editMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var selectionMode by remember { mutableStateOf(false) }
+    var selectedMessages by remember { mutableStateOf(setOf<Int>()) }
+    var searchMode by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var expandInput by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var isFirstNewMessage by remember { mutableStateOf(true) }
     // token passed from MainActivity
