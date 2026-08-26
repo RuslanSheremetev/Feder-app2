@@ -316,6 +316,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var searchQuery by remember { mutableStateOf("") }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
     var expandInput by remember { mutableStateOf(false) }
+    var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
+    var showForward by remember { mutableStateOf(false) }
+    var showDeleteSub by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var isFirstNewMessage by remember { mutableStateOf(true) }
     // token passed from MainActivity
