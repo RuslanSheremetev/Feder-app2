@@ -529,11 +529,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                 }
             }
-            // 2. Очищаем Room и загружаем свежие из API
+            // 2. Загружаем свежие из API (не очищаем Room)
             try {
-                repository?.let { repo ->
-                    repo.clearMessages()
-                }
                 if (internalToken.isEmpty()) {
                     val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                     val authBody = authJson.toRequestBody("application/json".toMediaType())
