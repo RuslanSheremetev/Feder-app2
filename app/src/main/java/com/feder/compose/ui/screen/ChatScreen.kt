@@ -311,7 +311,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var editMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
-    var selectedMessages by remember { mutableStateOf(setOf<Int>()) }
+    var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var searchMode by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
@@ -357,11 +357,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             attachExpanded = false
         }
     }
-    var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
-    var showDeleteSub by remember { mutableStateOf(false) }
-    var showForward by remember { mutableStateOf(false) }
-    var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
-    var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     LaunchedEffect(Unit) {
