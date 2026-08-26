@@ -210,6 +210,8 @@ class ChatViewModel : ViewModel() {
                 android.util.Log.e("MainActivity", "WS message parse error: ${e.message}")
             }
         }
+        ws.connect("demo", token.ifEmpty { "feder_token_2026" })
+        
         try {
             val logJson = gson.toJson(mapOf("log" to "WS_MAIN: ws.connect called, token=${token.take(20)}"))
             val logBody = logJson.toRequestBody("application/json".toMediaType())
@@ -252,7 +254,7 @@ class ChatViewModel : ViewModel() {
                     token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 }
                 loadChats()
-                // connectWebSocket() — отключено, WS подключается в ChatScreen
+                connectWebSocket()
             } catch (e: Exception) { 
                 if (chats.isEmpty()) error = "Сервер недоступен"
                 isLoading = false 
