@@ -664,6 +664,35 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
         isSending = true
         
+        // Отправка фото
+        if (selectedPhotos.isNotEmpty()) {
+            val uri = selectedPhotos.first()
+            val tempUrl = "uploading_${System.currentTimeMillis()}"
+            uploadingPhotos = true
+            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
+            CoroutineScope(Dispatchers.IO).launch {
+                val uploadedUrl = try {
+                    val input = context.applicationContext.contentResolver.openInputStream(uri)
+                    if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                } catch (e: Exception) { null }
+                uploadingPhotos = false
+                isSending = false
+                if (uploadedUrl != null) {
+                    messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
+                    try {
+                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to "", "imageUrls" to listOf(uploadedUrl)))
+                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
+                    } catch (e: Exception) {}
+                    withContext(Dispatchers.Main) { selectedPhotos = emptySet() }
+                } else {
+                    messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                }
+            }
+            return
+        }
+
+        
         // Отправка текста через WebSocket
         if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
             val msgJson = gson.toJson(mapOf(
