@@ -344,7 +344,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (uri != null) {
             selectedPhotos = setOf(uri)
             showAttachSheet = false
-            uploadingPhotos = true
+            attachExpanded = false
             // Сразу добавляем фото в диалог с индикатором
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
