@@ -330,7 +330,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     
     LaunchedEffect(token) {
-        ws.connect(myUsername, token.ifEmpty { "feder_token_2026" })
+        if (token.isNotEmpty()) { ws.connect(myUsername, token) }
     }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
