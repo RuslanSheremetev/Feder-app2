@@ -210,7 +210,7 @@ class ChatViewModel : ViewModel() {
                 android.util.Log.e("MainActivity", "WS message parse error: ${e.message}")
             }
         }
-        ws.connect("demo", token.ifEmpty { "feder_token_2026" })
+        if (token.isNotEmpty()) { ws.connect("demo", token) } else { android.util.Log.e("WS_MAIN", "Token is empty, cannot connect") }
         
         try {
             val logJson = gson.toJson(mapOf("log" to "WS_MAIN: ws.connect called, token=${token.take(20)}"))
