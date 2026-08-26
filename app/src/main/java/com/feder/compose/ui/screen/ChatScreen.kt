@@ -345,82 +345,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             selectedPhotos = setOf(uri)
             showAttachSheet = false
             attachExpanded = false
-            // Сразу добавляем фото в диалог с индикатором
-            val tempUrl = "uploading_${System.currentTimeMillis()}"
-            val newMsg = MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
-            messages = messages + newMsg
-            // Запускаем загрузку
-            uploadingPhotos = true
-            CoroutineScope(Dispatchers.IO).launch {
-                isSending = true
-                val uploadedUrl = try {
-                    val input = context.applicationContext.contentResolver.openInputStream(uri)
-                    if (input != null) {
-                        PhotoUploader.uploadPhoto(input, "photo.jpg", token)
-                    } else null
-                } catch (e: Exception) { null }
-                isSending = false
-                uploadingPhotos = false
-                // Обновляем сообщение
-                if (uploadedUrl != null) {
-                    messages = messages.map { msg ->
-                        if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg
-                    }
-                    
-                    // Отправляем сообщение через HTTP API
-                    try {
-                        val caption = inputText.trim()
-                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to caption, "imageUrls" to listOf(uploadedUrl)))
-                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                        val sendRequest = Request.Builder()
-                            .url("http://2.26.71.102:8004/api/chat/send")
-                            .header("Authorization", "Bearer $token")
-                            .post(sendBody)
-                            .build()
-                        val sendResponse = httpClient.newCall(sendRequest).execute()
-                        val respBody = sendResponse.body?.string() ?: ""
-                        android.util.Log.d("PhotoSend", "HTTP_SEND_RESPONSE: code=${sendResponse.code} body=$respBody")
-                        sendResponse.close()
-                        
-                        // Очищаем inputText после отправки
-                        withContext(Dispatchers.Main) {
-                            inputText = ""
-                            selectedPhotos = emptySet()
-                        }
-                    } catch (e: Exception) {
-                        android.util.Log.e("PhotoSend", "HTTP send error: ${e.message}", e)
-                    }
-                } else {
-                    uploadingPhotos = false
-                    messages = messages.filter { it.imageUrls != listOf(tempUrl) }
-                    withContext(Dispatchers.Main) {
-                        android.widget.Toast.makeText(context, "❌ Ошибка загрузки", android.widget.Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            android.util.Log.d("PhotoSend", "PHOTO_SELECT: 1 photo, uri=$uri")
-            logToDb("PHOTO_SELECT: uri=$uri")
-            try {
-                val logJson = gson.toJson(mapOf("log" to "PHOTO_SELECT: uri=$uri"))
-                val logBody = logJson.toRequestBody("application/json".toMediaType())
-                httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/logs").post(logBody).build()).enqueue(object : okhttp3.Callback {
-                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
-                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
-                })
-            } catch (_: Exception) {}
-        } else {
-            android.util.Log.e("PhotoSend", "PHOTO_SELECT: NULL uri")
-            logToDb("PHOTO_SELECT: NULL uri")
         }
     }
-    var expandInput by remember { mutableStateOf(false) }
-    var searchMode by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
-    var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
-    var replyMessage by remember { mutableStateOf<MsgItem?>(null) }
-    var editMessage by remember { mutableStateOf<MsgItem?>(null) }
-    var selectionMode by remember { mutableStateOf(false) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var showForward by remember { mutableStateOf(false) }
