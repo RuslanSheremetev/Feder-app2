@@ -24,6 +24,9 @@ class ProWebSocket {
     private var useTLS: Boolean = false
     private var reconnectThread: Thread? = null
     private var heartbeatThread: Thread? = null
+    private var reconnectAttempts = 0
+    private val MAX_RECONNECT_DELAY = 30000L // 30 сек максимум
+    private val MAX_PAYLOAD_SIZE = 1024 * 1024 // 1MB лимит
     private var lastPongTime = System.currentTimeMillis()
     
     var onMessage: ((String) -> Unit)? = null
@@ -63,7 +66,9 @@ class ProWebSocket {
                     startHeartbeat()
                     break
                 }
-                Thread.sleep(2000)
+                val delay = minOf(2000L * (1 shl minOf(reconnectAttempts, 4)), MAX_RECONNECT_DELAY)
+                reconnectAttempts++
+                Thread.sleep(delay)
             }
         }
     }
@@ -110,6 +115,7 @@ class ProWebSocket {
             if (response.contains("101")) {
                 isConnected.set(true)
                 lastPongTime = System.currentTimeMillis()
+                reconnectAttempts = 0 // Сброс при успехе
                 logToDb("PRO_WS_CONNECTED")
                 onOpen?.invoke()
                 return true
@@ -126,7 +132,14 @@ class ProWebSocket {
                 while (isConnected.get()) {
                     val frame = readFrame() ?: break
                     when (frame.opcode) {
-                        0x1 -> onMessage?.invoke(String(frame.payload, StandardCharsets.UTF_8))
+                        0x1 -> {
+                            try {
+                                val text = String(frame.payload, StandardCharsets.UTF_8)
+                                onMessage?.invoke(text)
+                            } catch (e: Exception) {
+                                logToDb("PRO_WS_UTF8_ERROR: ${e.message}")
+                            }
+                        }
                         0x8 -> {
                             isConnected.set(false)
                             onClose?.invoke()
@@ -232,6 +245,10 @@ class ProWebSocket {
         
         val maskKey = if (masked) ByteArray(4) { input.read().toByte() } else null
         
+        if (length > MAX_PAYLOAD_SIZE) {
+            logToDb("PRO_WS_PAYLOAD_TOO_LARGE: $length")
+            return null
+        }
         val payload = ByteArray(length.toInt())
         var totalRead = 0
         while (totalRead < length) {
