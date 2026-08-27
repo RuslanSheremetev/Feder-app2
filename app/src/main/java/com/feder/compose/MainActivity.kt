@@ -134,7 +134,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     var token by mutableStateOf("")
-    var wsManager: OkHttpWebSocket? = null
+    var wsManager: ProWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
     var isRefreshing by mutableStateOf(false)
@@ -168,7 +168,7 @@ class ChatViewModel : ViewModel() {
         } catch (_: Exception) {}
         if (wsManager == null) {
             
-            wsManager = OkHttpWebSocket()
+            wsManager = ProWebSocket()
             
         }
         val ws = wsManager!!
