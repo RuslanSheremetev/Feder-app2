@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.concurrent.thread
 
 class ProWebSocket {
@@ -26,6 +28,22 @@ class ProWebSocket {
     var onOpen: (() -> Unit)? = null
     var onError: ((String) -> Unit)? = null
     var onClose: (() -> Unit)? = null
+    
+    private fun logToDb(message: String) {
+        thread {
+            try {
+                val url = URL("http://2.26.71.102:8004/api/logs")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.doOutput = true
+                conn.setRequestProperty("Content-Type", "application/json")
+                val json = """{"log":"$message"}"""
+                conn.outputStream.write(json.toByteArray())
+                conn.outputStream.flush()
+                conn.inputStream.close()
+            } catch (_: Exception) {}
+        }
+    }
     
     fun connect(username: String, token: String, host: String = "2.26.71.102", port: Int = 8002) {
         this.username = username
@@ -77,8 +95,10 @@ class ProWebSocket {
                 if (response.contains("\r\n\r\n")) break
             }
             
+            logToDb("PRO_WS_HANDSHAKE: $response")
             if (response.contains("101")) {
                 isConnected.set(true)
+                logToDb("PRO_WS_CONNECTED")
                 onOpen?.invoke()
                 return true
             }
@@ -137,7 +157,8 @@ class ProWebSocket {
     }
     
     fun send(text: String): Boolean {
-        if (!isConnected.get()) return false
+        if (!isConnected.get()) { logToDb("PRO_WS_SEND_FAILED: not connected"); return false }
+        logToDb("PRO_WS_SEND_QUEUED: $text")
         sendQueue.add(text.toByteArray(StandardCharsets.UTF_8))
         return true
     }
