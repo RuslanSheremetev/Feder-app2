@@ -205,19 +205,29 @@ class ProWebSocket {
         val output = output ?: return
         synchronized(output) {
             output.write(0x80 or opcode)
+            
+            // Маска для клиентских frame
+            val maskKey = ByteArray(4) { (Math.random() * 256).toInt().toByte() }
+            
             if (payload.size < 126) {
-                output.write(payload.size)
+                output.write(0x80 or payload.size)
             } else if (payload.size < 65536) {
-                output.write(126)
+                output.write(0x80 or 126)
                 output.write((payload.size shr 8) and 0xFF)
                 output.write(payload.size and 0xFF)
             } else {
-                output.write(127)
+                output.write(0x80 or 127)
                 for (i in 7 downTo 0) {
                     output.write((payload.size shr (i * 8)) and 0xFF)
                 }
             }
-            output.write(payload)
+            
+            output.write(maskKey)
+            val masked = ByteArray(payload.size)
+            for (i in payload.indices) {
+                masked[i] = (payload[i].toInt() xor maskKey[i % 4].toInt()).toByte()
+            }
+            output.write(masked)
             output.flush()
         }
     }
