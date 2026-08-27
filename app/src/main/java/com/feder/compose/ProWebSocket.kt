@@ -119,7 +119,7 @@ class ProWebSocket {
                     null
                 }
                 try {
-                    sendFrame(0x1, payload)
+                    sendFrame(0x1, payload!!)
                 } catch (_: Exception) {}
             }
         }
