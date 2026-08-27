@@ -628,7 +628,7 @@ fun FederApp() {
                                 Box(Modifier.size(56.dp)) {
                                     if (chat.avatarUrl != null) {
                                         AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current).data(chat.avatarUrl).crossfade(true).build(),
+                                            model = ImageRequest.Builder(LocalContext.current).data(if (chat.avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004${chat.avatarUrl}" else chat.avatarUrl).crossfade(true).build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)
