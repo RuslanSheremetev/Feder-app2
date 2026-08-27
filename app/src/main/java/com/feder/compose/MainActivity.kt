@@ -133,7 +133,7 @@ class ChatViewModel : ViewModel() {
             repository = ChatRepository(database!!.messageDao(), database!!.chatDao())
         }
     }
-    var token by mutableStateOf("feder_token_2026")
+    var token by mutableStateOf("")
     var wsManager: OkHttpWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
