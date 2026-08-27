@@ -326,8 +326,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val ws = wsManager ?: remember(token) { OkHttpWebSocket() }
-        OkHttpWebSocket()
-    }
     LaunchedEffect(token, ws) {
         if (token.isNotEmpty() && wsManager == null) { ws.connect(myUsername, token) }
         if (token.isNotEmpty()) { ws.connect(myUsername, token) }
