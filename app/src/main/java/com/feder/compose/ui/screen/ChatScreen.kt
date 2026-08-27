@@ -328,7 +328,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val ws = wsManager ?: remember(token) { OkHttpWebSocket() }
     LaunchedEffect(token, ws) {
         if (token.isNotEmpty() && wsManager == null) { ws.connect(myUsername, token) }
-        if (token.isNotEmpty()) { ws.connect(myUsername, token) }
     }
     android.util.Log.d("WS_CHAT", "ws=$ws wsManager=$wsManager")
     val httpClient = remember { OkHttpClient() }
