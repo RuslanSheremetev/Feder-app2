@@ -8,8 +8,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import java.net.HttpURLConnection
-import java.net.URL
+import javax.net.ssl.SSLSocketFactory
 import kotlin.concurrent.thread
 
 class ProWebSocket {
@@ -22,18 +21,22 @@ class ProWebSocket {
     private var token: String = ""
     private var host: String = "2.26.71.102"
     private var port: Int = 8002
+    private var useTLS: Boolean = false
     private var reconnectThread: Thread? = null
+    private var heartbeatThread: Thread? = null
+    private var lastPongTime = System.currentTimeMillis()
     
     var onMessage: ((String) -> Unit)? = null
     var onOpen: (() -> Unit)? = null
     var onError: ((String) -> Unit)? = null
     var onClose: (() -> Unit)? = null
     
+    // Логирование в БД через HTTP
     private fun logToDb(message: String) {
         thread {
             try {
-                val url = URL("http://2.26.71.102:8004/api/logs")
-                val conn = url.openConnection() as HttpURLConnection
+                val url = java.net.URL("http://$host:8004/api/logs")
+                val conn = url.openConnection() as java.net.HttpURLConnection
                 conn.requestMethod = "POST"
                 conn.doOutput = true
                 conn.setRequestProperty("Content-Type", "application/json")
@@ -45,27 +48,33 @@ class ProWebSocket {
         }
     }
     
-    fun connect(username: String, token: String, host: String = "2.26.71.102", port: Int = 8002) {
+    fun connect(username: String, token: String, host: String = "2.26.71.102", port: Int = 8002, tls: Boolean = false) {
         this.username = username
         this.token = token
         this.host = host
         this.port = port
+        this.useTLS = tls
         
         thread(priority = Thread.MAX_PRIORITY) {
             while (true) {
                 if (doConnect()) {
                     startReader()
                     startWriter()
+                    startHeartbeat()
                     break
                 }
-                Thread.sleep(2000) // Пауза перед переподключением
+                Thread.sleep(2000)
             }
         }
     }
     
     private fun doConnect(): Boolean {
         try {
-            socket = Socket()
+            socket = if (useTLS) {
+                SSLSocketFactory.getDefault().createSocket()
+            } else {
+                Socket()
+            }
             socket?.tcpNoDelay = true
             socket?.keepAlive = true
             socket?.receiveBufferSize = 1024 * 1024
@@ -76,7 +85,8 @@ class ProWebSocket {
             output = BufferedOutputStream(socket?.getOutputStream(), 64 * 1024)
             
             val key = Base64.getEncoder().encodeToString(ByteArray(16) { (Math.random() * 256).toInt().toByte() })
-            val handshake = "GET /ws/$username?token=$token HTTP/1.1\r\n" +
+            val path = if (useTLS) "/ws/$username?token=$token" else "/ws/$username?token=$token"
+            val handshake = "GET $path HTTP/1.1\r\n" +
                 "Host: $host:$port\r\n" +
                 "Upgrade: websocket\r\n" +
                 "Connection: Upgrade\r\n" +
@@ -95,14 +105,18 @@ class ProWebSocket {
                 if (response.contains("\r\n\r\n")) break
             }
             
-            logToDb("PRO_WS_HANDSHAKE: $response")
+            logToDb("PRO_WS_HANDSHAKE: ${response.take(100)}")
+            
             if (response.contains("101")) {
                 isConnected.set(true)
+                lastPongTime = System.currentTimeMillis()
                 logToDb("PRO_WS_CONNECTED")
                 onOpen?.invoke()
                 return true
             }
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            logToDb("PRO_WS_CONNECT_ERROR: ${e.message}")
+        }
         return false
     }
     
@@ -119,25 +133,15 @@ class ProWebSocket {
                             scheduleReconnect()
                             return@thread
                         }
-                        0x9 -> sendFrame(0xA, frame.payload)
+                        0x9 -> sendFrame(0xA, frame.payload) // Pong
+                        0xA -> lastPongTime = System.currentTimeMillis() // Получен Pong
                     }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logToDb("PRO_WS_READ_ERROR: ${e.message}")
                 isConnected.set(false)
                 scheduleReconnect()
             }
-        }
-    }
-    
-    private fun scheduleReconnect() {
-        if (reconnectThread?.isAlive == true) return
-        reconnectThread = thread {
-            Thread.sleep(1000)
-            try {
-                socket?.close()
-            } catch (_: Exception) {}
-            isConnected.set(false)
-            connect(username, token, host, port)
         }
     }
     
@@ -151,22 +155,65 @@ class ProWebSocket {
                 }
                 try {
                     sendFrame(0x1, payload)
-                } catch (_: Exception) {}
+                    logToDb("PRO_WS_SENT: ${String(payload, StandardCharsets.UTF_8).take(50)}")
+                } catch (e: Exception) {
+                    logToDb("PRO_WS_SEND_ERROR: ${e.message}")
+                }
             }
         }
     }
     
+    private fun startHeartbeat() {
+        heartbeatThread?.interrupt()
+        heartbeatThread = thread {
+            while (isConnected.get()) {
+                Thread.sleep(30000) // Каждые 30 сек
+                
+                // Проверяем, получали ли Pong за последние 60 сек
+                if (System.currentTimeMillis() - lastPongTime > 60000) {
+                    logToDb("PRO_WS_HEARTBEAT_TIMEOUT")
+                    isConnected.set(false)
+                    scheduleReconnect()
+                    return@thread
+                }
+                
+                // Отправляем Ping
+                try {
+                    sendFrame(0x9, ByteArray(0))
+                    logToDb("PRO_WS_PING")
+                } catch (e: Exception) {
+                    logToDb("PRO_WS_PING_ERROR: ${e.message}")
+                }
+            }
+        }
+    }
+    
+    private fun scheduleReconnect() {
+        if (reconnectThread?.isAlive == true) return
+        reconnectThread = thread {
+            Thread.sleep(1000)
+            try { socket?.close() } catch (_: Exception) {}
+            isConnected.set(false)
+            connect(username, token, host, port, useTLS)
+        }
+    }
+    
     fun send(text: String): Boolean {
-        if (!isConnected.get()) { logToDb("PRO_WS_SEND_FAILED: not connected"); return false }
-        logToDb("PRO_WS_SEND_QUEUED: $text")
+        if (!isConnected.get()) {
+            logToDb("PRO_WS_SEND_FAILED: not connected")
+            return false
+        }
+        logToDb("PRO_WS_SEND_QUEUED: ${text.take(50)}")
         sendQueue.add(text.toByteArray(StandardCharsets.UTF_8))
         return true
     }
     
     private fun readFrame(): Frame? {
         val input = input ?: return null
+        
         val first = input.read()
         if (first == -1) return null
+        
         val second = input.read()
         if (second == -1) return null
         
@@ -184,6 +231,7 @@ class ProWebSocket {
         }
         
         val maskKey = if (masked) ByteArray(4) { input.read().toByte() } else null
+        
         val payload = ByteArray(length.toInt())
         var totalRead = 0
         while (totalRead < length) {
@@ -206,7 +254,6 @@ class ProWebSocket {
         synchronized(output) {
             output.write(0x80 or opcode)
             
-            // Маска для клиентских frame
             val maskKey = ByteArray(4) { (Math.random() * 256).toInt().toByte() }
             
             if (payload.size < 126) {
@@ -236,6 +283,7 @@ class ProWebSocket {
         try {
             sendFrame(0x8, ByteArray(0))
             isConnected.set(false)
+            heartbeatThread?.interrupt()
             socket?.close()
         } catch (_: Exception) {}
     }
