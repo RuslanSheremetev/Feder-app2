@@ -693,7 +693,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     } else {
                         Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape).clickable { onProfileClick() }) {
                             if (avatarUrl != null) {
-                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
                                 Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                     Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -880,7 +880,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Spacer(Modifier.width(8.dp))
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
-                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(avatar).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatar.startsWith("/")) "http://2.26.71.102:8004$avatar" else avatar).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                                 } else {
                                     Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 }
