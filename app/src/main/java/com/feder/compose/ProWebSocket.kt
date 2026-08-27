@@ -116,7 +116,7 @@ class ProWebSocket {
             while (isConnected.get()) {
                 val payload = sendQueue.poll() ?: run {
                     Thread.sleep(1)
-                    continue
+                    null
                 }
                 try {
                     sendFrame(0x1, payload)
