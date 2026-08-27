@@ -253,8 +253,8 @@ class ChatViewModel : ViewModel() {
                     val response = client.newCall(request).execute()
                     token = gson.fromJson(response.body?.string(), LoginResponse::class.java).accessToken
                 }
-                loadChats()
                 connectWebSocket()
+                loadChats()
             } catch (e: Exception) { 
                 if (chats.isEmpty()) error = "Сервер недоступен"
                 isLoading = false 
