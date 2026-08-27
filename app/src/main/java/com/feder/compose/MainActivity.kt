@@ -454,13 +454,13 @@ fun FederApp() {
                     } else {
                         Box(Modifier.width(56.dp).height(36.dp)) {
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterStart).padding(1.dp)) {
-                                AsyncImage(model = "https://lh3.googleusercontent.com/aida-public/AB6AXuDuNxtFN8QgoFWaxAdth_nymXAojX3zs2F0phj38lCAALFXLlHR5wQkQHvvp7Ijs8cn07pMKAzpwJ3PY71kyLh9bzJi7D5Ui4Khgzia777qiyZaLIVwnTv_BRYuyYuCgulf3SX7K7ie_n2uxGSLB7QXDX7bo8saxst0_Fy0oB_KJL6LjwtvW3iGzJL4YLB1RkW0q67Zad0NVZGVc6Ogk2LkB7EYA1NXjB8n2f1uaYP8ben5ngMB5NmZWr9TKV8qoSW57_JAukaw59i8", contentDescription = "Alex", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8004/avatars/alex/avatar.jpg", contentDescription = "Alex", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.Center).padding(1.dp)) {
-                                AsyncImage(model = "https://lh3.googleusercontent.com/aida-public/AB6AXuClWvgFAouTnhqQbweQ49FaJbyVJwawq-7pKz5bGAbh_cBROtSacwRzHmKE2ay5Mlsh-C6jmlcq6A7eoQ3yfEJrvQ1gO5wh7JG864dfm_Wxjks8VcubZBg-lBE4t1lYSgBFJgjenpbvcTMU4joROW0PVnbn2tpVF2gsOTDOcLAMwM4bMLrmCAOlVEVN8SCCMrEqKKyxvb4gBGcxW8oOo058zEpnS9iYXjpeFmyG8wzL1UgwiloSRQkxbNzHb2bRx9Hf2rm9fOhGvVao", contentDescription = "Jordan", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8004/avatars/david/avatar.jpg", contentDescription = "Jordan", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterEnd).padding(1.dp)) {
-                                AsyncImage(model = "https://lh3.googleusercontent.com/aida-public/AB6AXuBy0v2YVVuf-SeoVYPWBeY2-ffFo7RPJHmIeSvquaMFgx9xfUY5adDAjRoJ6pICNqrGDDcxEz9lQg_gJdsfa9QjtvcxUfybQwwuOSL9a7IbO5OPp7TKyr4G1_ZkEq6UdOnulqhOqK63zAg0DC-REgSGHX84d7_4UTs8rT6mXAqX4KFLFcBZ9GnoH5KMdVsLos1SAG9vvLincN0XIVBEXBWsMu5lUj6zSiTxDAJI5hxk4TS8Fx8z6994xBJJ6pYtbBIXFkWtGWX8ppJ6", contentDescription = "Riley", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8004/avatars/elena/avatar.jpg", contentDescription = "Riley", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                         }
                     }
