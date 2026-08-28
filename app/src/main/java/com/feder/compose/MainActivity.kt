@@ -179,13 +179,14 @@ class ChatViewModel : ViewModel() {
                 
                 // Обрабатываем online/offline отдельно
                 if (type == "user_online" || type == "user_offline") {
-                    val username = obj.get("username")?.asString ?: return@onMessage
+                    val username = obj.get("username")?.asString
                     val isOnline = type == "user_online"
-                    chats = chats.map { chat ->
-                        if (chat.username == username) chat.copy(online = isOnline) else chat
+                    if (username != null) {
+                        chats = chats.map { chat ->
+                            if (chat.username == username) chat.copy(online = isOnline) else chat
+                        }
                     }
-                    return@onMessage
-                }
+                } else {
                 
                 val sender = obj.get("from_user")?.asString ?: "unknown"
                 val msgText = obj.get("text")?.asString ?: ""
