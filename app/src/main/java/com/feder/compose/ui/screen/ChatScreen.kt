@@ -90,6 +90,7 @@ var fullScreenPhoto: String? = null
 var uploadingPhotos: Boolean = false
 
 data class MsgItem(
+    @com.google.gson.annotations.SerializedName("from_user")
     val from: String = "unknown",
     val to: String = "unknown",
     val text: String,
