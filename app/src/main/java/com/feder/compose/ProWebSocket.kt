@@ -38,7 +38,7 @@ class ProWebSocket {
     private fun logToDb(message: String) {
         thread {
             try {
-                val url = java.net.URL("http://$host:8004/api/logs")
+                val url = java.net.URL("http://$host:8006/api/logs")
                 val conn = url.openConnection() as java.net.HttpURLConnection
                 conn.requestMethod = "POST"
                 conn.doOutput = true
