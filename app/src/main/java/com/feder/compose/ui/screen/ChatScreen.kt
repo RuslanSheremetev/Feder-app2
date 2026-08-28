@@ -90,8 +90,8 @@ var fullScreenPhoto: String? = null
 var uploadingPhotos: Boolean = false
 
 data class MsgItem(
-    val from: String,
-    val to: String,
+    val from: String = "unknown",
+    val to: String = "unknown",
     val text: String,
     val time: String,
     var status: String = "sent",
