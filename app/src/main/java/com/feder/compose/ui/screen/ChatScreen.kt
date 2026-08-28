@@ -542,11 +542,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal)) else "now"
             // Для своих сообщений - обновляем pending
             if (sender == myUsername) {
-                messages = messages.map { msg ->
-                    val isPhotoMsg = msg.imageUrls.isNotEmpty() && text.contains(".jpg")
-                    if (msg.from == myUsername && (msg.text == text || isPhotoMsg) && msg.status == "pending") {
-                        msg.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else msg.timeVal, imageUrls = msg.imageUrls)
-                    } else msg
+                messages = messages.map { item ->
+                    val isPhotoMsg = item.imageUrls.isNotEmpty() && text.contains(".jpg")
+                    if (item.from == myUsername && (item.text == text || isPhotoMsg) && item.status == "pending") {
+                        item.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else item.timeVal, imageUrls = item.imageUrls)
+                    } else item
                 }
             } else {
                 val existing = messages.find { it.from == sender && it.text == text }
