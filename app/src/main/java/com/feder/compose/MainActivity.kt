@@ -216,6 +216,7 @@ class ChatViewModel : ViewModel() {
                                 isRead = selectedChat == sender
                             )
                         )
+            }
                         repo.updateLastMessage(sender, msgText, timeVal)
                     }
                 }
