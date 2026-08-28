@@ -634,6 +634,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 "to" to chatUsername
             ))
             wsManager?.send(msgJson)
+            android.util.Log.d("ChatScreen", "WS_SEND: $msgJson")
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
             val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
             messages = messages + newMsg
