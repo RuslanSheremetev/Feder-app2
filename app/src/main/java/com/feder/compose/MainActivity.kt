@@ -176,8 +176,6 @@ class ChatViewModel : ViewModel() {
             try {
                 val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
                 val type = obj.get("type")?.asString ?: ""
-                
-                // Обрабатываем online/offline отдельно
                 if (type == "user_online" || type == "user_offline") {
                     val username = obj.get("username")?.asString
                     val isOnline = type == "user_online"
@@ -187,36 +185,34 @@ class ChatViewModel : ViewModel() {
                         }
                     }
                 } else {
-                
-                val sender = obj.get("from_user")?.asString ?: "unknown"
-                val msgText = obj.get("text")?.asString ?: ""
-                val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
-                val msgId = obj.get("id")?.asInt ?: 0
-                
-                val updatedChats = chats.map { chat ->
-                    if (chat.username == sender) {
-                        chat.copy(
-                            lastMessage = msgText,
-                            timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
-                            unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
-                        )
-                    } else chat
-                }
-                chats = updatedChats.sortedByDescending { it.timestamp }
-                
-                viewModelScope.launch {
-                    repository?.let { repo ->
-                        repo.saveMessage(
-                            com.feder.compose.data.entity.MessageEntity(
-                                id = msgId.toLong(),
-                                fromUser = sender,
-                                toUser = "demo",
-                                text = msgText,
-                                timeVal = timeVal,
-                                isRead = selectedChat == sender
+                    val sender = obj.get("from_user")?.asString ?: "unknown"
+                    val msgText = obj.get("text")?.asString ?: ""
+                    val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
+                    val msgId = obj.get("id")?.asInt ?: 0
+                    val updatedChats = chats.map { chat ->
+                        if (chat.username == sender) {
+                            chat.copy(
+                                lastMessage = msgText,
+                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
+                                unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
                             )
-            }
-            }
+                        } else chat
+                    }
+                    chats = updatedChats.sortedByDescending { it.timestamp }
+                    viewModelScope.launch {
+                        repository?.let { repo ->
+                            repo.saveMessage(
+                                com.feder.compose.data.entity.MessageEntity(
+                                    id = msgId.toLong(),
+                                    fromUser = sender,
+                                    toUser = "demo",
+                                    text = msgText,
+                                    timeVal = timeVal,
+                                    isRead = selectedChat == sender
+                                )
+                            )
+                            repo.updateLastMessage(sender, msgText, timeVal)
+                        }
                     }
                 }
             } catch (e: Exception) {
