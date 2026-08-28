@@ -217,6 +217,7 @@ class ChatViewModel : ViewModel() {
                             )
             }
                         repo.updateLastMessage(sender, msgText, timeVal)
+            }
                     }
                 }
             } catch (e: Exception) {
