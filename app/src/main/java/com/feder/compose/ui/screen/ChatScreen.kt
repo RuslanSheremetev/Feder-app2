@@ -447,7 +447,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages = cachedMessages.map { entity ->
                         MsgItem(
                             imageUrls = entity.imageUrls?.split(",")?.filter { it.isNotBlank() } ?: emptyList(),
-                            from = entity.fromUser,
+                            from = entity.fromUser ?: "unknown",
                             to = entity.toUser,
                             text = if (entity.imageUrls.isNullOrEmpty()) entity.text else "",
                             time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal)),
