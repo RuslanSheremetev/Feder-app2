@@ -175,6 +175,10 @@ class ChatViewModel : ViewModel() {
         ws.onMessage = { json ->
             try {
                 val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
+                val type = obj.get("type")?.asString ?: ""
+                if (type == "user_online" || type == "user_offline") {
+                    return@onMessage
+                }
                 val sender = obj.get("from_user")?.asString ?: "unknown"
                 val msgText = obj.get("text")?.asString ?: ""
                 val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
