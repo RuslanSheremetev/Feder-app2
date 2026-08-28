@@ -223,6 +223,7 @@ class ChatViewModel : ViewModel() {
                 android.util.Log.e("MainActivity", "WS message parse error: ${e.message}")
             }
         }
+        }
         if (token.isNotEmpty()) { ws.connect("demo", token) } else { android.util.Log.e("WS_MAIN", "Token is empty, cannot connect") }
         
         try {
