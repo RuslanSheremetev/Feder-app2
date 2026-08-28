@@ -176,9 +176,17 @@ class ChatViewModel : ViewModel() {
             try {
                 val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
                 val type = obj.get("type")?.asString ?: ""
+                
+                // Обрабатываем online/offline отдельно
                 if (type == "user_online" || type == "user_offline") {
+                    val username = obj.get("username")?.asString ?: return@onMessage
+                    val isOnline = type == "user_online"
+                    chats = chats.map { chat ->
+                        if (chat.username == username) chat.copy(online = isOnline) else chat
+                    }
                     return@onMessage
                 }
+                
                 val sender = obj.get("from_user")?.asString ?: "unknown"
                 val msgText = obj.get("text")?.asString ?: ""
                 val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
