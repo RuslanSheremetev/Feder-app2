@@ -215,7 +215,6 @@ class ChatViewModel : ViewModel() {
                                 timeVal = timeVal,
                                 isRead = selectedChat == sender
                             )
-                        )
             }
                         repo.updateLastMessage(sender, msgText, timeVal)
                     }
