@@ -478,9 +478,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 messages = loaded.reversed().map { msg ->
                     // Парсим time строку в timeVal (epoch)
                     val timeVal = try {
-                        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
-                            .parse(msg.time)?.time ?: 0L
-                    } catch (e: Exception) { 0L }
+                        msg.time.toLong()
+                    } catch (e: Exception) {
+                        try {
+                            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
+                                .parse(msg.time)?.time?.div(1000) ?: 0L
+                        } catch (e2: Exception) { 0L }
+                    }
                     val urls = if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) msg.imageUrls else emptyList()
                     val cleanText = msg.text
                     msg.copy(status = msg.status?.ifEmpty { "sent" } ?: "sent", imageUrls = urls, text = cleanText)
