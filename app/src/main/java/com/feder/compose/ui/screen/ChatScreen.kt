@@ -475,7 +475,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val type = object : TypeToken<List<MsgItem>>() {}.type
                 val body = msgResp.body?.string() ?: "[]"
                 val loaded = gson.fromJson<List<MsgItem>>(body, type)
-                messages = loaded.map { msg ->
+                messages = loaded.reversed().map { msg ->
                     // Парсим time строку в timeVal (epoch)
                     val timeVal = try {
                         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
