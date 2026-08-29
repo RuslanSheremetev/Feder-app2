@@ -96,7 +96,6 @@ data class MsgItem(
     val text: String,
     val time: String = "",
     var status: String = "sent",
-    @com.google.gson.annotations.SerializedName("time")
     val timeVal: Long = 0L,
     val id: Int = 0,
     var posX: Float = 0f,
