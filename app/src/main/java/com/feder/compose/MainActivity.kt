@@ -89,7 +89,7 @@ data class ChatItem(
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
     @SerializedName("last_seen") val lastSeen: Long = 0,
-    @SerializedName("last_message") val lastMessage: String? = null,
+    @SerializedName("lastMessage") val lastMessage: String? = null,
     val timestamp: String? = null
 )
 
