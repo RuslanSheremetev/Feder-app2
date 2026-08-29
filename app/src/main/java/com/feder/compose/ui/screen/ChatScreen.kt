@@ -451,7 +451,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             from = entity.fromUser ?: "unknown",
                             to = entity.toUser ?: "unknown",
                             text = if (entity.imageUrls.isNullOrEmpty()) entity.text else "",
-                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal)),
+                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
                             status = if (entity.isRead) "read" else "sent",
                             timeVal = entity.timeVal,
                             id = entity.id.toInt(),
