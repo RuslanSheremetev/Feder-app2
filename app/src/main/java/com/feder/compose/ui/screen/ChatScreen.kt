@@ -94,10 +94,10 @@ data class MsgItem(
     val from: String = "unknown",
     val to: String = "unknown",
     val text: String,
-    @com.google.gson.annotations.SerializedName("time")
-    val timeVal: Long = 0L,
     val time: String = "",
     var status: String = "sent",
+    @com.google.gson.annotations.SerializedName("time")
+    val timeVal: Long = 0L,
     val id: Int = 0,
     var posX: Float = 0f,
     var posY: Float = 0f,
