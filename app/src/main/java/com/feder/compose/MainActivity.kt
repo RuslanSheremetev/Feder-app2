@@ -187,7 +187,11 @@ class ChatViewModel : ViewModel() {
                 } else {
                     val sender = obj.get("from_user")?.asString ?: "unknown"
                     val msgText = obj.get("text")?.asString ?: ""
-                    val timeVal = obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
+                    val timeVal = try {
+                    obj.get("time")?.asString?.toLong() ?: obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
+                } catch (e: Exception) {
+                    System.currentTimeMillis() / 1000
+                }
                     val msgId = obj.get("id")?.asInt ?: 0
                     val updatedChats = chats.map { chat ->
                         if (chat.username == sender) {
