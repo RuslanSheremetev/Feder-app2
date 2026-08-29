@@ -538,10 +538,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             isLoading = false
         }
     }
-    // WebSocket отдельно
+    // WebSocket обрабатывается в MainActivity
     LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
-        ws.onMessage = { json ->
+        /* ws.onMessage = { json ->
             val sender = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("from_user")?.asString ?: "unknown" } catch (e: Exception) { "unknown" }
             val text = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("text")?.asString ?: "" } catch (e: Exception) { "" }
             val timeVal = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("time")?.asLong ?: System.currentTimeMillis() / 1000 } catch (e: Exception) { System.currentTimeMillis() / 1000 }
@@ -564,7 +564,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages = messages + newMsg
                 }
             }
-        }
+        } */
         // ws уже подключен из ViewModel
     }
 
