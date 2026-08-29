@@ -487,7 +487,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     val urls = if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) msg.imageUrls else emptyList()
                     val cleanText = msg.text
-                    msg.copy(status = msg.status?.ifEmpty { "sent" } ?: "sent", imageUrls = urls, text = cleanText)
+                    msg.copy(status = msg.status?.ifEmpty { "sent" } ?: "sent", imageUrls = urls, text = cleanText, timeVal = parsedTimeVal)
                 }
                 // Сохраняем загруженные сообщения в Room
                 repository?.let { repo ->
