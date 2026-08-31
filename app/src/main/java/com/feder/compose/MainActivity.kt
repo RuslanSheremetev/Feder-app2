@@ -448,7 +448,10 @@ fun FederApp() {
                     onBack = { viewModel.selectedChat = null },
                     onMessageSent = { username, text ->
                         viewModel.chats = viewModel.chats.map { chat ->
-                            if (chat.username == username) chat.copy(lastMessage = text) else chat
+                            if (chat.username == username) chat.copy(
+                                lastMessage = text,
+                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+                            ) else chat
                         }
                     },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
