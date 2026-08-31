@@ -446,6 +446,11 @@ fun FederApp() {
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
                     onBack = { viewModel.selectedChat = null },
+                    onMessageSent = { username, text ->
+                        viewModel.chats = viewModel.chats.map { chat ->
+                            if (chat.username == username) chat.copy(lastMessage = text) else chat
+                        }
+                    },
                     onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
                 )
             }

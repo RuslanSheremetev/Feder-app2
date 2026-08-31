@@ -302,7 +302,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
@@ -642,6 +642,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ))
             wsManager?.send(msgJson)
             android.util.Log.d("ChatScreen", "WS_SEND: $msgJson")
+            
+            // Обновляем lastMessage в ViewModel
+            onMessageSent?.invoke(chatUsername, inputText.trim())
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
             val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
             messages = messages + newMsg
