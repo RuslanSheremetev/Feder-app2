@@ -258,7 +258,7 @@ class ChatViewModel : ViewModel() {
                             avatarUrl = entity.avatarUrl,
                             online = entity.online,
                             isMuted = entity.isMuted,
-                            lastSeen = entity.lastSeen,
+                            lastSeen = entity.lastSeen ?: 0,
                             lastMessage = entity.lastMessage,
                             timestamp = entity.lastTime?.toString() ?: ""
                         )
@@ -300,7 +300,7 @@ class ChatViewModel : ViewModel() {
                             avatarUrl = entity.avatarUrl,
                             online = entity.online,
                             isMuted = entity.isMuted,
-                            lastSeen = entity.lastSeen,
+                            lastSeen = entity.lastSeen ?: 0,
                             lastMessage = entity.lastMessage,
                             timestamp = entity.lastTime?.toString() ?: ""
                         )
@@ -486,7 +486,7 @@ fun FederApp() {
                     myUsername = "demo",
                     token = viewModel.token,
                     avatarUrl = viewModel.chats.find { it.username == viewModel.selectedChat }?.avatarUrl,
-                    lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen?.toLongOrNull() ?: 0,
+                    lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
                     isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
