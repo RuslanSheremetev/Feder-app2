@@ -26,7 +26,7 @@ object PhotoUploader {
                     .addFormDataPart("file", fileName, fileBody)
                     .build()
                 val request = Request.Builder()
-                    .url("http://2.26.71.102:8004/api/upload")
+                    .url("http://2.26.71.102:8012/api/upload")
                     .header("Authorization", "Bearer $token")
                     .header("Expect", "")
                     .post(requestBody)
