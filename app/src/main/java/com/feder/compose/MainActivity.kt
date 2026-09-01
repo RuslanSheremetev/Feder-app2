@@ -113,7 +113,6 @@ fun formatTimestamp(timestamp: String?): String {
             } else timestamp.takeLast(5)
         }
     } catch (e: Exception) { timestamp.takeLast(5) }
-    } catch (e: Exception) { timestamp.takeLast(8) }
 }
 
 class ChatViewModel : ViewModel() {
@@ -197,7 +196,7 @@ class ChatViewModel : ViewModel() {
                     val sender = obj.get("from_user")?.asString ?: "unknown"
                     val msgText = obj.get("text")?.asString ?: ""
                     val timeVal = try {
-                    obj.get("time")?.asString?.toLong() ?: obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)
+                    (obj.get("time")?.asString?.toLongOrNull() ?: obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000)) ?: (System.currentTimeMillis() / 1000)
                 } catch (e: Exception) {
                     System.currentTimeMillis() / 1000
                 }
@@ -206,7 +205,7 @@ class ChatViewModel : ViewModel() {
                         if (chat.username == sender) {
                             chat.copy(
                                 lastMessage = msgText,
-                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000)),
+                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date((timeVal ?: System.currentTimeMillis() / 1000) * 1000)),
                                 unread = if (selectedChat != sender) chat.unread + 1 else chat.unread
                             )
                         } else chat
@@ -359,7 +358,7 @@ class ChatViewModel : ViewModel() {
                         if (chat.username == username) {
                             chat.copy(
                                 lastMessage = lastMessage,
-                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000))
+                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date((timeVal ?: System.currentTimeMillis() / 1000) * 1000))
                             )
                         } else chat
                     }
