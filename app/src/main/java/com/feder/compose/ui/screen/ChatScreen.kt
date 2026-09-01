@@ -362,9 +362,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     LaunchedEffect(Unit) {
         try {
-            val client = OkHttpClient()
-            // Chat list now loaded via WebSocket 8008
-            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+            // Chat list now loaded via WebSocket 8008 (порт 8008)
+            // Убираем HTTP запрос - чаты загружаются через WebSocket
+            val response = null
             val body = response?.body?.string()
             if (body != null) {
                 val jsonElement = JsonParser.parseString(body)
