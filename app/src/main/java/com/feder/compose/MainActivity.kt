@@ -88,10 +88,10 @@ data class ChatItem(
     @SerializedName("avatar_url") val avatarUrl: String? = null,
     val online: Boolean = false,
     @SerializedName("is_muted") val isMuted: Boolean = false,
-    @SerializedName("last_seen") val lastSeen: String? = null,
+    @SerializedName("last_seen") val lastSeen: Long = 0,
     @SerializedName("lastMessage") val lastMessage: String? = null,
     val timestamp: String? = null,
-    @SerializedName("time") val timeVal: String? = null
+    @SerializedName("time") val timeVal: Long = 0
 )
 
 fun formatTimestamp(timestamp: String?): String {
