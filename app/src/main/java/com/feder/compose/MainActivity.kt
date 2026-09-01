@@ -259,7 +259,7 @@ class ChatViewModel : ViewModel() {
                             isMuted = entity.isMuted,
                             lastSeen = entity.lastSeen ?: 0,
                             lastMessage = entity.lastMessage,
-                            timestamp = entity.lastTime?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(it)) }
+                            timestamp = entity.lastTime?.toString() ?: ""
                         )
                     }
                     isLoading = false
@@ -301,7 +301,7 @@ class ChatViewModel : ViewModel() {
                             isMuted = entity.isMuted,
                             lastSeen = entity.lastSeen ?: 0,
                             lastMessage = entity.lastMessage,
-                            timestamp = entity.lastTime?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(it)) }
+                            timestamp = entity.lastTime?.toString() ?: ""
                         )
                     }
                     isLoading = false
@@ -337,7 +337,7 @@ class ChatViewModel : ViewModel() {
                                     avatarUrl = chat.avatarUrl,
                                     avatarColor = chat.avatarColor,
                                     lastMessage = chat.lastMessage,
-                                    lastTime = try { chat.timestamp?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(it)?.time } } catch (e: Exception) { null },
+                                    lastTime = chat.timestamp?.toLongOrNull() ?: chat.timeVal ?: (System.currentTimeMillis() / 1000),
                                     unread = chat.unread,
                                     isMuted = chat.isMuted,
                                     online = chat.online,
