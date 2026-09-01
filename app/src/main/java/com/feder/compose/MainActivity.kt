@@ -258,7 +258,7 @@ class ChatViewModel : ViewModel() {
                             avatarUrl = entity.avatarUrl,
                             online = entity.online,
                             isMuted = entity.isMuted,
-                            lastSeen = entity.lastSeen ?: 0,
+                            lastSeen = entity.lastSeen ?: 0L,
                             lastMessage = entity.lastMessage,
                             timestamp = entity.lastTime?.toString() ?: ""
                         )
@@ -300,7 +300,7 @@ class ChatViewModel : ViewModel() {
                             avatarUrl = entity.avatarUrl,
                             online = entity.online,
                             isMuted = entity.isMuted,
-                            lastSeen = entity.lastSeen ?: 0,
+                            lastSeen = entity.lastSeen ?: 0L,
                             lastMessage = entity.lastMessage,
                             timestamp = entity.lastTime?.toString() ?: ""
                         )
