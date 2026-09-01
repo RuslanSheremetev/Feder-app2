@@ -699,9 +699,9 @@ fun FederApp() {
                                         AsyncImage(
                                             model = ImageRequest.Builder(LocalContext.current).data(
     when {
-        chat.avatarUrl == null -> null
-        chat.avatarUrl.startsWith("http") -> chat.avatarUrl
-        chat.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
+        chat.avatarUrl.isNullOrEmpty() -> null
+        chat.avatarUrl!!.startsWith("http") -> chat.avatarUrl
+        chat.avatarUrl!!.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
         else -> "http://2.26.71.102:8010/avatars/${chat.username}/avatar.jpg"
     }
 ).crossfade(true).build(),
