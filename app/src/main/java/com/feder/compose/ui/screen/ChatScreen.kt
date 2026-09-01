@@ -360,12 +360,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
-    LaunchedEffect(Unit) {
-        try {
-            // Chat list now loaded via WebSocket 8008 (порт 8008)
-            // Убираем HTTP запрос - чаты загружаются через WebSocket
-        } catch (_: Exception) {}
-    }
 
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
