@@ -512,13 +512,13 @@ fun FederApp() {
                     } else {
                         Box(Modifier.width(56.dp).height(36.dp)) {
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterStart).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8004/avatars/alex/avatar.jpg", contentDescription = "Alex", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8010/avatars/alex/avatar.jpg", contentDescription = "Alex", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.Center).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8004/avatars/david/avatar.jpg", contentDescription = "Jordan", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8010/avatars/david/avatar.jpg", contentDescription = "Jordan", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterEnd).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8004/avatars/elena/avatar.jpg", contentDescription = "Riley", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = "http://2.26.71.102:8010/avatars/elena/avatar.jpg", contentDescription = "Riley", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             }
                         }
                     }
@@ -656,9 +656,9 @@ fun FederApp() {
                             }
                             // Contact stories
                             listOf(
-                                "Alex" to "http://2.26.71.102:8004/avatars/avatar_2.jpg",
-                                "Elena" to "http://2.26.71.102:8004/avatars/avatar_5.jpg",
-                                "Marcus" to "http://2.26.71.102:8004/avatars/avatar_1.jpg"
+                                "Alex" to "http://2.26.71.102:8010/avatars/avatar_2.jpg",
+                                "Elena" to "http://2.26.71.102:8010/avatars/avatar_5.jpg",
+                                "Marcus" to "http://2.26.71.102:8010/avatars/avatar_1.jpg"
                             ).forEach { (name, url) ->
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(url).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
@@ -686,7 +686,7 @@ fun FederApp() {
                                 Box(Modifier.size(56.dp)) {
                                     if (chat.avatarUrl != null) {
                                         AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current).data(if (chat.avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004${chat.avatarUrl}" else chat.avatarUrl).crossfade(true).build(),
+                                            model = ImageRequest.Builder(LocalContext.current).data(if (chat.avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8010${chat.avatarUrl}" else chat.avatarUrl).crossfade(true).build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)

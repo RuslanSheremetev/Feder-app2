@@ -363,7 +363,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     LaunchedEffect(Unit) {
         try {
             val client = OkHttpClient()
-            val request = Request.Builder().url("http://2.26.71.102:8004/api/chat_settings/all?me=$myUsername").build()
+            // Chat list now loaded via WebSocket 8008
             val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
             val body = response?.body?.string()
             if (body != null) {
