@@ -106,7 +106,7 @@ fun formatTimestamp(timestamp: String?): String {
             if (parts.size >= 2) {
                 val time = parts[1].split(":")
                 if (time.size >= 2) {
-                    val hour = time[0].padStart(2, '0')
+                    val hour = time.getOrNull(0)?.padStart(2, '0') ?: "00"
                     val minute = time[1]
                     "$hour:$minute"
                 } else timestamp.takeLast(5)
@@ -684,7 +684,7 @@ fun FederApp() {
                         // Список чатов
                         items(viewModel.filteredChats) { chat ->
                             val avColor = try { 
-    if (chat.avatarColor.isNotEmpty()) Color(android.graphics.Color.parseColor(chat.avatarColor)) else Primary 
+    if (chat.avatarColor.isNotEmpty() && chat.avatarColor.startsWith("#")) Color(android.graphics.Color.parseColor(chat.avatarColor)) else Primary 
 } catch (e: Exception) { Primary }
                             val lastMsg = chat.lastMessage ?: ""
                             val time = chat.timestamp ?: ""

@@ -553,7 +553,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (listState.isScrollInProgress) {
                     val items = listState.layoutInfo.visibleItemsInfo
                     if (items.isNotEmpty()) {
-                        val firstVisibleIdx = items.first().index
+                        val firstVisibleIdx = items.firstOrNull()?.index ?: 0
                         val firstDt = formatHeaderDate(messages[firstVisibleIdx].timeVal)
                         // Ищем границу: идём вперёд пока дата не изменится
                         var headerDate = firstDt
