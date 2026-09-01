@@ -90,7 +90,8 @@ data class ChatItem(
     @SerializedName("is_muted") val isMuted: Boolean = false,
     @SerializedName("last_seen") val lastSeen: Long = 0,
     @SerializedName("lastMessage") val lastMessage: String? = null,
-    val timestamp: String? = null
+    val timestamp: String? = null,
+    @SerializedName("time") val timeVal: Long? = null
 )
 
 fun formatTimestamp(timestamp: String): String {
@@ -686,7 +687,14 @@ fun FederApp() {
                                 Box(Modifier.size(56.dp)) {
                                     if (chat.avatarUrl != null) {
                                         AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current).data(if (chat.avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8010${chat.avatarUrl}" else chat.avatarUrl).crossfade(true).build(),
+                                            model = ImageRequest.Builder(LocalContext.current).data(
+    when {
+        chat.avatarUrl == null -> null
+        chat.avatarUrl.startsWith("http") -> chat.avatarUrl
+        chat.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
+        else -> "http://2.26.71.102:8010/avatars/${chat.username}/avatar.jpg"
+    }
+).crossfade(true).build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)
