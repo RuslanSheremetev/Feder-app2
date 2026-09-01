@@ -364,20 +364,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         try {
             // Chat list now loaded via WebSocket 8008 (порт 8008)
             // Убираем HTTP запрос - чаты загружаются через WebSocket
-            val response = null
-            val body = response?.body?.string()
-            if (body != null) {
-                val jsonElement = JsonParser.parseString(body)
-                val jsonArray = if (jsonElement.isJsonArray) jsonElement.asJsonArray else com.google.gson.JsonArray()
-                val loaded = jsonArray.map { el ->
-                    val obj = el.asJsonObject
-                    val uname = obj.get("username")?.asString ?: ""
-                    val name = obj.get("name")?.asString ?: uname
-                    val avatar = obj.get("avatar_url")?.asString ?: ""
-                    mapOf<String, Any?>("username" to uname, "name" to name, "avatar_url" to avatar)
-                }
-                forwardContacts = loaded
-            }
         } catch (_: Exception) {}
     }
 
