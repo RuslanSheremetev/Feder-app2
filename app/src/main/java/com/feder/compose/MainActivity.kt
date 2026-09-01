@@ -274,9 +274,11 @@ class ChatViewModel : ViewModel() {
             }
         }
     }
+    private var chatsWsManager: ProWebSocket? = null
+    
     private fun loadChats() {
+        // Загружаем из Room
         viewModelScope.launch {
-            // 1. Сначала загружаем из Room (мгновенно)
             repository?.let { repo ->
                 val cachedChats = repo.getChats()
                 if (cachedChats.isNotEmpty()) {
@@ -297,34 +299,67 @@ class ChatViewModel : ViewModel() {
                     isLoading = false
                 }
             }
+        }
+        
+        // Подключаемся к 8008 для списка чатов
+        if (chatsWsManager == null) {
+            chatsWsManager = ProWebSocket()
+        }
+        val chatsWs = chatsWsManager!!
+        
+        chatsWs.onMessage = { json ->
             try {
-                withContext(Dispatchers.IO) {
-                val request = Request.Builder().url("$server/api/chat_settings/all?me=demo").header("Authorization", "Bearer $token").build()
-                val response = client.newCall(request).execute()
-                val json = response.body?.string() ?: "[]"
-                val type = object : TypeToken<List<ChatItem>>() {}.type
-                chats = gson.fromJson(json, type)
-                }
-                // Сохраняем в Room
-                repository?.let { repo ->
-                    val chatEntities = chats.map { chat ->
-                        com.feder.compose.data.entity.ChatEntity(
-                            username = chat.username,
-                            name = chat.name,
-                            avatarUrl = chat.avatarUrl,
-                            avatarColor = chat.avatarColor,
-                            lastMessage = chat.lastMessage,
-                            lastTime = try { chat.timestamp?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(it)?.time } } catch (e: Exception) { null },
-                            unread = chat.unread,
-                            isMuted = chat.isMuted,
-                            online = chat.online,
-                            lastSeen = chat.lastSeen
-                        )
+                val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
+                val type = obj.get("type")?.asString ?: ""
+                
+                if (type == "chats_list") {
+                    val data = obj.getAsJsonArray("data")
+                    val typeToken = object : com.google.gson.reflect.TypeToken<List<ChatItem>>() {}.type
+                    val loadedChats = gson.fromJson<List<ChatItem>>(data, typeToken)
+                    chats = loadedChats
+                    isLoading = false
+                    
+                    // Сохраняем в Room
+                    repository?.let { repo ->
+                        val chatEntities = loadedChats.map { chat ->
+                            com.feder.compose.data.entity.ChatEntity(
+                                username = chat.username,
+                                name = chat.name,
+                                avatarUrl = chat.avatarUrl,
+                                avatarColor = chat.avatarColor,
+                                lastMessage = chat.lastMessage,
+                                lastTime = try { chat.timestamp?.let { java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).parse(it)?.time } } catch (e: Exception) { null },
+                                unread = chat.unread,
+                                isMuted = chat.isMuted,
+                                online = chat.online,
+                                lastSeen = chat.lastSeen
+                            )
+                        }
+                        repo.saveChats(chatEntities)
                     }
-                    repo.saveChats(chatEntities)
                 }
-                isLoading = false
-            } catch (e: Exception) { error = "Ошибка загрузки"; isLoading = false }
+                
+                if (type == "chat_update") {
+                    val username = obj.get("username")?.asString ?: return@onMessage
+                    val lastMessage = obj.get("lastMessage")?.asString ?: ""
+                    val timeVal = obj.get("time")?.asLong ?: System.currentTimeMillis() / 1000
+                    
+                    chats = chats.map { chat ->
+                        if (chat.username == username) {
+                            chat.copy(
+                                lastMessage = lastMessage,
+                                timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(timeVal * 1000))
+                            )
+                        } else chat
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ChatsWS", "Parse error: ${e.message}")
+            }
+        }
+        
+        if (token.isNotEmpty()) {
+            chatsWs.connect("demo", token, "2.26.71.102", 8008)
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
