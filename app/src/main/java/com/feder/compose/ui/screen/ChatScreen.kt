@@ -554,7 +554,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val items = listState.layoutInfo.visibleItemsInfo
                     if (items.isNotEmpty()) {
                         val firstVisibleIdx = items.firstOrNull()?.index ?: 0
-                        val firstDt = formatHeaderDate(messages[firstVisibleIdx].timeVal)
+                        val firstDt = if (messages.isNotEmpty() && firstVisibleIdx < messages.size) formatHeaderDate(messages[firstVisibleIdx].timeVal) else ""
                         // Ищем границу: идём вперёд пока дата не изменится
                         var headerDate = firstDt
                         for (i in firstVisibleIdx until messages.size) {
