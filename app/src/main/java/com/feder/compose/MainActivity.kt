@@ -142,6 +142,7 @@ class ChatViewModel : ViewModel() {
         }
     }
     var token by mutableStateOf("")
+    var currentUsername by mutableStateOf("")
     var wsManager: ProWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
     var isLoading by mutableStateOf(true)
@@ -369,7 +370,7 @@ class ChatViewModel : ViewModel() {
         }
         
         if (token.isNotEmpty()) {
-            chatsWs.connect(username, token, "2.26.71.102", 8008)
+            chatsWs.connect(currentUsername.ifEmpty { "demo" }, token, "2.26.71.102", 8008)
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
