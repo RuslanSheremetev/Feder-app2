@@ -342,7 +342,8 @@ class ChatViewModel : ViewModel() {
                 }
                 
                 if (type == "chat_update") {
-                    val username = obj.get("username")?.asString ?: return@chatsWs.onMessage
+                    val username = obj.get("username")?.asString
+                    if (username == null) return@onMessage
                     val lastMessage = obj.get("lastMessage")?.asString ?: ""
                     val timeVal = obj.get("time")?.asLong ?: System.currentTimeMillis() / 1000
                     
