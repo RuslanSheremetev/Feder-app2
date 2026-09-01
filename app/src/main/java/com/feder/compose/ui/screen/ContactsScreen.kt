@@ -169,7 +169,12 @@ private fun ContactRow(contact: ChatItem) {
         Box {
             if (contact.avatarUrl != null) {
                 AsyncImage(
-                    model = contact.avatarUrl,
+                    model = when {
+                        contact.avatarUrl.isNullOrEmpty() -> null
+                        contact.avatarUrl.startsWith("http") -> contact.avatarUrl
+                        contact.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${contact.avatarUrl}"
+                        else -> "http://2.26.71.102:8010/avatars/${contact.username}/avatar.jpg"
+                    },
                     contentDescription = contact.name,
                     modifier = Modifier.size(48.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
