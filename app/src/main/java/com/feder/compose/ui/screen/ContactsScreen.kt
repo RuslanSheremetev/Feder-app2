@@ -35,7 +35,8 @@ data class Contact(
     val status: String,
     val avatarUrl: String? = null,
     val initials: String? = null,
-    val online: Boolean = false
+    val online: Boolean = false,
+    val lastSeen: Long? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
