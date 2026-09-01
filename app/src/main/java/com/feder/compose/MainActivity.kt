@@ -322,7 +322,7 @@ class ChatViewModel : ViewModel() {
                 val type = obj.get("type")?.asString ?: ""
                 
                 if (type == "chats_list") {
-                    val data = obj.getAsJsonArray("data")
+                    val data = obj?.getAsJsonArray("data") ?: com.google.gson.JsonArray()
                     val typeToken = object : com.google.gson.reflect.TypeToken<List<ChatItem>>() {}.type
                     val loadedChats = gson.fromJson<List<ChatItem>>(data, typeToken)
                     chats = loadedChats
@@ -370,7 +370,12 @@ class ChatViewModel : ViewModel() {
         }
         
         if (token.isNotEmpty()) {
-            chatsWs.connect(currentUsername.ifEmpty { "demo" }, token, "2.26.71.102", 8008)
+            try {
+                chatsWs.connect(currentUsername.ifEmpty { "demo" }, token, "2.26.71.102", 8008)
+            } catch (e: Exception) {
+                android.util.Log.e("ChatsWS", "Cannot connect to 8008: ${e.message}")
+                isLoading = false
+            }
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
