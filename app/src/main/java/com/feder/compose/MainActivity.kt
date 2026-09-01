@@ -94,17 +94,25 @@ data class ChatItem(
     @SerializedName("time") val timeVal: Long? = null
 )
 
-fun formatTimestamp(timestamp: String): String {
+fun formatTimestamp(timestamp: String?): String {
+    if (timestamp.isNullOrEmpty()) return ""
     return try {
-        val parts = timestamp.split(" ")
-        if (parts.size >= 2) {
-            val time = parts[1].split(":")
-            if (time.size >= 2) {
-                val hour = time[0].padStart(2, '0')
-                val minute = time[1]
-                "$hour:$minute"
-            } else timestamp.takeLast(8)
-        } else timestamp.takeLast(8)
+        val epoch = timestamp.toLongOrNull()
+        if (epoch != null && epoch > 1000000000) {
+            val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.US)
+            sdf.format(java.util.Date(epoch * 1000))
+        } else {
+            val parts = timestamp.split(" ")
+            if (parts.size >= 2) {
+                val time = parts[1].split(":")
+                if (time.size >= 2) {
+                    val hour = time[0].padStart(2, '0')
+                    val minute = time[1]
+                    "$hour:$minute"
+                } else timestamp.takeLast(5)
+            } else timestamp.takeLast(5)
+        }
+    } catch (e: Exception) { timestamp.takeLast(5) }
     } catch (e: Exception) { timestamp.takeLast(8) }
 }
 
