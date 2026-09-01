@@ -369,7 +369,7 @@ class ChatViewModel : ViewModel() {
         }
         
         if (token.isNotEmpty()) {
-            chatsWs.connect("demo", token, "2.26.71.102", 8008)
+            chatsWs.connect(username, token, "2.26.71.102", 8008)
         }
     }
     fun refresh() { isLoading = true; error = null; if (token.isEmpty()) loginAndLoad() else loadChats() }
@@ -682,7 +682,9 @@ fun FederApp() {
 
                         // Список чатов
                         items(viewModel.filteredChats) { chat ->
-                            val avColor = try { Color(android.graphics.Color.parseColor(chat.avatarColor)) } catch (e: Exception) { Primary }
+                            val avColor = try { 
+    if (chat.avatarColor.isNotEmpty()) Color(android.graphics.Color.parseColor(chat.avatarColor)) else Primary 
+} catch (e: Exception) { Primary }
                             val lastMsg = chat.lastMessage ?: ""
                             val time = chat.timestamp ?: ""
                             
