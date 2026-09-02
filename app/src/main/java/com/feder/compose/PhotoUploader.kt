@@ -35,7 +35,8 @@ object PhotoUploader {
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
                         val json = JSONObject(response.body?.string() ?: "{}")
-                        val url = json.optString("url", null)
+                        val url = json.optString("url", "")
+                    if (url.isEmpty()) return null
                     android.util.Log.d("PhotoUploader", "UPLOAD_SUCCESS url=$url")
                     return url
                     }
