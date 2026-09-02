@@ -789,6 +789,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             msg.text,
                             msg.time.takeLast(8).take(5),
                             isMine,
+                            token = token,
                             position = position,
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
                             onClick = {
