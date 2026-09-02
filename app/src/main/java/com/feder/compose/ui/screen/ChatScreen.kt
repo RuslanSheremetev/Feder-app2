@@ -419,6 +419,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     LaunchedEffect(chatUsername) {
         android.util.Log.d("ChatScreen", "Chat opened: $chatUsername")
+        // Сбрасываем бейдж непрочитанных
+        repository?.markRead(chatUsername)
         withContext(Dispatchers.IO) {
             // 1. Загружаем из Room (мгновенно, работает оффлайн)
             repository?.let { repo ->
