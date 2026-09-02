@@ -32,12 +32,19 @@ object PhotoUploader {
                     .build()
                 
                 client.newCall(request).execute().use { response ->
+                    val responseBody = response.body?.string() ?: ""
+                    android.util.Log.d("PhotoUploader", "Response code: ${response.code}, body: $responseBody")
                     if (response.isSuccessful) {
-                        val json = JSONObject(response.body?.string() ?: "{}")
+                        val json = JSONObject(responseBody)
                         val url = json.optString("url", "")
-                    if (url.isEmpty()) return null
-                    android.util.Log.d("PhotoUploader", "UPLOAD_SUCCESS url=$url")
-                    return url
+                        if (url.isEmpty()) {
+                            android.util.Log.e("PhotoUploader", "Empty url in response")
+                            return null
+                        }
+                        android.util.Log.d("PhotoUploader", "UPLOAD_SUCCESS url=$url")
+                        return url
+                    } else {
+                        android.util.Log.e("PhotoUploader", "Upload failed: ${response.code}")
                     }
                 }
                 if (attempt < 3) Thread.sleep(100)
