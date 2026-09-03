@@ -163,7 +163,7 @@ class FederHttpClient(
         // Multipart headers
         output.writeBytes("--$boundary\r\n")
         output.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"$fileName\"\r\n")
-        output.writeBytes("Content-Type: application/octet-stream\r\n")
+        output.writeBytes("Content-Type: image/jpeg\r\n")
         output.writeBytes("\r\n")
         
         // Zero-copy для больших файлов (chunked)
