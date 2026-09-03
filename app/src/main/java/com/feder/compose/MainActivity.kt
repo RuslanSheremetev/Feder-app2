@@ -115,6 +115,26 @@ fun formatTimestamp(timestamp: String?): String {
     } catch (e: Exception) { timestamp.takeLast(5) }
 }
 
+class MainActivity : ComponentActivity() {
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (!allGranted) {
+            Toast.makeText(this, "Нужны разрешения для доступа к фото", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun requestMediaPermissions() {
+        permissionLauncher.launch(
+            arrayOf(
+                android.Manifest.permission.READ_MEDIA_IMAGES,
+                android.Manifest.permission.READ_MEDIA_VIDEO
+            )
+        )
+    }
+}
+
 class ChatViewModel : ViewModel() {
     var selectedChat by mutableStateOf<String?>(null)
     var selectedProfile by mutableStateOf<String?>(null)
