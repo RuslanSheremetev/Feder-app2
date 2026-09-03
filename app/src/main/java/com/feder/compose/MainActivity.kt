@@ -434,10 +434,38 @@ class MainActivity : ComponentActivity() {
         } catch (_: Exception) {}
     }
 
+    private val permissionLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (!allGranted) {
+            android.widget.Toast.makeText(this, "Нужны разрешения для фото", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun requestMediaPermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            permissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.READ_MEDIA_IMAGES,
+                    android.Manifest.permission.READ_MEDIA_VIDEO
+                )
+            )
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logToDb("MAIN_ACTIVITY_CREATED")
         scheduleSync()
+        // Запрашиваем разрешения при первом входе
+        requestMediaPermissions()
         try {
         window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
