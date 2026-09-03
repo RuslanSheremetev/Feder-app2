@@ -356,6 +356,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             selectedPhotos = setOf(uri)
             showAttachSheet = false
             attachExpanded = false
+            // Автоматически отправляем фото
+            sendMessage()
         }
     }
     var forwardSearch by remember { mutableStateOf("") }
