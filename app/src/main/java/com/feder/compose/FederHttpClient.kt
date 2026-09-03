@@ -378,6 +378,7 @@ object FederFileUploader {
         val encodedToken = URLEncoder.encode(token, "UTF-8")
         val encodedToUser = URLEncoder.encode(toUser, "UTF-8")
         
+        android.util.Log.d("FederFileUploader", "Uploading to: http://2.26.71.102:8012/api/upload?token=${encodedToken.take(20)}...&to_user=$encodedToUser")
         return client.upload(
             url = "http://2.26.71.102:8012/api/upload?token=$encodedToken&to_user=$encodedToUser",
             fileName = fileName,
