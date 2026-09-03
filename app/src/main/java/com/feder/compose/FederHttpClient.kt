@@ -210,7 +210,7 @@ class FederHttpClient(
         listener: ProgressListener? = null
     ): Boolean {
         return try {
-            val fullUrl = "$url?token=${URLEncoder.encode(token, "UTF-8")}"
+            val fullUrl = "$url?token=${encodeTokenForUrl(token)}"
             val connection = getConnection(fullUrl)
             
             connection.requestMethod = "GET"
@@ -351,6 +351,13 @@ class FederHttpClient(
         } catch (e: Exception) {}
     }
 
+    private fun encodeTokenForUrl(token: String): String {
+        return token
+            .replace("+", "-")
+            .replace("/", "_")
+            .replace("=", "")
+    }
+
     private fun parseUrl(json: String): String? {
         return try {
             val obj = org.json.JSONObject(json)
@@ -375,7 +382,7 @@ object FederFileUploader {
         onError: ((String) -> Unit)? = null
     ): String? {
         val bytes = inputStream.readBytes()
-        val encodedToken = URLEncoder.encode(token, "UTF-8")
+        val encodedToken = encodeTokenForUrl(token)
         val encodedToUser = URLEncoder.encode(toUser, "UTF-8")
         
         android.util.Log.d("FederFileUploader", "Uploading to: http://2.26.71.102:8012/api/upload?token=${encodedToken.take(20)}...&to_user=$encodedToUser")
