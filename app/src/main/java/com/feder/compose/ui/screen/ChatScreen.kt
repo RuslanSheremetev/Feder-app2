@@ -354,19 +354,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     ) { uri ->
         if (uri != null) {
             selectedPhotos = setOf(uri)
-            showAttachSheet = false
-            attachExpanded = false
+            // Меню остаётся открытым до нажатия Send
 
         }
     }
-    // Закрываем меню при выборе фото
-    LaunchedEffect(selectedPhotos) {
-        if (selectedPhotos.isNotEmpty()) {
-            showAttachSheet = false
-            attachExpanded = false
-        }
-    }
-    
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
 
