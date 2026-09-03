@@ -369,6 +369,10 @@ class FederHttpClient(
     }
 }
 
+fun encodeTokenForUrl(token: String): String {
+    return token.replace("+", "-").replace("/", "_").replace("=", "")
+}
+
 object FederFileUploader {
     private val client = FederHttpClient()
 
