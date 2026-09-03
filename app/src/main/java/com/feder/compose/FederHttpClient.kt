@@ -128,7 +128,7 @@ class FederHttpClient(
                 val jitter = (Math.random() * 500).toLong()
                 val delay = baseDelay + jitter
                 listener?.onRetry(attempt, delay)
-                Thread.sleep(delay)
+                Thread.sleep(100)
             }
         }
         
@@ -158,7 +158,7 @@ class FederHttpClient(
         connection.setRequestProperty("Accept-Encoding", "gzip")
         connection.setRequestProperty("User-Agent", "FederHttpClient/$VERSION")
         
-        val output = DataOutputStream(BufferedOutputStream(connection.outputStream, 131072))
+        val output = DataOutputStream(BufferedOutputStream(connection.outputStream, 65536))
         
         // Multipart headers
         output.writeBytes("--$boundary\r\n")
@@ -167,7 +167,7 @@ class FederHttpClient(
         output.writeBytes("\r\n")
         
         // Zero-copy для больших файлов (chunked)
-        val chunkSize = 262144 // 256KB
+        val chunkSize = 65536 // 64KB
         var sent = 0
         while (sent < fileBytes.size) {
             val len = minOf(chunkSize, fileBytes.size - sent)
