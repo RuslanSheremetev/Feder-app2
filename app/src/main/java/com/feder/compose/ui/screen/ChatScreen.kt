@@ -592,9 +592,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             showAttachSheet = false
             attachExpanded = false
             
-            val uri = photosToSend.first()
+            val uri = selectedPhotos.first()
             // Очищаем выбранные фото сразу
-            val photosToSend = selectedPhotos.toSet()
             selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             uploadingPhotos = true
