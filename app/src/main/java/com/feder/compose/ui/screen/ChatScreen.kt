@@ -605,6 +605,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                         httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
+                    // Сохраняем в Room
+                    repository?.let { repo ->
+                        repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                            id = System.currentTimeMillis(),
+                            fromUser = myUsername,
+                            toUser = chatUsername,
+                            text = inputText.trim(),
+                            timeVal = System.currentTimeMillis() / 1000,
+                            imageUrls = uploadedUrl,
+                            isRead = false
+                        ))
+                    }
                     } catch (e: Exception) {}
                     withContext(Dispatchers.Main) { 
                         selectedPhotos = emptySet()
