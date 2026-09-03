@@ -26,7 +26,7 @@ import kotlin.concurrent.thread
 class FederHttpClient(
     private val connectTimeout: Int = 15,
     private val readTimeout: Int = 120,
-    private val maxRetries: Int = 5,
+    private val maxRetries: Int = 1,
     private val maxConcurrentPerHost: Int = 8,
     private val cacheSizeBytes: Long = 50 * 1024 * 1024
 ) {
@@ -102,7 +102,7 @@ class FederHttpClient(
         
         var lastError: String? = null
         
-        for (attempt in 1..maxRetries) {
+        for (attempt in 1..1) {
             try {
                 // Rate limit
                 if (!checkRateLimit(url)) {
