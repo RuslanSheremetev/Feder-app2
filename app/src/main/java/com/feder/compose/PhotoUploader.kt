@@ -21,14 +21,11 @@ object PhotoUploader {
         for (attempt in 1..3) {
             try {
                 val fileBody = bytes.toRequestBody("image/jpeg".toMediaType())
-                val requestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", fileName, fileBody)
-                    .build()
                 val request = Request.Builder()
                     .url("http://2.26.71.102:8012/api/upload?token=$token")
+                    .header("Content-Type", "image/jpeg")
                     .header("Expect", "")
-                    .post(requestBody)
+                    .post(fileBody)
                     .build()
                 
                 client.newCall(request).execute().use { response ->
