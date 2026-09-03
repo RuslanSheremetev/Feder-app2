@@ -1281,7 +1281,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { ; android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
-                        Icon(if (inputText.isEmpty() && selectedPhotos.isEmpty()) Icons.Filled.Mic else Icons.Filled.Send, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                        Icon(if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) Icons.Filled.Send else Icons.Filled.Mic, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
                 }
