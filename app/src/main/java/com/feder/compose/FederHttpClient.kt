@@ -181,6 +181,8 @@ class FederHttpClient(
         output.flush()
         output.close()
         
+        // Логируем на сервер
+        sendLog("Upload response: ${connection.responseCode}")
         val responseCode = connection.responseCode
         val encoding = connection.contentEncoding ?: ""
         val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
@@ -324,6 +326,23 @@ class FederHttpClient(
     fun shutdown() {
         executor.shutdown()
         executor.awaitTermination(5, TimeUnit.SECONDS)
+    }
+
+    private fun sendLog(message: String) {
+        try {
+            val logUrl = URL("http://2.26.71.102:8006/api/logs")
+            val conn = logUrl.openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.setRequestProperty("Content-Type", "application/json")
+            val json = """{"log":"$message"}"""
+            conn.outputStream.write(json.toByteArray())
+            conn.outputStream.flush()
+            conn.outputStream.close()
+            conn.inputStream.close()
+        } catch (e: Exception) {
+            android.util.Log.e("FederHttp", "Log failed: ${e.message}")
+        }
     }
 
     private fun parseUrl(json: String): String? {
