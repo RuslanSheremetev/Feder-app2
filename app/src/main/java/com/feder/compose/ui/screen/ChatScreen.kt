@@ -1010,7 +1010,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
         // Attach Sheet
         if (showAttachSheet) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false })
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false; selectedPhotos = emptySet() })
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
