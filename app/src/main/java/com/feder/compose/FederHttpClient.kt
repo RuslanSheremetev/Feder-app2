@@ -86,6 +86,14 @@ class FederHttpClient(
         token: String,
         listener: ProgressListener? = null
     ): String? {
+        sendLog("UPLOAD_START url=$url size=${fileBytes.size}")
+
+        url: String,
+        fileName: String,
+        fileBytes: ByteArray,
+        token: String,
+        listener: ProgressListener? = null
+    ): String? {
         // Проверяем кэш (если такой же файл уже загружался)
         val cacheKey = "$url:${fileBytes.size}:${fileBytes.contentHashCode()}"
         memoryCache[cacheKey]?.let { cachedUrl ->
@@ -145,11 +153,13 @@ class FederHttpClient(
     ): String? {
         val boundary = "$BOUNDARY_PREFIX${System.nanoTime()}"
         val connection = getConnection(url)
+        sendLog("CONNECTION_READY url=$url")
         
         connection.requestMethod = "POST"
         connection.doOutput = true
         connection.doInput = true
         connection.connectTimeout = connectTimeout * 1000
+        sendLog("TIMEOUT_SET connect=$connectTimeout read=$readTimeout")
         connection.readTimeout = readTimeout * 1000
         connection.useCaches = false
         
@@ -158,9 +168,11 @@ class FederHttpClient(
         connection.setRequestProperty("Accept-Encoding", "gzip")
         connection.setRequestProperty("User-Agent", "FederHttpClient/$VERSION")
         
+        sendLog("OUTPUT_STREAM_READY")
         val output = DataOutputStream(BufferedOutputStream(connection.outputStream, 131072))
         
         // Multipart headers
+        sendLog("MULTIPART_HEADERS_WRITING boundary=$boundary")
         output.writeBytes("--$boundary\r\n")
         output.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"$fileName\"\r\n")
         output.writeBytes("Content-Type: image/jpeg\r\n")
@@ -179,11 +191,14 @@ class FederHttpClient(
         output.writeBytes("\r\n")
         output.writeBytes("--$boundary--\r\n")
         output.flush()
+        sendLog("MULTIPART_SENT bytes=${fileBytes.size}")
         output.close()
         
         // Логируем на сервер
         sendLog("Upload response: ${connection.responseCode}")
+        sendLog("GETTING_RESPONSE...")
         val responseCode = connection.responseCode
+        sendLog("RESPONSE_CODE=$responseCode")
         val encoding = connection.contentEncoding ?: ""
         val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
         val decodedStream = if (encoding.contains("gzip")) GZIPInputStream(stream) else stream
@@ -194,7 +209,9 @@ class FederHttpClient(
         recycleConnection(url, connection)
         
         if (responseCode in 200..299) {
-            return parseUrl(responseBody)
+            val parsedUrl = parseUrl(responseBody)
+        sendLog("PARSED_URL=$parsedUrl")
+        return parsedUrl
         }
         
         return null
