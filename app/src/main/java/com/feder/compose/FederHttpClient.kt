@@ -330,19 +330,25 @@ class FederHttpClient(
 
     private fun sendLog(message: String) {
         try {
-            val logUrl = URL("http://2.26.71.102:8006/api/logs")
-            val conn = logUrl.openConnection() as HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.doOutput = true
-            conn.setRequestProperty("Content-Type", "application/json")
-            val json = """{"log":"$message"}"""
-            conn.outputStream.write(json.toByteArray())
-            conn.outputStream.flush()
-            conn.outputStream.close()
-            conn.inputStream.close()
-        } catch (e: Exception) {
-            android.util.Log.e("FederHttp", "Log failed: ${e.message}")
-        }
+            kotlin.concurrent.thread {
+                try {
+                    val logUrl = URL("http://2.26.71.102:8006/api/logs")
+                    val conn = logUrl.openConnection() as HttpURLConnection
+                    conn.requestMethod = "POST"
+                    conn.doOutput = true
+                    conn.setRequestProperty("Content-Type", "application/json")
+                    conn.connectTimeout = 3000
+                    conn.readTimeout = 3000
+                    val json = """{"log":"$message"}"""
+                    conn.outputStream.write(json.toByteArray())
+                    conn.outputStream.flush()
+                    conn.outputStream.close()
+                    conn.inputStream.close()
+                } catch (e: Exception) {
+                    android.util.Log.e("FederHttp", "Log failed: ${e.message}")
+                }
+            }
+        } catch (e: Exception) {}
     }
 
     private fun parseUrl(json: String): String? {
