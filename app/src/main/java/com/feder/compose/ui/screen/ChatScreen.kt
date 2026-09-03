@@ -475,13 +475,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 // Сохраняем загруженные сообщения в Room
                 repository?.let { repo ->
-                    repo.saveMessages(loaded.map { msg ->
+                    repo.saveMessages(messages.map { msg ->
                         com.feder.compose.data.entity.MessageEntity(
                             id = msg.id.toLong(),
                             fromUser = msg.from,
                             toUser = msg.to,
                             text = msg.text,
-                            timeVal = msg.timeVal,
+                            timeVal = msg.timeVal.let { if (it > 0) it else (msg.time.toLongOrNull() ?: 0L) },
                             imageUrls = msg.imageUrls.joinToString(","),
                             isRead = msg.status == "read",
                             posX = msg.posX,
