@@ -344,15 +344,17 @@ object FederFileUploader {
         inputStream: InputStream,
         fileName: String,
         token: String,
+        toUser: String = "",
         onProgress: ((Long, Long) -> Unit)? = null,
         onComplete: ((String) -> Unit)? = null,
         onError: ((String) -> Unit)? = null
     ): String? {
         val bytes = inputStream.readBytes()
         val encodedToken = URLEncoder.encode(token, "UTF-8")
+        val encodedToUser = URLEncoder.encode(toUser, "UTF-8")
         
         return client.upload(
-            url = "http://2.26.71.102:8012/api/upload?token=$encodedToken",
+            url = "http://2.26.71.102:8012/api/upload?token=$encodedToken&to_user=$encodedToUser",
             fileName = fileName,
             fileBytes = bytes,
             token = token,

@@ -602,7 +602,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
                     val input = context.applicationContext.contentResolver.openInputStream(uri)
-                    if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token) else null
+                    if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
                 } catch (e: Exception) { null }
                 uploadingPhotos = false
                 isSending = false
