@@ -1,57 +1,9 @@
 package com.feder.compose
 
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
-import org.json.JSONObject
 
 object PhotoUploader {
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(120, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
-        .build()
-
     fun uploadPhoto(inputStream: InputStream, fileName: String, token: String): String? {
-        val bytes = inputStream.readBytes()
-        
-        for (attempt in 1..3) {
-            try {
-                val fileBody = bytes.toRequestBody("image/jpeg".toMediaType())
-                val requestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", fileName, fileBody)
-                    .build()
-                val request = Request.Builder()
-                    .url("http://2.26.71.102:8012/api/upload?token=$token")
-                    .header("Expect", "")
-                    .post(requestBody)
-                    .build()
-                
-                client.newCall(request).execute().use { response ->
-                    val responseBody = response.body?.string() ?: ""
-                    android.util.Log.d("PhotoUploader", "Response code: ${response.code}, body: $responseBody")
-                    if (response.isSuccessful) {
-                        val json = JSONObject(responseBody)
-                        val url = json.optString("url", "")
-                        if (url.isEmpty()) {
-                            android.util.Log.e("PhotoUploader", "Empty url in response")
-                            return null
-                        }
-                        android.util.Log.d("PhotoUploader", "UPLOAD_SUCCESS url=$url")
-                        return url
-                    } else {
-                        android.util.Log.e("PhotoUploader", "Upload failed: ${response.code}")
-                    }
-                }
-                if (attempt < 3) Thread.sleep(100)
-            } catch (e: Exception) {
-                if (attempt < 3) Thread.sleep(100)
-            }
-        }
-        return null
+        return FederFileUploader.uploadPhoto(inputStream, fileName, token)
     }
 }
