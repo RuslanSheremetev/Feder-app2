@@ -607,6 +607,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isSending = false
                 if (uploadedUrl != null) {
                     messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
+                    // Сохраняем обновлённое сообщение в Room
+                    val updatedMsg = messages.find { it.imageUrls == listOf(uploadedUrl) }
+                    if (updatedMsg != null) {
+                        repository?.let { repo ->
+                            repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                                id = updatedMsg.id.toLong(),
+                                fromUser = updatedMsg.from,
+                                toUser = updatedMsg.to,
+                                text = updatedMsg.text,
+                                timeVal = updatedMsg.timeVal,
+                                imageUrls = uploadedUrl,
+                                isRead = updatedMsg.status == "read"
+                            ))
+                        }
+                    }
                     try {
                         val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
