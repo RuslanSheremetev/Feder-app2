@@ -597,6 +597,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Отправка фото
         if (selectedPhotos.isNotEmpty()) {
+            // Закрываем меню выбора
+            showAttachSheet = false
+            attachExpanded = false
+            
             val uri = selectedPhotos.first()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             uploadingPhotos = true
