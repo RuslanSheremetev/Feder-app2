@@ -623,18 +623,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         ))
                     }
                     } catch (e: Exception) {}
-                    // Сохраняем в Room
-                    repository?.let { repo ->
-                        repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = System.currentTimeMillis(),
-                            fromUser = myUsername,
-                            toUser = chatUsername,
-                            text = inputText.trim(),
-                            timeVal = System.currentTimeMillis() / 1000,
-                            imageUrls = uploadedUrl,
-                            isRead = false
-                        ))
-                    }
                     withContext(Dispatchers.Main) { 
                         selectedPhotos = emptySet()
                         inputText = ""
