@@ -592,7 +592,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             showAttachSheet = false
             attachExpanded = false
             
-            val uri = selectedPhotos.first()
+            val uri = photosToSend.first()
+            // Очищаем выбранные фото сразу
+            val photosToSend = selectedPhotos.toSet()
+            selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             uploadingPhotos = true
             messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
