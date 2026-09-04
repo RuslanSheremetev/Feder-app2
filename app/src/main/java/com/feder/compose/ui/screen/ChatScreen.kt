@@ -608,7 +608,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (uploadedUrl != null) {
                     messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
                     // Сохраняем обновлённое сообщение в Room
-                    val updatedMsg = messages.find { it.imageUrls == listOf(uploadedUrl) }
+                    val updatedMsg = messages.find { it.imageUrls == listOf(tempUrl) }
                     if (updatedMsg != null) {
                         repository?.let { repo ->
                             repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
