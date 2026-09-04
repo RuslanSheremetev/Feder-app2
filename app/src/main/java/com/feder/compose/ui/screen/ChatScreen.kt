@@ -97,7 +97,7 @@ data class MsgItem(
     val time: String = "",
     var status: String = "sent",
     val timeVal: Long = 0L,
-    val id: Int = 0,
+    val id: Long = 0L,
     var posX: Float = 0f,
     var posY: Float = 0f,
     val imageUrl: String? = null,
@@ -436,7 +436,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
                             status = if (entity.isRead) "read" else "sent",
                             timeVal = entity.timeVal,
-                            id = entity.id.toInt(),
+                            id = entity.id,
                             posX = entity.posX ?: 0f,
                             posY = entity.posY ?: 0f
                         )
@@ -477,7 +477,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 repository?.let { repo ->
                     repo.saveMessages(messages.map { msg ->
                         com.feder.compose.data.entity.MessageEntity(
-                            id = msg.id.toLong(),
+                            id = msg.id,
                             fromUser = msg.from,
                             toUser = msg.to,
                             text = msg.text,
