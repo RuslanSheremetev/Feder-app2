@@ -606,43 +606,38 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 uploadingPhotos = false
                 isSending = false
                 if (uploadedUrl != null) {
+                    // Находим сообщение ДО обновления
+                    val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
+                    
+                    // Обновляем messages
                     messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
-                    // Сохраняем обновлённое сообщение в Room
-                    val updatedMsg = messages.find { it.imageUrls == listOf(tempUrl) }
-                    if (updatedMsg != null) {
+                    
+                    // Сохраняем в Room с правильным id
+                    if (originalMsg != null) {
                         repository?.let { repo ->
                             repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                                id = updatedMsg.id,
-                                fromUser = updatedMsg.from,
-                                toUser = updatedMsg.to,
-                                text = updatedMsg.text,
-                                timeVal = updatedMsg.timeVal,
+                                id = originalMsg.id,
+                                fromUser = originalMsg.from,
+                                toUser = originalMsg.to,
+                                text = originalMsg.text,
+                                timeVal = originalMsg.timeVal,
                                 imageUrls = uploadedUrl,
-                                isRead = updatedMsg.status == "read"
+                                isRead = false
                             ))
                         }
                     }
-                    // Принудительно обновляем UI
-                    messages = messages.toList()
+                    
+                    // Отправляем на сервер
                     try {
                         val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                         httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
-                    repository?.let { repo ->
-                        repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = System.currentTimeMillis(),
-                            fromUser = myUsername,
-                            toUser = chatUsername,
-                            text = inputText.trim(),
-                            timeVal = System.currentTimeMillis() / 1000,
-                            imageUrls = uploadedUrl,
-                            isRead = false
-                        ))
-                    }
                     } catch (e: Exception) {}
-                    withContext(Dispatchers.Main) { 
+                    
+                    withContext(Dispatchers.Main) {
                         selectedPhotos = emptySet()
                         inputText = ""
+                        messages = messages.toList()
                     }
                 } else {
                     messages = messages.filter { it.imageUrls != listOf(tempUrl) }
