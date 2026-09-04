@@ -637,6 +637,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             com.google.gson.JsonParser.parseString(responseBody).asJsonObject.get("id")?.asLong ?: tempId
                         } catch (e: Exception) { tempId }
                         
+                        // Формируем полный URL для фото
+                        val fullPhotoUrl = if (uploadedUrl.startsWith("http")) {
+                            uploadedUrl
+                        } else {
+                            "http://2.26.71.102:8012/uploads/$uploadedUrl"
+                        }
+                        android.util.Log.d("ChatScreen", "PHOTO_URL: $fullPhotoUrl")
+                        
                         // Сохраняем в Room с ID от сервера
                         repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
                             id = serverId,
@@ -644,7 +652,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             toUser = chatUsername,
                             text = "",
                             timeVal = System.currentTimeMillis() / 1000,
-                            imageUrls = uploadedUrl,
+                            imageUrls = fullPhotoUrl,
                             isRead = false
                         ))
                         
