@@ -368,7 +368,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
 
-    val msgPositions = remember { mutableMapOf<Int, androidx.compose.ui.geometry.Offset>() }
+    val msgPositions = remember { mutableMapOf<Long, androidx.compose.ui.geometry.Offset>() }
 
     val dateInHeader = remember { mutableStateOf("") }
     
