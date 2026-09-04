@@ -25,4 +25,14 @@ interface MessageDao {
 
     @Query("DELETE FROM messages")
     suspend fun clearAll()
+
+    // ✅ НОВЫЕ МЕТОДЫ
+    @Query("UPDATE messages SET id = :newId WHERE id = :oldId")
+    suspend fun updateMessageId(oldId: Long, newId: Long)
+
+    @Query("DELETE FROM messages WHERE id = :messageId")
+    suspend fun deleteMessage(messageId: Long)
+
+    @Query("UPDATE messages SET imageUrls = :imageUrls, isRead = :isRead WHERE id = :messageId")
+    suspend fun updateImageUrls(messageId: Long, imageUrls: String, isRead: Boolean)
 }

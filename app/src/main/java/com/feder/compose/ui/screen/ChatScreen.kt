@@ -596,52 +596,90 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Очищаем выбранные фото сразу
             selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
+            val tempId = -System.currentTimeMillis() // Отрицательный ID для временного сообщения
             uploadingPhotos = true
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = listOf(tempUrl))
+            
+            // Временное сообщение НЕ сохраняем в Room
+            messages = messages + MsgItem(myUsername, chatUsername, "", 
+                SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), 
+                "pending", System.currentTimeMillis() / 1000, 
+                id = tempId,
+                imageUrls = listOf(tempUrl))
+            
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
                     val input = context.applicationContext.contentResolver.openInputStream(uri)
                     if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
                 } catch (e: Exception) { null }
-                uploadingPhotos = false
-                isSending = false
+                
                 if (uploadedUrl != null) {
-                    // Находим сообщение ДО обновления
-                    val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
-                    
-                    // Обновляем messages
-                    messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
-                    
-                    // Сохраняем в Room с правильным id
-                    if (originalMsg != null) {
-                        repository?.let { repo ->
-                            repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                                id = originalMsg.id,
-                                fromUser = originalMsg.from,
-                                toUser = originalMsg.to,
-                                text = originalMsg.text,
-                                timeVal = originalMsg.timeVal,
-                                imageUrls = uploadedUrl,
-                                isRead = false
-                            ))
+                    try {
+                        // Отправляем на сервер и получаем ID
+                        val sendJson = gson.toJson(mapOf(
+                            "to" to chatUsername, 
+                            "text" to "", 
+                            "imageUrls" to listOf(uploadedUrl)
+                        ))
+                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+                        val response = httpClient.newCall(
+                            Request.Builder()
+                                .url("http://2.26.71.102:8004/api/chat/send")
+                                .header("Authorization", "Bearer $token")
+                                .post(sendBody)
+                                .build()
+                        ).execute()
+                        
+                        val responseBody = response.body?.string() ?: ""
+                        response.close()
+                        
+                        // Получаем ID от сервера
+                        val serverId = try {
+                            com.google.gson.JsonParser.parseString(responseBody).asJsonObject.get("id")?.asLong ?: tempId
+                        } catch (e: Exception) { tempId }
+                        
+                        // Сохраняем в Room с ID от сервера
+                        repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                            id = serverId,
+                            fromUser = myUsername,
+                            toUser = chatUsername,
+                            text = "",
+                            timeVal = System.currentTimeMillis() / 1000,
+                            imageUrls = uploadedUrl,
+                            isRead = false
+                        ))
+                        
+                        // Обновляем UI с правильным ID
+                        withContext(Dispatchers.Main) {
+                            messages = messages.map { msg -> 
+                                if (msg.id == tempId) {
+                                    msg.copy(
+                                        id = serverId,
+                                        imageUrls = listOf(uploadedUrl), 
+                                        status = "sent"
+                                    )
+                                } else msg
+                            }.toList()
+                            
+                            selectedPhotos = emptySet()
+                            inputText = ""
+                            uploadingPhotos = false
+                            isSending = false
+                        }
+                    } catch (e: Exception) {
+                        // В случае ошибки - удаляем временное сообщение
+                        withContext(Dispatchers.Main) {
+                            messages = messages.filter { it.id != tempId }
+                            uploadingPhotos = false
+                            isSending = false
                         }
                     }
-                    
-                    // Отправляем на сервер
-                    messages = messages.toList()
-                    try {
-                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
-                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
-                    } catch (e: Exception) {}
-                    
-                    withContext(Dispatchers.Main) {
-                        selectedPhotos = emptySet()
-                        inputText = ""
-                        messages = messages.toList()
-                    }
                 } else {
-                    messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                    // Ошибка загрузки - удаляем временное сообщение
+                    withContext(Dispatchers.Main) {
+                        messages = messages.filter { it.id != tempId }
+                        uploadingPhotos = false
+                        isSending = false
+                    }
                 }
             }
             return
