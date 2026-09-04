@@ -652,7 +652,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             toUser = chatUsername,
                             text = "",
                             timeVal = System.currentTimeMillis() / 1000,
-                            imageUrls = fullPhotoUrl,
+                            imageUrls = listOf(fullPhotoUrl).joinToString(","),
                             isRead = false
                         ))
                         
