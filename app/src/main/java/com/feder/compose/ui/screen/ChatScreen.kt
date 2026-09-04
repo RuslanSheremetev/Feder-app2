@@ -542,7 +542,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (existing == null) {
                     val urls = if (text.contains(".jpg")) listOf(text) else if (text.contains(",")) text.split(",") else emptyList()
                     val cleanText = if (urls.isNotEmpty()) "" else text
-                    val newMsg = MsgItem(sender ?: "unknown", myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = urls)
+                    val newMsg = MsgItem(sender ?: "unknown", myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = System.currentTimeMillis().toInt(), imageUrls = urls)
                     messages = messages + newMsg
                 }
             }
@@ -597,7 +597,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
             uploadingPhotos = true
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = listOf(tempUrl))
+            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis().toInt(), imageUrls = listOf(tempUrl))
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
                     val input = context.applicationContext.contentResolver.openInputStream(uri)
@@ -663,7 +663,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Обновляем lastMessage в ViewModel
             onMessageSent?.invoke(chatUsername, inputText.trim())
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-            val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()))
+            val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis().toInt())
             messages = messages + newMsg
             inputText = ""
             isSending = false
@@ -680,7 +680,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             return
         }
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = -(java.util.UUID.randomUUID().hashCode()), imageUrls = emptyList())
+        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis().toInt(), imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
         wsManager?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to" to chatUsername)))
