@@ -622,6 +622,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             ))
                         }
                     }
+                    // Принудительно обновляем UI
+                    messages = messages.toList()
                     try {
                         val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
