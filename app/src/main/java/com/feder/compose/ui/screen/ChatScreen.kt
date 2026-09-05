@@ -158,7 +158,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     }
                                 }
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8012/uploads/${url}?token=$token")
+                                    model = ImageRequest.Builder(LocalContext.current).data(
+                                        if (url.startsWith("http")) url else "http://2.26.71.102:8012/uploads/$url"
+                                    )
                                         .crossfade(true)
                                         .diskCacheKey(url)
                                         .memoryCacheKey(url)
@@ -168,7 +170,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { fullScreenPhoto = "http://2.26.71.102:8012/uploads/${url}?token=$token" }
+                                        .clickable { fullScreenPhoto = if (url.startsWith("http")) url else "http://2.26.71.102:8012/uploads/$url" }
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
