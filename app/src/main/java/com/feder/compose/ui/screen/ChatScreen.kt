@@ -681,8 +681,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     } catch (e: Exception) {
                         // В случае ошибки - удаляем временное сообщение
                         withContext(Dispatchers.Main) {
-                            messages = messages.filter { it.id != tempId }
                             uploadingPhotos = false
+                            messages = messages.filter { it.id != tempId }
                             isSending = false
                         }
                     }
