@@ -651,7 +651,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         
                         // Сохраняем в Room с ID от сервера
                         repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = tempId,
+                            id = serverId,
                             fromUser = myUsername,
                             toUser = chatUsername,
                             text = "",
