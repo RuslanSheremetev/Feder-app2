@@ -612,6 +612,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
                 } catch (e: Exception) { null }
                 
+                android.util.Log.d("ChatScreen", "PHOTO_UPLOADED: $uploadedUrl")
                 if (uploadedUrl != null) {
                     try {
                         // Отправляем на сервер и получаем ID
@@ -633,6 +634,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         response.close()
                         
                         // Получаем ID от сервера
+                        android.util.Log.d("ChatScreen", "SERVER_ID: $responseBody")
                         val serverId = try {
                             com.google.gson.JsonParser.parseString(responseBody).asJsonObject.get("id")?.asLong ?: tempId
                         } catch (e: Exception) { tempId }
@@ -657,6 +659,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         ))
                         
                         // Обновляем UI с правильным ID
+                        android.util.Log.d("ChatScreen", "BEFORE_UPDATE: ${messages.size} messages")
                         withContext(Dispatchers.Main) {
                             messages = messages.map { msg -> 
                                 if (msg.id == tempId) {
@@ -825,7 +828,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
+                LazyColumn(
+        state = listState,Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
@@ -946,7 +950,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Spacer(Modifier.height(8.dp))
                 
                 // Chat list for forward
-                LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+                LazyColumn(
+        state = listState,modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(allChats.filter { it.username != myUsername && it.username != "123" }) { contact ->
                         val name = contact.name
                         val avatar = contact.avatarUrl ?: ""
