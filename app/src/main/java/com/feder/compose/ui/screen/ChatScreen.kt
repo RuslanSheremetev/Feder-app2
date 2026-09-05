@@ -666,8 +666,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             messages = messages.map { msg -> 
                                 if (msg.id == tempId) {
                                     msg.copy(
-                                        id = serverId,
-                                        imageUrls = listOf(uploadedUrl), 
+                                        // id не меняем
+                                        imageUrls = listOf(fullPhotoUrl), 
                                         status = "sent"
                                     )
                                 } else msg
