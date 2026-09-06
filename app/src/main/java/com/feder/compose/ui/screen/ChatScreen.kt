@@ -614,6 +614,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     
                     // Сохраняем в Room с правильным id
                     if (originalMsg != null) {
+                        val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
                         repository?.let { repo ->
                             repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
                                 id = originalMsg.id,
@@ -621,7 +622,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 toUser = originalMsg.to,
                                 text = originalMsg.text,
                                 timeVal = originalMsg.timeVal,
-                                imageUrls = uploadedUrl,
+                                imageUrls = fullUrl,
                                 isRead = false
                             ))
                         }
