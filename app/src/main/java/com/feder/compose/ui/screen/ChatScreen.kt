@@ -607,44 +607,38 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 isSending = false
                 if (uploadedUrl != null) {
                     // Находим сообщение ДО обновления
-                    val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
-                    
-                    // Обновляем messages
                     withContext(Dispatchers.Main) {
-                        messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
-                        messages = messages.toList()
-                    }
-                    
-                    // Сохраняем в Room с правильным id
-                    if (originalMsg != null) {
+                        val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
+                        val msgId = originalMsg?.id ?: System.currentTimeMillis()
                         val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
-                        repository?.let { repo ->
-                            repo.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                                id = originalMsg.id,
-                                fromUser = originalMsg.from,
-                                toUser = originalMsg.to,
-                                text = originalMsg.text,
-                                timeVal = originalMsg.timeVal,
-                                imageUrls = fullUrl,
-                                isRead = false
-                            ))
-                        }
-                    }
-                    
-                    // Отправляем на сервер
-                    messages = messages.toList()
-                    // ✅ Принудительно обновляем UI после сохранения в Room
-                    withContext(Dispatchers.Main) {
+                        
+                        // Сохраняем в Room
+                        repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                            id = msgId,
+                            fromUser = myUsername,
+                            toUser = chatUsername,
+                            text = "",
+                            timeVal = System.currentTimeMillis() / 1000,
+                            imageUrls = fullUrl,
+                            isRead = false
+                        ))
+                        
+                        // Обновляем UI
+                        messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                        messages = messages + MsgItem(
+                            from = myUsername,
+                            to = chatUsername,
+                            text = "",
+                            time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                            status = "sent",
+                            timeVal = System.currentTimeMillis() / 1000,
+                            id = msgId,
+                            imageUrls = listOf(fullUrl)
+                        )
                         messages = messages.toList()
-                    }
-                    try {
-                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to inputText.trim(), "imageUrls" to listOf(uploadedUrl)))
-                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
-                    } catch (e: Exception) {}
-                    
-                    withContext(Dispatchers.Main) {
                         selectedPhotos = emptySet()
+                        inputText = ""
+                    }
                         inputText = ""
                         messages = messages.toList()
                     }
