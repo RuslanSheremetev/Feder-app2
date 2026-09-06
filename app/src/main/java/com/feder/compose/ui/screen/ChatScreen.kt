@@ -638,9 +638,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         messages = messages.toList()
                         selectedPhotos = emptySet()
                         inputText = ""
-                    }
-                        inputText = ""
-                        messages = messages.toList()
+                        uploadingPhotos = false
+                        isSending = false
                     }
                 } else {
                     messages = messages.filter { it.imageUrls != listOf(tempUrl) }
