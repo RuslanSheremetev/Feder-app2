@@ -610,7 +610,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
                     
                     // Обновляем messages
-                    messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
+                    withContext(Dispatchers.Main) {
+                        messages = messages.map { msg -> if (msg.imageUrls == listOf(tempUrl)) msg.copy(imageUrls = listOf(uploadedUrl), status = "sent") else msg }
+                        messages = messages.toList()
+                    }
                     
                     // Сохраняем в Room с правильным id
                     if (originalMsg != null) {
