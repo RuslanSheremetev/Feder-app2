@@ -221,7 +221,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data("http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
+                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) msg.imageUrl else "http://2.26.71.102:8012/uploads/${msg.imageUrl}")
                             .crossfade(true)
                             .diskCacheKey(msg.imageUrl ?: "")
                             .memoryCacheKey(msg.imageUrl ?: "")
