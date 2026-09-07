@@ -794,7 +794,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
-                        items(msgs, key = { it.id }) { msg ->
+                        items(msgs) { msg ->
                             val index = messages.indexOf(msg)
                             val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
