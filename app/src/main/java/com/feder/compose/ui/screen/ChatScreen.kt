@@ -318,6 +318,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var showForward by remember { mutableStateOf(false) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
+    var preloading by remember { mutableStateOf(false) }
     var isFirstNewMessage by remember { mutableStateOf(true) }
     // token passed from MainActivity
     val listState = rememberLazyListState()
@@ -508,6 +509,32 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     android.util.Log.e("ChatScreen", "API load error: ${e.message}")
                 }
             }
+        }
+
+        // Preload всех фото, потом показать
+        val photosToLoad = withContext(Dispatchers.Main) {
+            messages.flatMap { it.imageUrls }
+                .filter { it.isNotBlank() && !it.startsWith("uploading_") }
+        }
+        if (photosToLoad.isNotEmpty()) {
+            withContext(Dispatchers.Main) { preloading = true }
+            val ctx = context.applicationContext
+            photosToLoad.forEach { url ->
+                val fullUrl = if (url.startsWith("http")) {
+                    if (url.contains("?")) url else "$url?token=$token"
+                } else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                try {
+                    val req = ImageRequest.Builder(ctx)
+                        .data(fullUrl)
+                        .memoryCacheKey(fullUrl)
+                        .diskCacheKey(fullUrl)
+                        .build()
+                    withContext(Dispatchers.IO) {
+                        ctx.imageLoader.execute(req)
+                    }
+                } catch (_: Exception) {}
+            }
+            withContext(Dispatchers.Main) { preloading = false }
         }
 
         withContext(Dispatchers.Main) {
@@ -849,7 +876,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
                 }
 
-            if (isLoading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
+            if (isLoading || preloading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
