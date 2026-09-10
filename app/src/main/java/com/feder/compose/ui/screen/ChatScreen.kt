@@ -617,78 +617,95 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
         isSending = true
         
-        // Отправка фото
+        // Отправка фото (все выбранные)
         if (selectedPhotos.isNotEmpty()) {
             showAttachSheet = false
             attachExpanded = false
-            val uri = selectedPhotos.first()
+            val uris = selectedPhotos.toList()  // ВСЕ выбранные
             selectedPhotos = emptySet()
-            val tempId = System.currentTimeMillis()
             uploadingPhotos = true
-            // Локальный Uri как превью — показывается сразу
-            val localUriStr = uri.toString()
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(localUriStr))
-            // Автоскролл вниз при появлении пузыря фото
+
+            // Создаём пузырь для каждого фото сразу (с локальными Uri как превью)
+            val tempIds = uris.map { uri ->
+                val tempId = System.currentTimeMillis() + uri.hashCode().toLong()
+                val localUriStr = uri.toString()
+                messages = messages + MsgItem(
+                    myUsername, chatUsername, "",
+                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                    "pending", System.currentTimeMillis() / 1000,
+                    id = tempId, imageUrls = listOf(localUriStr)
+                )
+                tempId to uri
+            }
+
+            // Скролл вниз после добавления всех пузырей
             scope.launch {
-                kotlinx.coroutines.delay(50)
-                kotlinx.coroutines.delay(80)
+                kotlinx.coroutines.delay(100)
                 val total = listState.layoutInfo.totalItemsCount
                 if (total > 0) listState.scrollToItem(total - 1)
             }
-            
+
+            // Загружаем все фото ПАРАЛЛЕЛЬНО
             CoroutineScope(Dispatchers.IO).launch {
-                val uploadedUrl = try {
-                    val input = context.applicationContext.contentResolver.openInputStream(uri)
-                    if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
-                } catch (e: Exception) { null }
-                
-                if (uploadedUrl != null) {
-                    val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
-                    
-                    // Сохраняем в Room в фоне
-                    try {
-                        repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = tempId,
-                            fromUser = myUsername,
-                            toUser = chatUsername,
-                            text = "",
-                            timeVal = System.currentTimeMillis() / 1000,
-                            imageUrls = fullUrl,
-                            isRead = false
-                        ))
-                    } catch (e: Exception) {}
-                    
-                    // Обновляем UI через handler.post (гарантированно в Main потоке)
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        var updated = false
-                        val newList = ArrayList<MsgItem>(messages.size)
-                        for (m in messages) {
-                            if (!updated && m.id == tempId) {
-                                newList.add(m.copy(imageUrls = listOf(fullUrl), status = "sent"))
-                                updated = true
-                            } else newList.add(m)
-                        }
-                        messages = newList
-                        uploadingPhotos = false
-                        isSending = false
+                val uploadResults = tempIds.map { (tempId, uri) ->
+                    async {
+                        val uploadedUrl = try {
+                            val input = context.applicationContext.contentResolver.openInputStream(uri)
+                            if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
+                        } catch (e: Exception) { null }
+                        tempId to uploadedUrl
                     }
-                    
-                    // Отправляем на сервер и ЧИТАЕМ server id
+                }.awaitAll()
+
+                // Собираем все URL
+                val serverUrls = mutableListOf<String>()
+                uploadResults.forEach { (tempId, uploadedUrl) ->
+                    if (uploadedUrl != null) {
+                        val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl
+                                      else "http://2.26.71.102:8012/uploads/$uploadedUrl"
+                        serverUrls.add(fullUrl)
+
+                        // Обновляем UI
+                        android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            val newList = ArrayList<MsgItem>(messages.size)
+                            for (m in messages) {
+                                if (m.id == tempId) {
+                                    newList.add(m.copy(imageUrls = listOf(fullUrl), status = "sent"))
+                                } else newList.add(m)
+                            }
+                            messages = newList
+                        }
+                    } else {
+                        // Ошибка загрузки
+                        android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            messages = messages.map { m ->
+                                if (m.id == tempId) m.copy(status = "error") else m
+                            }.toList()
+                        }
+                    }
+                }
+
+                // Отправляем ОДНО сообщение со всеми URL на сервер
+                if (serverUrls.isNotEmpty()) {
                     try {
-                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to "", "imageUrls" to listOf(fullUrl)))
+                        val sendJson = gson.toJson(mapOf(
+                            "to" to chatUsername, "text" to "",
+                            "imageUrls" to serverUrls
+                        ))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                        val resp = httpClient.newCall(Request.Builder()
-                            .url("http://2.26.71.102:8004/api/chat/send")
-                            .header("Authorization", "Bearer $token")
-                            .post(sendBody).build()).execute()
+                        val resp = httpClient.newCall(
+                            Request.Builder()
+                                .url("http://2.26.71.102:8004/api/chat/send")
+                                .header("Authorization", "Bearer $token")
+                                .post(sendBody).build()
+                        ).execute()
                         val respText = resp.body?.string() ?: ""
                         resp.close()
                         val serverId = try {
-                            org.json.JSONObject(respText).optLong("id", tempId)
-                        } catch (_: Exception) { tempId }
-                        android.util.Log.d("ChatScreen", "server id=$serverId tempId=$tempId")
+                            org.json.JSONObject(respText).optLong("id", 0L)
+                        } catch (_: Exception) { 0L }
 
-                        // Обновляем Room с серверным id
+                        // Сохраняем в Room: одно сообщение со всеми URL
                         try {
                             repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
                                 id = serverId,
@@ -696,39 +713,55 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 toUser = chatUsername,
                                 text = "",
                                 timeVal = System.currentTimeMillis() / 1000,
-                                imageUrls = fullUrl,
+                                imageUrls = serverUrls.joinToString(","),
                                 isRead = false
                             ))
                         } catch (_: Exception) {}
 
-                        // Обновляем UI с серверным id
+                        // Заменяем в UI: слить все пузыри в один с serverUrls
                         android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            val firstTempId = uploadResults.firstOrNull()?.first ?: 0L
                             val newList = ArrayList<MsgItem>(messages.size)
+                            var merged = false
                             for (m in messages) {
-                                if (m.id == tempId) {
-                                    newList.add(m.copy(id = serverId, imageUrls = listOf(fullUrl), status = "sent"))
-                                } else newList.add(m)
+                                if (m.id == firstTempId && !merged) {
+                                    newList.add(m.copy(
+                                        id = serverId,
+                                        imageUrls = serverUrls,
+                                        status = "sent"
+                                    ))
+                                    merged = true
+                                } else if (m.id in tempIds.map { it.first }) {
+                                    // Пропускаем дубли
+                                } else {
+                                    newList.add(m)
+                                }
                             }
                             messages = newList
                         }
+
+                        // Удаляем временные записи из Room (если они там были)
+                        tempIds.forEach { (tid, _) ->
+                            try { repository?.deleteMessage(tid) } catch (_: Exception) {}
+                        }
                     } catch (e: Exception) {
-                        android.util.Log.e("ChatScreen", "send error: ${e.message}")
+                        android.util.Log.e("ChatScreen", "send multi: ${e.message}")
                     }
-                } else {
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        messages = messages.map { m ->
-                            if (m.id == tempId) m.copy(status = "error") else m
-                        }.toList()
-                        uploadingPhotos = false
-                        isSending = false
-                        android.util.Log.e("ChatScreen", "Upload FAILED for tempId=$tempId")
+                }
+
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    uploadingPhotos = false
+                    isSending = false
+                    scope.launch {
+                        kotlinx.coroutines.delay(80)
+                        val total = listState.layoutInfo.totalItemsCount
+                        if (total > 0) listState.scrollToItem(total - 1)
                     }
                 }
             }
             return
         }
 
-        
         // Отправка текста через WebSocket
         if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
             val txt = inputText.trim()
