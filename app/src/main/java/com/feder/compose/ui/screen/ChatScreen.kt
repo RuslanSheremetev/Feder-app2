@@ -585,33 +585,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Отправка фото
         if (selectedPhotos.isNotEmpty()) {
-            // Закрываем меню выбора
             showAttachSheet = false
             attachExpanded = false
-            
             val uri = selectedPhotos.first()
-            // Очищаем выбранные фото сразу
             selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
+            val tempId = System.currentTimeMillis()
             uploadingPhotos = true
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = listOf(tempUrl))
+            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(tempUrl))
+            
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
                     val input = context.applicationContext.contentResolver.openInputStream(uri)
                     if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
                 } catch (e: Exception) { null }
-                uploadingPhotos = false
-                isSending = false
+                
                 if (uploadedUrl != null) {
-                    // Находим сообщение ДО обновления
-                    withContext(Dispatchers.Main) {
-                        val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
-                        val msgId = originalMsg?.id ?: System.currentTimeMillis()
-                        val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
-                        
-                        // Сохраняем в Room
+                    val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
+                    
+                    // Сохраняем в Room в фоне
+                    try {
                         repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = msgId,
+                            id = tempId,
                             fromUser = myUsername,
                             toUser = chatUsername,
                             text = "",
@@ -619,9 +614,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             imageUrls = fullUrl,
                             isRead = false
                         ))
-                        
-                        // Обновляем UI
-                        messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                    } catch (e: Exception) {}
+                    
+                    // Обновляем UI через handler.post (гарантированно в Main потоке)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        messages = messages.filter { it.id != tempId }
                         messages = messages + MsgItem(
                             from = myUsername,
                             to = chatUsername,
@@ -629,18 +626,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
                             status = "sent",
                             timeVal = System.currentTimeMillis() / 1000,
-                            id = msgId,
+                            id = tempId,
                             imageUrls = listOf(fullUrl)
                         )
                         messages = messages.toList()
-                        selectedPhotos = emptySet()
-                        inputText = ""
                         uploadingPhotos = false
                         isSending = false
                     }
+                    
+                    // Отправляем на сервер
+                    try {
+                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to "", "imageUrls" to listOf(fullUrl)))
+                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
+                        httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(sendBody).build()).execute().close()
+                    } catch (e: Exception) {}
                 } else {
-                    withContext(Dispatchers.Main) {
-                        messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        messages = messages.filter { it.id != tempId }
+                        uploadingPhotos = false
+                        isSending = false
                     }
                 }
             }
