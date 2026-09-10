@@ -167,8 +167,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
                                         .crossfade(true)
-                                        .diskCacheKey(url.substringBefore("?"))
-                                        .memoryCacheKey(url.substringBefore("?"))
+                                        .diskCacheKey(url)
+                                        .memoryCacheKey(url)
                                         .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .build(),
@@ -517,7 +517,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Preload последних 10 фото — ПАРАЛЛЕЛЬНО
         val photosToLoad = withContext(Dispatchers.Main) {
             messages.flatMap { it.imageUrls }
-                .filter { it.isNotBlank() && !it.startsWith("uploading_") }
+                .filter { it.isNotBlank() && !it.startsWith("content://") && !it.startsWith("file://") && !it.startsWith("uploading_") }
                 .distinct()
                 .takeLast(10)
         }
@@ -624,10 +624,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             attachExpanded = false
             val uri = selectedPhotos.first()
             selectedPhotos = emptySet()
-            val tempUrl = "uploading_${System.currentTimeMillis()}"
             val tempId = System.currentTimeMillis()
             uploadingPhotos = true
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(tempUrl))
+            // Локальный Uri как превью — показывается сразу
+            val localUriStr = uri.toString()
+            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(localUriStr))
             // Автоскролл вниз при появлении пузыря фото
             scope.launch {
                 kotlinx.coroutines.delay(50)
