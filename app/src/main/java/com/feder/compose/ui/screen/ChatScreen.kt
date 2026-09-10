@@ -601,12 +601,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     dateInHeader.value = ""
                 }
             }
-            // scrollToItem убран — LazyColumn стартует сразу внизу через initialFirstVisibleItemIndex
+            // При открытии чата — мгновенно вниз к ПОСЛЕДНЕМУ элементу LazyColumn
     LaunchedEffect(chatUsername) {
-        // При открытии чата — мгновенно вниз (без анимации)
-        if (messages.isNotEmpty()) {
-            listState.scrollToItem(messages.size - 1)
-        }
+        kotlinx.coroutines.delay(100)
+        val total = listState.layoutInfo.totalItemsCount
+        if (total > 0) listState.scrollToItem(total - 1)
     }
 
 
@@ -632,7 +631,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // Автоскролл вниз при появлении пузыря фото
             scope.launch {
                 kotlinx.coroutines.delay(50)
-                if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+                kotlinx.coroutines.delay(80)
+                val total = listState.layoutInfo.totalItemsCount
+                if (total > 0) listState.scrollToItem(total - 1)
             }
             
             CoroutineScope(Dispatchers.IO).launch {
@@ -781,7 +782,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Автоскролл вниз
         scope.launch {
             kotlinx.coroutines.delay(50)
-            if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+            kotlinx.coroutines.delay(80)
+                val total = listState.layoutInfo.totalItemsCount
+                if (total > 0) listState.scrollToItem(total - 1)
         }
 
         // Сохраняем в Room
@@ -1435,13 +1438,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         AnimatedVisibility(
-            visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < messages.size - 2 } ?: false,
+            visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < listState.layoutInfo.totalItemsCount - 2 } ?: false,
             modifier = Modifier.padding(end = 28.dp, bottom = 76.dp).align(Alignment.BottomEnd),
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
         ) {
             FloatingActionButton(
-                onClick = { scope.launch { listState.animateScrollToItem(messages.size - 1) } },
+                onClick = { scope.launch {
+                    kotlinx.coroutines.delay(50)
+                    val total = listState.layoutInfo.totalItemsCount
+                    if (total > 0) listState.animateScrollToItem(total - 1)
+                } },
                 containerColor = SurfaceContainerHigh,
                 contentColor = Primary,
                 modifier = Modifier.size(40.dp),
