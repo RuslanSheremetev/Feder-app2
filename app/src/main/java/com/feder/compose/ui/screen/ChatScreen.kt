@@ -158,10 +158,14 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     }
                                 }
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current).data(if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token")
+                                    model = ImageRequest.Builder(LocalContext.current).data(
+                                        if (url.contains("?")) url 
+                                        else if (url.startsWith("http")) "$url?token=$token" 
+                                        else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                                    )
                                         .crossfade(true)
-                                        .diskCacheKey(url)
-                                        .memoryCacheKey(url)
+                                        .diskCacheKey("${msg.id}_$url")
+                                        .memoryCacheKey("${msg.id}_$url")
                                         .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .build(),
