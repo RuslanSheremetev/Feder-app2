@@ -69,6 +69,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.imageLoader
 import com.feder.compose.ProWebSocket
 import com.feder.compose.PhotoUploader
 import com.feder.compose.ui.theme.*
