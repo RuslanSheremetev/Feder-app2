@@ -628,6 +628,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val tempId = System.currentTimeMillis()
             uploadingPhotos = true
             messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(tempUrl))
+            // Автоскролл вниз при появлении пузыря фото
+            scope.launch {
+                kotlinx.coroutines.delay(50)
+                if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+            }
             
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
@@ -772,6 +777,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = txtId, imageUrls = emptyList())
         messages = messages + newMsg
         inputText = ""
+        // Автоскролл вниз
+        scope.launch {
+            kotlinx.coroutines.delay(50)
+            if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+        }
 
         // Сохраняем в Room
         CoroutineScope(Dispatchers.IO).launch {
