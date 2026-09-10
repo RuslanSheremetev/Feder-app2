@@ -539,7 +539,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages = messages + newMsg
                 }
             }
-        }
+        } */
         // ws уже подключен из ViewModel
     }
 
@@ -642,7 +642,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         } catch (_: Exception) { tempId }
                         android.util.Log.d("ChatScreen", "server id=$serverId tempId=$tempId")
 
-                        // Обновляем Room с серверным id (сохраняем СНАЧАЛА, потом удаляем temp)
+                        // Удаляем временную запись
+                        try {
+                            repository?.deleteMessage(tempId)
+                        } catch (_: Exception) {}
+
+                        // Обновляем Room с серверным id
                         try {
                             repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
                                 id = serverId,
@@ -653,11 +658,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 imageUrls = fullUrl,
                                 isRead = false
                             ))
-                            // Теперь безопасно удалить tempId
-                            repository?.deleteMessage(tempId)
-                        } catch (e: Exception) {
-                            android.util.Log.e("ChatScreen", "room update: ${e.message}")
-                        }
+                        } catch (_: Exception) {}
 
                         // Обновляем UI с серверным id
                         android.os.Handler(android.os.Looper.getMainLooper()).post {
@@ -689,32 +690,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Отправка текста через WebSocket
         if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
-            val txt = inputText.trim()
-            val txtId = System.currentTimeMillis()
             val msgJson = gson.toJson(mapOf(
                 "type" to "message",
-                "text" to txt,
+                "text" to inputText.trim(),
                 "to" to chatUsername
             ))
             wsManager?.send(msgJson)
             android.util.Log.d("ChatScreen", "WS_SEND: $msgJson")
-
-            // Сохраняем в Room
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                        id = txtId,
-                        fromUser = myUsername,
-                        toUser = chatUsername,
-                        text = txt,
-                        timeVal = System.currentTimeMillis() / 1000,
-                        imageUrls = null,
-                        isRead = false
-                    ))
-                } catch (e: Exception) {
-                    android.util.Log.e("ChatScreen", "save text: ${e.message}")
-                }
-            }
             
             // Обновляем lastMessage в ViewModel
             onMessageSent?.invoke(chatUsername, inputText.trim())
