@@ -175,7 +175,21 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token" }
+                                        .combinedClickable(
+                                            onClick = {
+                                                // короткий тап → fullscreen
+                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                                            },
+                                            onLongClick = {
+                                                // долгий тап → ОТКРЫТЬ МЕНЮ (как короткий тап на тексте)
+                                                val pos = msgPositions[msg.id]
+                                                if (pos != null) {
+                                                    msg.posX = pos.x
+                                                    msg.posY = pos.y
+                                                }
+                                                selectedMessage = msg
+                                            }
+                                        )
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
