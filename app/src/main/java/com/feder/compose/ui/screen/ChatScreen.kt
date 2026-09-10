@@ -718,8 +718,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             return
         }
         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = emptyList())
+        val textId = System.currentTimeMillis()
+        val newMsg = MsgItem(myUsername, chatUsername, text, now, "pending", System.currentTimeMillis() / 1000, id = textId, imageUrls = emptyList())
         messages = messages + newMsg
+
+        // Сохраняем текст в Room
+        try {
+            repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                id = textId,
+                fromUser = myUsername,
+                toUser = chatUsername,
+                text = text,
+                timeVal = System.currentTimeMillis() / 1000,
+                imageUrls = null,
+                isRead = false
+            ))
+        } catch (_: Exception) {}
+
         inputText = ""
         wsManager?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to" to chatUsername)))
     }
