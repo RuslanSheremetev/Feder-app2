@@ -416,24 +416,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     LaunchedEffect(chatUsername) {
         android.util.Log.d("ChatScreen", "Chat opened: $chatUsername")
+        // Сбрасываем бейдж непрочитанных
         repository?.markRead(chatUsername)
-
         withContext(Dispatchers.IO) {
-            var loadedFromRoom = false
-
+            // 1. Загружаем из Room (мгновенно, работает оффлайн)
             repository?.let { repo ->
                 val cachedMessages = repo.getMessages(myUsername, chatUsername)
-                android.util.Log.d("ChatScreen", "Room: ${cachedMessages.size} messages")
+                android.util.Log.d("ChatScreen", "Room: ${cachedMessages.size} messages for $chatUsername")
                 if (cachedMessages.isNotEmpty()) {
-                    loadedFromRoom = true
-                    val list = cachedMessages.map { entity ->
+                    messages = cachedMessages.map { entity ->
                         MsgItem(
                             imageUrls = entity.imageUrls?.split(",")?.filter { it.isNotBlank() } ?: emptyList(),
                             from = entity.fromUser ?: "unknown",
                             to = entity.toUser ?: "unknown",
                             text = if (entity.imageUrls.isNullOrEmpty()) entity.text else "",
-                            time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                                .format(java.util.Date(entity.timeVal * 1000)),
+                            time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date(entity.timeVal * 1000)),
                             status = if (entity.isRead) "read" else "sent",
                             timeVal = entity.timeVal,
                             id = entity.id,
@@ -441,80 +438,87 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             posY = entity.posY ?: 0f
                         )
                     }
-                    withContext(Dispatchers.Main) {
-                        messages = list
-                    }
                 }
             }
-
-            if (!loadedFromRoom) {
-                try {
-                    if (internalToken.isEmpty()) {
-                        val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
-                        val authBody = authJson.toRequestBody("application/json".toMediaType())
-                        val authResp = httpClient.newCall(Request.Builder()
-                            .url("http://2.26.71.102:8004/api/login").post(authBody).build()).execute()
-                        internalToken = JsonParser.parseString(authResp.body?.string() ?: "")
-                            .asJsonObject.get("access_token")?.asString ?: ""
+            // 2. Загружаем свежие из API (не очищаем Room)
+            try {
+                if (internalToken.isEmpty()) {
+                    val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+                    val authBody = authJson.toRequestBody("application/json".toMediaType())
+                    val authResp = httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/login").post(authBody).build()).execute()
+                    internalToken = JsonParser.parseString(authResp.body?.string() ?: "").asJsonObject.get("access_token")?.asString ?: ""
+                }
+                val msgResp = httpClient.newCall(Request.Builder()
+                    .url("http://2.26.71.102:8004/api/messages/$chatUsername")
+                    .header("Authorization", "Bearer $token").build()).execute(); android.util.Log.d("ChatScreen", "Token: ${internalToken.take(20)}...")
+                val type = object : TypeToken<List<MsgItem>>() {}.type
+                val body = msgResp.body?.string() ?: "[]"
+                val loaded = gson.fromJson<List<MsgItem>>(body, type)
+                messages = loaded.reversed().map { msg ->
+                    // Парсим time строку в timeVal (epoch)
+                    val timeVal = try {
+                        msg.time.toLong()
+                    } catch (e: Exception) {
+                        try {
+                            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
+                                .parse(msg.time)?.time?.div(1000) ?: 0L
+                        } catch (e2: Exception) { 0L }
                     }
-                    val msgResp = httpClient.newCall(Request.Builder()
-                        .url("http://2.26.71.102:8004/api/messages/$chatUsername")
-                        .header("Authorization", "Bearer $token").build()).execute()
-                    val body = msgResp.body?.string() ?: "[]"
-                    val type = object : com.google.gson.reflect.TypeToken<List<MsgItem>>() {}.type
-                    val loaded = gson.fromJson<List<MsgItem>>(body, type)
-
-                    val apiList = loaded.reversed().map { msg ->
-                        val urls = msg.imageUrls ?: emptyList()
-                        val timeStr = try {
-                            java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                                .format(java.util.Date(msg.time.toLong() * 1000))
-                        } catch (e: Exception) { msg.time }
-                        msg.copy(
-                            status = msg.status?.ifEmpty { "sent" } ?: "sent",
-                            imageUrls = urls,
+                    val urls = if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) msg.imageUrls else emptyList()
+                    val cleanText = msg.text
+                    val parsedTime = try { msg.time.toLong() } catch (e: Exception) { 0L }
+                    val timeStr = if (parsedTime > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(parsedTime * 1000)) else ""
+                    msg.copy(status = msg.status?.ifEmpty { "sent" } ?: "sent", imageUrls = urls, text = cleanText, timeVal = parsedTime, time = timeStr)
+                }
+                // Сохраняем загруженные сообщения в Room
+                repository?.let { repo ->
+                    repo.saveMessages(messages.map { msg ->
+                        com.feder.compose.data.entity.MessageEntity(
+                            id = msg.id,
+                            fromUser = msg.from,
+                            toUser = msg.to,
                             text = msg.text,
-                            timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
-                            time = timeStr
+                            timeVal = msg.timeVal.let { if (it > 0) it else (msg.time.toLongOrNull() ?: 0L) },
+                            imageUrls = msg.imageUrls.joinToString(","),
+                            isRead = msg.status == "read",
+                            posX = msg.posX,
+                            posY = msg.posY,
                         )
-                    }
-                    withContext(Dispatchers.Main) {
-                        messages = apiList
-                    }
-
-                    repository?.let { r ->
-                        r.saveMessages(apiList.map { m ->
-                            com.feder.compose.data.entity.MessageEntity(
-                                id = m.id,
-                                fromUser = m.from,
-                                toUser = m.to,
-                                text = m.text,
-                                timeVal = m.timeVal,
-                                imageUrls = m.imageUrls.joinToString(","),
-                                isRead = m.status == "read"
-                            )
-                        })
-                    }
-
-                    httpClient.newCall(Request.Builder()
-                        .url("http://2.26.71.102:8004/api/mark_read/$chatUsername")
-                        .header("Authorization", "Bearer $token")
-                        .post(RequestBody.create("application/json".toMediaType(), "")).build()
-                    ).enqueue(object : okhttp3.Callback {
-                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+                    })
+                }
+                try {
+                    val logBody = "{\"log\":\"Loaded \${loaded.size} messages for \$chatUsername, first=\${loaded.firstOrNull()?.text?.take(20)}\"}".toRequestBody("application/json".toMediaType())
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
                         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
                     })
-                } catch (e: Exception) {
-                    android.util.Log.e("ChatScreen", "API load error: ${e.message}")
+                } catch (_: Exception) { }
+                isFirstNewMessage = true
+                // Отмечаем как прочитанные
+                try {
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/mark_read/$chatUsername").header("Authorization", "Bearer $token").post(RequestBody.create("application/json".toMediaType(), "")).build()).enqueue(object : okhttp3.Callback {
+                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
+                        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                    })
+                } catch (_: Exception) { }
+            } catch (e: Exception) {
+                // Если уже есть сообщения из Room — не показываем ошибку
+                if (messages.isEmpty()) {
+                    messages = listOf(MsgItem("system", chatUsername, "Error: ${e.message}", "", "error", 0L, id = 0, imageUrls = emptyList()))
                 }
+                try {
+                    val logBody = "{\"log\":\"ChatScreen error: ${e.message}\"}".toRequestBody("application/json".toMediaType())
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/chat/send").header("Authorization", "Bearer $token").post(logBody).build()).enqueue(object : okhttp3.Callback {
+                        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) { }
+                        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+                    })
+                } catch (_: Exception) { }
             }
-        }
-
-        withContext(Dispatchers.Main) {
             isLoading = false
         }
     }
-        LaunchedEffect(internalToken) {
+    // WebSocket обрабатывается в MainActivity
+    LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
         /* ws.onMessage = { json ->
             val sender = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("from_user")?.asString ?: "unknown" } catch (e: Exception) { "unknown" }
@@ -581,28 +585,33 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Отправка фото
         if (selectedPhotos.isNotEmpty()) {
+            // Закрываем меню выбора
             showAttachSheet = false
             attachExpanded = false
+            
             val uri = selectedPhotos.first()
+            // Очищаем выбранные фото сразу
             selectedPhotos = emptySet()
             val tempUrl = "uploading_${System.currentTimeMillis()}"
-            val tempId = System.currentTimeMillis()
             uploadingPhotos = true
-            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = tempId, imageUrls = listOf(tempUrl))
-            
+            messages = messages + MsgItem(myUsername, chatUsername, "", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()), "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = listOf(tempUrl))
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadedUrl = try {
                     val input = context.applicationContext.contentResolver.openInputStream(uri)
                     if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
                 } catch (e: Exception) { null }
-                
+                uploadingPhotos = false
+                isSending = false
                 if (uploadedUrl != null) {
-                    val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
-                    
-                    // Сохраняем в Room в фоне
-                    try {
+                    // Находим сообщение ДО обновления
+                    withContext(Dispatchers.Main) {
+                        val originalMsg = messages.find { it.imageUrls == listOf(tempUrl) }
+                        val msgId = originalMsg?.id ?: System.currentTimeMillis()
+                        val fullUrl = if (uploadedUrl.startsWith("http")) uploadedUrl else "http://2.26.71.102:8012/uploads/$uploadedUrl"
+                        
+                        // Сохраняем в Room
                         repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                            id = tempId,
+                            id = msgId,
                             fromUser = myUsername,
                             toUser = chatUsername,
                             text = "",
@@ -610,72 +619,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             imageUrls = fullUrl,
                             isRead = false
                         ))
-                    } catch (e: Exception) {}
-                    
-                    // Обновляем UI через handler.post (гарантированно в Main потоке)
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        var updated = false
-                        val newList = ArrayList<MsgItem>(messages.size)
-                        for (m in messages) {
-                            if (!updated && m.id == tempId) {
-                                newList.add(m.copy(imageUrls = listOf(fullUrl), status = "sent"))
-                                updated = true
-                            } else newList.add(m)
-                        }
-                        messages = newList
+                        
+                        // Обновляем UI
+                        messages = messages.filter { it.imageUrls != listOf(tempUrl) }
+                        messages = messages + MsgItem(
+                            from = myUsername,
+                            to = chatUsername,
+                            text = "",
+                            time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                            status = "sent",
+                            timeVal = System.currentTimeMillis() / 1000,
+                            id = msgId,
+                            imageUrls = listOf(fullUrl)
+                        )
+                        messages = messages.toList()
+                        selectedPhotos = emptySet()
+                        inputText = ""
                         uploadingPhotos = false
                         isSending = false
-                    }
-                    
-                    // Отправляем на сервер и ЧИТАЕМ server id
-                    try {
-                        val sendJson = gson.toJson(mapOf("to" to chatUsername, "text" to "", "imageUrls" to listOf(fullUrl)))
-                        val sendBody = sendJson.toRequestBody("application/json".toMediaType())
-                        val resp = httpClient.newCall(Request.Builder()
-                            .url("http://2.26.71.102:8004/api/chat/send")
-                            .header("Authorization", "Bearer $token")
-                            .post(sendBody).build()).execute()
-                        val respText = resp.body?.string() ?: ""
-                        resp.close()
-                        val serverId = try {
-                            org.json.JSONObject(respText).optLong("id", tempId)
-                        } catch (_: Exception) { tempId }
-                        android.util.Log.d("ChatScreen", "server id=$serverId tempId=$tempId")
-
-                        // Обновляем Room с серверным id
-                        try {
-                            repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
-                                id = serverId,
-                                fromUser = myUsername,
-                                toUser = chatUsername,
-                                text = "",
-                                timeVal = System.currentTimeMillis() / 1000,
-                                imageUrls = fullUrl,
-                                isRead = false
-                            ))
-                        } catch (_: Exception) {}
-
-                        // Обновляем UI с серверным id
-                        android.os.Handler(android.os.Looper.getMainLooper()).post {
-                            val newList = ArrayList<MsgItem>(messages.size)
-                            for (m in messages) {
-                                if (m.id == tempId) {
-                                    newList.add(m.copy(id = serverId, imageUrls = listOf(fullUrl), status = "sent"))
-                                } else newList.add(m)
-                            }
-                            messages = newList
-                        }
-                    } catch (e: Exception) {
-                        android.util.Log.e("ChatScreen", "send error: ${e.message}")
                     }
                 } else {
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        messages = messages.map { m ->
-                            if (m.id == tempId) m.copy(status = "error") else m
-                        }.toList()
-                        uploadingPhotos = false
-                        isSending = false
-                        android.util.Log.e("ChatScreen", "Upload FAILED for tempId=$tempId")
+                    withContext(Dispatchers.Main) {
+                        messages = messages.filter { it.imageUrls != listOf(tempUrl) }
                     }
                 }
             }
@@ -828,7 +793,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
-                        items(msgs, key = { it.id }) { msg ->
+                        items(msgs) { msg ->
                             val index = messages.indexOf(msg)
                             val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
