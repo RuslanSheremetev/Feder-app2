@@ -435,7 +435,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             imageUrls = entity.imageUrls?.split(",")?.filter { it.isNotBlank() } ?: emptyList(),
                             from = entity.fromUser ?: "unknown",
                             to = entity.toUser ?: "unknown",
-                            text = if (entity.imageUrls.isNullOrEmpty()) entity.text else "",
+                            text = entity.text ?: "",
                             time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
                                 .format(java.util.Date(entity.timeVal * 1000)),
                             status = if (entity.isRead) "read" else "sent",
@@ -477,7 +477,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         msg.copy(
                             status = msg.status?.ifEmpty { "sent" } ?: "sent",
                             imageUrls = urls,
-                            text = msg.text,
+                            text = msg.text ?: "",
                             timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
                             time = timeStr
                         )
@@ -569,7 +569,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val existing = messages.find { it.from == sender && it.text == text }
                 if (existing == null) {
                     val urls = if (text.contains(".jpg")) listOf(text) else if (text.contains(",")) text.split(",") else emptyList()
-                    val cleanText = if (urls.isNotEmpty()) "" else text
+                    val cleanText = text   // ← сохраняем подпись
                     val newMsg = MsgItem(sender ?: "unknown", myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = urls)
                     messages = messages + newMsg
                 }
