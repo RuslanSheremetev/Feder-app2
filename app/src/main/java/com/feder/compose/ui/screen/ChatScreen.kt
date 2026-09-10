@@ -685,21 +685,35 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Отправка текста через WebSocket
         if (selectedPhotos.isEmpty() && inputText.isNotBlank()) {
+            val txt = inputText.trim()
+            val txtId = System.currentTimeMillis()
             val msgJson = gson.toJson(mapOf(
                 "type" to "message",
-                "text" to inputText.trim(),
+                "text" to txt,
                 "to" to chatUsername
             ))
             wsManager?.send(msgJson)
             android.util.Log.d("ChatScreen", "WS_SEND: $msgJson")
-            
-            // Обновляем lastMessage в ViewModel
-            onMessageSent?.invoke(chatUsername, inputText.trim())
+            onMessageSent?.invoke(chatUsername, txt)
             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-            val newMsg = MsgItem(myUsername, chatUsername, inputText.trim(), now, "pending", System.currentTimeMillis() / 1000, id = System.currentTimeMillis())
+            val newMsg = MsgItem(myUsername, chatUsername, txt, now, "pending", System.currentTimeMillis() / 1000, id = txtId)
             messages = messages + newMsg
-            inputText = ""
-            isSending = false
+            // Сохраняем в Room
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                        id = txtId,
+                        fromUser = myUsername,
+                        toUser = chatUsername,
+                        text = txt,
+                        timeVal = System.currentTimeMillis() / 1000,
+                        imageUrls = null,
+                        isRead = false
+                    ))
+                } catch (e: Exception) {
+                    android.util.Log.e("ChatScreen", "save text: ${e.message}")
+                }
+            }
             return
         }
         
