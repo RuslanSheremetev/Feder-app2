@@ -8,8 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
     <application
-        android:name=".FederApp"
-                android:name=".FederApplication"
+        android:name=".FederApplication"
         android:label="Feder Messenger"
         android:supportsRtl="true"
         android:theme="@style/Theme.Feder"

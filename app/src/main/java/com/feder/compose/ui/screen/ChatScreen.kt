@@ -1,5 +1,7 @@
 package com.feder.compose.ui.screen
 
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.feder.compose.ChatItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
