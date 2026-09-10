@@ -80,6 +80,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -512,30 +514,33 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
 
-        // Preload всех фото, потом показать
+        // Preload последних 10 фото — ПАРАЛЛЕЛЬНО
         val photosToLoad = withContext(Dispatchers.Main) {
             messages.flatMap { it.imageUrls }
                 .filter { it.isNotBlank() && !it.startsWith("uploading_") }
+                .distinct()
+                .takeLast(10)
         }
         if (photosToLoad.isNotEmpty()) {
             withContext(Dispatchers.Main) { preloading = true }
             val ctx = context.applicationContext
-            photosToLoad.forEach { url ->
-                val fullUrl = if (url.startsWith("http")) {
-                    if (url.contains("?")) url else "$url?token=$token"
-                } else "http://2.26.71.102:8012/uploads/$url?token=$token"
-                try {
-                    // Ключ кэша — БЕЗ токена, только URL-путь
-                    val cacheKey = fullUrl.substringBefore("?")
-                    val req = ImageRequest.Builder(ctx)
-                        .data(fullUrl)
-                        .memoryCacheKey(cacheKey)
-                        .diskCacheKey(cacheKey)
-                        .build()
-                    withContext(Dispatchers.IO) {
-                        ctx.imageLoader.execute(req)
+            withContext(Dispatchers.IO) {
+                photosToLoad.map { url ->
+                    async {
+                        val fullUrl = if (url.startsWith("http")) {
+                            if (url.contains("?")) url else "$url?token=$token"
+                        } else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                        try {
+                            val cacheKey = fullUrl.substringBefore("?")
+                            val req = ImageRequest.Builder(ctx)
+                                .data(fullUrl)
+                                .memoryCacheKey(cacheKey)
+                                .diskCacheKey(cacheKey)
+                                .build()
+                            ctx.imageLoader.execute(req)
+                        } catch (_: Exception) {}
                     }
-                } catch (_: Exception) {}
+                }.awaitAll()
             }
             withContext(Dispatchers.Main) { preloading = false }
         }
