@@ -165,8 +165,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
                                         .crossfade(true)
-                                        .diskCacheKey("${msg.id}_$url")
-                                        .memoryCacheKey("${msg.id}_$url")
+                                        .diskCacheKey(url.substringBefore("?"))
+                                        .memoryCacheKey(url.substringBefore("?"))
                                         .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                                         .build(),
