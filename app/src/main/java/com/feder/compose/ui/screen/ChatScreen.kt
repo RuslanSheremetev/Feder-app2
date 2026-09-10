@@ -516,7 +516,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
         LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
-        /* ws.onMessage = { json ->
+        wsManager?.onMessage = { json ->
             val sender = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("from_user")?.asString ?: "unknown" } catch (e: Exception) { "unknown" }
             val text = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("text")?.asString ?: "" } catch (e: Exception) { "" }
             val timeVal = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("time")?.asLong ?: System.currentTimeMillis() / 1000 } catch (e: Exception) { System.currentTimeMillis() / 1000 }
@@ -698,6 +698,24 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ))
             wsManager?.send(msgJson)
             android.util.Log.d("ChatScreen", "WS_SEND: $msgJson")
+
+            // Сохраняем в Room
+            val txtId = System.currentTimeMillis()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                        id = txtId,
+                        fromUser = myUsername,
+                        toUser = chatUsername,
+                        text = msgJson,
+                        timeVal = System.currentTimeMillis() / 1000,
+                        imageUrls = null,
+                        isRead = false
+                    ))
+                } catch (e: Exception) {
+                    android.util.Log.e("ChatScreen", "save text: ${e.message}")
+                }
+            }
 
             // Сохраняем в Room
             CoroutineScope(Dispatchers.IO).launch {
