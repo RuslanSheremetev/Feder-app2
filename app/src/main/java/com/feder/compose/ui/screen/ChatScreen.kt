@@ -618,17 +618,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     
                     // Обновляем UI через handler.post (гарантированно в Main потоке)
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        messages = messages.filter { it.id != tempId }
-                        messages = messages + MsgItem(
-                            from = myUsername,
-                            to = chatUsername,
-                            text = "",
-                            time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
-                            status = "sent",
-                            timeVal = System.currentTimeMillis() / 1000,
-                            id = tempId,
-                            imageUrls = listOf(fullUrl)
-                        )
+                        messages = messages.map { msg -> if (msg.id == tempId) msg.copy(imageUrls = listOf(fullUrl), status = "sent") else msg }
                         messages = messages.toList()
                         uploadingPhotos = false
                         isSending = false
