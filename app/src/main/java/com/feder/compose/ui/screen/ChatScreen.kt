@@ -221,8 +221,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
                             .crossfade(true)
-                            .diskCacheKey(msg.imageUrl ?: "")
-                            .memoryCacheKey(msg.imageUrl ?: "")
+                            .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
+                            .memoryCacheKey((msg.imageUrl ?: "").substringBefore("?"))
                             .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
@@ -525,10 +525,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     if (url.contains("?")) url else "$url?token=$token"
                 } else "http://2.26.71.102:8012/uploads/$url?token=$token"
                 try {
+                    // Ключ кэша — БЕЗ токена, только URL-путь
+                    val cacheKey = fullUrl.substringBefore("?")
                     val req = ImageRequest.Builder(ctx)
                         .data(fullUrl)
-                        .memoryCacheKey(fullUrl)
-                        .diskCacheKey(fullUrl)
+                        .memoryCacheKey(cacheKey)
+                        .diskCacheKey(cacheKey)
                         .build()
                     withContext(Dispatchers.IO) {
                         ctx.imageLoader.execute(req)
