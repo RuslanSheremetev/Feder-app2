@@ -16,6 +16,10 @@ class ChatRepository(
     suspend fun saveMessage(message: MessageEntity) {
         messageDao.insert(message)
     }
+
+    suspend fun deleteMessage(id: Long) {
+        messageDao.deleteById(id)
+    }
     suspend fun getChats(): List<ChatEntity> {
         return chatDao.getChats()
     }

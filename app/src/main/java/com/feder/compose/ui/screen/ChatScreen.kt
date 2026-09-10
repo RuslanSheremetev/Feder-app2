@@ -642,6 +642,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         } catch (_: Exception) { tempId }
                         android.util.Log.d("ChatScreen", "server id=$serverId tempId=$tempId")
 
+                        // Удаляем временную запись
+                        try {
+                            repository?.deleteMessage(tempId)
+                        } catch (_: Exception) {}
+
                         // Обновляем Room с серверным id
                         try {
                             repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
