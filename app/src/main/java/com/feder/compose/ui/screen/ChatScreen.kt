@@ -714,6 +714,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     android.util.Log.e("ChatScreen", "save text: ${e.message}")
                 }
             }
+            inputText = ""
+            isSending = false
             return
         }
         
@@ -750,6 +752,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         wsManager?.send(gson.toJson(mapOf("type" to "message", "text" to text, "to" to chatUsername)))
+        inputText = ""
+        isSending = false
     }
 
 
