@@ -324,7 +324,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var preloading by remember { mutableStateOf(false) }
     var isFirstNewMessage by remember { mutableStateOf(true) }
     // token passed from MainActivity
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = Int.MAX_VALUE)
     val gson = remember { Gson() }
     var wsStatus by remember { mutableStateOf("") }
     val ws = wsManager ?: remember(token) { ProWebSocket() }
@@ -601,8 +601,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     dateInHeader.value = ""
                 }
             }
-            LaunchedEffect(chatUsername) {
-        if (messages.isNotEmpty()) listState.scrollToItem(messages.size - 1)
+            // scrollToItem убран — LazyColumn стартует сразу внизу через initialFirstVisibleItemIndex
+    LaunchedEffect(chatUsername) {
+        // При открытии чата — мгновенно вниз (без анимации)
+        if (messages.isNotEmpty()) {
+            listState.scrollToItem(messages.size - 1)
+        }
     }
 
 
