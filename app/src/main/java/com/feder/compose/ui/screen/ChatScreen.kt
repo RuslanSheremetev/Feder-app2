@@ -622,6 +622,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             showAttachSheet = false
             attachExpanded = false
             val uris = selectedPhotos.toList()  // ВСЕ выбранные
+            val caption = inputText.trim()       // ← подпись к фото
             selectedPhotos = emptySet()
             uploadingPhotos = true
 
@@ -630,7 +631,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val tempId = System.currentTimeMillis() + uri.hashCode().toLong()
                 val localUriStr = uri.toString()
                 messages = messages + MsgItem(
-                    myUsername, chatUsername, "",
+                    myUsername, chatUsername, caption,     // ← текст!
                     SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
                     "pending", System.currentTimeMillis() / 1000,
                     id = tempId, imageUrls = listOf(localUriStr)
@@ -689,7 +690,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 if (serverUrls.isNotEmpty()) {
                     try {
                         val sendJson = gson.toJson(mapOf(
-                            "to" to chatUsername, "text" to "",
+                            "to" to chatUsername, "text" to caption,
                             "imageUrls" to serverUrls
                         ))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
@@ -711,7 +712,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 id = serverId,
                                 fromUser = myUsername,
                                 toUser = chatUsername,
-                                text = "",
+                                text = caption,        // ← подпись
                                 timeVal = System.currentTimeMillis() / 1000,
                                 imageUrls = serverUrls.joinToString(","),
                                 isRead = false
@@ -727,6 +728,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 if (m.id == firstTempId && !merged) {
                                     newList.add(m.copy(
                                         id = serverId,
+                                        text = caption,        // ← подпись
                                         imageUrls = serverUrls,
                                         status = "sent"
                                     ))
@@ -752,6 +754,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     uploadingPhotos = false
                     isSending = false
+                    inputText = ""     // ← очищаем поле ввода
                     scope.launch {
                         kotlinx.coroutines.delay(80)
                         val total = listState.layoutInfo.totalItemsCount
