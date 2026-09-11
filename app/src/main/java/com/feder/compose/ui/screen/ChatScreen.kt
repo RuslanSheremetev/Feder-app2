@@ -632,7 +632,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     LaunchedEffect(chatUsername) {
         kotlinx.coroutines.delay(100)
         val total = listState.layoutInfo.totalItemsCount
-        if (total > 0) listState.scrollToItem(total - 1)
+        kotlinx.coroutines.delay(120)
+                val total2 = listState.layoutInfo.totalItemsCount
+                if (total2 > 0) listState.scrollToItem(total2 - 1)
     }
 
 
@@ -670,7 +672,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             scope.launch {
                 kotlinx.coroutines.delay(100)
                 val total = listState.layoutInfo.totalItemsCount
-                if (total > 0) listState.scrollToItem(total - 1)
+                kotlinx.coroutines.delay(120)
+                val total2 = listState.layoutInfo.totalItemsCount
+                if (total2 > 0) listState.scrollToItem(total2 - 1)
             }
 
             // Загружаем все фото ПАРАЛЛЕЛЬНО
@@ -785,7 +789,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     scope.launch {
                         kotlinx.coroutines.delay(80)
                         val total = listState.layoutInfo.totalItemsCount
-                        if (total > 0) listState.scrollToItem(total - 1)
+                        kotlinx.coroutines.delay(120)
+                val total2 = listState.layoutInfo.totalItemsCount
+                if (total2 > 0) listState.scrollToItem(total2 - 1)
                     }
                 }
             }
@@ -847,7 +853,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             kotlinx.coroutines.delay(50)
             kotlinx.coroutines.delay(80)
                 val total = listState.layoutInfo.totalItemsCount
-                if (total > 0) listState.scrollToItem(total - 1)
+                kotlinx.coroutines.delay(120)
+                val total2 = listState.layoutInfo.totalItemsCount
+                if (total2 > 0) listState.scrollToItem(total2 - 1)
         }
 
         // Сохраняем в Room
@@ -967,7 +975,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             if (isLoading || preloading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 90.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
@@ -1377,7 +1385,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         if (!showForward) {
-            Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                 Column {
                     if (editMessage != null) {
