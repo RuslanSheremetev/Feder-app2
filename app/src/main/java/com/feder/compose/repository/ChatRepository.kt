@@ -20,10 +20,6 @@ class ChatRepository(
     suspend fun deleteMessage(id: Long) {
         messageDao.deleteById(id)
     }
-
-    suspend fun updateReactions(id: Long, json: String?) {
-        messageDao.updateReactions(id, json)
-    }
     suspend fun getChats(): List<ChatEntity> {
         return chatDao.getChats()
     }

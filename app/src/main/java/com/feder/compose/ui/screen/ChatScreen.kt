@@ -113,7 +113,6 @@ data class MsgItem(
     var posY: Float = 0f,
     val imageUrl: String? = null,
     val imageUrls: List<String> = emptyList(),
-    val reactions: List<Reaction> = emptyList(),
 )
 
 @Composable

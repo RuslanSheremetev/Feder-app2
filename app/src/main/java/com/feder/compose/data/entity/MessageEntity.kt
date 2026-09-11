@@ -14,6 +14,5 @@ data class MessageEntity(
     val isStarred: Boolean = false,
     val posX: Float? = null,
     val posY: Float? = null,
-    val imageUrls: String? = null,
-    val reactionsJson: String? = null
+    val imageUrls: String? = null
 )
