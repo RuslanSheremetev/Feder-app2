@@ -18,6 +18,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.animation.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -873,7 +874,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().imePadding()) {
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
             if (selectionMode) {
@@ -966,7 +967,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             if (isLoading || preloading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
@@ -1376,7 +1377,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         if (!showForward) {
-            Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
             Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                 Column {
                     if (editMessage != null) {
