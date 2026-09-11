@@ -198,7 +198,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         )
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
-                                        .border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
+                                        .border(0.5.dp, androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.08f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                                 if (index == msg.imageUrls.lastIndex) {
