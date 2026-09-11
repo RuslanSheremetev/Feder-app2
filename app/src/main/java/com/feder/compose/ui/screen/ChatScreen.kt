@@ -93,6 +93,13 @@ import java.util.concurrent.TimeUnit
 var fullScreenPhoto: String? = null
 var uploadingPhotos: Boolean = false
 
+data class Reaction(
+    val emoji: String = "",
+    val count: Int = 0,
+    val users: List<String> = emptyList(),
+    val me: Boolean = false
+)
+
 data class MsgItem(
     @com.google.gson.annotations.SerializedName("from_user")
     val from: String = "unknown",
