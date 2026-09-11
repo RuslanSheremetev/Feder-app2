@@ -177,17 +177,12 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .fillMaxWidth()
                                         .combinedClickable(
                                             onClick = {
-                                                // короткий тап → fullscreen
+                                                // короткий тап на фото → fullscreen
                                                 fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                             },
                                             onLongClick = {
-                                                // долгий тап → ОТКРЫТЬ МЕНЮ (как короткий тап на тексте)
-                                                val pos = msgPositions[msg.id]
-                                                if (pos != null) {
-                                                    msg.posX = pos.x
-                                                    msg.posY = pos.y
-                                                }
-                                                selectedMessage = msg
+                                                // долгий тап на фото → открыть меню (как клик по тексту)
+                                                onClick?.invoke()
                                             }
                                         )
                                         .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
