@@ -647,6 +647,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
 
     
+    // === REACTIONS API ===
+    fun toggleReactionApi(messageId: Long, emoji: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val json = gson.toJson(mapOf("message_id" to messageId, "emoji" to emoji))
+                val body = json.toRequestBody("application/json".toMediaType())
+                val resp = httpClient.newCall(
+                    Request.Builder()
+                        .url("http://2.26.71.102:8016/api/reaction/toggle")
+                        .header("Authorization", "Bearer $token")
+                        .post(body).build()
+                ).execute()
+                val respText = resp.body?.string() ?: ""
+                resp.close()
+                android.util.Log.d("ChatScreen", "TOGGLE_RESULT: $respText")
+            } catch (e: Exception) {
+                android.util.Log.e("ChatScreen", "TOGGLE_ERROR: ${e.message}")
+            }
+        }
+    }
+    // === END REACTIONS API ===
+
     fun sendMessage() {
         if (isSending) {
             android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
