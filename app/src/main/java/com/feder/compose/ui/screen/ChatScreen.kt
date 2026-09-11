@@ -175,6 +175,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     }
                                 }
                                 AsyncImage(
+                                    imageLoader = LocalContext.current.imageLoader,
+                                    placeholder = null,  // показываем только когда загрузилось
                                     model = ImageRequest.Builder(LocalContext.current).data(
                                         if (url.contains("?")) url 
                                         else if (url.startsWith("http")) "$url?token=$token" 
@@ -568,12 +570,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .data(fullUrl)
                                 .memoryCacheKey(cacheKey)
                                 .diskCacheKey(cacheKey)
+                                .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                                .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                                 .build()
-                            ctx.imageLoader.execute(req)
-                        } catch (_: Exception) {}
+                            val result = ctx.imageLoader.execute(req)
+                            android.util.Log.d("Preload", "loaded $cacheKey success=${result is coil.request.SuccessResult}")
+                        } catch (e: Exception) {
+                            android.util.Log.e("Preload", "fail $url: ${e.message}")
+                        }
                     }
                 }.awaitAll()
             }
+            // Даём Coil время записать в память
+            kotlinx.coroutines.delay(100)
             withContext(Dispatchers.Main) { preloading = false }
         }
 
