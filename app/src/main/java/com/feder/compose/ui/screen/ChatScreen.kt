@@ -148,7 +148,21 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
     Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
-        Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick ?: {}) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+        Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(
+            onClick = onClick ?: {},
+            onLongClick = {
+                try {
+                    val vb = LocalContext.current.getSystemService(android.content.Context.VIBRATOR_SERVICE) as android.os.Vibrator
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        vb.vibrate(android.os.VibrationEffect.createOneShot(30L, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vb.vibrate(30L)
+                    }
+                } catch (_: Exception) {}
+                onLongClick?.invoke()
+            }
+        ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(4.dp)) {
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
@@ -181,7 +195,16 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                 fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                             },
                                             onLongClick = {
-                                                // долгий тап на фото → открыть меню (как клик по тексту)
+                                                // долгий тап на фото → вибрация + меню
+                                                try {
+                                                    val vb = LocalContext.current.getSystemService(android.content.Context.VIBRATOR_SERVICE) as android.os.Vibrator
+                                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                                        vb.vibrate(android.os.VibrationEffect.createOneShot(30L, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                                                    } else {
+                                                        @Suppress("DEPRECATION")
+                                                        vb.vibrate(30L)
+                                                    }
+                                                } catch (_: Exception) {}
                                                 onClick?.invoke()
                                             }
                                         )
