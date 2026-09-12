@@ -156,7 +156,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Column(Modifier.wrapContentWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(
