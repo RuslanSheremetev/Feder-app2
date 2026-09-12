@@ -205,6 +205,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                 onClick?.invoke()
                                             }
                                         )
+                                        .heightIn(max = 240.dp)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(1.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), RoundedCornerShape(if (index == 0) 14.dp else 10.dp)),
                                     contentScale = ContentScale.Crop
@@ -257,7 +258,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), RoundedCornerShape(14.dp)),
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp).clip(RoundedCornerShape(14.dp)).border(1.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty() && msg.reactions.isEmpty()) {
