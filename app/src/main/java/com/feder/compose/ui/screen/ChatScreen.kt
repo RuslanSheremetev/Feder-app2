@@ -160,7 +160,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         android.util.Log.d("BubbleSize", "id=${msg.id} imageUrls=${msg.imageUrls.size} imageUrl=${msg.imageUrl?.take(20)} width=180")
-        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(180.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
+        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(180.dp) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
