@@ -170,11 +170,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                           else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
                           else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
             LaunchedEffect(firstUrl) {
-                val (nw, nh) = withContext(Dispatchers.IO) {
+                val result = withContext(Dispatchers.IO) {
                     try {
-                        val req = ImageRequest.Builder(LocalContext.current).data(fullUrl).build()
-                        val result = imageLoader.execute(req)
-                        val drawable = result.drawable
+                        val req = ImageRequest.Builder(imageLoader.context).data(fullUrl).build()
+                        val r = imageLoader.execute(req)
+                        val drawable = r.drawable
                         val w = drawable?.intrinsicWidth?.toFloat() ?: 0f
                         val h = drawable?.intrinsicHeight?.toFloat() ?: 0f
                         if (w > 0 && h > 0) {
@@ -200,6 +200,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         180f to 180f
                     }
                 }
+                val (nw, nh) = result
                 photoWidth = with(density) { nw.toDp() }
                 photoHeight = with(density) { nh.toDp() }
             }
