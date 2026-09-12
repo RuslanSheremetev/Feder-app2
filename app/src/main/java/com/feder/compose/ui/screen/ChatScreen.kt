@@ -311,6 +311,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             if (msg.reactions.isNotEmpty()) {
                 Spacer(Modifier.height(2.dp))
                 Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
                     horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
