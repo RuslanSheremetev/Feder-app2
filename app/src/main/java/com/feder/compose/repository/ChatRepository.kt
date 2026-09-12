@@ -36,6 +36,10 @@ class ChatRepository(
         chatDao.markRead(username)
         messageDao.markRead(username, username)
     }
+    suspend fun updateReactions(id: Long, json: String?) {
+        messageDao.updateReactions(id, json)
+    }
+
     suspend fun clearMessages() {
         messageDao.clearAll()
     }

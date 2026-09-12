@@ -26,6 +26,9 @@ interface MessageDao {
     @Query("DELETE FROM messages WHERE id = :id")
     suspend fun deleteById(id: Long)
 
+    @Query("UPDATE messages SET reactionsJson = :json WHERE id = :id")
+    suspend fun updateReactions(id: Long, json: String?)
+
     @Query("DELETE FROM messages")
     suspend fun clearAll()
 }
