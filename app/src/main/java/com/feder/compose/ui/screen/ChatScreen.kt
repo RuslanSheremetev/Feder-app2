@@ -165,35 +165,40 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
         if (firstUrl != null) {
             val density = androidx.compose.ui.platform.LocalDensity.current
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(if (firstUrl.contains("?")) firstUrl
+            val imageLoader = LocalContext.current.imageLoader
+            val fullUrl = if (firstUrl.contains("?")) firstUrl
                           else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
-                          else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token")
-                    .build(),
-                contentDescription = null,
-                onSuccess = { state ->
-                    val drawable = state.result.drawable
+                          else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
+            LaunchedEffect(firstUrl) {
+                try {
+                    val req = ImageRequest.Builder(LocalContext.current).data(fullUrl).build()
+                    val result = imageLoader.execute(req)
+                    val drawable = result.drawable
                     val w = drawable.intrinsicWidth.toFloat()
                     val h = drawable.intrinsicHeight.toFloat()
-                    val ratio = w / h
-                    val maxW = 280f
-                    val maxH = 320f
-                    var newW: Float
-                    var newH: Float
-                    when {
-                        ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }        // панорама
-                        ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio } // горизонтальное
-                        ratio >= 0.8f -> { newW = 220f; newH = 220f }                // квадрат
-                        ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }        // вертикальное
-                        else -> { newW = 180f; newH = 180f / ratio }                 // очень вертикальное
+                    if (w > 0 && h > 0) {
+                        val ratio = w / h
+                        val maxW = 280f
+                        val maxH = 320f
+                        var newW: Float
+                        var newH: Float
+                        when {
+                            ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }
+                            ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio }
+                            ratio >= 0.8f -> { newW = 220f; newH = 220f }
+                            ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }
+                            else -> { newW = 180f; newH = 180f / ratio }
+                        }
+                        if (newH > maxH) { newH = maxH; newW = maxH * ratio }
+                        withContext(Dispatchers.Main) {
+                            photoWidth = with(density) { newW.toDp() }
+                            photoHeight = with(density) { newH.toDp() }
+                        }
                     }
-                    if (newH > maxH) { newH = maxH; newW = maxH * ratio }
-                    photoWidth = with(density) { newW.toDp() }
-                    photoHeight = with(density) { newH.toDp() }
-                },
-                modifier = Modifier.size(0.dp)
-            )
+                } catch (e: Exception) {
+                    android.util.Log.e("BubbleSize", "load err: ${e.message}")
+                }
+            }
         }
         android.util.Log.d("BubbleSize", "id=${msg.id} imageUrls=${msg.imageUrls.size} dynamicW=${photoWidth}")
         Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
