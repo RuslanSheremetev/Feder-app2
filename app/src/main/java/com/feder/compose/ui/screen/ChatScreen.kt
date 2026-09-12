@@ -287,9 +287,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     }
                 }
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
-                if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
+                if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty()) {
-                    Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.weight(1f))
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
