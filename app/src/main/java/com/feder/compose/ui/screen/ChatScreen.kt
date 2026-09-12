@@ -286,9 +286,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         }
                     }
                 }
-            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
-                if (time.isNotEmpty()) {
+                if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                     Spacer(Modifier.weight(1f))
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                     if (isMine) {
@@ -320,7 +320,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         Spacer(Modifier.width(4.dp))
                     }
                     // Если фото-сообщение — время справа в этом же ряду
-                    if ((msg.imageUrls.isNotEmpty() || msg.imageUrl != null) && time.isNotEmpty()) {
+                    if (time.isNotEmpty()) {
                         Spacer(Modifier.weight(1f))
                         Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                         if (isMine) {
