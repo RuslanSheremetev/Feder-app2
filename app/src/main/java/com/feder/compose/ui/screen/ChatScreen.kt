@@ -1348,7 +1348,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     if (!showAllReactions) {
                     Spacer(Modifier.height(12.dp))
                     Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
-                        Column(Modifier.width(240.dp)) {
+                        Column(Modifier.width(180.dp)) {
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.Reply, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
