@@ -156,7 +156,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Column(Modifier.wrapContentWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+    Box(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         Surface(Modifier.widthIn(max = 280.dp).then(if (onClick != null) Modifier.combinedClickable(
@@ -166,7 +166,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 onLongClick?.invoke()
             }
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
-            Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 1.dp else 4.dp)) {
+            Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 0.dp else 4.dp)) {
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
                     Column(Modifier.fillMaxWidth()) {
