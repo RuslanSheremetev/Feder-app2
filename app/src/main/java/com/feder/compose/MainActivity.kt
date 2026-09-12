@@ -134,6 +134,9 @@ class ChatViewModel : ViewModel() {
     private val server = "http://2.26.71.102:8004"
     private var database: FederDatabase? = null
     var repository: ChatRepository? = null
+    // Канал обновлений реакций (message_id -> reactions_json)
+    private val _reactionUpdates = kotlinx.coroutines.flow.MutableStateFlow<Pair<Long, String>?>(null)
+    val reactionUpdates: kotlinx.coroutines.flow.StateFlow<Pair<Long, String>?> = _reactionUpdates
     
     fun initDatabase(context: android.content.Context) {
         if (database == null) {
@@ -185,7 +188,18 @@ class ChatViewModel : ViewModel() {
             try {
                 val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
                 val type = obj.get("type")?.asString ?: ""
-                if (type == "user_online" || type == "user_offline") {
+                if (type == "reaction") {
+                    val mid = obj.get("message_id")?.asLong ?: 0L
+                    val rxArr = obj.get("reactions")?.asJsonArray
+                    if (mid > 0L && rxArr != null) {
+                        val rxStr = rxArr.toString()
+                        android.util.Log.d("MainActivity", "WS REACTION: mid=$mid rx=$rxStr")
+                        _reactionUpdates.value = Pair(mid, rxStr)
+                        viewModelScope.launch {
+                            try { repository?.updateReactions(mid, rxStr) } catch (_: Exception) {}
+                        }
+                    }
+                } else if (type == "user_online" || type == "user_offline") {
                     val username = obj.get("username")?.asString
                     val isOnline = type == "user_online"
                     if (username != null) {
@@ -524,6 +538,7 @@ fun FederApp() {
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
+                    reactionUpdates = viewModel.reactionUpdates,
                     onBack = { viewModel.selectedChat = null },
                     onMessageSent = { username, text ->
                         viewModel.chats = viewModel.chats.map { chat ->
