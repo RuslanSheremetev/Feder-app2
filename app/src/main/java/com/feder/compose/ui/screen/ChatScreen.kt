@@ -257,7 +257,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.widthIn(max = 250.dp).aspectRatio(1f).clip(RoundedCornerShape(16.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(16.dp)),
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(14.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty() && msg.reactions.isEmpty()) {
