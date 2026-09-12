@@ -148,7 +148,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet()) {
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo") {
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -315,7 +315,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     msg.reactions.forEach { r ->
-                        ReactionPill(r = r, onClick = { }, onLongClick = { })
+                        ReactionPill(r = r, allChats = allChats, myUsername = myUsername, onClick = { }, onLongClick = { })
                         Spacer(Modifier.width(4.dp))
                     }
                 }
@@ -324,6 +324,45 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             }
         }
 }
+@Composable
+fun MiniAvatar(url: String?, username: String) {
+    val bg = remember(username) {
+        val palette = listOf(
+            Color(0xFF339DFF), Color(0xFFE17076),
+            Color(0xFF7BC862), Color(0xFFE5CA77),
+            Color(0xFFA695E7), Color(0xFFEE7AAE)
+        )
+        palette[kotlin.math.abs(username.hashCode()) % palette.size]
+    }
+    Box(
+        modifier = Modifier
+            .size(18.dp)
+            .clip(CircleShape)
+            .background(bg)
+            .border(1.dp, SecondaryContainer, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        if (url.isNullOrBlank()) {
+            Text(
+                text = username.take(1).uppercase(),
+                fontSize = 9.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(if (url.startsWith("/")) "http://2.26.71.102:8004$url" else url)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = username,
+                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
@@ -1139,6 +1178,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             token = token,
                             position = position,
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
+                            allChats = allChats, myUsername = myUsername,
                             onClick = {
                                     if (selectionMode) {
                                         if (selectedMessages.contains(msg.time)) {
@@ -1651,7 +1691,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ReactionPill(r: Reaction, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername: String = "", onClick: () -> Unit, onLongClick: () -> Unit) {
     val bc = if (r.me) Primary else OutlineVariant.copy(alpha = 0.4f)
     val bg = if (r.me) Primary.copy(alpha = 0.12f) else SurfaceContainerHigh
     Surface(shape = RoundedCornerShape(50), color = bg, border = BorderStroke(1.dp, bc),
@@ -1661,8 +1701,18 @@ fun ReactionPill(r: Reaction, onClick: () -> Unit, onLongClick: () -> Unit) {
         Row(Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            // Мини-аватарки тех, кто поставил реакцию (до 3, слева)
+            if (r.users.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
+                    r.users.take(3).forEach { uname ->
+                        val chat = allChats.find { it.username == uname }
+                        MiniAvatar(url = chat?.avatarUrl, username = uname)
+                    }
+                }
+                Spacer(Modifier.width(2.dp))
+            }
             Text(r.emoji, fontSize = 13.sp)
-            if (r.count > 1) {
+            if (r.count > 0) {
                 Text(r.count.toString(), fontSize = 11.sp, fontWeight = FontWeight.Medium,
                     color = if (r.me) Primary else OnSurfaceVariant)
             }
