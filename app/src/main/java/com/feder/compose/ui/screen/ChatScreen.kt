@@ -1227,7 +1227,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             if (!showAllReactions) {
                                 Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                                     allReactions.take(6).forEach { emoji ->
-                                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
+                                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
                                     }
                                     Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
                                         Text("›", color = OnSurfaceVariant, fontSize = 20.sp)
@@ -1245,7 +1245,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     allReactions.chunked(6).forEach { row ->
                                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                                             row.forEach { emoji ->
-                                                Box(Modifier.size(40.dp).clip(CircleShape).clickable { selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 24.sp) }
+                                                Box(Modifier.size(40.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 24.sp) }
                                             }
                                             repeat(6 - row.size) { Spacer(Modifier.size(40.dp)) }
                                         }
