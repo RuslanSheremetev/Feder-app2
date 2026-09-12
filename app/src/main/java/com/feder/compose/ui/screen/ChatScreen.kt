@@ -286,7 +286,6 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         }
                     }
                 }
-            }
             Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text("[$position][id=${msg.id} x=${msg.posX.toInt()} y=${msg.posY.toInt()}] $text", color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false))
                 if (time.isNotEmpty()) {
@@ -320,6 +319,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         Spacer(Modifier.width(4.dp))
                     }
                 }
+            }
             }
             }
         }
