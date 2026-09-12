@@ -659,7 +659,53 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
 
     
-    // === REACTIONS API ===
+    
+    // Загрузка реакций при открытии чата / обновлении сообщений
+    LaunchedEffect(messages.size) {
+        if (messages.isEmpty()) return@LaunchedEffect
+        val ids = messages.takeLast(50).mapNotNull { it.id.takeIf { id -> id > 0 } }
+        if (ids.isEmpty()) return@LaunchedEffect
+        withContext(Dispatchers.IO) {
+            try {
+                val reqJson = gson.toJson(mapOf("ids" to ids))
+                val reqBody = reqJson.toRequestBody("application/json".toMediaType())
+                val resp = httpClient.newCall(
+                    Request.Builder()
+                        .url("http://2.26.71.102:8016/api/reactions/batch")
+                        .header("Authorization", "Bearer $token")
+                        .post(reqBody).build()
+                ).execute()
+                val respText = resp.body?.string() ?: "{}"
+                resp.close()
+                android.util.Log.d("ChatScreen", "BATCH_RESP: ${respText.take(200)}")
+                val obj = org.json.JSONObject(respText)
+                val updated = messages.map { m ->
+                    val arr = obj.optJSONArray(m.id.toString())
+                    if (arr != null) {
+                        val list = mutableListOf<Reaction>()
+                        for (i in 0 until arr.length()) {
+                            val o = arr.getJSONObject(i)
+                            val users = mutableListOf<String>()
+                            val ua = o.optJSONArray("users")
+                            if (ua != null) for (j in 0 until ua.length()) users.add(ua.getString(j))
+                            list.add(Reaction(
+                                emoji = o.optString("emoji", ""),
+                                count = o.optInt("count", 0),
+                                users = users,
+                                me = users.contains(myUsername)
+                            ))
+                        }
+                        m.copy(reactions = list)
+                    } else m
+                }
+                withContext(Dispatchers.Main) { messages = updated }
+            } catch (e: Exception) {
+                android.util.Log.e("ChatScreen", "BATCH_ERR: ${e.message}")
+            }
+        }
+    }
+
+// === REACTIONS API ===
     fun toggleReactionApi(messageId: Long, emoji: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
