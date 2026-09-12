@@ -209,7 +209,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .border(0.5.dp, androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.08f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
                                 )
-                                if (index == msg.imageUrls.lastIndex) {
+                                if (index == msg.imageUrls.lastIndex && msg.reactions.isEmpty()) {
                                     Surface(
                                         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                                         shape = RoundedCornerShape(12.dp),
@@ -260,7 +260,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             modifier = Modifier.widthIn(max = 250.dp).aspectRatio(1f).clip(RoundedCornerShape(16.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
-                        if (time.isNotEmpty()) {
+                        if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                             Surface(
                                 modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                                 shape = RoundedCornerShape(12.dp),
@@ -311,13 +311,33 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             if (msg.reactions.isNotEmpty()) {
                 Spacer(Modifier.height(2.dp))
                 Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 2.dp),
                     horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     msg.reactions.forEach { r ->
                         ReactionPill(r = r, allChats = allChats, myUsername = myUsername, onClick = { }, onLongClick = { })
                         Spacer(Modifier.width(4.dp))
+                    }
+                    // Если фото-сообщение — время справа в этом же ряду
+                    if ((msg.imageUrls.isNotEmpty() || msg.imageUrl != null) && time.isNotEmpty()) {
+                        Spacer(Modifier.weight(1f))
+                        Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                        if (isMine) {
+                            Spacer(Modifier.width(2.dp))
+                            val checkText = when (msg.status) {
+                                "pending" -> "✓"
+                                "sent" -> "✓"
+                                "received" -> "✓✓"
+                                "read" -> "✓✓"
+                                else -> "✓"
+                            }
+                            val checkColor = when (msg.status) {
+                                "read" -> Color(0xFF4CAF50)
+                                else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
+                            }
+                            Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                        }
                     }
                 }
             }
