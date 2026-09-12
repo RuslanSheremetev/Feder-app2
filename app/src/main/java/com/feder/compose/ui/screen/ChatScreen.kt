@@ -389,6 +389,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
 }
 @Composable
 fun MiniAvatar(url: String?, username: String) {
+    // Fallback: если url нет — берём /avatars/{username}/avatar.jpg
+    val effectiveUrl = url ?: "/avatars/$username/avatar.jpg"
     val bg = remember(username) {
         val palette = listOf(
             Color(0xFF339DFF), Color(0xFFE17076),
@@ -405,7 +407,7 @@ fun MiniAvatar(url: String?, username: String) {
             .border(1.dp, SecondaryContainer, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        if (url.isNullOrBlank()) {
+        if (effectiveUrl.isNullOrBlank()) {
             Text(
                 text = username.take(1).uppercase(),
                 fontSize = 9.sp,
@@ -415,7 +417,7 @@ fun MiniAvatar(url: String?, username: String) {
         } else {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(if (url.startsWith("/")) "http://2.26.71.102:8010$url" else url)
+                    .data(if (effectiveUrl.startsWith("/")) "http://2.26.71.102:8010$effectiveUrl" else effectiveUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = username,
