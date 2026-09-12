@@ -173,8 +173,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     .build(),
                 contentDescription = null,
                 onSuccess = { state ->
-                    val w = state.result.image.width.toFloat()
-                    val h = state.result.image.height.toFloat()
+                    val drawable = state.result.drawable
+                    val w = drawable.intrinsicWidth.toFloat()
+                    val h = drawable.intrinsicHeight.toFloat()
                     val ratio = w / h
                     val maxW = 280f
                     val maxH = 320f
