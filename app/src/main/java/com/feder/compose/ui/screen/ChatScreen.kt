@@ -353,7 +353,7 @@ fun MiniAvatar(url: String?, username: String) {
         } else {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(if (url.startsWith("/")) "http://2.26.71.102:8004$url" else url)
+                    .data(if (url.startsWith("/")) "http://2.26.71.102:8010$url" else url)
                     .crossfade(true)
                     .build(),
                 contentDescription = username,
