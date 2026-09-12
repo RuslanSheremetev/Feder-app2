@@ -135,8 +135,12 @@ class ChatViewModel : ViewModel() {
     private var database: FederDatabase? = null
     var repository: ChatRepository? = null
     // Канал обновлений реакций (message_id -> reactions_json)
-    private val _reactionUpdates = kotlinx.coroutines.flow.MutableStateFlow<Pair<Long, String>?>(null)
-    val reactionUpdates: kotlinx.coroutines.flow.StateFlow<Pair<Long, String>?> = _reactionUpdates
+    private val _reactionUpdates = kotlinx.coroutines.flow.MutableSharedFlow<Pair<Long, String>>(
+        replay = 0,
+        extraBufferCapacity = 64,
+        onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+    )
+    val reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>> = _reactionUpdates
     
     fun initDatabase(context: android.content.Context) {
         if (database == null) {
@@ -194,7 +198,7 @@ class ChatViewModel : ViewModel() {
                     if (mid > 0L && rxArr != null) {
                         val rxStr = rxArr.toString()
                         android.util.Log.d("MainActivity", "WS REACTION: mid=$mid rx=$rxStr")
-                        _reactionUpdates.value = Pair(mid, rxStr)
+                        _reactionUpdates.tryEmit(Pair(mid, rxStr))
                         viewModelScope.launch {
                             try { repository?.updateReactions(mid, rxStr) } catch (_: Exception) {}
                         }

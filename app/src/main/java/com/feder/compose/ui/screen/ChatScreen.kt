@@ -402,36 +402,36 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.StateFlow<Pair<Long, String>?>? = null) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
 
-    // === Приём реакций из WS через ViewModel ===
+    // === Приём реакций из WS через ViewModel (SharedFlow) ===
     if (reactionUpdates != null) {
-        val rxPair by reactionUpdates.collectAsState()
-        LaunchedEffect(rxPair) {
-            val pair = rxPair ?: return@LaunchedEffect
-            val (mid, rxStr) = pair
-            android.util.Log.d("ChatScreen", "REACTION_UPDATE: mid=$mid rx=$rxStr")
-            val newList = try {
-                val arr = org.json.JSONArray(rxStr)
-                val list = mutableListOf<Reaction>()
-                for (i in 0 until arr.length()) {
-                    val o = arr.getJSONObject(i)
-                    val users = mutableListOf<String>()
-                    val ua = o.optJSONArray("users")
-                    if (ua != null) for (j in 0 until ua.length()) users.add(ua.getString(j))
-                    list.add(Reaction(
-                        emoji = o.optString("emoji", ""),
-                        count = o.optInt("count", 0),
-                        users = users,
-                        me = users.contains(myUsername)
-                    ))
-                }
-                list
-            } catch (e: Exception) { emptyList() }
-            messages = messages.map { m -> if (m.id == mid) m.copy(reactions = newList) else m }
+        LaunchedEffect(reactionUpdates) {
+            reactionUpdates.collect { pair ->
+                val (mid, rxStr) = pair
+                android.util.Log.d("ChatScreen", "REACTION_UPDATE: mid=$mid rx=$rxStr")
+                val newList = try {
+                    val arr = org.json.JSONArray(rxStr)
+                    val list = mutableListOf<Reaction>()
+                    for (i in 0 until arr.length()) {
+                        val o = arr.getJSONObject(i)
+                        val users = mutableListOf<String>()
+                        val ua = o.optJSONArray("users")
+                        if (ua != null) for (j in 0 until ua.length()) users.add(ua.getString(j))
+                        list.add(Reaction(
+                            emoji = o.optString("emoji", ""),
+                            count = o.optInt("count", 0),
+                            users = users,
+                            me = users.contains(myUsername)
+                        ))
+                    }
+                    list
+                } catch (e: Exception) { emptyList() }
+                messages = messages.map { m -> if (m.id == mid) m.copy(reactions = newList) else m }
+            }
         }
     }
     var inputText by remember { mutableStateOf("") }
