@@ -159,6 +159,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     Box(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+        android.util.Log.d("BubbleSize", "id=${msg.id} imageUrls=${msg.imageUrls.size} imageUrl=${msg.imageUrl?.take(20)} width=180")
         Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(180.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
@@ -204,7 +205,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                 onClick?.invoke()
                                             }
                                         )
-                                        .then(if (msg.imageUrls.size > 1) Modifier.aspectRatio(1f) else Modifier)
+                                        .aspectRatio(1f)
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
                                         .border(0.5.dp, androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.08f), RoundedCornerShape(if (index == 0) 16.dp else 8.dp)),
                                     contentScale = ContentScale.Crop
