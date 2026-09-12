@@ -1562,3 +1562,24 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
     }
 }
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun ReactionPill(r: Reaction, onClick: () -> Unit, onLongClick: () -> Unit) {
+    val bc = if (r.me) Primary else OutlineVariant.copy(alpha = 0.4f)
+    val bg = if (r.me) Primary.copy(alpha = 0.12f) else SurfaceContainerHigh
+    Surface(shape = RoundedCornerShape(50), color = bg, border = BorderStroke(1.dp, bc),
+        modifier = Modifier.height(26.dp).combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null, onClick = onClick, onLongClick = onLongClick)) {
+        Row(Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(r.emoji, fontSize = 13.sp)
+            if (r.count > 1) {
+                Text(r.count.toString(), fontSize = 11.sp, fontWeight = FontWeight.Medium,
+                    color = if (r.me) Primary else OnSurfaceVariant)
+            }
+        }
+    }
+}
