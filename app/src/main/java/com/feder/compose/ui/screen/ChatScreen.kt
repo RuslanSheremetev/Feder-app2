@@ -242,7 +242,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             }
                                         )
                                         .clip(RoundedCornerShape(if (index == 0) 16.dp else 8.dp))
-                                        .border(1.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), RoundedCornerShape(if (index == 0) 14.dp else 10.dp)),
+                                        .border(2.dp, if (isMine) PrimaryContainer else SecondaryContainer, RoundedCornerShape(if (index == 0) 14.dp else 10.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                                 if (index == msg.imageUrls.lastIndex && msg.reactions.isEmpty()) {
@@ -293,7 +293,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.width(photoWidth).height(photoHeight).clip(RoundedCornerShape(14.dp)).border(1.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), RoundedCornerShape(14.dp)),
+                            modifier = Modifier.width(photoWidth).height(photoHeight).clip(RoundedCornerShape(14.dp)).border(2.dp, if (isMine) PrimaryContainer else SecondaryContainer, RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty() && msg.reactions.isEmpty()) {
