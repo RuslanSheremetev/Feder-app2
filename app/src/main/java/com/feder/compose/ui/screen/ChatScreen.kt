@@ -290,7 +290,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             Row(Modifier.then(if (msg.imageUrls.isEmpty() && msg.imageUrl == null) Modifier else Modifier.height(0.dp)).padding(horizontal = 10.dp, vertical = if (msg.imageUrls.isEmpty() && msg.imageUrl == null) 6.dp else 0.dp), verticalAlignment = Alignment.Bottom) {
                 if (msg.imageUrls.isEmpty() && msg.imageUrl == null) { Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
-                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.width(8.dp))
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
