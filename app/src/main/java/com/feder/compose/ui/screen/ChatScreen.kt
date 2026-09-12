@@ -309,19 +309,19 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     }
                 }
                 }
-            }
-        if (msg.reactions.isNotEmpty()) {
-            Spacer(Modifier.height(2.dp))
-            Row(
-                horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                msg.reactions.forEach { r ->
-                    ReactionPill(r = r, onClick = { }, onLongClick = { })
-                    Spacer(Modifier.width(4.dp))
+            if (msg.reactions.isNotEmpty()) {
+                Spacer(Modifier.height(2.dp))
+                Row(
+                    horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    msg.reactions.forEach { r ->
+                        ReactionPill(r = r, onClick = { }, onLongClick = { })
+                        Spacer(Modifier.width(4.dp))
+                    }
                 }
             }
-        }
+            }
         }
 }
 @OptIn(ExperimentalFoundationApi::class)
