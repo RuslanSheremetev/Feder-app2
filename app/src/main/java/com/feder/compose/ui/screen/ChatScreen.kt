@@ -170,34 +170,38 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                           else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
                           else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
             LaunchedEffect(firstUrl) {
-                try {
-                    val req = ImageRequest.Builder(LocalContext.current).data(fullUrl).build()
-                    val result = imageLoader.execute(req)
-                    val drawable = result.drawable
-                    val w = drawable.intrinsicWidth.toFloat()
-                    val h = drawable.intrinsicHeight.toFloat()
-                    if (w > 0 && h > 0) {
-                        val ratio = w / h
-                        val maxW = 280f
-                        val maxH = 320f
-                        var newW: Float
-                        var newH: Float
-                        when {
-                            ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }
-                            ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio }
-                            ratio >= 0.8f -> { newW = 220f; newH = 220f }
-                            ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }
-                            else -> { newW = 180f; newH = 180f / ratio }
+                val (nw, nh) = withContext(Dispatchers.IO) {
+                    try {
+                        val req = ImageRequest.Builder(LocalContext.current).data(fullUrl).build()
+                        val result = imageLoader.execute(req)
+                        val drawable = result.drawable
+                        val w = drawable?.intrinsicWidth?.toFloat() ?: 0f
+                        val h = drawable?.intrinsicHeight?.toFloat() ?: 0f
+                        if (w > 0 && h > 0) {
+                            val ratio = w / h
+                            val maxW = 280f
+                            val maxH = 320f
+                            var newW: Float
+                            var newH: Float
+                            when {
+                                ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }
+                                ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio }
+                                ratio >= 0.8f -> { newW = 220f; newH = 220f }
+                                ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }
+                                else -> { newW = 180f; newH = 180f / ratio }
+                            }
+                            if (newH > maxH) { newH = maxH; newW = maxH * ratio }
+                            newW to newH
+                        } else {
+                            180f to 180f
                         }
-                        if (newH > maxH) { newH = maxH; newW = maxH * ratio }
-                        withContext(Dispatchers.Main) {
-                            photoWidth = with(density) { newW.toDp() }
-                            photoHeight = with(density) { newH.toDp() }
-                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("BubbleSize", "load err: ${e.message}")
+                        180f to 180f
                     }
-                } catch (e: Exception) {
-                    android.util.Log.e("BubbleSize", "load err: ${e.message}")
                 }
+                photoWidth = with(density) { nw.toDp() }
+                photoHeight = with(density) { nh.toDp() }
             }
         }
         android.util.Log.d("BubbleSize", "id=${msg.id} imageUrls=${msg.imageUrls.size} dynamicW=${photoWidth}")
