@@ -169,10 +169,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             val fullUrl = if (firstUrl.contains("?")) firstUrl
                           else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
                           else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
+            val appContext = LocalContext.current.applicationContext
             LaunchedEffect(firstUrl) {
                 val result = withContext(Dispatchers.IO) {
                     try {
-                        val req = ImageRequest.Builder(imageLoader.context).data(fullUrl).build()
+                        val req = ImageRequest.Builder(appContext).data(fullUrl).build()
                         val r = imageLoader.execute(req)
                         val drawable = r.drawable
                         val w = drawable?.intrinsicWidth?.toFloat() ?: 0f
