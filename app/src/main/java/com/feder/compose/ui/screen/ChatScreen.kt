@@ -194,8 +194,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 } else 200f to 200f
             } else 200f to 200f
         }
-        val photoWidth = with(density) { computedSize.first.toDp() }
-        val photoHeight = with(density) { computedSize.second.toDp() }
+        val photoWidth = computedSize.first.dp
+        val photoHeight = computedSize.second.dp
         Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
