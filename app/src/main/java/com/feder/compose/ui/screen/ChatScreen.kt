@@ -159,19 +159,20 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     Box(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-        // Динамический размер фото (Coil 2.x painter)
-        var photoWidth by remember(msg.id) { mutableStateOf(180.dp) }
-        var photoHeight by remember(msg.id) { mutableStateOf(180.dp) }
+        // Динамический размер фото через Coil painter
         val density = androidx.compose.ui.platform.LocalDensity.current
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
-        if (firstUrl != null) {
-            val fullUrl = if (firstUrl.contains("?")) firstUrl
-                          else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
-                          else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
-            val measurePainter = coil.compose.rememberAsyncImagePainter(model = fullUrl)
-            val painterState = measurePainter.state
-            if (painterState is coil.compose.AsyncImagePainter.State.Success) {
-                val drawable = painterState.result.drawable
+        val fullUrl = if (firstUrl != null) {
+            if (firstUrl.contains("?")) firstUrl
+            else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
+            else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
+        } else null
+        val measurePainter = if (fullUrl != null)
+            coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
+        val painterSuccess = measurePainter?.state as? coil.compose.AsyncImagePainter.State.Success
+        val computedSize = remember(painterSuccess, msg.id) {
+            val drawable = painterSuccess?.result?.drawable
+            if (drawable != null) {
                 val w = drawable.intrinsicWidth.toFloat()
                 val h = drawable.intrinsicHeight.toFloat()
                 if (w > 0 && h > 0) {
@@ -188,14 +189,13 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         else -> { newW = 180f; newH = 180f / ratio }
                     }
                     if (newH > maxH) { newH = maxH; newW = maxH * ratio }
-                    if (photoWidth.value != newW || photoHeight.value != newH) {
-                        photoWidth = with(density) { newW.toDp() }
-                        photoHeight = with(density) { newH.toDp() }
-                        android.util.Log.d("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=${ratio} new=${newW}x${newH}")
-                    }
-                }
-            }
+                    android.util.Log.d("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=$ratio new=${newW}x${newH}")
+                    newW to newH
+                } else 200f to 200f
+            } else 200f to 200f
         }
+        val photoWidth = with(density) { computedSize.first.toDp() }
+        val photoHeight = with(density) { computedSize.second.toDp() }
         Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
