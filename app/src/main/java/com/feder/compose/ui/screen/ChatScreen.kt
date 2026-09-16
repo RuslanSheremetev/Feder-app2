@@ -1758,7 +1758,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername: String = "", onClick: () -> Unit, onLongClick: () -> Unit) {
     val bc = if (r.me) Primary else OutlineVariant.copy(alpha = 0.4f)
     val bg = if (r.me) Primary.copy(alpha = 0.12f) else SurfaceContainerHigh
-    Surface(shape = RoundedCornerShape(50), color = bg, border = BorderStroke(1.dp, bc),
+    Surface(shape = RoundedCornerShape(50), color = if (r.me) Primary.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.12f),
         modifier = Modifier.height(26.dp).combinedClickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null, onClick = onClick, onLongClick = onLongClick)) {
