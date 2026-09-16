@@ -792,6 +792,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     
     
+    // Автоскролл вниз при новом сообщении (как в Telegram)
+    LaunchedEffect(messages.size, messages.lastOrNull()?.id) {
+        if (messages.isEmpty()) return@LaunchedEffect
+        kotlinx.coroutines.delay(50)
+        val total = listState.layoutInfo.totalItemsCount
+        if (total > 0) {
+            try {
+                listState.animateScrollToItem(total - 1)
+            } catch (e: Exception) {
+                android.util.Log.e("ChatScreen", "autoscroll: ${e.message}")
+            }
+        }
+    }
+    
     // Загрузка реакций при открытии чата / обновлении сообщений
     LaunchedEffect(messages.size) {
         if (messages.isEmpty()) return@LaunchedEffect
