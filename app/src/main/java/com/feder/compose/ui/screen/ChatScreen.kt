@@ -1115,8 +1115,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().background(Background)) {
-        Column(modifier = Modifier.fillMaxSize().imePadding()) {
+    Box(modifier = Modifier.fillMaxSize().background(Background).imePadding()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
             if (selectionMode) {
