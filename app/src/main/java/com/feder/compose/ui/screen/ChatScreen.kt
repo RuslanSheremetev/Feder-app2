@@ -1282,7 +1282,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
-                    item { Spacer(Modifier.height(40.dp)) }
+                    item { Spacer(Modifier.height(60.dp)) }
                 }
 
             }
