@@ -169,7 +169,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         } else null
         val measurePainter = if (fullUrl != null)
             coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
-        val painterSuccess = measurePainter?.state as? coil.compose.AsyncImagePainter.State.Success
+        val painterState = measurePainter?.state
+        android.util.Log.d("PhotoDebug", "id=${msg.id} state=${painterState?.javaClass?.simpleName} fullUrl=${fullUrl?.take(80)}")
+        val painterSuccess = painterState as? coil.compose.AsyncImagePainter.State.Success
         val computedSize = remember(painterSuccess, msg.id) {
             val drawable = painterSuccess?.result?.drawable
             if (drawable != null) {
