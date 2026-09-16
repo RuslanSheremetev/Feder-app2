@@ -205,7 +205,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 onLongClick?.invoke()
             }
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
-            Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 0.dp else 4.dp)) {
+            Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 4.dp)) {
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
                     Column(Modifier.fillMaxWidth()) {
