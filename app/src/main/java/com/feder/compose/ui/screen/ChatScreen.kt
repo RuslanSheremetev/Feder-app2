@@ -1195,7 +1195,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             if (isLoading || preloading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 20.dp)) {
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 96.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
                     grouped.forEach { (date, msgs) ->
@@ -1268,6 +1268,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     }
                     item { Spacer(Modifier.height(16.dp)) }
+                    item { Spacer(Modifier.height(80.dp)) }
                 }
 
             }
