@@ -180,15 +180,15 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 if (w > 0 && h > 0) {
                     val ratio = w / h
                     val maxW = 280f
-                    val maxH = 640f
+                    val maxH = 720f
                     var newW: Float
                     var newH: Float
                     when {
                         ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }
-                        ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio }
-                        ratio >= 0.8f -> { newW = 220f; newH = 220f }
-                        ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }
-                        else -> { newW = 180f; newH = 180f / ratio }
+                        ratio >= 1.0f -> { newW = maxW * 0.95f; newH = newW / ratio }
+                        ratio >= 0.8f -> { newW = 260f; newH = 260f }
+                        ratio >= 0.5f -> { newW = 240f; newH = 240f / ratio }
+                        else -> { newW = 220f; newH = 220f / ratio }
                     }
                     if (newH > maxH) { newH = maxH; newW = maxH * ratio }
                     android.util.Log.d("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=$ratio new=${newW}x${newH}")
