@@ -198,6 +198,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         }
         val photoWidth = computedSize.first.dp
         val photoHeight = computedSize.second.dp
+        var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
         Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(280.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
@@ -233,8 +234,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .build(),
                                     contentDescription = "photo",
                                     modifier = Modifier
-                                        .width(280.dp)
-                                        .height(600.dp)
+                                        .sizeIn(maxWidth = 280.dp, maxHeight = 600.dp)
+                                        .aspectRatio(imageAspectRatio ?: 0.75f)
                                         .combinedClickable(
                                             onClick = {
                                                 // короткий тап на фото → fullscreen
