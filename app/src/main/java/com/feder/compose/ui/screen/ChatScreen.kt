@@ -198,7 +198,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         }
         val photoWidth = computedSize.first.dp
         val photoHeight = computedSize.second.dp
-        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
+        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -329,10 +329,10 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     }
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
+            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
                 Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
-                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.width(8.dp))
                     Text(time, color = if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
