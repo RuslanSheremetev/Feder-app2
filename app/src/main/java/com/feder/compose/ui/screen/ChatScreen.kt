@@ -177,8 +177,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 val h = drawable.intrinsicHeight.toFloat()
                 if (w > 0 && h > 0) {
                     val ratio = w / h
-                    val maxW = 260f
-                    val maxH = 320f
+                    val maxW = 280f
+                    val maxH = 640f
                     var newW: Float
                     var newH: Float
                     when {
