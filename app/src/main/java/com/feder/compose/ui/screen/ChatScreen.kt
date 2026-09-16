@@ -159,7 +159,44 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     Box(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.widthIn(max = 180.dp) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
+        // Динамический размер фото (Coil 2.x painter)
+        var photoWidth by remember(msg.id) { mutableStateOf(180.dp) }
+        var photoHeight by remember(msg.id) { mutableStateOf(180.dp) }
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+        if (firstUrl != null) {
+            val fullUrl = if (firstUrl.contains("?")) firstUrl
+                          else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
+                          else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
+            val measurePainter = coil.compose.rememberAsyncImagePainter(model = fullUrl)
+            val painterState = measurePainter.state
+            if (painterState is coil.compose.AsyncImagePainter.State.Success) {
+                val drawable = painterState.result.drawable
+                val w = drawable.intrinsicWidth.toFloat()
+                val h = drawable.intrinsicHeight.toFloat()
+                if (w > 0 && h > 0) {
+                    val ratio = w / h
+                    val maxW = 260f
+                    val maxH = 320f
+                    var newW: Float
+                    var newH: Float
+                    when {
+                        ratio >= 2.0f -> { newW = maxW; newH = maxW / ratio }
+                        ratio >= 1.0f -> { newW = maxW * 0.9f; newH = newW / ratio }
+                        ratio >= 0.8f -> { newW = 220f; newH = 220f }
+                        ratio >= 0.5f -> { newW = 200f; newH = 200f / ratio }
+                        else -> { newW = 180f; newH = 180f / ratio }
+                    }
+                    if (newH > maxH) { newH = maxH; newW = maxH * ratio }
+                    if (photoWidth.value != newW || photoHeight.value != newH) {
+                        photoWidth = with(density) { newW.toDp() }
+                        photoHeight = with(density) { newH.toDp() }
+                        android.util.Log.d("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=${ratio} new=${newW}x${newH}")
+                    }
+                }
+            }
+        }
+        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(photoWidth) else Modifier.widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -185,6 +222,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         else if (url.startsWith("http")) "$url?token=$token" 
                                         else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
+                                        .size(360, 480)
                                         .crossfade(true)
                                         .diskCacheKey(url)
                                         .memoryCacheKey(url)
@@ -193,7 +231,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .build(),
                                     contentDescription = "photo",
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .width(photoWidth)
+                                        .height(photoHeight)
                                         .combinedClickable(
                                             onClick = {
                                                 // короткий тап на фото → fullscreen
@@ -250,6 +289,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     Box {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
+                            .size(360, 480)
                             .crossfade(true)
                             .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
                             .memoryCacheKey((msg.imageUrl ?: "").substringBefore("?"))
@@ -257,7 +297,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                             .build(),
                             contentDescription = "photo",
-                            modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(14.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(14.dp)),
+                            modifier = Modifier.width(photoWidth).height(photoHeight).clip(RoundedCornerShape(14.dp)).border(0.1.dp, OutlineVariant.copy(alpha = 0.04f), RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
                         if (time.isNotEmpty() && msg.reactions.isEmpty()) {
