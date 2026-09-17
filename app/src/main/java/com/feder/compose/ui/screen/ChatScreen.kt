@@ -1622,7 +1622,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Поле ввода поверх сообщений
         if (!showForward) {
             Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
-            Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+            Surface(shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                 Column {
                     if (editMessage != null) {
                         Surface(
@@ -1685,7 +1685,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                         }
                     }
-                    Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(horizontal = 8.dp, vertical = 4.dp).padding(4.dp), verticalAlignment = Alignment.Bottom) {
+                    Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
                         Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
@@ -1717,7 +1717,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(PrimaryContainer).clickable { ; android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(40.dp).clip(CircleShape).background(PrimaryContainer).clickable { ; android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
                         Icon(if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) Icons.Filled.Send else Icons.Filled.Mic, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                     }
                 }
