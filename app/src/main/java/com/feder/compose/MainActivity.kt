@@ -803,14 +803,14 @@ fun FederApp() {
             }
             // Bottom menu overlay
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
-                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 8.dp, tonalElevation = 2.dp, border = BorderStroke(0.1.dp, Color(0xFF3A3A3A))) {
-                    Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 12.dp, tonalElevation = 0.dp, border = BorderStroke(0.1.dp, Color(0xFF3A3A3A))) {
+                    Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         listOf("Chats" to Icons.Filled.ChatBubble, "Contacts" to Icons.Filled.Contacts, "Discovery" to Icons.Filled.Explore, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
                             Column(Modifier.weight(1f).clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                                Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(22.dp))
                                 Spacer(Modifier.height(4.dp))
-                                Text(label, fontSize = 12.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.W500, color = if (selected) Primary else OnSurfaceVariant)
+                                Text(label, fontSize = 11.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.W500, color = if (selected) Primary else OnSurfaceVariant)
                             }
                         }
                     }
