@@ -807,7 +807,7 @@ fun FederApp() {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         listOf("Chats" to Icons.Filled.ChatBubble, "Contacts" to Icons.Filled.Contacts, "Discovery" to Icons.Filled.Explore, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
-                            Column(Modifier.weight(1f).clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(Modifier.weight(1f).clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(22.dp))
                                 Spacer(Modifier.height(4.dp))
                                 Text(label, fontSize = 11.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.W500, color = if (selected) Primary else OnSurfaceVariant)
