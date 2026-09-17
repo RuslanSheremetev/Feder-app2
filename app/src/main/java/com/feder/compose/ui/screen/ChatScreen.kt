@@ -1801,6 +1801,8 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
 }
 
 
+
+
 @Composable
 fun DrawCheck(
     double: Boolean,
@@ -1810,30 +1812,37 @@ fun DrawCheck(
     androidx.compose.foundation.Canvas(modifier = Modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
-        val stroke = w * 0.12f  // толщина
-        val paint = androidx.compose.ui.graphics.Paint().apply {
-            color = tint
-            style = androidx.compose.ui.graphics.PaintingStyle.Stroke
-            strokeWidth = stroke
-            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-            strokeJoin = androidx.compose.ui.graphics.StrokeJoin.Round
-        }
-        // Одиночная галочка — две линии
-        // Точки: (0.15w, 0.55h) -> (0.4w, 0.8h) -> (0.85w, 0.2h)
-        val path1 = androidx.compose.ui.graphics.Path().apply {
-            moveTo(w * 0.15f, h * 0.55f)
-            lineTo(w * 0.4f, h * 0.8f)
-            lineTo(w * 0.85f, h * 0.2f)
-        }
-        drawPath(path1, paint)
-        // Двойная галочка — вторая смещённая
+        val stroke = w * 0.13f
+        // Одиночная галочка: 2 линии
+        drawLine(
+            color = tint,
+            start = androidx.compose.ui.geometry.Offset(w * 0.15f, h * 0.55f),
+            end = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.8f),
+            strokeWidth = stroke,
+            cap = androidx.compose.ui.graphics.StrokeCap.Round
+        )
+        drawLine(
+            color = tint,
+            start = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.8f),
+            end = androidx.compose.ui.geometry.Offset(w * 0.85f, h * 0.22f),
+            strokeWidth = stroke,
+            cap = androidx.compose.ui.graphics.StrokeCap.Round
+        )
         if (double) {
-            val path2 = androidx.compose.ui.graphics.Path().apply {
-                moveTo(w * 0.4f, h * 0.55f)
-                lineTo(w * 0.65f, h * 0.8f)
-                lineTo(w * 1.1f, h * 0.2f)
-            }
-            drawPath(path2, paint)
+            drawLine(
+                color = tint,
+                start = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.55f),
+                end = androidx.compose.ui.geometry.Offset(w * 0.69f, h * 0.8f),
+                strokeWidth = stroke,
+                cap = androidx.compose.ui.graphics.StrokeCap.Round
+            )
+            drawLine(
+                color = tint,
+                start = androidx.compose.ui.geometry.Offset(w * 0.69f, h * 0.8f),
+                end = androidx.compose.ui.geometry.Offset(w * 1.12f, h * 0.22f),
+                strokeWidth = stroke,
+                cap = androidx.compose.ui.graphics.StrokeCap.Round
+            )
         }
     }
 }
