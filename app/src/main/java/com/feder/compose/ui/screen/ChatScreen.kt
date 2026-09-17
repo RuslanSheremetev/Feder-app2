@@ -270,7 +270,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                     "read" -> Color(0xFF4CAF50)
                                                     else -> Color.White
                                                 }
-                                                Text(checkText, color = checkColor, fontSize = 11.sp)
+                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                                             }
                                         }
                                     }
@@ -322,7 +322,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             "read" -> Color(0xFF4CAF50)
                                             else -> Color.White
                                         }
-                                        Text(checkText, color = checkColor, fontSize = 11.sp)
+                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                                     }
                                 }
                             }
@@ -347,7 +347,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             "read" -> Color(0xFF4CAF50)
                             else -> Color.White
                         }
-                        Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                         }
                     }
                 }
@@ -380,7 +380,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
                             }
-                            Text(checkText, color = checkColor, fontSize = 12.sp, modifier = Modifier.offset(y = 2.dp))
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                         }
                     }
                 }
@@ -1796,6 +1796,44 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
                 Text(r.count.toString(), fontSize = 11.sp, fontWeight = FontWeight.Medium,
                     color = if (r.me) Primary else OnSurfaceVariant)
             }
+        }
+    }
+}
+
+
+@Composable
+fun DrawCheck(
+    double: Boolean,
+    tint: androidx.compose.ui.graphics.Color,
+    size: androidx.compose.ui.unit.Dp = 14.dp
+) {
+    androidx.compose.foundation.Canvas(modifier = Modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+        val stroke = w * 0.12f  // толщина
+        val paint = androidx.compose.ui.graphics.Paint().apply {
+            color = tint
+            style = androidx.compose.ui.graphics.PaintingStyle.Stroke
+            strokeWidth = stroke
+            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+            strokeJoin = androidx.compose.ui.graphics.StrokeJoin.Round
+        }
+        // Одиночная галочка — две линии
+        // Точки: (0.15w, 0.55h) -> (0.4w, 0.8h) -> (0.85w, 0.2h)
+        val path1 = androidx.compose.ui.graphics.Path().apply {
+            moveTo(w * 0.15f, h * 0.55f)
+            lineTo(w * 0.4f, h * 0.8f)
+            lineTo(w * 0.85f, h * 0.2f)
+        }
+        drawPath(path1, paint)
+        // Двойная галочка — вторая смещённая
+        if (double) {
+            val path2 = androidx.compose.ui.graphics.Path().apply {
+                moveTo(w * 0.4f, h * 0.55f)
+                lineTo(w * 0.65f, h * 0.8f)
+                lineTo(w * 1.1f, h * 0.2f)
+            }
+            drawPath(path2, paint)
         }
     }
 }
