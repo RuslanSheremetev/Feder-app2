@@ -268,7 +268,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                 }
                                                 val checkColor = when (msg.status) {
                                                     "read" -> Color(0xFF4CAF50)
-                                                    else -> Color.White
+                                                    else -> Color.White.copy(alpha = 0.7f)
                                                 }
                                                 DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                                             }
@@ -320,7 +320,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         }
                                         val checkColor = when (msg.status) {
                                             "read" -> Color(0xFF4CAF50)
-                                            else -> Color.White
+                                            else -> Color.White.copy(alpha = 0.7f)
                                         }
                                         DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                                     }
@@ -334,7 +334,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                     Spacer(Modifier.width(8.dp))
-                    Text(time, color = if (isMine) Color.White else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                    Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
                         val checkText = when (msg.status) {
@@ -345,7 +345,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         }
                         val checkColor = when (msg.status) {
                             "read" -> Color(0xFF4CAF50)
-                            else -> Color.White
+                            else -> Color.White.copy(alpha = 0.7f)
                         }
                         DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 16.dp)
                         }
@@ -366,7 +366,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     // Если фото-сообщение — время справа в этом же ряду
                     if (time.isNotEmpty()) {
                         Spacer(Modifier.weight(1f))
-                        Text(time, color = if (isMine) Color.White else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
