@@ -270,7 +270,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                     "read" -> Color(0xFF4CAF50)
                                                     else -> Color.White.copy(alpha = 0.7f)
                                                 }
-                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
+                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 14.dp, modifier = Modifier.offset(y = 3.dp))
                                             }
                                         }
                                     }
@@ -322,7 +322,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             "read" -> Color(0xFF4CAF50)
                                             else -> Color.White.copy(alpha = 0.7f)
                                         }
-                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
+                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 14.dp, modifier = Modifier.offset(y = 3.dp))
                                     }
                                 }
                             }
@@ -334,7 +334,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                     Spacer(Modifier.width(8.dp))
-                    Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                    Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 3.dp))
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
                         val checkText = when (msg.status) {
@@ -347,7 +347,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             "read" -> Color(0xFF4CAF50)
                             else -> Color.White.copy(alpha = 0.7f)
                         }
-                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
+                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 14.dp, modifier = Modifier.offset(y = 3.dp))
                         }
                     }
                 }
@@ -366,7 +366,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     // Если фото-сообщение — время справа в этом же ряду
                     if (time.isNotEmpty()) {
                         Spacer(Modifier.weight(1f))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 3.dp))
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
@@ -380,7 +380,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
                             }
-                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 14.dp, modifier = Modifier.offset(y = 3.dp))
                         }
                     }
                 }
@@ -1803,6 +1803,9 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
 
 
 
+
+
+
 @Composable
 fun DrawCheck(
     double: Boolean,
@@ -1813,36 +1816,39 @@ fun DrawCheck(
     androidx.compose.foundation.Canvas(modifier = modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
-        val stroke = w * 0.13f
-        // Одиночная галочка: 2 линии
+        val stroke = w * 0.14f
+        // Одиночная галочка — две прямые линии
+        // Левая наклонная: с (0.13w, 0.52h) до (0.4w, 0.78h)
         drawLine(
             color = tint,
-            start = androidx.compose.ui.geometry.Offset(w * 0.15f, h * 0.55f),
-            end = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.8f),
+            start = androidx.compose.ui.geometry.Offset(w * 0.13f, h * 0.52f),
+            end = androidx.compose.ui.geometry.Offset(w * 0.4f, h * 0.78f),
             strokeWidth = stroke,
-            cap = androidx.compose.ui.graphics.StrokeCap.Round
+            cap = androidx.compose.ui.graphics.StrokeCap.Square
         )
+        // Правая наклонная: с (0.4w, 0.78h) до (0.87w, 0.2h)
         drawLine(
             color = tint,
-            start = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.8f),
-            end = androidx.compose.ui.geometry.Offset(w * 0.85f, h * 0.22f),
+            start = androidx.compose.ui.geometry.Offset(w * 0.4f, h * 0.78f),
+            end = androidx.compose.ui.geometry.Offset(w * 0.87f, h * 0.2f),
             strokeWidth = stroke,
-            cap = androidx.compose.ui.graphics.StrokeCap.Round
+            cap = androidx.compose.ui.graphics.StrokeCap.Square
         )
+        // Если double — вторая галочка справа
         if (double) {
             drawLine(
                 color = tint,
-                start = androidx.compose.ui.geometry.Offset(w * 0.42f, h * 0.55f),
-                end = androidx.compose.ui.geometry.Offset(w * 0.69f, h * 0.8f),
+                start = androidx.compose.ui.geometry.Offset(w * 0.4f, h * 0.52f),
+                end = androidx.compose.ui.geometry.Offset(w * 0.66f, h * 0.78f),
                 strokeWidth = stroke,
-                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                cap = androidx.compose.ui.graphics.StrokeCap.Square
             )
             drawLine(
                 color = tint,
-                start = androidx.compose.ui.geometry.Offset(w * 0.69f, h * 0.8f),
-                end = androidx.compose.ui.geometry.Offset(w * 1.12f, h * 0.22f),
+                start = androidx.compose.ui.geometry.Offset(w * 0.66f, h * 0.78f),
+                end = androidx.compose.ui.geometry.Offset(w * 1.13f, h * 0.2f),
                 strokeWidth = stroke,
-                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                cap = androidx.compose.ui.graphics.StrokeCap.Square
             )
         }
     }
