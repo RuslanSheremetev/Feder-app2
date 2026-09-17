@@ -255,7 +255,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     Surface(
                                         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                                         shape = RoundedCornerShape(12.dp),
-                                        color = Color.Black.copy(alpha = 0.6f)
+                                        color = SurfaceContainerHigh
                                     ) {
                                         Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                             Text(time, color = Color.White, fontSize = 11.sp)
@@ -307,7 +307,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             Surface(
                                 modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                                 shape = RoundedCornerShape(12.dp),
-                                color = Color.Black.copy(alpha = 0.6f)
+                                color = SurfaceContainerHigh
                             ) {
                                 Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(time, color = Color.White, fontSize = 11.sp)
