@@ -331,7 +331,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
             Row(Modifier.padding(horizontal = 6.dp, vertical = 3.dp), verticalAlignment = Alignment.Bottom) {
-                Text(text, color = if (isMine) OnPrimaryContainer else OnSurface, fontSize = 14.sp)
+                Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                     Spacer(Modifier.width(8.dp))
                     Text(time, color = if (isMine) Color.White else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp))
