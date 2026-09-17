@@ -1218,7 +1218,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             stickyHeader(key = "sticky_$date") {
                                 Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh, shadowElevation = 2.dp) {
-                                        Text(date, color = OnSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                                        Text(date, color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
                                     }
                                 }
                             }
