@@ -260,7 +260,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                             Text(time, color = Color.White, fontSize = 11.sp)
                                             if (isMine) {
-                                                Spacer(Modifier.width(3.dp))
+                                                Spacer(Modifier.width(1.dp))
                                                 val checkText = when (msg.status) {
                                                     "read" -> "✓✓"
                                                     "received" -> "✓✓"
@@ -312,7 +312,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(time, color = Color.White, fontSize = 11.sp)
                                     if (isMine) {
-                                        Spacer(Modifier.width(3.dp))
+                                        Spacer(Modifier.width(1.dp))
                                         val checkText = when (msg.status) {
                                             "read" -> "✓✓"
                                             "received" -> "✓✓"
