@@ -270,7 +270,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                     "read" -> Color(0xFF4CAF50)
                                                     else -> Color.White.copy(alpha = 0.7f)
                                                 }
-                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp)
+                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
                                             }
                                         }
                                     }
@@ -322,7 +322,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             "read" -> Color(0xFF4CAF50)
                                             else -> Color.White.copy(alpha = 0.7f)
                                         }
-                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp)
+                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
                                     }
                                 }
                             }
@@ -347,7 +347,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             "read" -> Color(0xFF4CAF50)
                             else -> Color.White.copy(alpha = 0.7f)
                         }
-                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp)
+                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
                         }
                     }
                 }
@@ -380,7 +380,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
                             }
-                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp)
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp))
                         }
                     }
                 }
@@ -1807,9 +1807,10 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
 fun DrawCheck(
     double: Boolean,
     tint: androidx.compose.ui.graphics.Color,
-    size: androidx.compose.ui.unit.Dp = 14.dp
+    size: androidx.compose.ui.unit.Dp = 14.dp,
+    modifier: Modifier = Modifier
 ) {
-    androidx.compose.foundation.Canvas(modifier = Modifier.size(size)) {
+    androidx.compose.foundation.Canvas(modifier = modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
         val stroke = w * 0.13f
