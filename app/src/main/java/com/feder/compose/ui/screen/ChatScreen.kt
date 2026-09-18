@@ -1820,14 +1820,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .pointerInput(inputText, selectedPhotos, isRecording, recordLocked) {
-                                if (!isRecording && inputText.isEmpty() && selectedPhotos.isEmpty()) {
-                                    detectTapGestures(
-                                        onLongPress = {
-                                            recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
-                                        }
-                                    )
+                            .combinedClickable(
+                                enabled = !isRecording && inputText.isEmpty() && selectedPhotos.isEmpty(),
+                                onClick = {
+                                    // длинный tap без записи — ничего
+                                },
+                                onLongClick = {
+                                    android.util.Log.d("ChatScreen", "LONG-PRESS on Mic — request permission")
+                                    recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
                                 }
+                            )
+                            .pointerInput(isRecording, recordLocked) {
                                 if (isRecording && !recordLocked) {
                                     detectDragGestures(
                                         onDrag = { change, dragAmount ->
@@ -1876,11 +1879,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     )
                                 }
                             }
-                            .clickable(enabled = !isRecording) {
-                                if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
-                                    sendMessage()
+                            .combinedClickable(
+                                enabled = !isRecording,
+                                onClick = {
+                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
+                                        sendMessage()
+                                    }
+                                },
+                                onLongClick = {
+                                    if (inputText.isEmpty() && selectedPhotos.isEmpty()) {
+                                        android.util.Log.d("ChatScreen", "LONG-PRESS via 2nd combinedClickable")
+                                        recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                    }
                                 }
-                            },
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
