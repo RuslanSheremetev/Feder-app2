@@ -1878,10 +1878,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                 isRecording = false
                                                 recordOffsetX = 0f
                                             } else {
-                                                // Не записывали — это был tap
+                                                // Не записывали (лаунчер ещё не вернул) — это был tap ИЛИ быстрый long-press
                                                 if (!isLong && elapsed < 500) {
+                                                    // Обычный tap
                                                     if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
                                                         sendMessage()
+                                                    }
+                                                } else if (isLong) {
+                                                    // Long-press, но запись ещё не стартовала.
+                                                    // Отменяем: помечаем что нужно остановить сразу после старта
+                                                    android.util.Log.d("ChatScreen", "Long-press but record not yet started — schedule cancel")
+                                                    scope.launch {
+                                                        kotlinx.coroutines.delay(300)
+                                                        if (isRecordingState.value) {
+                                                            audioRecorder.cancel()
+                                                            isRecording = false
+                                                            recordOffsetX = 0f
+                                                        }
                                                     }
                                                 }
                                             }
