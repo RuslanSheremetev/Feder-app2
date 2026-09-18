@@ -99,6 +99,25 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+private fun logToServer(tag: String, msg: String) {
+    android.util.Log.d(tag, msg)
+    try {
+        kotlin.concurrent.thread {
+            try {
+                val body = ("{\"log\":\"[" + tag + "] " + msg.replace("\"", "'").replace("\n", " ") + "\"}")
+                    .toRequestBody("application/json".toMediaType())
+                okhttp3.OkHttpClient().newCall(
+                    okhttp3.Request.Builder()
+                        .url("http://2.26.71.102:8006/api/logs")
+                        .post(body)
+                        .build()
+                ).execute().close()
+            } catch (_: Exception) {}
+        }
+    } catch (_: Exception) {}
+}
+
+
 var fullScreenPhoto: String? = null
 var uploadingPhotos: Boolean = false
 
@@ -487,8 +506,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val recordPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { granted ->
+        logToServer("ChatScreen", "PERMISSION callback granted=$granted")
         if (granted) {
             val f = audioRecorder.start()
+            logToServer("ChatScreen", "AUDIO start file=${f?.absolutePath}")
             if (f != null) {
                 if (recordReleasedBeforeStart) {
                     audioRecorder.cancel()
@@ -664,7 +685,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
     LaunchedEffect(chatUsername) {
-        android.util.Log.d("ChatScreen", "Chat opened: $chatUsername")
+        logToServer("ChatScreen", "OPEN chat=$chatUsername me=$myUsername token=${token.take(20)}")
         repository?.markRead(chatUsername)
 
         withContext(Dispatchers.IO) {
@@ -672,7 +693,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             repository?.let { repo ->
                 val cachedMessages = repo.getMessages(myUsername, chatUsername)
-                android.util.Log.d("ChatScreen", "Room: ${cachedMessages.size} messages")
+                logToServer("ChatScreen", "ROOM read: ${cachedMessages.size} messages")
                 if (cachedMessages.isNotEmpty()) {
                     loadedFromRoom = true
                     val list = cachedMessages.map { entity ->
@@ -693,6 +714,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     withContext(Dispatchers.Main) {
                         messages = list
                     }
+                    logToServer("ChatScreen", "ROOM applied: ${list.size} msgs")
                 }
             }
 
@@ -707,12 +729,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         internalToken = JsonParser.parseString(authResp.body?.string() ?: "")
                             .asJsonObject.get("access_token")?.asString ?: ""
                     }
+                    logToServer("ChatScreen", "API request /api/messages/$chatUsername")
                     val msgResp = httpClient.newCall(Request.Builder()
                         .url("http://2.26.71.102:8004/api/messages/$chatUsername")
                         .header("Authorization", "Bearer $token").build()).execute()
                     val body = msgResp.body?.string() ?: "[]"
+                    logToServer("ChatScreen", "API response code=${msgResp.code} body_len=${body.length}")
                     val type = object : com.google.gson.reflect.TypeToken<List<MsgItem>>() {}.type
                     val loaded = gson.fromJson<List<MsgItem>>(body, type)
+                    logToServer("ChatScreen", "JSON parsed: ${loaded.size} msgs")
 
                     val apiList = loaded.reversed().map { msg ->
                         val urls = msg.imageUrls ?: emptyList()
@@ -734,6 +759,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         messages.forEach { mergedMap[it.id] = it }
                         apiList.forEach { mergedMap[it.id] = it }
                         messages = mergedMap.values.sortedBy { it.timeVal }
+                        logToServer("ChatScreen", "MERGE done: total=${messages.size} (room+api)")
                     }
 
                     repository?.let { r ->
@@ -1857,13 +1883,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             // Long-press сработал?
                                             if (!isLong && !isRecordingState.value && System.currentTimeMillis() - startTime >= 400) {
                                                 isLong = true
-                                                android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
+                                                logToServer("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
                                                 recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
                                             }
                                         } else {
                                             // ОТПУСТИЛИ
                                             val elapsed = System.currentTimeMillis() - startTime
-                                            android.util.Log.d("ChatScreen", "RELEASE: isRec=${isRecordingState.value} isLong=$isLong elapsed=$elapsed offset=$recordOffsetX")
+                                            logToServer("ChatScreen", "RELEASE isRec=${isRecordingState.value} isLong=$isLong elapsed=$elapsed offset=$recordOffsetX")
                                             if (isRecordingState.value) {
                                                 // Мы записывали — отправить или отменить
                                                 if (recordOffsetX < -100f) {
@@ -1871,6 +1897,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     android.util.Log.d("ChatScreen", "CANCEL")
                                                 } else {
                                                     val result = audioRecorder.stop()
+                                                    logToServer("ChatScreen", "AUDIO stop result=${result?.first?.absolutePath} dur=${result?.second}")
                                                     if (result != null) {
                                                         val (file, _) = result
                                                         val localId = System.currentTimeMillis()
@@ -1878,7 +1905,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                         val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
                                                         messages = messages + MsgItem(myUsername, chatUsername, "", nowStr, "pending", now, id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath))
                                                         scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                            logToServer("ChatScreen", "UPLOAD start file=${file.name} size=${file.length()}")
                                                             val url = try { com.feder.compose.AudioUploader.uploadAudio(file.inputStream(), file.name, token, chatUsername) } catch (e: Exception) { null }
+                                                            logToServer("ChatScreen", "UPLOAD done url=$url")
                                                             withContext(kotlinx.coroutines.Dispatchers.Main) {
                                                                 if (url != null) messages = messages.map { if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it }
                                                                 file.delete()
