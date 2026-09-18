@@ -1149,7 +1149,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                         )
                     } else {
-                        Box(Modifier.size(40.dp).clip(CircleShape).border(1.dp, OutlineVariant, CircleShape).clickable { onProfileClick() }) {
+                        Box(Modifier.size(40.dp).clip(CircleShape).clickable { onProfileClick() }) {
                             if (avatarUrl != null) {
                                 AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
