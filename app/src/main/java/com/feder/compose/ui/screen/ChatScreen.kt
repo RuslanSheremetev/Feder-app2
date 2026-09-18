@@ -754,13 +754,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         )
                     }
                     // Мержим: Room-кэш + API, убираем дубли по id
-                    // НЕ используем withContext(Main) — уже на Main через LaunchedEffect
-                    withContext(Dispatchers.Main.immediate) {
+                    // withContext убран — LaunchedEffect уже на Main
+                    try {
                         val mergedMap = LinkedHashMap<Long, MsgItem>()
                         messages.forEach { mergedMap[it.id] = it }
                         apiList.forEach { mergedMap[it.id] = it }
-                        messages = mergedMap.values.sortedBy { it.timeVal }
-                        logToServer("ChatScreen", "MERGE done: total=${messages.size} (room+api)")
+                        val merged = mergedMap.values.sortedBy { it.timeVal }
+                        logToServer("ChatScreen", "MERGE done: total=${merged.size} (room+api)")
+                        messages = merged
+                    } catch (e: Exception) {
+                        logToServer("ChatScreen", "MERGE ERROR: ${e.message}")
                     }
 
                     repository?.let { r ->
