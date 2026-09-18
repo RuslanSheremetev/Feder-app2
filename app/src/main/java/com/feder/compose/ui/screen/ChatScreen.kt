@@ -1788,8 +1788,98 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Icon(if (expandInput) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, "expand", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     }
-                    Box(Modifier.size(40.dp).clip(CircleShape).background(PrimaryContainer).clickable { ; android.util.Log.d("ChatScreen", "CLICKED send"); sendMessage() }, contentAlignment = Alignment.Center) {
-                        Icon(if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) Icons.Filled.Send else Icons.Filled.Mic, "send", tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(if (isRecording) (48 * audioPulseScale).dp else 40.dp)
+                            .drawBehind {
+                                if (isRecording) {
+                                    drawCircle(
+                                        color = Color.Red.copy(alpha = audioGlowAlpha * 0.55f),
+                                        radius = size.minDimension / 2 * 1.55f
+                                    )
+                                    drawCircle(
+                                        color = Color.Red.copy(alpha = audioGlowAlpha * 0.25f),
+                                        radius = size.minDimension / 2 * 2.1f
+                                    )
+                                }
+                            }
+                            .clip(CircleShape)
+                            .background(if (isRecording) Color.Red else PrimaryContainer)
+                            .pointerInput(inputText, selectedPhotos, isRecording) {
+                                if (!isRecording && inputText.isEmpty() && selectedPhotos.isEmpty()) {
+                                    detectTapGestures(
+                                        onLongPress = {
+                                            recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                        }
+                                    )
+                                }
+                            }
+                            .pointerInput(isRecording, recordLocked) {
+                                if (isRecording && !recordLocked) {
+                                    detectDragGestures(
+                                        onDrag = { change, dragAmount ->
+                                            recordOffsetX += dragAmount.x
+                                            change.consume()
+                                        },
+                                        onDragEnd = {
+                                            if (recordOffsetX < -100f) {
+                                                // Отмена
+                                                audioRecorder.cancel()
+                                                isRecording = false
+                                                recordOffsetX = 0f
+                                                recordLocked = false
+                                            } else {
+                                                // Отправка
+                                                val result = audioRecorder.stop()
+                                                isRecording = false
+                                                recordOffsetX = 0f
+                                                if (result != null) {
+                                                    val (file, dur) = result
+                                                    val localId = System.currentTimeMillis()
+                                                    val now = localId / 1000
+                                                    val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                                                    messages = messages + MsgItem(
+                                                        myUsername, chatUsername, "",
+                                                        nowStr, "pending", now,
+                                                        id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath)
+                                                    )
+                                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                        val url = try {
+                                                            val input = file.inputStream()
+                                                            com.feder.compose.AudioUploader.uploadAudio(input, file.name, token, chatUsername)
+                                                        } catch (e: Exception) { null }
+                                                        withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                            if (url != null) {
+                                                                messages = messages.map {
+                                                                    if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it
+                                                                }
+                                                            }
+                                                            file.delete()
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                            .clickable(enabled = !isRecording) {
+                                if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
+                                    sendMessage()
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            when {
+                                isRecording -> Icons.Filled.Stop
+                                inputText.isNotEmpty() || selectedPhotos.isNotEmpty() -> Icons.Filled.Send
+                                else -> Icons.Filled.Mic
+                            },
+                            "send",
+                            tint = if (isRecording) Color.White else OnPrimaryContainer,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
                 }
