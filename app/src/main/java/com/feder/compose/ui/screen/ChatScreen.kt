@@ -270,7 +270,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                     "read" -> Color(0xFF4CAF50)
                                                     else -> Color.White.copy(alpha = 0.7f)
                                                 }
-                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp)
+                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp, modifier = Modifier.offset(y = (-2).dp))
                                             }
                                         }
                                     }
@@ -322,7 +322,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             "read" -> Color(0xFF4CAF50)
                                             else -> Color.White.copy(alpha = 0.7f)
                                         }
-                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp)
+                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp, modifier = Modifier.offset(y = (-2).dp))
                                     }
                                 }
                             }
@@ -347,7 +347,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             "read" -> Color(0xFF4CAF50)
                             else -> Color.White.copy(alpha = 0.7f)
                         }
-                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp)
+                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp, modifier = Modifier.offset(y = (-2).dp))
                         }
                     }
                 }
@@ -380,7 +380,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
                             }
-                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp)
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 10.dp, modifier = Modifier.offset(y = (-2).dp))
                         }
                     }
                 }
