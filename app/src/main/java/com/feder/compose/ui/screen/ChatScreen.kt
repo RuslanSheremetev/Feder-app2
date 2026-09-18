@@ -270,7 +270,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                                     "read" -> Color(0xFF4CAF50)
                                                     else -> Color.White.copy(alpha = 0.7f)
                                                 }
-                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp).alignByBaseline())
+                                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                                             }
                                         }
                                     }
@@ -322,7 +322,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                             "read" -> Color(0xFF4CAF50)
                                             else -> Color.White.copy(alpha = 0.7f)
                                         }
-                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp).alignByBaseline())
+                                        DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                                     }
                                 }
                             }
@@ -334,7 +334,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp, modifier = Modifier.alignByBaseline())
                     if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                         Spacer(Modifier.width(8.dp))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 2.dp).alignByBaseline())
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
@@ -348,7 +348,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> Color.White.copy(alpha = 0.7f)
                             }
-                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp).alignByBaseline())
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                         }
                     }
                 }
@@ -381,7 +381,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 "read" -> Color(0xFF4CAF50)
                                 else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
                             }
-                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.offset(y = 2.dp).alignByBaseline())
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                         }
                     }
                 }
