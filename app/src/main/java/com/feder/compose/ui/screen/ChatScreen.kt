@@ -213,7 +213,20 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
-                    android.util.Log.d("PhotoDisplay", "Rendering photo: ${msg.imageUrls.first()}, count=${msg.imageUrls.size}")
+                    val firstUrl = msg.imageUrls.first()
+                    val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
+                    android.util.Log.d("PhotoDisplay", "Rendering ${if (isAudio) "audio" else "photo"}: $firstUrl, count=${msg.imageUrls.size}")
+                    if (isAudio) {
+                        // ═══ AUDIO BUBBLE ═══
+                        com.feder.compose.audio.AudioBubble(
+                            audioUrl = firstUrl,
+                            token = token,
+                            isMine = isMine,
+                            time = time,
+                            msgStatus = msg.status,
+                            onLongClick = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() }
+                        )
+                    } else {
                     Column(Modifier.fillMaxWidth()) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
@@ -293,6 +306,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             )
                         }
                     }
+                    }  // end else (photo)
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
