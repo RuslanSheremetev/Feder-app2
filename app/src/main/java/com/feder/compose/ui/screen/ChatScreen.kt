@@ -452,6 +452,43 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
 
+    // ═══ Запись голосовых сообщений ═══
+    val audioRecorder = remember { com.feder.compose.AudioRecorder(context.applicationContext) }
+    var isRecording by remember { mutableStateOf(false) }
+    var recordLocked by remember { mutableStateOf(false) }
+    var recordTimeSec by remember { mutableStateOf(0) }
+    var recordAmplitude by remember { mutableStateOf(0f) }
+    var recordOffsetX by remember { mutableStateOf(0f) }
+    val recordPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val f = audioRecorder.start()
+            if (f != null) { isRecording = true; recordTimeSec = 0; recordOffsetX = 0f }
+        }
+    }
+    // Таймер + амплитуда
+    LaunchedEffect(isRecording) {
+        if (isRecording) {
+            while (isRecording) {
+                kotlinx.coroutines.delay(100L)
+                recordTimeSec = audioRecorder.durationSec
+                recordAmplitude = (audioRecorder.getAmplitude().toFloat() / 32767f).coerceIn(0f, 1f)
+            }
+        }
+    }
+    // Анимация пульсации и свечения
+    val audioPulse = rememberInfiniteTransition()
+    val audioPulseScale by audioPulse.animateFloat(
+        initialValue = 1f, targetValue = if (isRecording) 1.15f else 1f,
+        animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse)
+    )
+    val audioGlowAlpha by audioPulse.animateFloat(
+        initialValue = 0.25f, targetValue = 0.85f,
+        animationSpec = infiniteRepeatable(tween(450), RepeatMode.Reverse)
+    )
+    // ═══ /Запись голосовых ═══
+
     // === Приём реакций из WS через ViewModel (SharedFlow) ===
     if (reactionUpdates != null) {
         LaunchedEffect(reactionUpdates) {
