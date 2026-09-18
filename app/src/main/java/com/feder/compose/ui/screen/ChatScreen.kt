@@ -685,7 +685,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
             }
 
-            if (!loadedFromRoom) {
+            // ВСЕГДА грузим с API, даже если есть Room-кэш
+            run {
                 try {
                     if (internalToken.isEmpty()) {
                         val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
@@ -717,7 +718,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         )
                     }
                     withContext(Dispatchers.Main) {
-                        messages = apiList
+                        // Мержим: Room-кэш + API, убираем дубли по id
+                        val mergedMap = LinkedHashMap<Long, MsgItem>()
+                        messages.forEach { mergedMap[it.id] = it }
+                        apiList.forEach { mergedMap[it.id] = it }
+                        messages = mergedMap.values.sortedBy { it.timeVal }
                     }
 
                     repository?.let { r ->
