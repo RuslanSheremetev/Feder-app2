@@ -1824,34 +1824,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .pointerInput(inputText, selectedPhotos, isRecording) {
-                                if (isRecording) return@pointerInput
-                                awaitEachGesture {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    var isLong = false
-                                    try {
-                                        withTimeout(400L) {
-                                            while (true) {
-                                                val ev = awaitPointerEvent()
-                                                if (ev.changes.all { !it.pressed }) {
-                                                    // Отпустили раньше 400мс — обычный tap
-                                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) sendMessage()
-                                                    return@withTimeout
-                                                }
-                                            }
-                                        }
-                                    } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
-                                        isLong = true
+                            .combinedClickable(
+                                enabled = !isRecording,
+                                onClick = {
+                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
+                                        sendMessage()
                                     }
-                                    if (!isLong) return@awaitEachGesture
-                                    // Long-press: запрос разрешения и старт
-                                    android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
-                                    recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
-                                    // Ждём отпускания, записывая offset
+                                },
+                                onLongClick = {
+                                    if (inputText.isEmpty() && selectedPhotos.isEmpty()) {
+                                        android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
+                                        recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                    }
+                                }
+                            )
+                            .pointerInput(isRecording, recordLocked) {
+                                if (!isRecording || recordLocked) return@pointerInput
+                                awaitEachGesture {
+                                    awaitFirstDown(requireUnconsumed = false)
                                     var totalDx = 0f
                                     while (true) {
                                         val ev = awaitPointerEvent()
-                                        val ch = ev.changes.firstOrNull() ?: continue
+                                        val ch = ev.changes.firstOrNull() ?: break
                                         if (ch.pressed) {
                                             totalDx += ch.positionChange().x
                                             recordOffsetX = totalDx
