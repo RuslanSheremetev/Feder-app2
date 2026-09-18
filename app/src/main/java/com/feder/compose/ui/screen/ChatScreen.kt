@@ -477,6 +477,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     // ═══ Запись голосовых сообщений ═══
     val audioRecorder = remember { com.feder.compose.AudioRecorder(context.applicationContext) }
+    val isRecordingState = rememberUpdatedState(isRecording)
     var isRecording by remember { mutableStateOf(false) }
     var recordLocked by remember { mutableStateOf(false) }
     var recordTimeSec by remember { mutableStateOf(0) }
@@ -1824,67 +1825,64 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .pointerInput(inputText, selectedPhotos, isRecording, recordLocked) {
-                                if (isRecording) {
-                                    if (recordLocked) return@pointerInput
-                                    awaitEachGesture {
-                                        awaitFirstDown(requireUnconsumed = false)
-                                        var totalDx = 0f
-                                        while (true) {
-                                            val ev = awaitPointerEvent()
-                                            val ch = ev.changes.firstOrNull() ?: break
-                                            if (ch.pressed) {
-                                                totalDx += ch.positionChange().x
-                                                recordOffsetX = totalDx
-                                            } else break
-                                            ch.consume()
-                                        }
-                                        android.util.Log.d("ChatScreen", "RELEASED offset=$recordOffsetX isRec=$isRecording")
-                                        if (recordOffsetX < -100f) {
-                                            audioRecorder.cancel()
-                                        } else {
-                                            val result = audioRecorder.stop()
-                                            if (result != null) {
-                                                val (file, _) = result
-                                                val localId = System.currentTimeMillis()
-                                                val now = localId / 1000
-                                                val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                                                messages = messages + MsgItem(myUsername, chatUsername, "", nowStr, "pending", now, id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath))
-                                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                                    val url = try { com.feder.compose.AudioUploader.uploadAudio(file.inputStream(), file.name, token, chatUsername) } catch (e: Exception) { null }
-                                                    withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                        if (url != null) messages = messages.map { if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it }
-                                                        file.delete()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        isRecording = false
-                                        recordOffsetX = 0f
-                                    }
-                                } else {
-                                    awaitEachGesture {
-                                        awaitFirstDown(requireUnconsumed = false)
-                                        val startTime = System.currentTimeMillis()
-                                        var isLong = false
-                                        while (true) {
-                                            val ev = awaitPointerEvent()
-                                            val ch = ev.changes.firstOrNull() ?: break
-                                            if (!ch.pressed) {
-                                                // Отпустили
-                                                val elapsed = System.currentTimeMillis() - startTime
-                                                if (!isLong && elapsed < 400) {
-                                                    // Tap
-                                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) sendMessage()
-                                                }
-                                                return@awaitEachGesture
-                                            }
-                                            if (!isLong && System.currentTimeMillis() - startTime >= 400) {
+                            .pointerInput(Unit) {
+                                awaitEachGesture {
+                                    awaitFirstDown(requireUnconsumed = false)
+                                    val startTime = System.currentTimeMillis()
+                                    var isLong = false
+                                    var totalDx = 0f
+                                    // Ждём отпускания, отслеживаем движение
+                                    while (true) {
+                                        val ev = awaitPointerEvent()
+                                        val ch = ev.changes.firstOrNull() ?: break
+                                        if (ch.pressed) {
+                                            totalDx += ch.positionChange().x
+                                            if (isRecordingState.value) recordOffsetX = totalDx
+                                            // Long-press сработал?
+                                            if (!isLong && !isRecordingState.value && System.currentTimeMillis() - startTime >= 400) {
                                                 isLong = true
                                                 android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
                                                 recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
                                             }
+                                        } else {
+                                            // ОТПУСТИЛИ
+                                            val elapsed = System.currentTimeMillis() - startTime
+                                            android.util.Log.d("ChatScreen", "RELEASE: isRec=${isRecordingState.value} isLong=$isLong elapsed=$elapsed offset=$recordOffsetX")
+                                            if (isRecordingState.value) {
+                                                // Мы записывали — отправить или отменить
+                                                if (recordOffsetX < -100f) {
+                                                    audioRecorder.cancel()
+                                                    android.util.Log.d("ChatScreen", "CANCEL")
+                                                } else {
+                                                    val result = audioRecorder.stop()
+                                                    if (result != null) {
+                                                        val (file, _) = result
+                                                        val localId = System.currentTimeMillis()
+                                                        val now = localId / 1000
+                                                        val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                                                        messages = messages + MsgItem(myUsername, chatUsername, "", nowStr, "pending", now, id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath))
+                                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                            val url = try { com.feder.compose.AudioUploader.uploadAudio(file.inputStream(), file.name, token, chatUsername) } catch (e: Exception) { null }
+                                                            withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                                if (url != null) messages = messages.map { if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it }
+                                                                file.delete()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                isRecording = false
+                                                recordOffsetX = 0f
+                                            } else {
+                                                // Не записывали — это был tap
+                                                if (!isLong && elapsed < 500) {
+                                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
+                                                        sendMessage()
+                                                    }
+                                                }
+                                            }
+                                            break
                                         }
+                                        ch.consume()
                                     }
                                 }
                             },
