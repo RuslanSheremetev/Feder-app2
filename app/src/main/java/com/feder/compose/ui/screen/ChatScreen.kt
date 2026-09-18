@@ -1660,6 +1660,35 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
         if (!showForward) {
+            if (isRecording) {
+                // ═══ ПАНЕЛЬ ЗАПИСИ ═══
+                Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = 8.dp)) {
+                    Surface(shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            // Красная точка (пульсирует)
+                            Box(Modifier.size(12.dp).clip(CircleShape).background(Color.Red.copy(alpha = audioGlowAlpha)))
+                            Spacer(Modifier.width(10.dp))
+                            // Таймер
+                            Text(
+                                "%d:%02d".format(recordTimeSec / 60, recordTimeSec % 60),
+                                color = OnSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium
+                            )
+                            Spacer(Modifier.weight(1f))
+                            // Slide to cancel / Release to cancel
+                            Text(
+                                if (recordOffsetX < -100f) "Release to cancel" else "◀ Slide to cancel",
+                                color = if (recordOffsetX < -100f) Color.Red else OnSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                            Spacer(Modifier.weight(1f))
+                            // Кнопка lock
+                            IconButton(onClick = { recordLocked = !recordLocked }, modifier = Modifier.size(40.dp)) {
+                                Icon(if (recordLocked) Icons.Filled.Lock else Icons.Filled.LockOpen, "lock", tint = if (recordLocked) Primary else OnSurfaceVariant, modifier = Modifier.size(22.dp))
+                            }
+                        }
+                    }
+                }
+            } else {
             Box(modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).align(if (expandInput) Alignment.TopCenter else Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 4.dp).imePadding().navigationBarsPadding().padding(bottom = if (expandInput) 16.dp else 8.dp)) {
             Surface(shape = RoundedCornerShape(24.dp), color = SurfaceContainerHigh, shadowElevation = 4.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                 Column {
@@ -1763,6 +1792,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
             }
         }
+            }
         }
         // Кнопка прокрутки вниз
         // Полноэкранный просмотр
