@@ -1807,7 +1807,6 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
 
 
 @Composable
-@Composable
 fun DrawCheck(
     double: Boolean,
     tint: androidx.compose.ui.graphics.Color,
