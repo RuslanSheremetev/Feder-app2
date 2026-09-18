@@ -1820,7 +1820,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .pointerInput(inputText, selectedPhotos, isRecording) {
+                            .pointerInput(inputText, selectedPhotos, isRecording, recordLocked) {
                                 if (!isRecording && inputText.isEmpty() && selectedPhotos.isEmpty()) {
                                     detectTapGestures(
                                         onLongPress = {
@@ -1828,8 +1828,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     )
                                 }
-                            }
-                            .pointerInput(isRecording, recordLocked) {
                                 if (isRecording && !recordLocked) {
                                     detectDragGestures(
                                         onDrag = { change, dragAmount ->
