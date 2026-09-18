@@ -753,8 +753,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             time = timeStr
                         )
                     }
-                    withContext(Dispatchers.Main) {
-                        // Мержим: Room-кэш + API, убираем дубли по id
+                    // Мержим: Room-кэш + API, убираем дубли по id
+                    // НЕ используем withContext(Main) — уже на Main через LaunchedEffect
+                    withContext(Dispatchers.Main.immediate) {
                         val mergedMap = LinkedHashMap<Long, MsgItem>()
                         messages.forEach { mergedMap[it.id] = it }
                         apiList.forEach { mergedMap[it.id] = it }
