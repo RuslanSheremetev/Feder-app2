@@ -334,7 +334,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp)
                 if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                     Spacer(Modifier.width(8.dp))
-                    Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 3.dp))
+                    Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp)
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
                         val checkText = when (msg.status) {
@@ -357,7 +357,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 2.dp),
                     horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     msg.reactions.forEach { r ->
                         ReactionPill(r = r, allChats = allChats, myUsername = myUsername, onClick = { }, onLongClick = { })
@@ -366,7 +366,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     // Если фото-сообщение — время справа в этом же ряду
                     if (time.isNotEmpty()) {
                         Spacer(Modifier.weight(1f))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.offset(y = 3.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp)
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
