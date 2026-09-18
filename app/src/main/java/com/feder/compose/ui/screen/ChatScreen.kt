@@ -299,7 +299,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         color = SurfaceContainerHigh
                                     ) {
                                         Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Top) {
-                                            Text(time, color = Color.White, fontSize = 11.sp)
+                                            Text(time, color = Color.White, fontSize = 11.sp, maxLines = 1, softWrap = false)
                                             if (isMine) {
                                                 Spacer(Modifier.width(1.dp))
                                                 val checkText = when (msg.status) {
@@ -352,7 +352,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 color = SurfaceContainerHigh
                             ) {
                                 Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Top) {
-                                    Text(time, color = Color.White, fontSize = 11.sp)
+                                    Text(time, color = Color.White, fontSize = 11.sp, maxLines = 1, softWrap = false)
                                     if (isMine) {
                                         Spacer(Modifier.width(1.dp))
                                         val checkText = when (msg.status) {
@@ -373,10 +373,10 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
                 Row(Modifier.padding(horizontal = 6.dp, vertical = 3.dp), verticalAlignment = Alignment.Top) {
-                    Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp, modifier = Modifier.alignByBaseline())
+                    Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false).alignByBaseline())
                     if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                         Spacer(Modifier.width(8.dp))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
@@ -409,7 +409,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     // Если фото-сообщение — время справа в этом же ряду
                     if (time.isNotEmpty()) {
                         Spacer(Modifier.weight(1f))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp)
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false)
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
