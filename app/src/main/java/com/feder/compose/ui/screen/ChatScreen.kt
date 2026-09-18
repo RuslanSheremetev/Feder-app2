@@ -4,6 +4,10 @@ import com.feder.compose.ChatItem
 import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.positionChange
+import kotlinx.coroutines.withTimeout
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.geometry.Offset
@@ -1820,79 +1824,66 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .combinedClickable(
-                                enabled = !isRecording && inputText.isEmpty() && selectedPhotos.isEmpty(),
-                                onClick = {
-                                    // длинный tap без записи — ничего
-                                },
-                                onLongClick = {
-                                    android.util.Log.d("ChatScreen", "LONG-PRESS on Mic — request permission")
+                            .pointerInput(inputText, selectedPhotos, isRecording) {
+                                if (isRecording) return@pointerInput
+                                awaitEachGesture {
+                                    val down = awaitFirstDown(requireUnconsumed = false)
+                                    var isLong = false
+                                    try {
+                                        withTimeout(400L) {
+                                            while (true) {
+                                                val ev = awaitPointerEvent()
+                                                if (ev.changes.all { !it.pressed }) {
+                                                    // Отпустили раньше 400мс — обычный tap
+                                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) sendMessage()
+                                                    return@withTimeout
+                                                }
+                                            }
+                                        }
+                                    } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                                        isLong = true
+                                    }
+                                    if (!isLong) return@awaitEachGesture
+                                    // Long-press: запрос разрешения и старт
+                                    android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
                                     recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
-                                }
-                            )
-                            .pointerInput(isRecording, recordLocked) {
-                                if (isRecording && !recordLocked) {
-                                    detectDragGestures(
-                                        onDrag = { change, dragAmount ->
-                                            recordOffsetX += dragAmount.x
-                                            change.consume()
-                                        },
-                                        onDragEnd = {
-                                            if (recordOffsetX < -100f) {
-                                                // Отмена
-                                                audioRecorder.cancel()
-                                                isRecording = false
-                                                recordOffsetX = 0f
-                                                recordLocked = false
-                                            } else {
-                                                // Отправка
-                                                val result = audioRecorder.stop()
-                                                isRecording = false
-                                                recordOffsetX = 0f
-                                                if (result != null) {
-                                                    val (file, dur) = result
-                                                    val localId = System.currentTimeMillis()
-                                                    val now = localId / 1000
-                                                    val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                                                    messages = messages + MsgItem(
-                                                        myUsername, chatUsername, "",
-                                                        nowStr, "pending", now,
-                                                        id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath)
-                                                    )
-                                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                                        val url = try {
-                                                            val input = file.inputStream()
-                                                            com.feder.compose.AudioUploader.uploadAudio(input, file.name, token, chatUsername)
-                                                        } catch (e: Exception) { null }
-                                                        withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                            if (url != null) {
-                                                                messages = messages.map {
-                                                                    if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it
-                                                                }
-                                                            }
-                                                            file.delete()
-                                                        }
+                                    // Ждём отпускания, записывая offset
+                                    var totalDx = 0f
+                                    while (true) {
+                                        val ev = awaitPointerEvent()
+                                        val ch = ev.changes.firstOrNull() ?: continue
+                                        if (ch.pressed) {
+                                            totalDx += ch.positionChange().x
+                                            recordOffsetX = totalDx
+                                        } else break
+                                        ch.consume()
+                                    }
+                                    android.util.Log.d("ChatScreen", "RELEASED offset=$recordOffsetX isRec=$isRecording")
+                                    if (isRecording) {
+                                        if (recordOffsetX < -100f) {
+                                            audioRecorder.cancel()
+                                        } else {
+                                            val result = audioRecorder.stop()
+                                            if (result != null) {
+                                                val (file, _) = result
+                                                val localId = System.currentTimeMillis()
+                                                val now = localId / 1000
+                                                val nowStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                                                messages = messages + MsgItem(myUsername, chatUsername, "", nowStr, "pending", now, id = localId, imageUrls = listOf("LOCAL:" + file.absolutePath))
+                                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                    val url = try { com.feder.compose.AudioUploader.uploadAudio(file.inputStream(), file.name, token, chatUsername) } catch (e: Exception) { null }
+                                                    withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                        if (url != null) messages = messages.map { if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it }
+                                                        file.delete()
                                                     }
                                                 }
                                             }
                                         }
-                                    )
-                                }
-                            }
-                            .combinedClickable(
-                                enabled = !isRecording,
-                                onClick = {
-                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
-                                        sendMessage()
-                                    }
-                                },
-                                onLongClick = {
-                                    if (inputText.isEmpty() && selectedPhotos.isEmpty()) {
-                                        android.util.Log.d("ChatScreen", "LONG-PRESS via 2nd combinedClickable")
-                                        recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                        isRecording = false
+                                        recordOffsetX = 0f
                                     }
                                 }
-                            ),
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
