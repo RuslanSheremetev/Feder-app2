@@ -1829,7 +1829,7 @@ fun DrawCheck(
         ) {
             val w = this.size.width
             val h = this.size.height
-            val stroke = 1.2f
+            val stroke = 1.6f
             drawLine(
                 color = tint,
                 start = androidx.compose.ui.geometry.Offset(w * 0.13f, h * 0.52f),
