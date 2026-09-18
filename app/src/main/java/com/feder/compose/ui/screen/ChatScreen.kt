@@ -483,12 +483,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var recordTimeSec by remember { mutableStateOf(0) }
     var recordAmplitude by remember { mutableStateOf(0f) }
     var recordOffsetX by remember { mutableStateOf(0f) }
+    var recordReleasedBeforeStart by remember { mutableStateOf(false) }
     val recordPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
             val f = audioRecorder.start()
-            if (f != null) { isRecording = true; recordTimeSec = 0; recordOffsetX = 0f }
+            if (f != null) {
+                if (recordReleasedBeforeStart) {
+                    audioRecorder.cancel()
+                    recordReleasedBeforeStart = false
+                    android.util.Log.d("ChatScreen", "Record start but user already released — cancel")
+                } else {
+                    isRecording = true
+                    recordTimeSec = 0
+                    recordOffsetX = 0f
+                }
+            }
         }
     }
     // Таймер + амплитуда
@@ -1887,6 +1898,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                 } else if (isLong) {
                                                     // Long-press, но запись ещё не стартовала.
                                                     // Отменяем: помечаем что нужно остановить сразу после старта
+                                                    recordReleasedBeforeStart = true
                                                     android.util.Log.d("ChatScreen", "Long-press but record not yet started — schedule cancel")
                                                     scope.launch {
                                                         kotlinx.coroutines.delay(300)
@@ -2061,3 +2073,4 @@ fun DrawCheck(
         }
     }
 }
+
