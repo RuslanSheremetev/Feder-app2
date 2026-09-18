@@ -84,7 +84,8 @@ class FederHttpClient(
         fileName: String,
         fileBytes: ByteArray,
         token: String,
-        listener: ProgressListener? = null
+        listener: ProgressListener? = null,
+        contentType: String = "image/jpeg"
     ): String? {
         // Проверяем кэш (если такой же файл уже загружался)
         val cacheKey = "$url:${fileBytes.size}:${fileBytes.contentHashCode()}"
@@ -110,7 +111,7 @@ class FederHttpClient(
                     return null
                 }
                 
-                val result = doUpload(url, fileName, fileBytes, token, listener)
+                val result = doUpload(url, fileName, fileBytes, token, listener, contentType)
                 if (result != null) {
                     recordSuccess(url)
                     memoryCache[cacheKey] = result.toByteArray()
@@ -141,7 +142,8 @@ class FederHttpClient(
         fileName: String,
         fileBytes: ByteArray,
         token: String,
-        listener: ProgressListener?
+        listener: ProgressListener?,
+        contentType: String = "image/jpeg"
     ): String? {
         val boundary = "$BOUNDARY_PREFIX${System.nanoTime()}"
         val connection = getConnection(url)
@@ -163,7 +165,7 @@ class FederHttpClient(
         // Multipart headers
         output.writeBytes("--$boundary\r\n")
         output.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"$fileName\"\r\n")
-        output.writeBytes("Content-Type: image/jpeg\r\n")
+        output.writeBytes("Content-Type: $contentType\r\n")
         output.writeBytes("\r\n")
         
         // Zero-copy для больших файлов (chunked)
@@ -407,6 +409,42 @@ object FederFileUploader {
                 }
                 override fun onRetry(attempt: Int, delayMs: Long) {
                     android.util.Log.w("FederHttp", "Retry $attempt in ${delayMs}ms")
+                }
+            }
+        )
+    }
+
+    fun uploadAudio(
+        inputStream: InputStream,
+        fileName: String,
+        token: String,
+        toUser: String = "",
+        onProgress: ((Long, Long) -> Unit)? = null,
+        onComplete: ((String) -> Unit)? = null,
+        onError: ((String) -> Unit)? = null
+    ): String? {
+        val bytes = inputStream.readBytes()
+        val encodedToken = encodeTokenForUrl(token)
+        val encodedToUser = URLEncoder.encode(toUser, "UTF-8")
+        android.util.Log.d("FederFileUploader", "Uploading audio to: http://2.26.71.102:8014/upload?token=${encodedToken.take(20)}...&to_user=$encodedToUser (${bytes.size} bytes)")
+        return client.upload(
+            url = "http://2.26.71.102:8014/upload?token=$encodedToken&to_user=$encodedToUser",
+            fileName = fileName,
+            fileBytes = bytes,
+            token = token,
+            contentType = "audio/mp4",
+            listener = object : FederHttpClient.ProgressListener {
+                override fun onProgress(sentBytes: Long, totalBytes: Long) {
+                    onProgress?.invoke(sentBytes, totalBytes)
+                }
+                override fun onComplete(url: String) {
+                    onComplete?.invoke(url)
+                }
+                override fun onError(error: String) {
+                    onError?.invoke(error)
+                }
+                override fun onRetry(attempt: Int, delayMs: Long) {
+                    android.util.Log.w("FederHttp", "Audio retry $attempt in ${delayMs}ms")
                 }
             }
         )
