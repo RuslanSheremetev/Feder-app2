@@ -477,8 +477,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     // ═══ Запись голосовых сообщений ═══
     val audioRecorder = remember { com.feder.compose.AudioRecorder(context.applicationContext) }
-    val isRecordingState = rememberUpdatedState(isRecording)
     var isRecording by remember { mutableStateOf(false) }
+    val isRecordingState = rememberUpdatedState(isRecording)
     var recordLocked by remember { mutableStateOf(false) }
     var recordTimeSec by remember { mutableStateOf(0) }
     var recordAmplitude by remember { mutableStateOf(0f) }
