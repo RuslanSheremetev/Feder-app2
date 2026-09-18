@@ -1824,36 +1824,22 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             .clip(CircleShape)
                             .background(if (isRecording) Color.Red else PrimaryContainer)
-                            .combinedClickable(
-                                enabled = !isRecording,
-                                onClick = {
-                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) {
-                                        sendMessage()
-                                    }
-                                },
-                                onLongClick = {
-                                    if (inputText.isEmpty() && selectedPhotos.isEmpty()) {
-                                        android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
-                                        recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
-                                    }
-                                }
-                            )
-                            .pointerInput(isRecording, recordLocked) {
-                                if (!isRecording || recordLocked) return@pointerInput
-                                awaitEachGesture {
-                                    awaitFirstDown(requireUnconsumed = false)
-                                    var totalDx = 0f
-                                    while (true) {
-                                        val ev = awaitPointerEvent()
-                                        val ch = ev.changes.firstOrNull() ?: break
-                                        if (ch.pressed) {
-                                            totalDx += ch.positionChange().x
-                                            recordOffsetX = totalDx
-                                        } else break
-                                        ch.consume()
-                                    }
-                                    android.util.Log.d("ChatScreen", "RELEASED offset=$recordOffsetX isRec=$isRecording")
-                                    if (isRecording) {
+                            .pointerInput(inputText, selectedPhotos, isRecording, recordLocked) {
+                                if (isRecording) {
+                                    if (recordLocked) return@pointerInput
+                                    awaitEachGesture {
+                                        awaitFirstDown(requireUnconsumed = false)
+                                        var totalDx = 0f
+                                        while (true) {
+                                            val ev = awaitPointerEvent()
+                                            val ch = ev.changes.firstOrNull() ?: break
+                                            if (ch.pressed) {
+                                                totalDx += ch.positionChange().x
+                                                recordOffsetX = totalDx
+                                            } else break
+                                            ch.consume()
+                                        }
+                                        android.util.Log.d("ChatScreen", "RELEASED offset=$recordOffsetX isRec=$isRecording")
                                         if (recordOffsetX < -100f) {
                                             audioRecorder.cancel()
                                         } else {
@@ -1875,6 +1861,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                         isRecording = false
                                         recordOffsetX = 0f
+                                    }
+                                } else {
+                                    awaitEachGesture {
+                                        awaitFirstDown(requireUnconsumed = false)
+                                        val startTime = System.currentTimeMillis()
+                                        var isLong = false
+                                        while (true) {
+                                            val ev = awaitPointerEvent()
+                                            val ch = ev.changes.firstOrNull() ?: break
+                                            if (!ch.pressed) {
+                                                // Отпустили
+                                                val elapsed = System.currentTimeMillis() - startTime
+                                                if (!isLong && elapsed < 400) {
+                                                    // Tap
+                                                    if (inputText.isNotEmpty() || selectedPhotos.isNotEmpty()) sendMessage()
+                                                }
+                                                return@awaitEachGesture
+                                            }
+                                            if (!isLong && System.currentTimeMillis() - startTime >= 400) {
+                                                isLong = true
+                                                android.util.Log.d("ChatScreen", "LONG-PRESS — request RECORD_AUDIO")
+                                                recordPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                            }
+                                        }
                                     }
                                 }
                             },
