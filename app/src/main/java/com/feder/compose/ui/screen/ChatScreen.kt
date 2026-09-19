@@ -204,7 +204,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val measurePainter = if (fullUrl != null)
             coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
         val painterState = measurePainter?.state
-        android.util.Log.d("PhotoDebug", "id=${msg.id} state=${painterState?.javaClass?.simpleName} fullUrl=${fullUrl?.take(80)}")
+        rlog("PhotoDebug", "id=${msg.id} state=${painterState?.javaClass?.simpleName} fullUrl=${fullUrl?.take(80)}")
         val painterSuccess = painterState as? coil.compose.AsyncImagePainter.State.Success
         val computedSize = remember(painterSuccess, msg.id) {
             val drawable = painterSuccess?.result?.drawable
@@ -225,7 +225,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         else -> { newW = 220f; newH = 220f / ratio }
                     }
                     if (newH > maxH) { newH = maxH; newW = maxH * ratio }
-                    android.util.Log.d("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=$ratio new=${newW}x${newH}")
+                    rlog("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=$ratio new=${newW}x${newH}")
                     newW to newH
                 } else 200f to 200f
             } else 200f to 200f
@@ -244,7 +244,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
-                    android.util.Log.d("PhotoDisplay", "Rendering ${if (isAudio) "audio" else "photo"}: $firstUrl, count=${msg.imageUrls.size}")
+                    rlog("PhotoDisplay", "Rendering ${if (isAudio) "audio" else "photo"}: $firstUrl, count=${msg.imageUrls.size}")
                     if (isAudio) {
                         // ═══ AUDIO BUBBLE ═══
                         com.feder.compose.audio.AudioBubble(
@@ -856,7 +856,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                                 .build()
                             val result = ctx.imageLoader.execute(req)
-                            android.util.Log.d("Preload", "loaded $cacheKey success=${result is coil.request.SuccessResult}")
+                            rlog("Preload", "loaded $cacheKey success=${result is coil.request.SuccessResult}")
                         } catch (e: Exception) {
                             android.util.Log.e("Preload", "fail $url: ${e.message}")
                         }
