@@ -198,8 +198,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
         val fullUrl = if (firstUrl != null) {
             if (firstUrl.contains("?")) firstUrl
-            else if (firstUrl.startsWith("http")) "$firstUrl?token=${internalToken.ifEmpty { token }}"
-            else "http://2.26.71.102:8012/uploads/$firstUrl?token=${internalToken.ifEmpty { token }}"
+            else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
+            else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
         } else null
         val measurePainter = if (fullUrl != null)
             coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
@@ -269,8 +269,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     placeholder = null,  // показываем только когда загрузилось
                                     model = ImageRequest.Builder(LocalContext.current).data(
                                         if (url.contains("?")) url 
-                                        else if (url.startsWith("http")) "$url?token=${internalToken.ifEmpty { token }}" 
-                                        else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
+                                        else if (url.startsWith("http")) "$url?token=$token" 
+                                        else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
                                         .size(360, 480)
                                         .crossfade(true)
@@ -286,7 +286,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .combinedClickable(
                                             onClick = {
                                                 // короткий тап на фото → fullscreen
-                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=${internalToken.ifEmpty { token }}" else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
+                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                             },
                                             onLongClick = {
                                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -339,7 +339,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=${internalToken.ifEmpty { token }}" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=${internalToken.ifEmpty { token }}")
+                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
                             .size(360, 480)
                             .crossfade(true)
                             .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
