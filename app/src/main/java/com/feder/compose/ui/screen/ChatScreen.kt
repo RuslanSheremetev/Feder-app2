@@ -727,13 +727,22 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             // ВСЕГДА грузим с API, даже если есть Room-кэш
             run {
                 try {
-                    if (internalToken.isEmpty()) {
+                    // ВСЕГДА логинимся заново — токен из MainActivity может быть просрочен
+                    try {
                         val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
                         val authBody = authJson.toRequestBody("application/json".toMediaType())
                         val authResp = httpClient.newCall(Request.Builder()
                             .url("http://2.26.71.102:8004/api/login").post(authBody).build()).execute()
-                        internalToken = JsonParser.parseString(authResp.body?.string() ?: "")
+                        val freshToken = JsonParser.parseString(authResp.body?.string() ?: "")
                             .asJsonObject.get("access_token")?.asString ?: ""
+                        if (freshToken.isNotEmpty()) {
+                            internalToken = freshToken
+                            rlog("ChatScreen", "RELOGIN ok token_len=${freshToken.length}")
+                        } else {
+                            rlog("ChatScreen", "RELOGIN empty token")
+                        }
+                    } catch (e: Exception) {
+                        rlog("ChatScreen", "RELOGIN fail: ${e.message}")
                     }
                     rlog("ChatScreen", "API request /api/messages/$chatUsername")
                     val msgResp = httpClient.newCall(Request.Builder()
