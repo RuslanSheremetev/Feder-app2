@@ -777,7 +777,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     imageUrls = urls,
                                     text = msg.text ?: "",
                                     timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
-                                    time = timeStr
+                                    time = timeStr,
+                                    reactions = msg.reactions ?: emptyList()
                                 )
                             } catch (e: Exception) {
                                 rlog("ChatScreen", "MAP_ITEM_FAIL idx=$idx id=${msg.id} err=${e.message}")
