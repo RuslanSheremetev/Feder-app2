@@ -6,7 +6,10 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
 import android.view.SurfaceHolder
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,29 +18,42 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Свой видеоплеер на MediaPlayer + SurfaceView. Без ExoPlayer.
+ * FederVideoPlayer — свой видеоплеер на MediaPlayer + SurfaceView.
+ *
+ * Паттерн: backing property.
+ * - Публичные поля — val (Compose читает, не пишет)
+ * - Внутренние _X — mutableStateOf (private, меняются только изнутри)
+ *
+ * Так избегаем бага Kotlin 2.0: `var X by mutableStateOf(...)` + `private set`
+ * (компилятор запрещает присваивание X даже внутри класса).
  */
 class FederVideoPlayer(private val ctx: Context) {
 
+    // ─── Internal state (backing properties) ───
+    private val _isPrepared = mutableStateOf(false)
+    val isPrepared: Boolean get() = _isPrepared.value
+
+    private val _isPlaying = mutableStateOf(false)
+    val isPlaying: Boolean get() = _isPlaying.value
+
+    private val _duration = mutableStateOf(0)
+    val duration: Int get() = _duration.value
+
+    private val _position = mutableStateOf(0)
+    val position: Int get() = _position.value
+
+    private val _isMuted = mutableStateOf(true)
+    val isMuted: Boolean get() = _isMuted.value
+
+    private val _lastError = mutableStateOf<String?>(null)
+    val lastError: String? get() = _lastError.value
+
+    // ─── Native objects ───
     private var mediaPlayer: MediaPlayer? = null
     private var surfaceHolder: SurfaceHolder? = null
-
-    var isPrepared by mutableStateOf(false)
-
-        private set
-    var isPlaying by mutableStateOf(false)
-        private set
-    var duration by mutableStateOf(0)
-        private set
-    var position by mutableStateOf(0)
-        private set
-    var isMuted by mutableStateOf(true)
-        private set
-    var lastError by mutableStateOf<String?>(null)
-        private set
-
     private var progressJob: Job? = null
 
+    // ─── Surface management ───
     fun attachSurface(holder: SurfaceHolder) {
         surfaceHolder = holder
         mediaPlayer?.setDisplay(holder)
@@ -48,9 +64,11 @@ class FederVideoPlayer(private val ctx: Context) {
         surfaceHolder = null
     }
 
+    // ─── Prepare ───
     fun prepare(url: String) {
         release()
-        lastError = null
+        _lastError.value = null
+
         try {
             val mp = MediaPlayer().apply {
                 setAudioAttributes(
@@ -62,39 +80,44 @@ class FederVideoPlayer(private val ctx: Context) {
                 setDataSource(ctx, Uri.parse(url))
                 isLooping = false
                 setVolume(0f, 0f)
-                setOnPreparedListener { mp ->
-                    Log.d("FederVideo", "Prepared: ${mp.duration}ms")
-                    duration = mp.duration
-                    isPrepared = true
-                    surfaceHolder?.let { mp.setDisplay(it) }
+
+                setOnPreparedListener { prepared ->
+                    Log.d("FederVideo", "Prepared: ${prepared.duration}ms")
+                    _duration.value = prepared.duration
+                    _isPrepared.value = true
+                    surfaceHolder?.let { prepared.setDisplay(it) }
                 }
+
                 setOnCompletionListener {
-                    isPlaying = false
-                    position = 0
+                    _isPlaying.value = false
+                    _position.value = 0
                     try { it.seekTo(0) } catch (_: Exception) {}
                 }
+
                 setOnErrorListener { _, what, extra ->
-                    lastError = "err what=$what extra=$extra"
-                    Log.e("FederVideo", lastError!!)
-                    isPrepared = false
-                    isPlaying = false
+                    _lastError.value = "err what=$what extra=$extra"
+                    Log.e("FederVideo", _lastError.value!!)
+                    _isPrepared.value = false
+                    _isPlaying.value = false
                     true
                 }
+
                 prepareAsync()
             }
             mediaPlayer = mp
         } catch (e: Exception) {
-            lastError = e.message
+            _lastError.value = e.message
             Log.e("FederVideo", "prepare failed", e)
         }
     }
 
+    // ─── Playback ───
     fun play() {
         val mp = mediaPlayer ?: return
         if (!isPrepared) return
         try {
             mp.start()
-            isPlaying = true
+            _isPlaying.value = true
             startTicker()
         } catch (e: Exception) {
             Log.e("FederVideo", "play failed", e)
@@ -104,26 +127,31 @@ class FederVideoPlayer(private val ctx: Context) {
     fun pause() {
         try {
             mediaPlayer?.let { if (it.isPlaying) it.pause() }
-            isPlaying = false
+            _isPlaying.value = false
             stopTicker()
         } catch (_: Exception) {}
     }
 
-    fun toggle() { if (isPlaying) pause() else play() }
+    fun toggle() {
+        if (isPlaying) pause() else play()
+    }
 
+    // ─── Volume ───
     fun setMuted(muted: Boolean) {
-        isMuted = muted
+        _isMuted.value = muted
         val v = if (muted) 0f else 1f
         try { mediaPlayer?.setVolume(v, v) } catch (_: Exception) {}
     }
 
+    // ─── Seek ───
     fun seekTo(ms: Int) {
         try {
             mediaPlayer?.seekTo(ms)
-            position = ms
+            _position.value = ms
         } catch (_: Exception) {}
     }
 
+    // ─── Release ───
     fun release() {
         stopTicker()
         try {
@@ -132,20 +160,21 @@ class FederVideoPlayer(private val ctx: Context) {
             mediaPlayer?.release()
         } catch (_: Exception) {}
         mediaPlayer = null
-        isPrepared = false
-        isPlaying = false
-        position = 0
-        duration = 0
+        _isPrepared.value = false
+        _isPlaying.value = false
+        _position.value = 0
+        _duration.value = 0
     }
 
+    // ─── Progress ticker ───
     private fun startTicker() {
         stopTicker()
         progressJob = CoroutineScope(Dispatchers.Main).launch {
             while (true) {
                 try {
                     val mp = mediaPlayer
-                    if (mp != null && isPrepared) {
-                        position = try { mp.currentPosition } catch (_: Exception) { position }
+                    if (mp != null && _isPrepared.value) {
+                        _position.value = try { mp.currentPosition } catch (_: Exception) { _position.value }
                     }
                 } catch (_: Exception) {}
                 delay(200)
