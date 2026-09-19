@@ -241,6 +241,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             }
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
+                rlog("PhotoDebug", "BUBBLE_START id=${msg.id} hasUrls=${msg.imageUrls != null} size=${msg.imageUrls.size} imageUrl=${msg.imageUrl}")
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
@@ -753,7 +754,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val type = object : com.google.gson.reflect.TypeToken<List<MsgItem>>() {}.type
                     val loaded = gson.fromJson<List<MsgItem>>(body, type)
                     rlog("ChatScreen", "JSON parsed: ${loaded.size} msgs")
+                    val withPhotosCount = loaded.count { it.imageUrls.isNotEmpty() || it.imageUrl != null }
+                    rlog("ChatScreen", "JSON_WITH_PHOTOS: $withPhotosCount / ${loaded.size}")
+                    loaded.filter { it.imageUrls.isNotEmpty() }.take(3).forEach { m ->
+                        rlog("ChatScreen", "JSON_PHOTO id=${m.id} urls=${m.imageUrls}")
+                    }
 
+                    rlog("ChatScreen", "BEFORE_MAP loaded.size=${loaded.size}")
                     rlog("ChatScreen", "BEFORE_MAP loaded.size=${loaded.size}")
                     val apiList = try {
                         loaded.reversed().mapIndexed { idx, msg ->
@@ -791,6 +798,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         emptyList()
                     }
                     rlog("ChatScreen", "AFTER_MAP apiList.size=${apiList.size}")
+                    val apiWithPhotos = apiList.count { it.imageUrls.isNotEmpty() }
+                    rlog("ChatScreen", "AFTER_MAP_PHOTOS: $apiWithPhotos / ${apiList.size}")
                     // Мержим: Room-кэш + API, убираем дубли по id
                     // withContext убран — LaunchedEffect уже на Main
                     val mergedMap = LinkedHashMap<Long, MsgItem>()
