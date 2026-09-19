@@ -738,7 +738,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     rlog("ChatScreen", "API request /api/messages/$chatUsername")
                     val msgResp = httpClient.newCall(Request.Builder()
                         .url("http://2.26.71.102:8004/api/messages/$chatUsername")
-                        .header("Authorization", "Bearer $token").build()).execute()
+                        .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}").build()).execute()
                     val body = msgResp.body?.string() ?: "[]"
                     rlog("ChatScreen", "API response code=${msgResp.code} body_len=${body.length}")
                     val type = object : com.google.gson.reflect.TypeToken<List<MsgItem>>() {}.type
