@@ -754,20 +754,43 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val loaded = gson.fromJson<List<MsgItem>>(body, type)
                     rlog("ChatScreen", "JSON parsed: ${loaded.size} msgs")
 
-                    val apiList = loaded.reversed().map { msg ->
-                        val urls = msg.imageUrls ?: emptyList()
-                        val timeStr = try {
-                            java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                                .format(java.util.Date(msg.time.toLong() * 1000))
-                        } catch (e: Exception) { msg.time }
-                        msg.copy(
-                            status = msg.status?.ifEmpty { "sent" } ?: "sent",
-                            imageUrls = urls,
-                            text = msg.text ?: "",
-                            timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
-                            time = timeStr
-                        )
+                    rlog("ChatScreen", "BEFORE_MAP loaded.size=${loaded.size}")
+                    val apiList = try {
+                        loaded.reversed().mapIndexed { idx, msg ->
+                            try {
+                                val urls = msg.imageUrls ?: emptyList()
+                                val timeStr = try {
+                                    java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                                        .format(java.util.Date(msg.time.toLong() * 1000))
+                                } catch (e: Exception) { msg.time ?: "" }
+                                msg.copy(
+                                    status = msg.status?.ifEmpty { "sent" } ?: "sent",
+                                    imageUrls = urls,
+                                    text = msg.text ?: "",
+                                    timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
+                                    time = timeStr
+                                )
+                            } catch (e: Exception) {
+                                rlog("ChatScreen", "MAP_ITEM_FAIL idx=$idx id=${msg.id} err=${e.message}")
+                                MsgItem(
+                                    id = msg.id,
+                                    from = msg.from ?: "unknown",
+                                    to = msg.to ?: "unknown",
+                                    text = msg.text ?: "",
+                                    timeVal = 0L,
+                                    time = "",
+                                    status = "sent",
+                                    imageUrls = emptyList(),
+                                    posX = 0f,
+                                    posY = 0f
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        rlog("ChatScreen", "MAP_FAIL: ${e.message}")
+                        emptyList()
                     }
+                    rlog("ChatScreen", "AFTER_MAP apiList.size=${apiList.size}")
                     // Мержим: Room-кэш + API, убираем дубли по id
                     // withContext убран — LaunchedEffect уже на Main
                     val mergedMap = LinkedHashMap<Long, MsgItem>()
