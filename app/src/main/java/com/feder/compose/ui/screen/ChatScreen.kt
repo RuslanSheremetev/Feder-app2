@@ -79,6 +79,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import com.feder.compose.video.VideoBubble
+import com.feder.compose.video.FullscreenVideoPlayer
 import coil.request.ImageRequest
 import coil.imageLoader
 import com.feder.compose.ProWebSocket
@@ -247,6 +249,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     val firstUrl = msg.imageUrls.first()
                     val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
                     rlog("PhotoDisplay", "Rendering ${if (isAudio) "audio" else "photo"}: $firstUrl, count=${msg.imageUrls.size}")
+                    val isVideo = com.feder.compose.audio.IsVideo.isVideoFile(firstUrl)
                     if (isAudio) {
                         // ═══ AUDIO BUBBLE ═══
                         com.feder.compose.audio.AudioBubble(
@@ -256,6 +259,18 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             time = time,
                             msgStatus = msg.status,
                             onLongClick = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() }
+                        )
+                    } else if (isVideo) {
+                        VideoBubble(
+                            videoUrl = firstUrl,
+                            token = token,
+                            isMine = isMine,
+                            time = time,
+                            msgStatus = msg.status,
+                            thumbUrl = firstUrl.substringBeforeLast(".").replace("videos/", "video_thumbs/") + ".jpg",
+                            isVisible = true,
+                            onLongPress = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() },
+                            onOpenFullscreen = { onClick?.invoke() }
                         )
                     } else {
                     Column(Modifier.fillMaxWidth()) {

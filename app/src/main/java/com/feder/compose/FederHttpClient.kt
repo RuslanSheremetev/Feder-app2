@@ -449,4 +449,37 @@ object FederFileUploader {
             }
         )
     }
+
+    fun uploadVideo(
+        inputStream: InputStream,
+        fileName: String,
+        token: String,
+        toUser: String = "",
+        onProgress: ((Long, Long) -> Unit)? = null,
+        onComplete: ((String) -> Unit)? = null,
+        onError: ((String) -> Unit)? = null
+    ): String? {
+        val bytes = inputStream.readBytes()
+        val encodedToken = encodeTokenForUrl(token)
+        val encodedToUser = URLEncoder.encode(toUser, "UTF-8")
+        android.util.Log.d("FederFileUploader", "Uploading video to 8018 (${bytes.size} bytes)")
+        return client.upload(
+            url = "http://2.26.71.102:8018/api/upload?token=$encodedToken&to_user=$encodedToUser",
+            fileName = fileName,
+            fileBytes = bytes,
+            token = token,
+            contentType = "video/mp4",
+            listener = object : FederHttpClient.ProgressListener {
+                override fun onProgress(sentBytes: Long, totalBytes: Long) {
+                    onProgress?.invoke(sentBytes, totalBytes)
+                }
+                override fun onComplete(url: String) { onComplete?.invoke(url) }
+                override fun onError(error: String) { onError?.invoke(error) }
+                override fun onRetry(attempt: Int, delayMs: Long) {
+                    android.util.Log.w("FederHttp", "Video retry $attempt in ${delayMs}ms")
+                }
+            }
+        )
+    }
+
 }
