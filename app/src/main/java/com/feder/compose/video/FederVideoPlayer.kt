@@ -22,12 +22,19 @@ class FederVideoPlayer(private val ctx: Context) {
     private var mediaPlayer: MediaPlayer? = null
     private var surfaceHolder: SurfaceHolder? = null
 
-    var isPrepared by mutableStateOf(false); private set
-    var isPlaying by mutableStateOf(false); private set
-    var duration by mutableStateOf(0); private set
-    var position by mutableStateOf(0); private set
-    var isMuted by mutableStateOf(true); private set
-    var lastError by mutableStateOf<String?>(null); private set
+    var isPrepared by mutableStateOf(false)
+
+        private set
+    var isPlaying by mutableStateOf(false)
+        private set
+    var duration by mutableStateOf(0)
+        private set
+    var position by mutableStateOf(0)
+        private set
+    var isMuted by mutableStateOf(true)
+        private set
+    var lastError by mutableStateOf<String?>(null)
+        private set
 
     private var progressJob: Job? = null
 
