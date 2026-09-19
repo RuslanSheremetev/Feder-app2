@@ -282,11 +282,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     contentDescription = "photo",
                                     modifier = Modifier
                                         .sizeIn(maxWidth = 280.dp, maxHeight = 600.dp)
-                                        .aspectRatio(imageAspectRatio ?: 0.75f)
+                                        .aspectRatio(if (imageAspectRatio != null && imageAspectRatio!! > 0.05f) imageAspectRatio!! else 0.75f)
                                         .combinedClickable(
                                             onClick = {
                                                 // короткий тап на фото → fullscreen
-                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=${internalToken.ifEmpty { token }}" else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
                                             },
                                             onLongClick = {
                                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -1106,7 +1106,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val resp = httpClient.newCall(
                             Request.Builder()
                                 .url("http://2.26.71.102:8004/api/chat/send")
-                                .header("Authorization", "Bearer $token")
+                                .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
                                 .post(sendBody).build()
                         ).execute()
                         val respText = resp.body?.string() ?: ""
