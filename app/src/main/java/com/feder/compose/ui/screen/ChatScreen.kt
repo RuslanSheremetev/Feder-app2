@@ -747,9 +747,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     apiList.forEach { mergedMap[it.id] = it }
                     val merged = mergedMap.values.sortedBy { it.timeVal }
                     android.util.Log.d("ChatScreen", "MERGE done: total=${merged.size} (room+api)")
-                    withContext(Dispatchers.Main) {
-                        messages = merged
-                    }
+                    messages = merged
 
                     repository?.let { r ->
                         r.saveMessages(apiList.map { m ->
