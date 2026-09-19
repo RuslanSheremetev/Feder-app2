@@ -197,7 +197,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val density = androidx.compose.ui.platform.LocalDensity.current
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
         val fullUrl = if (firstUrl != null) {
-            if (firstUrl.contains("?")) firstUrl
+            if (firstUrl.startsWith("content://") || firstUrl.startsWith("file://")) firstUrl
+            else if (firstUrl.contains("?")) firstUrl
             else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
             else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
         } else null
@@ -287,7 +288,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         .combinedClickable(
                                             onClick = {
                                                 // короткий тап на фото → fullscreen
-                                                fullScreenPhoto = if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                                                fullScreenPhoto = if (url.startsWith("content://") || url.startsWith("file://")) url else if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                             },
                                             onLongClick = {
                                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -340,7 +341,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
+                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("content://") == true || msg.imageUrl?.startsWith("file://") == true) msg.imageUrl else if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
                             .size(360, 480)
                             .crossfade(true)
                             .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
@@ -853,7 +854,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 photosToLoad.map { url ->
                     async {
                         val fullUrl = if (url.startsWith("http")) {
-                            if (url.contains("?")) url else "$url?token=${internalToken.ifEmpty { token }}"
+                            if (url.startsWith("content://") || url.startsWith("file://")) url
+                            else if (url.contains("?")) url else "$url?token=${internalToken.ifEmpty { token }}"
                         } else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
                         try {
                             val cacheKey = fullUrl.substringBefore("?")
