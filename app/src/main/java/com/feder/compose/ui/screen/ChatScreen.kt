@@ -60,6 +60,30 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+
+// ══════════════════════════════════════════════════════════════════
+// Remote logger → POST /api/logs → ws_logs
+// ══════════════════════════════════════════════════════════════════
+private val rlogClient: okhttp3.OkHttpClient by lazy { okhttp3.OkHttpClient() }
+
+fun rlog(tag: String, message: String) {
+    android.util.Log.d(tag, message)
+    Thread {
+        try {
+            val safe = message.replace("\\", "/").replace("\"", "'").replace("\n", " ")
+            val json = "{\"log\":\"[$tag] $safe\"}"
+            val body = okhttp3.RequestBody.create(
+                okhttp3.MediaType.parse("application/json"), json
+            )
+            val req = okhttp3.Request.Builder()
+                .url("http://2.26.71.102:8004/api/logs")
+                .post(body)
+                .build()
+            rlogClient.newCall(req).execute().use { }
+        } catch (_: Exception) { }
+    }.start()
+}
+
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.widthIn
@@ -672,7 +696,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
     LaunchedEffect(chatUsername) {
-        android.util.Log.d("ChatScreen", "OPEN chat=$chatUsername me=$myUsername token=${token.take(20)}")
+        rlog("ChatScreen", "OPEN chat=$chatUsername me=$myUsername")
         repository?.markRead(chatUsername)
 
         withContext(Dispatchers.IO) {
@@ -680,7 +704,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             repository?.let { repo ->
                 val cachedMessages = repo.getMessages(myUsername, chatUsername)
-                android.util.Log.d("ChatScreen", "ROOM read: ${cachedMessages.size} messages")
+                rlog("ChatScreen", "ROOM read: ${cachedMessages.size} msgs")
                 if (cachedMessages.isNotEmpty()) {
                     loadedFromRoom = true
                     val list = cachedMessages.map { entity ->
@@ -701,7 +725,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     withContext(Dispatchers.Main) {
                         messages = list
                     }
-                    android.util.Log.d("ChatScreen", "ROOM applied: ${list.size} msgs")
+                    rlog("ChatScreen", "ROOM applied: ${list.size} msgs")
                 }
             }
 
@@ -716,15 +740,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         internalToken = JsonParser.parseString(authResp.body?.string() ?: "")
                             .asJsonObject.get("access_token")?.asString ?: ""
                     }
-                    android.util.Log.d("ChatScreen", "API request /api/messages/$chatUsername")
+                    rlog("ChatScreen", "API request /api/messages/$chatUsername")
                     val msgResp = httpClient.newCall(Request.Builder()
                         .url("http://2.26.71.102:8004/api/messages/$chatUsername")
                         .header("Authorization", "Bearer $token").build()).execute()
                     val body = msgResp.body?.string() ?: "[]"
-                    android.util.Log.d("ChatScreen", "API response code=${msgResp.code} body_len=${body.length}")
+                    rlog("ChatScreen", "API response code=${msgResp.code} body_len=${body.length}")
                     val type = object : com.google.gson.reflect.TypeToken<List<MsgItem>>() {}.type
                     val loaded = gson.fromJson<List<MsgItem>>(body, type)
-                    android.util.Log.d("ChatScreen", "JSON parsed: ${loaded.size} msgs")
+                    rlog("ChatScreen", "JSON parsed: ${loaded.size} msgs")
 
                     val apiList = loaded.reversed().map { msg ->
                         val urls = msg.imageUrls ?: emptyList()
@@ -746,8 +770,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     messages.forEach { mergedMap[it.id] = it }
                     apiList.forEach { mergedMap[it.id] = it }
                     val merged = mergedMap.values.sortedBy { it.timeVal }
-                    android.util.Log.d("ChatScreen", "MERGE done: total=${merged.size} (room+api)")
+                    rlog("ChatScreen", "MERGE done: total=${merged.size} (room+api)")
+                    rlog("ChatScreen", "BEFORE_ASSIGN merged.size=${merged.size}")
                     messages = merged
+                    rlog("ChatScreen", "AFTER_ASSIGN messages.size=${messages.size}")
 
                     repository?.let { r ->
                         r.saveMessages(apiList.map { m ->
