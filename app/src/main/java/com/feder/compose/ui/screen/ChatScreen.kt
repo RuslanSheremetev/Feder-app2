@@ -198,8 +198,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
         val fullUrl = if (firstUrl != null) {
             if (firstUrl.contains("?")) firstUrl
-            else if (firstUrl.startsWith("http")) "$firstUrl?token=$token"
-            else "http://2.26.71.102:8012/uploads/$firstUrl?token=$token"
+            else if (firstUrl.startsWith("http")) "$firstUrl?token=${internalToken.ifEmpty { token }}"
+            else "http://2.26.71.102:8012/uploads/$firstUrl?token=${internalToken.ifEmpty { token }}"
         } else null
         val measurePainter = if (fullUrl != null)
             coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
@@ -269,8 +269,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     placeholder = null,  // показываем только когда загрузилось
                                     model = ImageRequest.Builder(LocalContext.current).data(
                                         if (url.contains("?")) url 
-                                        else if (url.startsWith("http")) "$url?token=$token" 
-                                        else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                                        else if (url.startsWith("http")) "$url?token=${internalToken.ifEmpty { token }}" 
+                                        else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
                                     )
                                         .size(360, 480)
                                         .crossfade(true)
@@ -339,7 +339,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 } else if (msg.imageUrl != null) {
                     Box {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
+                            model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=${internalToken.ifEmpty { token }}" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=${internalToken.ifEmpty { token }}")
                             .size(360, 480)
                             .crossfade(true)
                             .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
@@ -685,7 +685,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 try {
                     val json = """{"id":${msg.id},"x":${msg.posX},"y":${msg.posY}}"""
                     val body = json.toRequestBody("application/json".toMediaType())
-                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/message_pos").header("Authorization", "Bearer $token").post(body).build()).execute().close()
+                    httpClient.newCall(Request.Builder().url("http://2.26.71.102:8004/api/message_pos").header("Authorization", "Bearer ${internalToken.ifEmpty { token }}").post(body).build()).execute().close()
                 } catch (_: Exception) {}
             }
         }
@@ -818,7 +818,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
                     httpClient.newCall(Request.Builder()
                         .url("http://2.26.71.102:8004/api/mark_read/$chatUsername")
-                        .header("Authorization", "Bearer $token")
+                        .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
                         .post(RequestBody.create("application/json".toMediaType(), "")).build()
                     ).enqueue(object : okhttp3.Callback {
                         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
@@ -844,8 +844,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 photosToLoad.map { url ->
                     async {
                         val fullUrl = if (url.startsWith("http")) {
-                            if (url.contains("?")) url else "$url?token=$token"
-                        } else "http://2.26.71.102:8012/uploads/$url?token=$token"
+                            if (url.contains("?")) url else "$url?token=${internalToken.ifEmpty { token }}"
+                        } else "http://2.26.71.102:8012/uploads/$url?token=${internalToken.ifEmpty { token }}"
                         try {
                             val cacheKey = fullUrl.substringBefore("?")
                             val req = ImageRequest.Builder(ctx)
@@ -962,7 +962,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val resp = httpClient.newCall(
                     Request.Builder()
                         .url("http://2.26.71.102:8016/api/reactions/batch")
-                        .header("Authorization", "Bearer $token")
+                        .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
                         .post(reqBody).build()
                 ).execute()
                 val respText = resp.body?.string() ?: "{}"
@@ -1004,7 +1004,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val resp = httpClient.newCall(
                     Request.Builder()
                         .url("http://2.26.71.102:8016/api/reaction/toggle")
-                        .header("Authorization", "Bearer $token")
+                        .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
                         .post(body).build()
                 ).execute()
                 val respText = resp.body?.string() ?: ""
