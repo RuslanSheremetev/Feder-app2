@@ -101,28 +101,22 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+
 // ══════════════════════════════════════════════════════════════════
-// Remote logger → POST /api/logs → ws_logs
+// Remote logger → FederHttpClient.sendLog() → /api/logs → ws_logs
 // ══════════════════════════════════════════════════════════════════
-private val rlogClient: okhttp3.OkHttpClient by lazy { okhttp3.OkHttpClient() }
+private val rlogClient by lazy { com.feder.compose.FederHttpClient() }
 
 fun rlog(tag: String, message: String) {
     android.util.Log.d(tag, message)
     Thread {
         try {
-            val safe = message.replace("\\", "/").replace("\"", "'").replace("\n", " ")
-            val json = "{\"log\":\"[$tag] $safe\"}"
-            val body = okhttp3.RequestBody.create(
-                okhttp3.MediaType.parse("application/json"), json
-            )
-            val req = okhttp3.Request.Builder()
-                .url("http://2.26.71.102:8004/api/logs")
-                .post(body)
-                .build()
-            rlogClient.newCall(req).execute().use { }
+            rlogClient.sendLog("[$tag] $message")
         } catch (_: Exception) { }
     }.start()
 }
+
+
 
 private val loggerClient: okhttp3.OkHttpClient by lazy {
     okhttp3.OkHttpClient.Builder().build()

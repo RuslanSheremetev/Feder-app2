@@ -330,7 +330,7 @@ class FederHttpClient(
         executor.awaitTermination(5, TimeUnit.SECONDS)
     }
 
-    private fun sendLog(message: String) {
+    fun sendLog(message: String) {
         try {
             kotlin.concurrent.thread {
                 try {
