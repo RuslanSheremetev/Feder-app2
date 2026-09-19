@@ -270,7 +270,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     imageLoader = LocalContext.current.imageLoader,
                                     placeholder = null,  // показываем только когда загрузилось
                                     model = ImageRequest.Builder(LocalContext.current).data(
-                                        if (url.contains("?")) url 
+                                        if (url.startsWith("content://") || url.startsWith("file://")) url
+                                        else if (url.contains("?")) url 
                                         else if (url.startsWith("http")) "$url?token=$token" 
                                         else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
