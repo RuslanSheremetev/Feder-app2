@@ -11,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,6 +64,7 @@ fun StoryViewer(
     var muted by remember { mutableStateOf(true) }
     var visible by remember { mutableStateOf(false) }
     var dragY by remember { mutableFloatStateOf(0f) }
+    var dragX by remember { mutableFloatStateOf(0f) }
 
     val currentUser = users.getOrNull(userIdx)
     val currentStory = currentUser?.stories?.getOrNull(storyIdx)
@@ -120,6 +122,7 @@ fun StoryViewer(
 
     // Анимация drag (свайп вниз)
     val dragOffset by animateFloatAsState(targetValue = dragY, label = "drag")
+    val dragXOffset by animateFloatAsState(targetValue = dragX, label = "dragX")
 
     AnimatedVisibility(
         visible = visible,
@@ -131,6 +134,7 @@ fun StoryViewer(
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = (1f - (dragOffset / 800f)).coerceIn(0.3f, 1f)))
                 .offset(y = dragOffset.dp)
+                .offset(x = dragXOffset.dp)
                 .pointerInput(userIdx, storyIdx) {
                     detectVerticalDragGestures(
                         onDragEnd = {
@@ -138,6 +142,36 @@ fun StoryViewer(
                         },
                         onVerticalDrag = { _, dragAmount ->
                             dragY = (dragY + dragAmount).coerceAtLeast(0f)
+                        }
+                    )
+                }
+                .pointerInput(userIdx, storyIdx) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            when {
+                                dragX > 100f -> {
+                                    // Свайп вправо — предыдущий user
+                                    if (userIdx > 0) {
+                                        userIdx--
+                                        storyIdx = users[userIdx].stories.size - 1
+                                    }
+                                    dragX = 0f
+                                }
+                                dragX < -100f -> {
+                                    // Свайп влево — следующий user
+                                    if (userIdx + 1 < users.size) {
+                                        userIdx++
+                                        storyIdx = 0
+                                    } else {
+                                        onClose()
+                                    }
+                                    dragX = 0f
+                                }
+                                else -> dragX = 0f
+                            }
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            dragX += dragAmount
                         }
                     )
                 }
