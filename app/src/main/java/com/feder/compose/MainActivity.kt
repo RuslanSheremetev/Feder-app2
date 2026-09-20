@@ -1,6 +1,8 @@
 package com.feder.compose
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.feder.compose.stories.StoryApi
+import com.feder.compose.stories.StoryViewer
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.BorderStroke
@@ -157,6 +159,8 @@ class ChatViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
     var showStories by mutableStateOf(false)
+    var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
+    var storyUserIndex by mutableIntStateOf(-1)
     var isSearchVisible by mutableStateOf(false)
     var searchQuery by mutableStateOf("")
     
@@ -520,6 +524,13 @@ fun FederApp() {
         cm.registerDefaultNetworkCallback(callback)
     }
     LaunchedEffect(Unit) { viewModel.initDatabase(context) }
+    LaunchedEffect(viewModel.token) {
+        if (viewModel.token.isNotEmpty()) {
+            storiesFeed = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                StoryApi.fetchFeed("demo", viewModel.token)
+            }
+        }
+    }
     LaunchedEffect(viewModel.wsStatus) {
         if (viewModel.wsStatus.isNotEmpty()) {
             Toast.makeText(context, "WS: ${viewModel.wsStatus}", Toast.LENGTH_SHORT).show()
@@ -715,16 +726,33 @@ fun FederApp() {
                                 Spacer(Modifier.height(4.dp))
                                 Text("My story", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            // Contact stories
-                            listOf(
-                                "Alex" to "http://2.26.71.102:8010/avatars/avatar_2.jpg",
-                                "Elena" to "http://2.26.71.102:8010/avatars/avatar_5.jpg",
-                                "Marcus" to "http://2.26.71.102:8010/avatars/avatar_1.jpg"
-                            ).forEach { (name, url) ->
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(url).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(68.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                            // Contact stories (из API)
+                            storiesFeed.forEachIndexed { idx, user ->
+                                val hasUnread = user.stories.any { !it.viewed }
+                                val ringColor = if (hasUnread) Color(0xFF2AABEE) else Color(0xFF555555)
+                                val avatarFullUrl = if (user.avatarUrl.startsWith("http")) user.avatarUrl
+                                    else "http://2.26.71.102:8010" + user.avatarUrl
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.clickable { viewModel.storyUserIndex = idx }
+                                ) {
+                                    Box(
+                                        modifier = Modifier.size(68.dp).clip(CircleShape).border(2.dp, ringColor, CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(avatarFullUrl)
+                                                .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                                                .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+                                                .build(),
+                                            contentDescription = user.username,
+                                            modifier = Modifier.size(60.dp).clip(CircleShape),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
                                     Spacer(Modifier.height(4.dp))
-                                    Text(name, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+                                    Text(user.username, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
                                 }
                             }
                         }
@@ -820,6 +848,17 @@ fun FederApp() {
 
 }
     
+
+    // Story Viewer overlay
+    if (viewModel.storyUserIndex >= 0 && viewModel.storyUserIndex < storiesFeed.size) {
+        StoryViewer(
+            users = storiesFeed,
+            startUserIndex = viewModel.storyUserIndex,
+            myUsername = "demo",
+            token = viewModel.token,
+            onClose = { viewModel.storyUserIndex = -1 }
+        )
+    }
 }
 @Composable
 fun MenuRow(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
