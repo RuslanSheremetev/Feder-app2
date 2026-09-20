@@ -11,6 +11,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.platform.LocalContext
 import com.feder.compose.video.VideoSurface
 
@@ -203,7 +205,7 @@ fun StoryVideoPlayerView(
     }
 
     VideoSurface(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         onSurfaceReady = { holder -> player.attachSurface(holder) },
         onSurfaceDestroyed = { player.detachSurface() }
     )
