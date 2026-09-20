@@ -526,7 +526,7 @@ fun FederApp() {
     LaunchedEffect(Unit) { viewModel.initDatabase(context) }
     LaunchedEffect(viewModel.token) {
         if (viewModel.token.isNotEmpty()) {
-            storiesFeed = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            viewModel.storiesFeed = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 StoryApi.fetchFeed("demo", viewModel.token)
             }
         }
@@ -727,7 +727,7 @@ fun FederApp() {
                                 Text("My story", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             // Contact stories (из API)
-                            storiesFeed.forEachIndexed { idx, user ->
+                            viewModel.storiesFeed.forEachIndexed { idx, user ->
                                 val hasUnread = user.stories.any { !it.viewed }
                                 val ringColor = if (hasUnread) Color(0xFF2AABEE) else Color(0xFF555555)
                                 val avatarFullUrl = if (user.avatarUrl.startsWith("http")) user.avatarUrl
@@ -850,9 +850,9 @@ fun FederApp() {
     
 
     // Story Viewer overlay
-    if (viewModel.storyUserIndex >= 0 && viewModel.storyUserIndex < storiesFeed.size) {
+    if (viewModel.storyUserIndex >= 0 && viewModel.storyUserIndex < viewModel.storiesFeed.size) {
         StoryViewer(
-            users = storiesFeed,
+            users = viewModel.storiesFeed,
             startUserIndex = viewModel.storyUserIndex,
             myUsername = "demo",
             token = viewModel.token,
