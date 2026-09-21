@@ -2,6 +2,7 @@ package com.feder.compose
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.feder.compose.stories.StoryApi
+import com.feder.compose.stories.StoryPicker
 import com.feder.compose.stories.StoryViewer
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
@@ -161,6 +162,7 @@ class ChatViewModel : ViewModel() {
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
     var storyUserIndex by mutableIntStateOf(-1)
+    var isUploadingStory by mutableStateOf(false)
     var isSearchVisible by mutableStateOf(false)
     var searchQuery by mutableStateOf("")
     
@@ -531,6 +533,27 @@ fun FederApp() {
             }
         }
     }
+
+    val storyPicker = StoryPicker.rememberStoryPicker(
+        user = "demo",
+        token = viewModel.token,
+        onResult = { result ->
+            viewModel.isUploadingStory = false
+            when (result) {
+                is StoryPicker.Result.Success -> {
+                    android.util.Log.d("Feder", "Story uploaded: ${result.filename}")
+                    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                        viewModel.storiesFeed = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                            StoryApi.fetchFeed("demo", viewModel.token)
+                        }
+                    }
+                }
+                is StoryPicker.Result.Error -> {
+                    android.util.Log.e("Feder", "Upload error: ${result.message}")
+                }
+            }
+        }
+    )
     LaunchedEffect(viewModel.wsStatus) {
         if (viewModel.wsStatus.isNotEmpty()) {
             Toast.makeText(context, "WS: ${viewModel.wsStatus}", Toast.LENGTH_SHORT).show()
@@ -580,7 +603,7 @@ fun FederApp() {
                 if (viewModel.selectedTab == 0) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.showStories = !viewModel.showStories }) {
                     if (viewModel.showStories) {
-                        Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp).clickable { viewModel.showStories = false })
                     } else {
                         Box(Modifier.width(56.dp).height(36.dp)) {
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterStart).padding(1.dp)) {
@@ -716,7 +739,13 @@ fun FederApp() {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             // My Story
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.clickable {
+                                    viewModel.isUploadingStory = true
+                                    storyPicker.launch()
+                                }
+                            ) {
                                 Box(
                                     modifier = Modifier.size(68.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest).border(2.dp, MaterialTheme.colorScheme.surfaceContainer, CircleShape),
                                     contentAlignment = Alignment.Center
