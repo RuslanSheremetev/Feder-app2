@@ -685,7 +685,7 @@ fun FederApp() {
                             ),
                         contentPadding = PaddingValues(bottom = 72.dp)
                     ) {
-                        item { Spacer(Modifier.height(48.dp)) }
+                        item { Spacer(Modifier.height(64.dp)) }
                         // Поиск — появляется по нажатию на лупу
                         item {
                             AnimatedVisibility(

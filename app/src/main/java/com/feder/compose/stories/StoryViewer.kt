@@ -273,7 +273,7 @@ fun StoryViewer(
                                 .clip(RoundedCornerShape(2.dp))
                                 .background(Color.White.copy(alpha = 0.3f))
                                 .pointerInput(i) {
-                                    androidx.compose.foundation.gestures.detectTapGestures(
+                                    detectTapGestures(
                                         onTap = {
                                             if (i < (currentUser?.stories?.size ?: 0)) {
                                                 storyIdx = i
@@ -375,7 +375,7 @@ fun StoryViewer(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .pointerInput(replyText) {
-                                        androidx.compose.foundation.gestures.detectTapGestures(
+                                        detectTapGestures(
                                             onTap = {
                                                 if (replyText.isNotBlank() && currentUser != null) {
                                                     val text = replyText
@@ -422,7 +422,7 @@ fun StoryViewer(
                                     .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
                                     .padding(horizontal = 16.dp, vertical = 10.dp)
                                     .pointerInput(Unit) {
-                                        androidx.compose.foundation.gestures.detectTapGestures(
+                                        detectTapGestures(
                                             onTap = { isReplyFocused = true }
                                         )
                                     },
