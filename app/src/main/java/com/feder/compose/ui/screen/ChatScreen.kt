@@ -149,6 +149,9 @@ data class MsgItem(
     var posY: Float = 0f,
     val imageUrl: String? = null,
     val imageUrls: List<String> = emptyList(),
+    val replyToStoryId: Int = 0,
+    val replyToStoryFilename: String? = null,
+    val replyToStoryAuthor: String? = null,
     val reactions: List<Reaction> = emptyList(),
 )
 
@@ -793,7 +796,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     text = msg.text ?: "",
                                     timeVal = try { msg.time.toLong() } catch (e: Exception) { 0L },
                                     time = timeStr,
-                                    reactions = msg.reactions ?: emptyList()
+                                    reactions = msg.reactions ?: emptyList(),
+                                            replyToStoryId = msg.replyToStoryId,
+                                            replyToStoryFilename = msg.replyToStoryFilename,
+                                            replyToStoryAuthor = msg.replyToStoryAuthor,
                                 )
                             } catch (e: Exception) {
                                 rlog("ChatScreen", "MAP_ITEM_FAIL idx=$idx id=${msg.id} err=${e.message}")
