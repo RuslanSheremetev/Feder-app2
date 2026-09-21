@@ -247,6 +247,38 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             }
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
+                        // ═══ Reply to story preview ═══
+                        if (msg.replyToStoryId > 0 && !msg.replyToStoryFilename.isNullOrEmpty()) {
+                            Row(
+                                Modifier
+                                    .padding(horizontal = 6.dp, vertical = 6.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (isMine) Color.Black.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.12f))
+                                    .padding(6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                coil.compose.AsyncImage(
+                                    model = "http://2.26.71.102:8020/stories/${msg.replyToStoryFilename}",
+                                    contentDescription = "story",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(6.dp))
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        "Ответ на story",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (isMine) OnPrimaryContainer else OnSecondaryContainer
+                                    )
+                                    Text(
+                                        msg.replyToStoryAuthor ?: "",
+                                        fontSize = 12.sp,
+                                        color = if (isMine) OnPrimaryContainer.copy(alpha = 0.7f) else OnSecondaryContainer.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                        }
                 rlog("PhotoDebug", "BUBBLE_START id=${msg.id} hasUrls=${msg.imageUrls != null} size=${msg.imageUrls.size} imageUrl=${msg.imageUrl}")
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
