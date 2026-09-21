@@ -252,6 +252,7 @@ fun StoryViewer(
                 // Прогресс-бар (сегменты)
                 val total = currentUser?.stories?.size ?: 1
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                     repeat(total) { i ->
                         val segProgress = when {
                             i < storyIdx -> 1f
@@ -268,6 +269,16 @@ fun StoryViewer(
                                 .height(3.dp)
                                 .clip(RoundedCornerShape(2.dp))
                                 .background(Color.White.copy(alpha = 0.3f))
+                                .pointerInput(i) {
+                                    androidx.compose.foundation.gestures.detectTapGestures(
+                                        onTap = {
+                                            if (i < (currentUser?.stories?.size ?: 0)) {
+                                                storyIdx = i
+                                                progressMs = 0
+                                            }
+                                        }
+                                    )
+                                }
                         ) {
                             Box(
                                 Modifier
@@ -277,6 +288,7 @@ fun StoryViewer(
                             )
                         }
                     }
+                }
                 }
 
                 Spacer(Modifier.height(12.dp))
