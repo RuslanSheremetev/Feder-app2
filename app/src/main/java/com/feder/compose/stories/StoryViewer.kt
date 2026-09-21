@@ -381,6 +381,10 @@ fun StoryViewer(
                                         detectTapGestures(
                                             onTap = {
                                                 if (replyText.isNotBlank() && currentUser != null) {
+                                            val storyId = currentStory?.id ?: 0
+                                            val storyFn = currentStory?.filename ?: ""
+                                            val storyAuthor = currentUser?.username ?: ""
+
                                                     val text = replyText
                                                     val toUser = currentUser.username
                                                     replyText = ""
@@ -394,7 +398,10 @@ fun StoryViewer(
                                                             conn.setRequestProperty("Content-Type", "application/json")
                                                             conn.setRequestProperty("Authorization", "Bearer " + token)
                                                             conn.doOutput = true
-                                                            val body = "{\"from\":\"" + myUsername + "\",\"to\":\"" + toUser + "\",\"text\":\"" + text + "\"}"
+                                                            val body = "{\"from\":\"" + myUsername + "\",\"to\":\"" + toUser + "\",\"text\":\"" + text + "\"," +
+                                                                "\"replyToStoryId\":" + storyId + "," +
+                                                                "\"replyToStoryFilename\":\"" + storyFn + "\"," +
+                                                                "\"replyToStoryAuthor\":\"" + storyAuthor + "\"}"
                                                             conn.outputStream.use { it.write(body.toByteArray()) }
                                                             val code = conn.responseCode
                                                             android.util.Log.d("StoryViewer", "Reply sent: " + code)
