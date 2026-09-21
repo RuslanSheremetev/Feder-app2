@@ -62,6 +62,9 @@ fun StoryViewer(
     var progressMs by remember { mutableIntStateOf(0) }
     var paused by remember { mutableStateOf(false) }
     var muted by remember { mutableStateOf(true) }
+    var replyText by remember { mutableStateOf("") }
+    var isReplyFocused by remember { mutableStateOf(false) }
+    var replySent by remember { mutableStateOf(false) }
     var visible by remember { mutableStateOf(false) }
     var dragY by remember { mutableFloatStateOf(0f) }
     var dragX by remember { mutableFloatStateOf(0f) }
@@ -331,6 +334,104 @@ fun StoryViewer(
                     )
                 }
             }
+
+                    // ─── Reply UI (текстовый ответ) ───
+                    if (isReplyFocused) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .background(Color.Black.copy(alpha = 0.9f))
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.foundation.text.BasicTextField(
+                                value = replyText,
+                                onValueChange = { replyText = it },
+                                singleLine = true,
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    color = Color.White,
+                                    fontSize = 15.sp
+                                ),
+                                cursorBrush = androidx.compose.ui.graphics.SolidColor(Color.White),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(20.dp))
+                                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                                decorationBox = { inner ->
+                                    Box {
+                                        if (replyText.isEmpty()) {
+                                            Text("Ответить...", color = Color.White.copy(alpha = 0.5f), fontSize = 15.sp)
+                                        }
+                                        inner()
+                                    }
+                                }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Icon(
+                                Icons.Filled.Send,
+                                "send",
+                                tint = if (replyText.isNotBlank()) Color(0xFF2AABEE) else Color.White.copy(alpha = 0.4f),
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .pointerInput(replyText) {
+                                        androidx.compose.foundation.gestures.detectTapGestures(
+                                            onTap = {
+                                                if (replyText.isNotBlank() && currentUser != null) {
+                                                    val text = replyText
+                                                    val toUser = currentUser.username
+                                                    replyText = ""
+                                                    replySent = true
+                                                    isReplyFocused = false
+                                                    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                        try {
+                                                            val url = java.net.URL("http://2.26.71.102:8004/api/chat/send")
+                                                            val conn = url.openConnection() as java.net.HttpURLConnection
+                                                            conn.requestMethod = "POST"
+                                                            conn.setRequestProperty("Content-Type", "application/json")
+                                                            conn.setRequestProperty("Authorization", "Bearer " + token)
+                                                            conn.doOutput = true
+                                                            val body = "{\"from\":\"" + myUsername + "\",\"to\":\"" + toUser + "\",\"text\":\"" + text + "\"}"
+                                                            conn.outputStream.use { it.write(body.toByteArray()) }
+                                                            val code = conn.responseCode
+                                                            android.util.Log.d("StoryViewer", "Reply sent: " + code)
+                                                            conn.disconnect()
+                                                        } catch (e: Exception) {
+                                                            android.util.Log.e("StoryViewer", "Reply error", e)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                            )
+                        }
+                    }
+
+                    // Кнопка «Ответить» (если reply не активен)
+                    if (!isReplyFocused) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                                    .pointerInput(Unit) {
+                                        androidx.compose.foundation.gestures.detectTapGestures(
+                                            onTap = { isReplyFocused = true }
+                                        )
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Ответить...", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
+                            }
+                        }
+                    }
         }
     }
 }
