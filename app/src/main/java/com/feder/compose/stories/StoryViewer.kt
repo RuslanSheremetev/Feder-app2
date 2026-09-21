@@ -37,6 +37,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * StoryViewer — полноэкранный просмотрщик stories.
