@@ -750,7 +750,15 @@ fun FederApp() {
                                     modifier = Modifier.size(68.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest).border(2.dp, MaterialTheme.colorScheme.surfaceContainer, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+                                    if (viewModel.isUploadingStory) {
+                                        androidx.compose.material3.CircularProgressIndicator(
+                                            modifier = Modifier.size(32.dp),
+                                            color = MaterialTheme.colorScheme.primary,
+                                            strokeWidth = 3.dp
+                                        )
+                                    } else {
+                                        Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+                                    }
                                 }
                                 Spacer(Modifier.height(4.dp))
                                 Text("My story", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
