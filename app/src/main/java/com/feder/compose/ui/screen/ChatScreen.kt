@@ -265,19 +265,19 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Column {
-                                    Text(
-                                        "Ответ на story",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = if (isMine) OnPrimaryContainer else OnSecondaryContainer
-                                    )
-                                    Text(
-                                        msg.replyToStoryAuthor ?: "",
-                                        fontSize = 12.sp,
-                                        color = if (isMine) OnPrimaryContainer.copy(alpha = 0.7f) else OnSecondaryContainer.copy(alpha = 0.7f)
-                                    )
-                                }
+                                androidx.compose.material3.Text(
+                                    "Ответ на story",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                                androidx.compose.material3.Text(
+                                    msg.replyToStoryAuthor ?: "",
+                                    fontSize = 12.sp,
+                                    color = Color.White.copy(alpha = 0.7f)
+                                )
                             }
+                        }
                         }
                 rlog("PhotoDebug", "BUBBLE_START id=${msg.id} hasUrls=${msg.imageUrls != null} size=${msg.imageUrls.size} imageUrl=${msg.imageUrl}")
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
