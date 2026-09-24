@@ -251,51 +251,45 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
             Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
                         // ═══ Reply to story preview ═══
-                        // ─── Forwarded from плашка ───
+                        // ─── Forwarded from плашка (внутри bubble) ───
                         if (!msg.forwardedFrom.isNullOrEmpty()) {
-                            Surface(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
-                                color = if (isMine) Color(0x33FFFFFF) else Color(0x22000000),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+                            Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp)) {
+                                Text(
+                                    "Forwarded from",
+                                    color = if (isMine) Color.White.copy(alpha = 0.75f) else OnSurfaceVariant,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        Modifier.size(18.dp).clip(CircleShape).background(if (isMine) Color.White.copy(alpha = 0.3f) else Primary.copy(alpha = 0.3f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            (msg.forwardedName ?: msg.forwardedFrom ?: "?").take(1).uppercase(),
+                                            color = if (isMine) Color.White else Primary,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    Spacer(Modifier.width(6.dp))
                                     Text(
-                                        "Forwarded from",
-                                        color = if (isMine) Color.White.copy(alpha = 0.8f) else OnSurfaceVariant,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold
+                                        msg.forwardedName ?: msg.forwardedFrom ?: "",
+                                        color = if (isMine) Color.White else OnSurface,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Medium
                                     )
+                                }
+                                if (!msg.forwardedText.isNullOrEmpty()) {
                                     Spacer(Modifier.height(4.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Box(
-                                            Modifier.size(18.dp).clip(CircleShape).background(if (isMine) Color.White.copy(alpha = 0.3f) else Primary.copy(alpha = 0.3f)),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                (msg.forwardedName ?: msg.forwardedFrom ?: "?").take(1).uppercase(),
-                                                color = if (isMine) Color.White else Primary,
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
-                                        Spacer(Modifier.width(6.dp))
-                                        Text(
-                                            msg.forwardedName ?: msg.forwardedFrom ?: "",
-                                            color = if (isMine) Color.White else OnSurface,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                    if (!msg.forwardedText.isNullOrEmpty()) {
-                                        Spacer(Modifier.height(4.dp))
-                                        Text(
-                                            msg.forwardedText.take(200),
-                                            color = if (isMine) Color.White.copy(alpha = 0.9f) else OnSurface,
-                                            fontSize = 13.sp,
-                                            maxLines = 3,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
+                                    Text(
+                                        msg.forwardedText.take(200),
+                                        color = if (isMine) Color.White.copy(alpha = 0.9f) else OnSurface,
+                                        fontSize = 13.sp,
+                                        maxLines = 3,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             }
                         }
