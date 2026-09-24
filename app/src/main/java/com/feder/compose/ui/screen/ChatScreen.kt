@@ -1668,6 +1668,107 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
+
+                // ─── Плашка + поле ввода (в стиле чата) ───
+                if (forwardSelected.isNotEmpty()) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                        color = SurfaceContainerHigh,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Filled.Forward, "fwd", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                forwardSelected.size.toString() + " " + pluralMessages(forwardSelected.size) + " переслать",
+                                color = OnSurfaceVariant, fontSize = 13.sp
+                            )
+                            Spacer(Modifier.weight(1f))
+                            IconButton(onClick = { showForward = false; forwardSelected = emptySet() }, modifier = Modifier.size(20.dp)) {
+                                Icon(Icons.Filled.Close, "close", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = SurfaceContainerHigh,
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
+                        }
+                        Box(modifier = Modifier.weight(1f)) {
+                            BasicTextField(
+                                value = forwardMessage,
+                                onValueChange = { forwardMessage = it },
+                                singleLine = false,
+                                maxLines = 4,
+                                textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                cursorBrush = SolidColor(Primary),
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp).padding(end = 4.dp).heightIn(max = 80.dp),
+                                decorationBox = { innerTextField ->
+                                    if (forwardMessage.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
+                                    innerTextField()
+                                }
+                            )
+                        }
+                        IconButton(onClick = { showEmojiSheet = true }, modifier = Modifier.size(40.dp)) {
+                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Primary)
+                                .clickable {
+                                    if (forwardSelected.isNotEmpty()) {
+                                        val recipients = forwardSelected.toList()
+                                        val text = forwardMessage.ifEmpty { "[пересланное сообщение]" }
+                                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            recipients.forEach { to ->
+                                                try {
+                                                    val body = org.json.JSONObject().apply {
+                                                        put("from", myUsername)
+                                                        put("to", to)
+                                                        put("text", text)
+                                                        put("forwarded", true)
+                                                    }
+                                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/send").openConnection() as java.net.HttpURLConnection
+                                                    conn.requestMethod = "POST"
+                                                    conn.setRequestProperty("Content-Type", "application/json")
+                                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                    conn.doOutput = true
+                                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                    conn.responseCode
+                                                    conn.disconnect()
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("ChatScreen", "forward fail: ${e.message}")
+                                                }
+                                            }
+                                        }
+                                        forwardMessage = ""
+                                        forwardSelected = emptySet()
+                                        selectedMessages = emptySet()
+                                        selectionMode = false
+                                        showForward = false
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Filled.Send, "send", tint = Color.White, modifier = Modifier.size(22.dp))
+                        }
+                    }
+                }
                 
             }
         }
