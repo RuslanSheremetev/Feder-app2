@@ -1507,7 +1507,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         // Forward screen
-        if (showForward && selectedMessage != null) {
+        if (showForward && selectedMessages.isNotEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize().background(Background)
             ) {
