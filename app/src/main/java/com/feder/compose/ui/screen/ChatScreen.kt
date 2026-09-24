@@ -1685,7 +1685,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .clickable {
                                     if (forwardSelected.isNotEmpty()) {
                                         val recipients = forwardSelected.toList()
-                                        val text = forwardMessage.ifEmpty { "[пересланное сообщение]" }
+                                        val text = forwardMessage
                                         kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                             recipients.forEach { to ->
                                                 try {
