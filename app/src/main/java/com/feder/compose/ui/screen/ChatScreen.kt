@@ -686,6 +686,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var forwardMessage by remember { mutableStateOf("") }
 
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
@@ -892,6 +893,106 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 } catch (e: Exception) {
                     android.util.Log.e("ChatScreen", "API load error: ${e.message}")
                 }
+                // ─── Плашка + поле ввода (в стиле чата) ───
+                Surface(color = Surface, shadowElevation = 8.dp) {
+                    Column(Modifier.fillMaxWidth()) {
+                        // Плашка "N сообщений переслать"
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                            color = SurfaceContainerHigh,
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.Forward, "fwd", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    forwardSelected.size.toString() + " " + pluralMessages(forwardSelected.size) + " переслать",
+                                    color = OnSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+
+                        // Поле ввода в стиле чата
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp).navigationBarsPadding().imePadding(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier.size(40.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { /* attach */ },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Filled.Add, "add", tint = OnSurfaceVariant, modifier = Modifier.size(22.dp))
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Box(
+                                Modifier.weight(1f).clip(RoundedCornerShape(24.dp)).background(SurfaceContainerHigh).padding(horizontal = 16.dp, vertical = 10.dp)
+                            ) {
+                                BasicTextField(
+                                    value = forwardMessage,
+                                    onValueChange = { forwardMessage = it },
+                                    singleLine = false,
+                                    maxLines = 4,
+                                    textStyle = TextStyle(color = OnSurface, fontSize = 15.sp),
+                                    cursorBrush = SolidColor(Primary),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    decorationBox = { innerTextField ->
+                                        if (forwardMessage.isEmpty()) {
+                                            Text("Message", color = Outline, fontSize = 15.sp)
+                                        }
+                                        innerTextField()
+                                    }
+                                )
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Box(
+                                Modifier.size(48.dp).clip(CircleShape).background(Primary).clickable {
+                                    if (forwardSelected.isNotEmpty()) {
+                                        // Отправка
+                                        val recipients = forwardSelected.toList()
+                                        val text = forwardMessage
+                                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            recipients.forEach { to ->
+                                                try {
+                                                    val body = org.json.JSONObject().apply {
+                                                        put("from", myUsername)
+                                                        put("to", to)
+                                                        put("text", text.ifEmpty { "[пересланное сообщение]" })
+                                                        put("forwarded", true)
+                                                    }
+                                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/send").openConnection() as java.net.HttpURLConnection
+                                                    conn.requestMethod = "POST"
+                                                    conn.setRequestProperty("Content-Type", "application/json")
+                                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                    conn.doOutput = true
+                                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                    conn.responseCode
+                                                    conn.disconnect()
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("ChatScreen", "forward fail: ${e.message}")
+                                                }
+                                            }
+                                        }
+                                        // Сброс
+                                        forwardMessage = ""
+                                        forwardSelected = emptySet()
+                                        selectedMessages = emptySet()
+                                        selectionMode = false
+                                        showForward = false
+                                    }
+                                },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Filled.Send, "send", tint = Color.White, modifier = Modifier.size(22.dp))
+                            }
+                        }
+                    }
+                }
+
+
             }
         }
 
@@ -1334,7 +1435,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     IconButton(onClick = { selectionMode = false; selectedMessages = emptySet() }) { Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp)) }
                     Text("${selectedMessages.size} selected", color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
                     Spacer(Modifier.weight(1f))
-                    IconButton(onClick = { }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = {
+                        if (selectedMessages.isNotEmpty()) {
+                            showForward = true
+                            forwardSelected = emptySet()
+                        }
+                    }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     IconButton(onClick = { }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
             } else {
@@ -2209,3 +2315,13 @@ fun DrawCheck(
     }
 }
 
+
+private fun pluralMessages(n: Int): String {
+    val mod10 = n % 10
+    val mod100 = n % 100
+    return when {
+        mod10 == 1 && mod100 != 11 -> "сообщение"
+        mod10 in 2..4 && (mod100 !in 12..14) -> "сообщения"
+        else -> "сообщений"
+    }
+}
