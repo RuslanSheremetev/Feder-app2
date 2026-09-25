@@ -1695,7 +1695,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                             recipients.forEach { to ->
                                                 try {
-                                                    val origMsg = messages.firstOrNull { it.time == selectedMessages.firstOrNull() } ?: messages.firstOrNull()
+                                                    val origMsg = messages.firstOrNull { it.id.toString() == selectedMessages.firstOrNull() } ?: messages.firstOrNull()
                                                     val body = org.json.JSONObject().apply {
                                                         put("from", myUsername)
                                                         put("to", to)
@@ -1704,6 +1704,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                         put("forwardedFrom", origMsg?.from ?: "")
                                                         put("forwardedName", origMsg?.from ?: "")
                                                         put("forwardedText", origMsg?.text ?: "")
+                                                        // Переслать медиа (фото/видео/аудио)
+                                                        if (origMsg?.imageUrls?.isNotEmpty() == true) {
+                                                            put("imageUrls", org.json.JSONArray(origMsg.imageUrls))
+                                                        }
                                                     }
                                                     val conn = java.net.URL("http://2.26.71.102:8004/api/chat/send").openConnection() as java.net.HttpURLConnection
                                                     conn.requestMethod = "POST"
