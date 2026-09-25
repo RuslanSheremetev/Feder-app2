@@ -612,8 +612,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     // ─── Системный back (свайп от края + кнопка назад) ───
     androidx.activity.compose.BackHandler(enabled = true) {
-        if (searchMode) { searchMode = false; searchQuery = "" }
-        else onBack()
+        onBack()
     }
 
     val scope = rememberCoroutineScope()
