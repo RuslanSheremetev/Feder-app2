@@ -1808,7 +1808,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); android.util.Log.d("ChatScreen", "Copied"); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.ContentCopy, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
                             }
-                            Row(Modifier.fillMaxWidth().clickable { showForward = true }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.fillMaxWidth().clickable {
+                                // Forward из popup: добавить текущее сообщение в selectedMessages
+                                selectedMessage?.let { m ->
+                                    selectedMessages = selectedMessages + m.id.toString()
+                                }
+                                selectionMode = true
+                                showForward = true
+                                forwardSelected = emptySet()
+                                selectedMessage = null
+                            }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.Forward, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
                                 Surface(shape = RoundedCornerShape(12.dp), color = SecondaryContainer) { Text("Group", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), fontSize = 10.sp, color = Primary) }
                             }
