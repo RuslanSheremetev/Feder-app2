@@ -477,36 +477,37 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     }
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
-                Box(Modifier.padding(horizontal = 6.dp, vertical = 3.dp).fillMaxWidth()) {
+                Row(
+                    Modifier.padding(horizontal = 6.dp, vertical = 3.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
+                ) {
                     if (text.isNotEmpty()) {
                         Text(
                             text,
                             color = if (isMine) Color.White else OnSurface,
                             fontSize = 14.sp,
-                            modifier = Modifier.padding(end = 70.dp)
+                            modifier = Modifier.weight(1f, fill = false)
                         )
+                    } else {
+                        Spacer(Modifier.weight(1f))
                     }
                     if (time.isNotEmpty() && msg.reactions.isEmpty()) {
-                        Row(
-                            Modifier.align(Alignment.BottomEnd),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.alignByBaseline().offset(y = 2.dp))
-                            if (isMine) {
-                                Spacer(Modifier.width(2.dp))
-                                val checkText = when (msg.status) {
-                                    "pending" -> "✓"
-                                    "sent" -> "✓"
-                                    "received" -> "✓✓"
-                                    "read" -> "✓✓"
-                                    else -> "✓"
-                                }
-                                val checkColor = when (msg.status) {
-                                    "read" -> Color(0xFF4CAF50)
-                                    else -> Color.White.copy(alpha = 0.7f)
-                                }
-                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 2.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.align(Alignment.Bottom).offset(y = (-1).dp))
+                        if (isMine) {
+                            Spacer(Modifier.width(2.dp))
+                            val checkText = when (msg.status) {
+                                "pending" -> "✓"
+                                "sent" -> "✓"
+                                "received" -> "✓✓"
+                                "read" -> "✓✓"
+                                else -> "✓"
                             }
+                            val checkColor = when (msg.status) {
+                                "read" -> Color(0xFF4CAF50)
+                                else -> Color.White.copy(alpha = 0.7f)
+                            }
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.align(Alignment.Bottom).offset(y = (-1).dp))
                         }
                     }
                 }
