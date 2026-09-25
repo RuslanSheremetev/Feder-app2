@@ -1509,14 +1509,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (selectionMode) {
                                 Icon(
-                                    if (selectedMessages.contains(msg.time)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
+                                    if (selectedMessages.contains(msg.id.toString())) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
                                     contentDescription = "select",
-                                    tint = if (selectedMessages.contains(msg.time)) Primary else OutlineVariant,
+                                    tint = if (selectedMessages.contains(msg.id.toString())) Primary else OutlineVariant,
                                     modifier = Modifier.size(24.dp).clickable {
-                                        if (selectedMessages.contains(msg.time)) {
-                                            selectedMessages = selectedMessages - msg.time
+                                        if (selectedMessages.contains(msg.id.toString())) {
+                                            selectedMessages = selectedMessages - msg.id.toString()
                                         } else {
-                                            selectedMessages = selectedMessages + msg.time
+                                            selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     }
                                 )
@@ -1534,10 +1534,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             allChats = allChats, myUsername = myUsername,
                             onClick = {
                                     if (selectionMode) {
-                                        if (selectedMessages.contains(msg.time)) {
-                                            selectedMessages = selectedMessages - msg.time
+                                        if (selectedMessages.contains(msg.id.toString())) {
+                                            selectedMessages = selectedMessages - msg.id.toString()
                                         } else {
-                                            selectedMessages = selectedMessages + msg.time
+                                            selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
                                         val pos = msgPositions[msg.id]
@@ -1549,7 +1549,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     }
                                 },
                             
-                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.time }
+                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() }
                         )
                             }
                         }
