@@ -1,5 +1,6 @@
 package com.feder.compose.ui.screen
 
+import androidx.activity.compose.BackHandler
 import com.feder.compose.ChatItem
 import android.Manifest
 import androidx.compose.foundation.background
@@ -608,6 +609,13 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null) {
     val context = LocalContext.current
+
+    // ─── Системный back (свайп от края + кнопка назад) ───
+    androidx.activity.compose.BackHandler(enabled = true) {
+        if (searchMode) { searchMode = false; searchQuery = "" }
+        else onBack()
+    }
+
     val scope = rememberCoroutineScope()
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
 
