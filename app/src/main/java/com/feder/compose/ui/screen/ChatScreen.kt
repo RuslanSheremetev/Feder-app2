@@ -478,7 +478,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
                 Row(Modifier.padding(horizontal = 6.dp, vertical = 3.dp), verticalAlignment = Alignment.Top) {
-                    Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false).alignByBaseline())
+                    if (text.isNotEmpty()) {
+                        Text(text, color = if (isMine) Color.White else OnSurface, fontSize = 14.sp, modifier = Modifier.weight(1f, fill = false).alignByBaseline())
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
                     if (time.isNotEmpty() && msg.reactions.isEmpty()) {
                         Spacer(Modifier.width(8.dp))
                         Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
