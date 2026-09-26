@@ -668,7 +668,12 @@ fun FederApp() {
                             ) else chat
                         }
                     },
-                    onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null },
+                    onProfileClick = {
+                        val targetUser = viewModel.selectedChat
+                        viewModel.selectedProfile = targetUser
+                        viewModel.selectedChat = null
+                        targetUser?.let { viewModel.loadProfileMedia(it) }
+                    },
                     onSavedProfileClick = { viewModel.showSavedProfile = true }
                 )
             }
