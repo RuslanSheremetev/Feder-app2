@@ -272,7 +272,7 @@ class ChatViewModel : ViewModel() {
             repository?.let { repo ->
                 val cachedChats = repo.getChats()
                 if (cachedChats.isNotEmpty()) {
-                    chats = cachedChats.map { entity ->
+                    val mapped = cachedChats.map { entity ->
                         ChatItem(
                             username = entity.username,
                             name = entity.name,
@@ -285,7 +285,11 @@ class ChatViewModel : ViewModel() {
                             lastMessage = entity.lastMessage,
                             timestamp = entity.lastTime?.toString() ?: ""
                         )
-                    }
+                    }.sortedByDescending { it.timestamp }
+                    // Saved Messages — всегда первым
+                    val saved = mapped.filter { it.username == "saved_messages" }
+                    val rest = mapped.filter { it.username != "saved_messages" }
+                    chats = saved + rest
                     isLoading = false
                 }
             }
@@ -811,24 +815,24 @@ fun FederApp() {
                             ) {
                                 // Аватар + онлайн-точка
                                 Box(Modifier.size(56.dp)) {
-                                    if (chat.avatarUrl != null) {
+                                    if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
+                                        // Saved Messages: синий круг с белой закладкой
+                                        Box(Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
+                                            Icon(Icons.Filled.Bookmarks, "saved", tint = Color.White, modifier = Modifier.size(28.dp))
+                                        }
+                                    } else if (!chat.avatarUrl.isNullOrEmpty()) {
                                         AsyncImage(
                                             model = ImageRequest.Builder(LocalContext.current).data(
-    when {
-        chat.avatarUrl.isNullOrEmpty() -> null
-        chat.avatarUrl.startsWith("http") -> chat.avatarUrl
-        chat.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
-        else -> "http://2.26.71.102:8010/avatars/${chat.username}/avatar.jpg"
-    }
-).crossfade(true).build(),
+                                                when {
+                                                    chat.avatarUrl.startsWith("http") -> chat.avatarUrl
+                                                    chat.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
+                                                    else -> "http://2.26.71.102:8010/avatars/${chat.username}/avatar.jpg"
+                                                }
+                                            ).crossfade(true).build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.size(56.dp).clip(CircleShape)
                                         )
-                                    } else if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
-                                        Box(Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
-                                            Icon(Icons.Filled.Bookmarks, "saved", tint = Color.White, modifier = Modifier.size(28.dp))
-                                        }
                                     } else {
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                             Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
