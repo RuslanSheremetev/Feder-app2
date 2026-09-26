@@ -2404,7 +2404,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < listState.layoutInfo.totalItemsCount - 2 } ?: false,
-            modifier = Modifier.padding(end = 28.dp, bottom = 76.dp).align(Alignment.BottomEnd),
+            modifier = Modifier.padding(end = 80.dp, bottom = 100.dp).align(Alignment.BottomEnd),
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
         ) {
