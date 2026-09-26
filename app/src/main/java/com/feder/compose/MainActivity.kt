@@ -67,6 +67,7 @@ import com.feder.compose.ui.theme.ThemeController
 import com.feder.compose.ui.screen.ContactsScreen
 import com.feder.compose.ui.screen.SettingsScreen
 import com.feder.compose.ui.screen.ContactProfileScreen
+import com.feder.compose.ui.screen.TelegramContactProfile
 import com.feder.compose.ui.screen.ChatScreen
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -568,6 +569,24 @@ fun FederApp() {
     if (viewModel.selectedChat != null || viewModel.selectedProfile != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
+                viewModel.selectedProfile != null -> {
+                    val prof = viewModel.chats.find { it.username == viewModel.selectedProfile }
+                    TelegramContactProfile(
+                        contactName = prof?.name ?: (viewModel.selectedProfile ?: ""),
+                        contactUsername = viewModel.selectedProfile ?: "",
+                        onBack = { viewModel.selectedProfile = null },
+                        avatarUrl = prof?.avatarUrl,
+                        phone = "",
+                        bio = "",
+                        lastSeen = if (prof?.online == true) "online" else "last seen recently",
+                        mediaUrls = emptyList(),
+                        isMuted = prof?.isMuted ?: false,
+                        onMessage = {
+                            viewModel.selectedChat = viewModel.selectedProfile
+                            viewModel.selectedProfile = null
+                        }
+                    )
+                }
                 viewModel.selectedChat != null -> ChatScreen(
                     chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
                     chatUsername = viewModel.selectedChat ?: "",
@@ -814,7 +833,12 @@ fun FederApp() {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Аватар + онлайн-точка
-                                Box(Modifier.size(56.dp)) {
+                                Box(Modifier.size(56.dp).clickable {
+                                if (chat.username != "saved_messages") {
+                                    viewModel.selectedProfile = chat.username
+                                    viewModel.selectedChat = null
+                                }
+                            }) {
                                     if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
                                         // Saved Messages: синий круг с белой закладкой
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
