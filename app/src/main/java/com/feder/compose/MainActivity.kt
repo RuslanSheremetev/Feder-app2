@@ -121,6 +121,7 @@ fun formatTimestamp(timestamp: String?): String {
 class ChatViewModel : ViewModel() {
     var selectedChat by mutableStateOf<String?>(null)
     var selectedProfile by mutableStateOf<String?>(null)
+    var showSavedProfile by mutableStateOf(false)
     private val client = OkHttpClient()
     
     private fun logWs(message: String) {
@@ -566,9 +567,14 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
+                viewModel.showSavedProfile -> {
+                    com.feder.compose.ui.screen.SavedMessagesProfile(
+                        onBack = { viewModel.showSavedProfile = false }
+                    )
+                }
                 viewModel.selectedProfile != null -> {
                     val prof = viewModel.chats.find { it.username == viewModel.selectedProfile }
                     TelegramContactProfile(
@@ -608,7 +614,8 @@ fun FederApp() {
                             ) else chat
                         }
                     },
-                    onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null }
+                    onProfileClick = { viewModel.selectedProfile = viewModel.selectedChat; viewModel.selectedChat = null },
+                    onSavedProfileClick = { viewModel.showSavedProfile = true }
                 )
             }
         }
