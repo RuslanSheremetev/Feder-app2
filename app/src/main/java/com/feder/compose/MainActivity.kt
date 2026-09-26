@@ -632,7 +632,7 @@ fun FederApp() {
                 }
                 Box {
                     var showMoreMenu by remember { mutableStateOf(false) }
-                    Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.padding(start = 16.dp).size(24.dp).clickable { showMoreMenu = true })
+                    Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.padding(start = 16.dp, end = 16.dp).size(24.dp).clickable { showMoreMenu = true })
                     if (showMoreMenu) {
                         Popup(alignment = Alignment.TopEnd, onDismissRequest = { showMoreMenu = false }, properties = PopupProperties(focusable = true)) {
                             Surface(modifier = Modifier.padding(top = 8.dp, end = 16.dp).width(IntrinsicSize.Max), shape = RoundedCornerShape(16.dp), color = SurfaceContainerHigh, shadowElevation = 8.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
