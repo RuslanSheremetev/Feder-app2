@@ -1861,8 +1861,65 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             if (showDeleteSub) {
                                 Column {
-                                    Row(Modifier.fillMaxWidth().clickable { messages = messages.filter { it != selectedMessage }; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for me", color = OnSurface, fontSize = 14.sp) }
-                                    Row(Modifier.fillMaxWidth().clickable { messages = messages.filter { it != selectedMessage }; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for all", color = Error, fontSize = 14.sp) }
+                                    // ─── Delete for me: пометить в БД + локально скрыть ───
+                                    Row(Modifier.fillMaxWidth().clickable {
+                                        val m = selectedMessage
+                                        messages = messages.filter { it != m }
+                                        selectedMessage = null
+                                        showDeleteSub = false
+                                        if (m != null && m.id > 0) {
+                                            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                try {
+                                                    val body = org.json.JSONObject().apply {
+                                                        put("id", m.id)
+                                                        put("forAll", false)
+                                                        put("user", myUsername)
+                                                    }
+                                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                                    conn.requestMethod = "POST"
+                                                    conn.setRequestProperty("Content-Type", "application/json")
+                                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                    conn.doOutput = true
+                                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                    conn.responseCode
+                                                    conn.disconnect()
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("ChatScreen", "delete for me fail: ${e.message}")
+                                                }
+                                            }
+                                        }
+                                    }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for me", color = OnSurface, fontSize = 14.sp) }
+
+                                    // ─── Delete for all: только для своих сообщений ───
+                                    if (selectedMessage?.from == myUsername) {
+                                        Row(Modifier.fillMaxWidth().clickable {
+                                            val m = selectedMessage
+                                            messages = messages.filter { it != m }
+                                            selectedMessage = null
+                                            showDeleteSub = false
+                                            if (m != null && m.id > 0) {
+                                                kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                    try {
+                                                        val body = org.json.JSONObject().apply {
+                                                            put("id", m.id)
+                                                            put("forAll", true)
+                                                            put("user", myUsername)
+                                                        }
+                                                        val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                                        conn.requestMethod = "POST"
+                                                        conn.setRequestProperty("Content-Type", "application/json")
+                                                        if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                        conn.doOutput = true
+                                                        conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                        conn.responseCode
+                                                        conn.disconnect()
+                                                    } catch (e: Exception) {
+                                                        android.util.Log.e("ChatScreen", "delete for all fail: ${e.message}")
+                                                    }
+                                                }
+                                            }
+                                        }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for all", color = Error, fontSize = 14.sp) }
+                                    }
                                 }
                             }
                         }
