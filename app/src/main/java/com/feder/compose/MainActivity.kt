@@ -174,7 +174,7 @@ class ChatViewModel : ViewModel() {
                 else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
     
     fun loadProfileMedia(username: String) {
-        android.util.Log.d("ProfileMedia", "== CALLED for $username ==")
+        logWs("ProfileMedia: CALLED for $username")
         viewModelScope.launch {
             try {
                 val httpClient = okhttp3.OkHttpClient()
@@ -198,19 +198,19 @@ class ChatViewModel : ViewModel() {
                 ).execute()
                 val body = resp.body?.string() ?: "[]"
                 resp.close()
-                android.util.Log.d("ProfileMedia", "HTTP ${resp.code} body_len=${body.length}")
+                logWs("ProfileMedia: HTTP ${resp.code} body_len=${body.length}")
                 val type = object : com.google.gson.reflect.TypeToken<List<com.feder.compose.ui.screen.MsgItem>>() {}.type
-                android.util.Log.d("ProfileMedia", "PARSING...")
+                logWs("ProfileMedia: PARSING")
                 val messages: List<com.feder.compose.ui.screen.MsgItem> = gson.fromJson(body, type) ?: emptyList()
-                android.util.Log.d("ProfileMedia", "PARSED ${messages.size} messages")
+                logWs("ProfileMedia: PARSED ${messages.size}")
                 val urls = messages.flatMap { it.imageUrls }
                     .filter { it.isNotBlank() }
                     .distinct()
                     .reversed()
-android.util.Log.d("ProfileMedia", "URLS extracted: ${urls.size}: $urls")
+logWs("ProfileMedia: URLS=${urls.size}")
                 profileMediaUrls = urls
             } catch (e: Exception) {
-                android.util.Log.e("ProfileMedia", "FAIL: ${e.message}", e)
+                logWs("ProfileMedia FAIL: ${e.message}")
                 profileMediaUrls = emptyList()
             }
         }
