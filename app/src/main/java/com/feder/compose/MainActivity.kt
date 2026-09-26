@@ -122,6 +122,7 @@ fun formatTimestamp(timestamp: String?): String {
 class ChatViewModel : ViewModel() {
     var selectedChat by mutableStateOf<String?>(null)
     var selectedProfile by mutableStateOf<String?>(null)
+    var profileMediaUrls by mutableStateOf<List<String>>(emptyList())
     var showSavedProfile by mutableStateOf(false)
     private val client = OkHttpClient()
     
@@ -172,6 +173,43 @@ class ChatViewModel : ViewModel() {
         get() = if (searchQuery.isEmpty()) chats
                 else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
     
+    fun loadProfileMedia(username: String) {
+        viewModelScope.launch {
+            try {
+                val httpClient = okhttp3.OkHttpClient()
+                var tok = token
+                try {
+                    val authJson = gson.toJson(mapOf("username" to currentUsername.ifEmpty { "demo" }, "password" to currentUsername.ifEmpty { "demo" }))
+                    val authBody = authJson.toRequestBody("application/json".toMediaType())
+                    val authResp = httpClient.newCall(
+                        okhttp3.Request.Builder().url("$server/api/login").post(authBody).build()
+                    ).execute()
+                    val freshToken = com.google.gson.JsonParser.parseString(authResp.body?.string() ?: "")
+                        .asJsonObject.get("access_token")?.asString ?: ""
+                    authResp.close()
+                    if (freshToken.isNotEmpty()) tok = freshToken
+                } catch (_: Exception) {}
+                val resp = httpClient.newCall(
+                    okhttp3.Request.Builder()
+                        .url("$server/api/messages/$username")
+                        .header("Authorization", "Bearer $tok")
+                        .build()
+                ).execute()
+                val body = resp.body?.string() ?: "[]"
+                resp.close()
+                val type = object : com.google.gson.reflect.TypeToken<List<com.feder.compose.ui.screen.MsgItem>>() {}.type
+                val messages: List<com.feder.compose.ui.screen.MsgItem> = gson.fromJson(body, type) ?: emptyList()
+                val urls = messages.flatMap { it.imageUrls }
+                    .filter { it.isNotBlank() }
+                    .distinct()
+                    .reversed()
+                profileMediaUrls = urls
+            } catch (_: Exception) {
+                profileMediaUrls = emptyList()
+            }
+        }
+    }
+
     init { 
         loginAndLoad()
     }
@@ -560,6 +598,15 @@ fun FederApp() {
             }
         }
     )
+    LaunchedEffect(viewModel.selectedProfile) {
+        viewModel.selectedProfile?.let { uname ->
+            if (uname != "saved_messages") {
+                viewModel.loadProfileMedia(uname)
+            } else {
+                viewModel.profileMediaUrls = emptyList()
+            }
+        }
+    }
     LaunchedEffect(viewModel.wsStatus) {
         if (viewModel.wsStatus.isNotEmpty()) {
             Toast.makeText(context, "WS: ${viewModel.wsStatus}", Toast.LENGTH_SHORT).show()
@@ -586,7 +633,7 @@ fun FederApp() {
                         phone = "",
                         bio = "",
                         lastSeen = if (prof?.online == true) "online" else "last seen recently",
-                        mediaUrls = emptyList(),
+                        mediaUrls = viewModel.profileMediaUrls,
                         isMuted = prof?.isMuted ?: false,
                         onMessage = {
                             viewModel.selectedChat = viewModel.selectedProfile
