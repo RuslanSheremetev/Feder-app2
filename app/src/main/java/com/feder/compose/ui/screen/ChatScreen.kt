@@ -1432,7 +1432,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         )
                     } else {
                         Box(Modifier.size(40.dp).clip(CircleShape).clickable { onProfileClick() }) {
-                            if (avatarUrl != null) {
+                            if (chatUsername == "saved_messages") {
+                                // Saved Messages — синий круг с белой закладкой
+                                Box(Modifier.size(40.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Filled.Bookmarks, "saved", tint = Color.White, modifier = Modifier.size(22.dp))
+                                }
+                            } else if (avatarUrl != null) {
                                 AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
                                 Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
@@ -1442,7 +1447,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(if (chatUsername == "saved_messages") "Saved Messages" else chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(
                                 when {
                                     isOnline -> "online"
