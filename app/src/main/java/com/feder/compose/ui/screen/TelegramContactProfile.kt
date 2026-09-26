@@ -26,6 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.HorizontalDivider
 
 @Composable
 fun TelegramContactProfile(
@@ -66,8 +71,34 @@ fun TelegramContactProfile(
                 Icon(Icons.Filled.ArrowBack, "back", tint = Color(0xFFE5E2E1), modifier = Modifier.size(24.dp))
             }
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = { /* more */ }) {
-                Icon(Icons.Filled.MoreVert, "more", tint = Color(0xFFE5E2E1), modifier = Modifier.size(24.dp))
+            var showMoreMenu by remember { mutableStateOf(false) }
+            Box {
+                IconButton(onClick = { showMoreMenu = true }) {
+                    Icon(Icons.Filled.MoreVert, "more", tint = Color(0xFFE5E2E1), modifier = Modifier.size(24.dp))
+                }
+                if (showMoreMenu) {
+                    androidx.compose.ui.window.Popup(
+                        alignment = Alignment.TopEnd,
+                        onDismissRequest = { showMoreMenu = false },
+                        properties = androidx.compose.ui.window.PopupProperties(focusable = true)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = Color(0xFF2A2A2A),
+                            shadowElevation = 8.dp,
+                            modifier = Modifier.padding(top = 8.dp, end = 8.dp).width(230.dp)
+                        ) {
+                            Column(Modifier.padding(vertical = 6.dp)) {
+                                MenuRow(Icons.Filled.ZoomIn, "Zoom In") { showMoreMenu = false }
+                                MenuRow(Icons.Filled.ZoomOut, "Zoom Out") { showMoreMenu = false }
+                                MenuRow(Icons.Filled.CalendarMonth, "Calendar") { showMoreMenu = false }
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = Color(0xFF404752))
+                                MenuRow(Icons.Filled.Check, "Show Photos") { showMoreMenu = false }
+                                MenuRow(Icons.Filled.Check, "Show Videos") { showMoreMenu = false }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -268,6 +299,40 @@ private fun MediaThumb(url: String) {
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+
+@Composable
+private fun MenuRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    label: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = Color(0xFFE5E2E1),
+                modifier = Modifier.size(20.dp)
+            )
+        } else {
+            Spacer(Modifier.width(20.dp))
+        }
+        Spacer(Modifier.width(14.dp))
+        Text(
+            label,
+            color = Color(0xFFE5E2E1),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Normal
         )
     }
 }
