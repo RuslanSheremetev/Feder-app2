@@ -751,6 +751,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var forwardMultiSelect by remember { mutableStateOf(false) }
     var forwardMessage by remember { mutableStateOf("") }
 
         LaunchedEffect(selectedMessage) {
@@ -1579,7 +1580,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 var forwardSearchMode by remember { mutableStateOf(false) }
                 // Header
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { if (forwardSearchMode) { forwardSearchMode = false; forwardSearch = "" } else showForward = false }) {
+                    IconButton(onClick = { 
+                        if (forwardSearchMode) { forwardSearchMode = false; forwardSearch = "" } 
+                        else { 
+                            showForward = false
+                            forwardMultiSelect = false
+                            forwardSelected = emptySet()
+                        }
+                    }) {
                         Icon(Icons.Filled.ArrowBack, "back", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
                     if (forwardSearchMode) {
@@ -1617,8 +1625,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     items(allChats.filter { it.username != myUsername && it.username != "123" }) { contact ->
                         val name = contact.name
                         val avatar = contact.avatarUrl ?: ""
-                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).combinedClickable(onClick = { val uname = contact.username; if (forwardSelected.isNotEmpty()) { if (forwardSelected.contains(uname)) forwardSelected = forwardSelected - uname else forwardSelected = forwardSelected + uname } }, onLongClick = { val uname = contact.username; forwardSelected = setOf(uname) }), verticalAlignment = Alignment.CenterVertically) {
-                            if (forwardSelected.isNotEmpty()) { Icon(if (forwardSelected.contains(contact.username)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, contentDescription = "select", tint = if (forwardSelected.contains(contact.username)) Primary else OutlineVariant, modifier = Modifier.size(24.dp)) }
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).combinedClickable(
+                            onClick = {
+                                val uname = contact.username
+                                if (forwardMultiSelect) {
+                                    // Мультивыбор — toggle
+                                    forwardSelected = if (forwardSelected.contains(uname)) forwardSelected - uname else forwardSelected + uname
+                                } else {
+                                    // Одиночный выбор — сразу отправить одному
+                                    forwardSelected = setOf(uname)
+                                    forwardMultiSelect = true  // для показа чекбокса в момент отправки
+                                }
+                            },
+                            onLongClick = {
+                                val uname = contact.username
+                                forwardMultiSelect = true
+                                forwardSelected = forwardSelected + uname
+                            }
+                        ), verticalAlignment = Alignment.CenterVertically) {
+                            if (forwardMultiSelect || forwardSelected.isNotEmpty()) { Icon(if (forwardSelected.contains(contact.username)) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, contentDescription = "select", tint = if (forwardSelected.contains(contact.username)) Primary else OutlineVariant, modifier = Modifier.size(24.dp)) }
                             Spacer(Modifier.width(8.dp))
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
