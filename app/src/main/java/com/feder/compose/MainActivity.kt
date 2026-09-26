@@ -36,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -849,7 +850,7 @@ fun FederApp() {
                                     if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
                                         // Saved Messages: синий круг с белой закладкой
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
-                                            Icon(Icons.Filled.Bookmarks, "saved", tint = Color.White, modifier = Modifier.size(28.dp))
+                                            Icon(Icons.Filled.Bookmark, "saved", tint = Color.White, modifier = Modifier.size(28.dp))
                                         }
                                     } else if (!chat.avatarUrl.isNullOrEmpty()) {
                                         AsyncImage(

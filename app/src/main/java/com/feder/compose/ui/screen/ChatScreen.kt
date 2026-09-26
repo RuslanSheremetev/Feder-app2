@@ -42,6 +42,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -1466,7 +1467,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             if (chatUsername == "saved_messages") {
                                 // Saved Messages — синий круг с белой закладкой
                                 Box(Modifier.size(40.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Filled.Bookmarks, "saved", tint = Color.White, modifier = Modifier.size(22.dp))
+                                    Icon(Icons.Filled.Bookmark, "saved", tint = Color.White, modifier = Modifier.size(22.dp))
                                 }
                             } else if (avatarUrl != null) {
                                 AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
