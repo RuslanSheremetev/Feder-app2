@@ -77,6 +77,7 @@ import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import kotlinx.coroutines.Dispatchers
 
 data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(
@@ -175,7 +176,7 @@ class ChatViewModel : ViewModel() {
     
     fun loadProfileMedia(username: String) {
         logWs("ProfileMedia: CALLED for $username")
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val httpClient = okhttp3.OkHttpClient()
                 var tok = token
@@ -210,7 +211,7 @@ class ChatViewModel : ViewModel() {
 logWs("ProfileMedia: URLS=${urls.size}")
                 profileMediaUrls = urls
             } catch (e: Exception) {
-                logWs("ProfileMedia FAIL: ${e.message}")
+                logWs("ProfileMedia FAIL: ${e.javaClass.simpleName}: ${e.message}\n${e.stackTraceToString().take(600)}")
                 profileMediaUrls = emptyList()
             }
         }
