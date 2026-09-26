@@ -1407,7 +1407,38 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             forwardSelected = emptySet()
                         }
                     }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
-                    IconButton(onClick = { }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    IconButton(onClick = {
+                        if (selectedMessages.isEmpty()) return@IconButton
+                        val ids = selectedMessages.toList()
+                        // Локально убрать
+                        messages = messages.filter { it.id.toString() !in selectedMessages }
+                        // Отправить на сервер
+                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                            ids.forEach { idStr ->
+                                try {
+                                    val idLong = idStr.toLongOrNull() ?: return@forEach
+                                    val body = org.json.JSONObject().apply {
+                                        put("id", idLong)
+                                        put("forAll", false)     // для себя; изменить на true для «у всех»
+                                        put("user", myUsername)
+                                    }
+                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                    conn.requestMethod = "POST"
+                                    conn.setRequestProperty("Content-Type", "application/json")
+                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                    conn.doOutput = true
+                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                    conn.responseCode
+                                    conn.disconnect()
+                                } catch (e: Exception) {
+                                    android.util.Log.e("ChatScreen", "delete fail: ${e.message}")
+                                }
+                            }
+                        }
+                        // Выход из режима выбора
+                        selectedMessages = emptySet()
+                        selectionMode = false
+                    }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1851,7 +1882,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Icon(Icons.Filled.Forward, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
                                 Surface(shape = RoundedCornerShape(12.dp), color = SecondaryContainer) { Text("Group", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), fontSize = 10.sp, color = Primary) }
                             }
-                            Row(Modifier.fillMaxWidth().clickable { selectionMode = true; selectedMessages = setOf(selectedMessage?.time ?: ""); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.fillMaxWidth().clickable {
+                                selectedMessage?.let { m ->
+                                    selectionMode = true
+                                    selectedMessages = setOf(m.id.toString())
+                                }
+                                selectedMessage = null
+                            }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Filled.CheckBox, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Select", color = OnSurface, fontSize = 16.sp)
                             }
                             HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
