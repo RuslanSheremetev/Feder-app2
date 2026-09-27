@@ -249,7 +249,36 @@ private fun GenericCard(
 
 fun extractFirstUrl(text: String): String? {
     if (text.isBlank()) return null
+    // 1. Декодируем \uXXXX (Gson escape): \u003d -> =
+    val decoded = decodeUnicodeEscapes(text)
+    android.util.Log.d("extractFirstUrl", "in=$text -> decoded=$decoded")
+    // 2. Ищем URL
     val regex = Regex("""https?://[^\s<>"']+""", RegexOption.IGNORE_CASE)
-    val match = regex.find(text) ?: return null
-    return match.value.trimEnd('.', ',', ';', ':', '!', '?', ')', ']', '}')
+    val match = regex.find(decoded) ?: return null
+    val url = match.value.trimEnd('.', ',', ';', ':', '!', '?', ')', ']', '}')
+    android.util.Log.d("extractFirstUrl", "extracted=$url")
+    return url
+}
+
+/**
+ * Декодирует последовательности \uXXXX в реальные символы.
+ * Пример: "si\u003d6kq" -> "si=6kq"
+ */
+private fun decodeUnicodeEscapes(s: String): String {
+    if (!s.contains("\\u")) return s
+    val sb = StringBuilder(s.length)
+    var i = 0
+    while (i < s.length) {
+        if (i + 5 < s.length && s[i] == '\\' && s[i + 1] == 'u') {
+            try {
+                val code = s.substring(i + 2, i + 6).toInt(16)
+                sb.append(code.toChar())
+                i += 6
+                continue
+            } catch (_: Exception) { }
+        }
+        sb.append(s[i])
+        i++
+    }
+    return sb.toString()
 }
