@@ -6,15 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.feder.compose.data.entity.ChatEntity
 import com.feder.compose.data.entity.MessageEntity
+import com.feder.compose.data.entity.LinkPreviewEntity
 
 @Database(
-    entities = [MessageEntity::class, ChatEntity::class],
-    version = 4,
+    entities = [MessageEntity::class, ChatEntity::class, LinkPreviewEntity::class],
+    version = 5,
     exportSchema = false
 )
 abstract class FederDatabase : RoomDatabase() {
     abstract fun messageDao(): MessageDao
     abstract fun chatDao(): ChatDao
+    abstract fun linkPreviewDao(): LinkPreviewDao
 
     companion object {
         @Volatile
