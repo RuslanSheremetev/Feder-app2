@@ -140,11 +140,13 @@ private fun YouTubeCard(
                         fontSize = 11.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f, fill = true)   // ← fill = true!
                     )
+                } else {
+                    Spacer(Modifier.weight(1f))
                 }
-                Spacer(Modifier.weight(1f))
                 if (time.isNotEmpty()) {
+                    Spacer(Modifier.width(4.dp))                          // ← небольшой отступ
                     Text(
                         time,
                         color = TextSite,
