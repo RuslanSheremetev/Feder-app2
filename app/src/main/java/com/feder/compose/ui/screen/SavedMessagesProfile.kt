@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import com.feder.compose.ui.components.PhotoViewer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
@@ -46,6 +47,7 @@ fun SavedMessagesProfile(
     mediaUrls: List<String> = emptyList()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var photoViewerIndex by remember { mutableStateOf<Int?>(null) }
     val tabs = listOf("Медиа", "Файлы", "Ссылки", "Музыка", "Голосовые", "Заметки")
 
     Column(
@@ -165,15 +167,28 @@ fun SavedMessagesProfile(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (mediaUrls.isNotEmpty()) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                        userScrollEnabled = false
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        items(mediaUrls) { url ->
-                            MediaThumb(url = url)
+                        mediaUrls.chunked(3).forEachIndexed { rowIdx, rowUrls ->
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                rowUrls.forEachIndexed { colIdx, url ->
+                                    val globalIndex = rowIdx * 3 + colIdx
+                                    Box(Modifier.weight(1f)) {
+                                        MediaThumb(
+                                            url = url,
+                                            onClick = { photoViewerIndex = globalIndex }
+                                        )
+                                    }
+                                }
+                                repeat(3 - rowUrls.size) {
+                                    Spacer(Modifier.weight(1f))
+                                }
+                            }
                         }
                     }
                 } else {
@@ -205,7 +220,7 @@ fun SavedMessagesProfile(
 }
 
 @Composable
-private fun MediaThumb(url: String) {
+private fun MediaThumb(url: String, onClick: () -> Unit = {}) {
     val fullUrl = when {
         url.startsWith("http://") || url.startsWith("https://") -> url
         url.startsWith("LOCAL:") -> url.removePrefix("LOCAL:")
@@ -214,7 +229,11 @@ private fun MediaThumb(url: String) {
         else -> "http://2.26.71.102:8012/uploads/$url"
     }
     Box(
-        Modifier.aspectRatio(1f).clip(RoundedCornerShape(4.dp)).background(Color(0xFF353534))
+        Modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFF353534))
+            .clickable { onClick() }
     ) {
         AsyncImage(
             model = fullUrl,

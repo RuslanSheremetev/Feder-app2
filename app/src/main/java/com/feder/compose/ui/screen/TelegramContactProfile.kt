@@ -1,6 +1,7 @@
 package com.feder.compose.ui.screen
 
 import androidx.compose.foundation.horizontalScroll
+import com.feder.compose.ui.components.PhotoViewer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -49,6 +50,7 @@ fun TelegramContactProfile(
     onMuteToggle: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var photoViewerIndex by remember { mutableStateOf<Int?>(null) }
     val tabs = listOf("Media", "Files", "Links", "Music", "Polls")
 
     val avatarFullUrl = when {
@@ -228,14 +230,18 @@ fun TelegramContactProfile(
                         Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        mediaUrls.chunked(3).forEach { rowUrls ->
+                        mediaUrls.chunked(3).forEachIndexed { rowIdx, rowUrls ->
                             Row(
                                 Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
-                                rowUrls.forEach { url ->
+                                rowUrls.forEachIndexed { colIdx, url ->
+                                    val globalIndex = rowIdx * 3 + colIdx
                                     Box(Modifier.weight(1f)) {
-                                        MediaThumb(url = url)
+                                        MediaThumb(
+                                            url = url,
+                                            onClick = { photoViewerIndex = globalIndex }
+                                        )
                                     }
                                 }
                                 // Добить пустыми, если ряд неполный
@@ -258,6 +264,15 @@ fun TelegramContactProfile(
             Spacer(Modifier.height(24.dp))
         }
     }
+
+        // ─── PhotoViewer (fullscreen) ───
+        photoViewerIndex?.let { idx ->
+            PhotoViewer(
+                urls = mediaUrls,
+                initialIndex = idx,
+                onClose = { photoViewerIndex = null }
+            )
+        }
 }
 
 @Composable
@@ -293,7 +308,7 @@ private fun InfoRow(value: String, label: String) {
 }
 
 @Composable
-private fun MediaThumb(url: String) {
+private fun MediaThumb(url: String, onClick: () -> Unit = {}) {
     val fullUrl = when {
         url.startsWith("http") -> url
         url.startsWith("/") -> "http://2.26.71.102:8010$url"
@@ -302,7 +317,11 @@ private fun MediaThumb(url: String) {
     }
     val context = LocalContext.current
     Box(
-        Modifier.aspectRatio(1f).clip(RoundedCornerShape(4.dp)).background(Color(0xFF353534))
+        Modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFF353534))
+            .clickable { onClick() }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context).data(fullUrl).crossfade(true).build(),
