@@ -254,7 +254,13 @@ fun extractFirstUrl(text: String): String? {
     com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: in=$text decoded=$decoded")
     // 2. Ищем URL
     val regex = Regex("""https?://[^\s<>"']+""", RegexOption.IGNORE_CASE)
-    val match = regex.find(decoded) ?: return null
+    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: BEFORE regex find")
+    val match = regex.find(decoded)
+    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: AFTER regex find match=${match?.value}")
+    if (match == null) {
+        com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: NO MATCH return null")
+        return null
+    }
     val url = match.value.trimEnd('.', ',', ';', ':', '!', '?', ')', ']', '}')
     com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: extracted=$url")
     return url
