@@ -33,11 +33,7 @@ class LinkPreviewRepository(
         // 1. Кэш
         val cached = dao.getFresh(url, System.currentTimeMillis() - cacheTtlMs)
         if (cached != null) {
-            try {
-                val http = OkHttpClient()
-                val body = Gson().toJson(mapOf("log" to "LinkPreviewRepo: CACHE HIT $url")).let { it.toRequestBody("application/json".toMediaType()) }
-                http.newCall(Request.Builder().url("$server/api/logs").post(body).build()).execute().close()
-            } catch (_: Exception) {}
+            com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: CACHE HIT $url")
             return cached
         }
 
@@ -53,11 +49,7 @@ class LinkPreviewRepository(
             resp.close()
 
             if (resp.code != 200 || body.isEmpty()) {
-                try {
-                val http = OkHttpClient()
-                val body2 = Gson().toJson(mapOf("log" to "LinkPreviewRepo: HTTP ${resp.code} $body")).toRequestBody("application/json".toMediaType())
-                http.newCall(Request.Builder().url("$server/api/logs").post(body2).build()).execute().close()
-            } catch (_: Exception) {}
+                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: HTTP ${resp.code} $body")
                 return null
             }
 
@@ -73,18 +65,10 @@ class LinkPreviewRepository(
                 fetchedAt = System.currentTimeMillis()
             )
             dao.insert(entity)
-            try {
-                val http = OkHttpClient()
-                val body = Gson().toJson(mapOf("log" to "LinkPreviewRepo: FETCH OK $url type=${entity.type}")).toRequestBody("application/json".toMediaType())
-                http.newCall(Request.Builder().url("$server/api/logs").post(body).build()).execute().close()
-            } catch (_: Exception) {}
+            com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FETCH OK $url type=${entity.type}")
             entity
         } catch (e: Exception) {
-            try {
-                val http = OkHttpClient()
-                val body = Gson().toJson(mapOf("log" to "LinkPreviewRepo: FAIL ${e.message}")).toRequestBody("application/json".toMediaType())
-                http.newCall(Request.Builder().url("$server/api/logs").post(body).build()).execute().close()
-            } catch (_: Exception) {}
+            com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FAIL ${e.message}")
             null
         }
     }
