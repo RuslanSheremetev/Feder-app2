@@ -224,15 +224,25 @@ fun TelegramContactProfile(
                         Text("No media yet", color = Color(0xFFC0C7D4), fontSize = 14.sp)
                     }
                 } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier.fillMaxWidth().heightIn(max = 600.dp).padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                        userScrollEnabled = false
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        items(mediaUrls) { url ->
-                            MediaThumb(url = url)
+                        mediaUrls.chunked(3).forEach { rowUrls ->
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                rowUrls.forEach { url ->
+                                    Box(Modifier.weight(1f)) {
+                                        MediaThumb(url = url)
+                                    }
+                                }
+                                // Добить пустыми, если ряд неполный
+                                repeat(3 - rowUrls.size) {
+                                    Spacer(Modifier.weight(1f))
+                                }
+                            }
                         }
                     }
                 }
