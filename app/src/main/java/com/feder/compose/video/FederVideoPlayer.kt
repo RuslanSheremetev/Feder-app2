@@ -16,8 +16,11 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import com.github.haarigerharald.android.youtubeExtractor.YouTubeUriExtractor
 import java.util.concurrent.atomic.AtomicBoolean
+import at.huber.youtubeExtractor.YouTubeUriExtractor
+import at.huber.youtubeExtractor.YtFile
+import at.huber.youtubeExtractor.VideoMeta
+import android.util.SparseArray
 
 /**
  * FederVideoPlayer v2 — на Media3/ExoPlayer.
@@ -117,36 +120,36 @@ class FederVideoPlayer(private val ctx: Context) {
     }
 
     private fun prepareYouTube(url: String) {
-        // YouTubeUriExtractor работает асинхронно
-        val extractor = YouTubeUriExtractor(ctx)
-        extractor.setListener(object : YouTubeUriExtractor.YouTubeUriExtractorListener {
-            override fun onUrisAvailable(videoId: String?, videoTitle: String?, videoUris: Map<String, Uri>?) {
-                if (videoUris.isNullOrEmpty()) {
+        // YouTubeUriExtractor — абстрактный класс, наследуемся анонимно
+        val extractor = object : YouTubeUriExtractor(ctx) {
+            override fun onUrisAvailable(
+                videoId: String?,
+                videoTitle: String?,
+                ytFiles: SparseArray<YtFile>?
+            ) {
+                if (ytFiles == null || ytFiles.size() == 0) {
                     onError?.invoke("YouTube: no playable URLs (age-restricted or blocked)")
                     return
                 }
-                // Выбираем лучшее качество (например, 720p или ближайшее)
-                val bestUrl = pickBestQuality(videoUris)
-                if (bestUrl != null) {
-                    prepareDirect(bestUrl)
+                // Приоритет: 22 = 720p, 18 = 360p, 17 = 144p; fallback — последний
+                val ytFile = ytFiles.get(22)
+                    ?: ytFiles.get(18)
+                    ?: ytFiles.get(17)
+                    ?: ytFiles.valueAt(ytFiles.size() - 1)
+                val playUrl = ytFile?.url
+                if (playUrl.isNullOrEmpty()) {
+                    onError?.invoke("YouTube: unable to pick URL")
                 } else {
-                    onError?.invoke("YouTube: unable to pick quality")
+                    android.util.Log.d("FederVideoPlayer",
+                        "YouTube: ${videoTitle ?: ""} → $playUrl")
+                    prepareDirect(playUrl)
                 }
             }
-        })
-        extractor.extract(url)
-    }
-
-    private fun pickBestQuality(uris: Map<String, Uri>): String? {
-        // Приоритет: 720p → 480p → 360p → любой
-        val priority = listOf("720p", "480p", "360p", "240p", "144p")
-        for (q in priority) {
-            uris[q]?.let { return it.toString() }
         }
-        return uris.values.firstOrNull()?.toString()
+        extractor.extract(url, false, false)
     }
 
-    private fun isYouTube(url: String): Boolean {
+private fun isYouTube(url: String): Boolean {
         return url.contains("youtube.com/watch") ||
                url.contains("youtu.be/") ||
                url.contains("youtube.com/shorts/") ||
