@@ -217,6 +217,15 @@ fun SavedMessagesProfile(
             }
         }
     }
+
+        // ─── PhotoViewer (fullscreen) ───
+        photoViewerIndex?.let { idx ->
+            PhotoViewer(
+                urls = mediaUrls,
+                initialIndex = idx,
+                onClose = { photoViewerIndex = null }
+            )
+        }
 }
 
 @Composable
