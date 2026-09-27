@@ -36,6 +36,8 @@ fun LinkPreviewCard(
     url: String,
     token: String,
     isMine: Boolean,
+    time: String = "",
+    msgStatus: String = "sent",
     repository: LinkPreviewRepository?,
     onYouTubeClick: (videoId: String) -> Unit = {}
 ) {
@@ -69,7 +71,7 @@ fun LinkPreviewCard(
     val p = preview ?: return
 
     when (p.type) {
-        "youtube" -> YouTubeCard(p, isMine) { vid -> onYouTubeClick(vid) }
+        "youtube" -> YouTubeCard(p, isMine, time, msgStatus) { vid -> onYouTubeClick(vid) }
         "article" -> ArticleCard(p, isMine) { openUrl(url) }
         "image"   -> ImageCard(p, isMine) { openUrl(url) }
         else      -> GenericCard(p, isMine) { openUrl(url) }
@@ -80,6 +82,8 @@ fun LinkPreviewCard(
 private fun YouTubeCard(
     p: LinkPreviewEntity,
     isMine: Boolean,
+    time: String,
+    msgStatus: String,
     onPlay: (String) -> Unit
 ) {
     val bg = if (isMine) CardBgMine else CardBg
@@ -124,15 +128,43 @@ private fun YouTubeCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            if (!p.description.isNullOrEmpty()) {
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    p.description,
-                    color = TextSite,
-                    fontSize = 11.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            Spacer(Modifier.height(4.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (!p.description.isNullOrEmpty()) {
+                    Text(
+                        p.description,
+                        color = TextSite,
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                if (time.isNotEmpty()) {
+                    Text(
+                        time,
+                        color = TextSite,
+                        fontSize = 10.sp,
+                        maxLines = 1
+                    )
+                    if (isMine) {
+                        Spacer(Modifier.width(2.dp))
+                        Text(
+                            when (msgStatus) {
+                                "read" -> "✓✓"
+                                "received" -> "✓✓"
+                                else -> "✓"
+                            },
+                            color = if (msgStatus == "read") Color(0xFF4CAF50) else TextSite,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }

@@ -447,6 +447,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                     url = firstUrl,
                                     token = token,
                                     isMine = isMine,
+                                    time = time,
+                                    msgStatus = msg.status,
                                     repository = linkPreviewRepo,
                                     onYouTubeClick = onYouTubeClick
                                 )
@@ -539,6 +541,8 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             url = firstUrl,
                             token = token,
                             isMine = isMine,
+                            time = time,
+                            msgStatus = msg.status,
                             repository = linkPreviewRepo,
                             onYouTubeClick = onYouTubeClick
                         )
