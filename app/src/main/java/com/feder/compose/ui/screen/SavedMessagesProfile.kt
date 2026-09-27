@@ -24,6 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 // ─── Хардкод цветов (не тянем из Theme.kt, чтобы файл компилировался сам) ───
 private val Bg               = Color(0xFF131313)
@@ -37,7 +42,8 @@ private val OutlineVariant   = Color(0xFF404752)
 
 @Composable
 fun SavedMessagesProfile(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    mediaUrls: List<String> = emptyList()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Медиа", "Файлы", "Ссылки", "Музыка", "Голосовые", "Заметки")
@@ -158,28 +164,63 @@ fun SavedMessagesProfile(
                     .padding(top = 40.dp, bottom = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    Icons.Filled.Bookmark,
-                    contentDescription = null,
-                    tint = OutlineVariant,
-                    modifier = Modifier.size(64.dp)
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    "Нет медиа",
-                    color = OnSurfaceVar,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    "Всё, что вы сохраняете — фото, видео, документы — появится здесь",
-                    color = Outline,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 40.dp)
-                )
+                if (mediaUrls.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                        userScrollEnabled = false
+                    ) {
+                        items(mediaUrls) { url ->
+                            MediaThumb(url = url)
+                        }
+                    }
+                } else {
+                    Icon(
+                        Icons.Filled.Bookmark,
+                        contentDescription = null,
+                        tint = OutlineVariant,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Нет медиа",
+                        color = OnSurfaceVar,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "Всё, что вы сохраняете — фото, видео, документы — появится здесь",
+                        color = Outline,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 40.dp)
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun MediaThumb(url: String) {
+    val fullUrl = when {
+        url.startsWith("http://") || url.startsWith("https://") -> url
+        url.startsWith("LOCAL:") -> url.removePrefix("LOCAL:")
+        url.endsWith(".mp4") -> "http://2.26.71.102:8018/videos/$url"
+        url.startsWith("/uploads/") -> "http://2.26.71.102:8012$url"
+        else -> "http://2.26.71.102:8012/uploads/$url"
+    }
+    Box(
+        Modifier.aspectRatio(1f).clip(RoundedCornerShape(4.dp)).background(Color(0xFF353534))
+    ) {
+        AsyncImage(
+            model = fullUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

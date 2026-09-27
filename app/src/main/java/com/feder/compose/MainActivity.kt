@@ -614,6 +614,11 @@ fun FederApp() {
             }
         }
     }
+    LaunchedEffect(viewModel.showSavedProfile) {
+        if (viewModel.showSavedProfile) {
+            viewModel.loadProfileMedia("demo")
+        }
+    }
     LaunchedEffect(viewModel.wsStatus) {
         if (viewModel.wsStatus.isNotEmpty()) {
             Toast.makeText(context, "WS: ${viewModel.wsStatus}", Toast.LENGTH_SHORT).show()
@@ -627,7 +632,8 @@ fun FederApp() {
             when {
                 viewModel.showSavedProfile -> {
                     com.feder.compose.ui.screen.SavedMessagesProfile(
-                        onBack = { viewModel.showSavedProfile = false }
+                        onBack = { viewModel.showSavedProfile = false },
+                        mediaUrls = viewModel.profileMediaUrls
                     )
                 }
                 viewModel.selectedProfile != null -> {
