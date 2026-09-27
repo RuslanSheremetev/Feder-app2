@@ -530,6 +530,20 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         }
                     }
                 }
+                // ─── Link Preview (для обычного текста) ───
+                if (text.isNotEmpty() && linkPreviewRepo != null) {
+                    val firstUrl = extractFirstUrl(text)
+                    if (firstUrl != null) {
+                        Spacer(Modifier.height(4.dp))
+                        LinkPreviewCard(
+                            url = firstUrl,
+                            token = token,
+                            isMine = isMine,
+                            repository = linkPreviewRepo,
+                            onYouTubeClick = onYouTubeClick
+                        )
+                    }
+                }
             }
             if (msg.reactions.isNotEmpty()) {
                 Spacer(Modifier.height(2.dp))
