@@ -30,6 +30,8 @@ class LinkPreviewRepository(
     private val cacheTtlMs = 7L * 24 * 60 * 60 * 1000
 
     suspend fun getPreview(url: String, token: String): LinkPreviewEntity? {
+        com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: getPreview START url=$url")
+
         // 1. Кэш
         val cached = dao.getFresh(url, System.currentTimeMillis() - cacheTtlMs)
         if (cached != null) {
@@ -37,39 +39,43 @@ class LinkPreviewRepository(
             return cached
         }
 
-        // 2. Запрос к серверу
-        return try {
-            val encoded = java.net.URLEncoder.encode(url, "UTF-8")
-            val req = Request.Builder()
-                .url("$server/api/link_preview?url=$encoded")
-                .header("Authorization", "Bearer $token")
-                .build()
-            val resp = http.newCall(req).execute()
-            val body = resp.body?.string() ?: ""
-            resp.close()
+        // 2. Запрос к серверу — В ФОНОВОМ ПОТОКЕ
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: HTTP GET start")
+                val encoded = java.net.URLEncoder.encode(url, "UTF-8")
+                val req = Request.Builder()
+                    .url("$server/api/link_preview?url=$encoded")
+                    .header("Authorization", "Bearer $token")
+                    .build()
+                val resp = http.newCall(req).execute()
+                val body = resp.body?.string() ?: ""
+                resp.close()
+                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: HTTP ${resp.code} len=${body.length}")
 
-            if (resp.code != 200 || body.isEmpty()) {
-                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: HTTP ${resp.code} $body")
-                return null
+                if (resp.code != 200 || body.isEmpty()) {
+                    com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: HTTP FAIL ${resp.code}")
+                    return@withContext null
+                }
+
+                val json = JsonParser.parseString(body).asJsonObject
+                val entity = LinkPreviewEntity(
+                    url = url,
+                    type = json.get("type")?.asString ?: "generic",
+                    title = json.get("title")?.asString,
+                    description = json.get("description")?.asString,
+                    image = json.get("image")?.asString,
+                    siteName = json.get("site_name")?.asString,
+                    videoId = json.get("video_id")?.asString,
+                    fetchedAt = System.currentTimeMillis()
+                )
+                dao.insert(entity)
+                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FETCH OK type=${entity.type} title=${entity.title}")
+                entity
+            } catch (e: Exception) {
+                com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FAIL ${e.javaClass.simpleName}: ${e.message}")
+                null
             }
-
-            val json = JsonParser.parseString(body).asJsonObject
-            val entity = LinkPreviewEntity(
-                url = url,
-                type = json.get("type")?.asString ?: "generic",
-                title = json.get("title")?.asString,
-                description = json.get("description")?.asString,
-                image = json.get("image")?.asString,
-                siteName = json.get("site_name")?.asString,
-                videoId = json.get("video_id")?.asString,
-                fetchedAt = System.currentTimeMillis()
-            )
-            dao.insert(entity)
-            com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FETCH OK $url type=${entity.type}")
-            entity
-        } catch (e: Exception) {
-            com.feder.compose.FederHttpClient().sendLog("LinkPreviewRepo: FAIL ${e.message}")
-            null
         }
     }
 }
