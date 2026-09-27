@@ -141,6 +141,7 @@ class ChatViewModel : ViewModel() {
     private val server = "http://2.26.71.102:8004"
     private var database: FederDatabase? = null
     var repository: ChatRepository? = null
+    var linkPreviewRepository: com.feder.compose.repository.LinkPreviewRepository? = null
     // Канал обновлений реакций (message_id -> reactions_json)
     private val _reactionUpdates = kotlinx.coroutines.flow.MutableSharedFlow<Pair<Long, String>>(
         replay = 0,
@@ -153,6 +154,7 @@ class ChatViewModel : ViewModel() {
         if (database == null) {
             database = FederDatabase.getInstance(context)
             repository = ChatRepository(database!!.messageDao(), database!!.chatDao())
+            linkPreviewRepository = com.feder.compose.repository.LinkPreviewRepository(database!!.linkPreviewDao())
         }
     }
     var token by mutableStateOf("")
@@ -665,6 +667,7 @@ fun FederApp() {
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
+                    linkPreviewRepo = viewModel.linkPreviewRepository,
                     reactionUpdates = viewModel.reactionUpdates,
                     onBack = { viewModel.selectedChat = null },
                     onMessageSent = { username, text ->

@@ -83,6 +83,9 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.feder.compose.video.VideoBubble
 import com.feder.compose.video.FullscreenVideoPlayer
+import com.feder.compose.ui.components.LinkPreviewCard
+import com.feder.compose.ui.components.extractFirstUrl
+import com.feder.compose.repository.LinkPreviewRepository
 import coil.request.ImageRequest
 import coil.imageLoader
 import com.feder.compose.ProWebSocket
@@ -192,7 +195,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo") {
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {}) {
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -435,6 +438,20 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
+                        // ─── Link Preview ───
+                        if (msg.text.isNotEmpty() && linkPreviewRepo != null) {
+                            val firstUrl = extractFirstUrl(msg.text)
+                            if (firstUrl != null) {
+                                Spacer(Modifier.height(4.dp))
+                                LinkPreviewCard(
+                                    url = firstUrl,
+                                    token = token,
+                                    isMine = isMine,
+                                    repository = linkPreviewRepo,
+                                    onYouTubeClick = onYouTubeClick
+                                )
+                            }
+                        }
                     }
                     }  // end else (photo)
                 } else if (msg.imageUrl != null) {
@@ -608,7 +625,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null) {
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null) {
     val context = LocalContext.current
 
     // ─── Системный back (свайп от края + кнопка назад) ───
@@ -754,6 +771,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     var forwardMultiSelect by remember { mutableStateOf(false) }
     var forwardMessage by remember { mutableStateOf("") }
+    var youtubeVideoId by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
@@ -1577,6 +1595,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             position = position,
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
                             allChats = allChats, myUsername = myUsername,
+                            linkPreviewRepo = linkPreviewRepo,
+                            onYouTubeClick = { vid -> youtubeVideoId = vid },
                             onClick = {
                                     if (selectionMode) {
                                         if (selectedMessages.contains(msg.id.toString())) {
@@ -2105,6 +2125,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
+        // ─── YouTube fullscreen player ───
+        youtubeVideoId?.let { vid ->
+            com.feder.compose.video.FullscreenVideoPlayer(
+                videoUrl = "https://www.youtube.com/watch?v=$vid",
+                token = token,
+                onClose = { youtubeVideoId = null }
+            )
+        }
+
         if (showEmojiSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showEmojiSheet = false })
             Column(
