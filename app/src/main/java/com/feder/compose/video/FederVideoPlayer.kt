@@ -140,8 +140,7 @@ class FederVideoPlayer(private val ctx: Context) {
                 if (playUrl.isNullOrEmpty()) {
                     onError?.invoke("YouTube: unable to pick URL")
                 } else {
-                    android.util.Log.d("FederVideoPlayer",
-                        "YouTube: ${videoTitle ?: ""} → $playUrl")
+                    com.feder.compose.FederHttpClient().sendLog("FederVideoPlayer: YouTube OK title=$videoTitle url=$playUrl")
                     prepareDirect(playUrl)
                 }
             }
