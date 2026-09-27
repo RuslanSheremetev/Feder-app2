@@ -217,7 +217,7 @@ private fun isYouTube(url: String): Boolean {
         Thread {
             while (tickerActive.get()) {
                 try {
-                    onProgress?.invoke(currentPosition())
+                    onProgress?.invoke((player?.currentPosition ?: 0L).toInt())
                     Thread.sleep(200)
                 } catch (_: InterruptedException) { break }
             }
