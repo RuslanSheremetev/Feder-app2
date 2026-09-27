@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import androidx.compose.foundation.clickable
 
 // ─── Хардкод цветов (не тянем из Theme.kt, чтобы файл компилировался сам) ───
 private val Bg               = Color(0xFF131313)
