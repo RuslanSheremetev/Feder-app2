@@ -89,7 +89,7 @@ private fun YouTubeCard(
     val bg = if (isMine) CardBgMine else CardBg
     Column(
         Modifier
-            .width(260.dp)
+            .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .clickable {
