@@ -512,7 +512,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                     } else {
                         Spacer(Modifier.weight(1f))
                     }
-                    if (time.isNotEmpty() && msg.reactions.isEmpty()) {
+                    // Скрыть время, если есть link preview (оно уже внутри карточки)
+                    val hasLinkPreview = linkPreviewRepo != null && extractFirstUrl(text) != null
+                    if (time.isNotEmpty() && msg.reactions.isEmpty() && !hasLinkPreview) {
                         Spacer(Modifier.width(6.dp))
                         Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.align(Alignment.Bottom).offset(y = (-1).dp))
                         if (isMine) {
