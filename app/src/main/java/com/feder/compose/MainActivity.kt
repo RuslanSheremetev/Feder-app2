@@ -973,7 +973,7 @@ fun FederApp() {
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
                 Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 12.dp, tonalElevation = 0.dp, border = BorderStroke(0.1.dp, Color(0xFF3A3A3A))) {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                        listOf("Chats" to Icons.Filled.ChatBubble, "Contacts" to Icons.Filled.Contacts, "Discovery" to Icons.Filled.Explore, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
+                        listOf("Chats" to Icons.Outlined.ChatBubbleOutline, "Contacts" to Icons.Outlined.Contacts, "Discovery" to Icons.Outlined.Explore, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
                             Column(Modifier.weight(1f).fillMaxHeight().clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(22.dp))
