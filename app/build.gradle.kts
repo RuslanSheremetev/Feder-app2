@@ -73,5 +73,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-hls:1.4.1")
     implementation("androidx.media3:media3-datasource-okhttp:1.4.1")
     // YouTube Extractor (получение прямых URL из YouTube)
-    implementation("com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT")
+    implementation("com.github.HaarigerHarald:android-youtubeExtractor:v2.1.0")
 }
