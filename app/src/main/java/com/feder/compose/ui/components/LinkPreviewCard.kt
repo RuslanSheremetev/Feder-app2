@@ -88,7 +88,10 @@ private fun YouTubeCard(
             .width(260.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
-            .clickable { p.videoId?.let(onPlay) }
+            .clickable {
+                com.feder.compose.FederHttpClient().sendLog("YouTubeCard CLICK videoId=${p.videoId}")
+                p.videoId?.let(onPlay)
+            }
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
             if (!p.image.isNullOrEmpty()) {
