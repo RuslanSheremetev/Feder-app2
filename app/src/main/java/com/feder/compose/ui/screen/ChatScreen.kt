@@ -1501,7 +1501,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                         if (chatUsername != myUsername) {
                             IconButton(onClick = { }) { Icon(Icons.Filled.Videocam, "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
-                            IconButton(onClick = { }) { Icon(Icons.Filled.Call, "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
+                            IconButton(onClick = { }) { Icon(painter = painterResource(R.drawable.ic_phone_outline), contentDescription = "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                         }
                     }
                     var showMoreMenu by remember { mutableStateOf(false) }
