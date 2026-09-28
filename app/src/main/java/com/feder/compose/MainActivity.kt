@@ -14,6 +14,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.expandVertically
@@ -771,6 +776,20 @@ fun FederApp() {
                     }
                 }
                 else -> {
+                    // Анимированный переход между табами (slide)
+                    AnimatedContent(
+                        targetState = viewModel.selectedTab,
+                        transitionSpec = {
+                            if (targetState > initialState) {
+                                (slideInHorizontally(animationSpec = tween(280)) { it } + fadeIn(tween(280)))
+                                    .togetherWith(slideOutHorizontally(animationSpec = tween(280)) { -it / 4 } + fadeOut(tween(280)))
+                            } else {
+                                (slideInHorizontally(animationSpec = tween(280)) { -it } + fadeIn(tween(280)))
+                                    .togetherWith(slideOutHorizontally(animationSpec = tween(280)) { it / 4 } + fadeOut(tween(280)))
+                            }
+                        },
+                        label = "tab_slide"
+                    ) { _ ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (viewModel.selectedTab == 1) {
                         ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" }, onBack = { viewModel.selectedTab = 0 })
@@ -993,6 +1012,7 @@ fun FederApp() {
                         }
                     }
                 }
+                    }
             }
 
             }
