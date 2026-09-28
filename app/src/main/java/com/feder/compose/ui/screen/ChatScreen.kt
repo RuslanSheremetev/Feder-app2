@@ -48,6 +48,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -1586,7 +1587,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 )
                                 Spacer(Modifier.width(8.dp))
                             }
-                            Box(modifier = Modifier) {
+                            Box(modifier = Modifier.onGloballyPositioned { coords ->
+                                msgPositions[msg.id] = coords.positionInRoot()
+                            }) {
                                 MessageBubble(
                             msg,
                             msg.text,
@@ -1831,15 +1834,34 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
+            val density = LocalDensity.current
+            val screenHeightPx = context.resources.displayMetrics.heightPixels
+            val screenWidthPx = context.resources.displayMetrics.widthPixels
+            val menuHeightPx = with(density) { 480.dp.toPx() }
+            val menuWidthPx = with(density) { 260.dp.toPx() }
+            val msg = selectedMessage!!
+            val isMyMsg = msg.from == myUsername
+            val msgY = msg.posY
+            val msgX = msg.posX
+            // Y: под сообщением, если влезает; иначе над
+            val menuY = if (msgY + menuHeightPx + 100 < screenHeightPx) {
+                (msgY + 16).toInt().coerceAtLeast(80)
+            } else {
+                (msgY - menuHeightPx).toInt().coerceAtLeast(80)
+            }
+            // X: справа для "моих", слева для чужих
+            val menuX = if (isMyMsg) {
+                (msgX - menuWidthPx - 16).toInt().coerceAtLeast(16)
+            } else {
+                (msgX + 16).toInt().coerceAtMost((screenWidthPx - menuWidthPx - 16).toInt())
+            }
             Popup(
-                onDismissRequest = { selectedMessage = null; showDeleteSub = false }
+                onDismissRequest = { selectedMessage = null; showDeleteSub = false },
+                alignment = Alignment.TopStart,
+                offset = IntOffset(menuX, menuY)
             ) {
-                val screenHeight = context.resources.displayMetrics.heightPixels
-                val rawY = selectedMessage!!.posY.toInt() - 300
-                val clampedY = rawY.coerceIn(80, screenHeight - 650)
-                val topPadding = with(LocalDensity.current) { clampedY.toDp() }
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
-                Column(Modifier.fillMaxWidth().padding(end = 16.dp).padding(top = topPadding), horizontalAlignment = Alignment.End) {
+                Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
                         var showAllReactions by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
                     Surface(shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
