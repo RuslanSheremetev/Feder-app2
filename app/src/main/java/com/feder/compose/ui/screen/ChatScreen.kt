@@ -256,7 +256,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
             }
         ) else Modifier).clip(RoundedCornerShape(ts, te, be, bs)).background(
             Brush.verticalGradient(
-                colors = if (isMine) listOf(Color(0xFF7B87DA), Color(0xFF4F3AC4))
+                colors = if (isMine) listOf(Color(0xFF5EA8FF), Color(0xFF339DFF))
                          else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
             )
         )) {
