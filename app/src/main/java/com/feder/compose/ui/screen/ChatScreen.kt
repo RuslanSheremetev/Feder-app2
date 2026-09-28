@@ -1562,8 +1562,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
-                @OptIn(ExperimentalFoundationApi::class)
-                            stickyHeader(key = "sticky_$date") {
+                            item(key = "header_$date") {
                                 Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh, shadowElevation = 2.dp) {
                                         Text(date, color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
