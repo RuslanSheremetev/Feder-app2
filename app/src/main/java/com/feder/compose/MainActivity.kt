@@ -743,7 +743,7 @@ fun FederApp() {
                 }) {
                     Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
-                Box {
+                Box(Modifier.align(Alignment.CenterVertically)) {
                     var showMoreMenu by remember { mutableStateOf(false) }
                     Icon(Icons.Filled.MoreVert, "menu", tint = Color.White, modifier = Modifier.padding(start = 16.dp, end = 16.dp).size(24.dp).clickable { showMoreMenu = true })
                     if (showMoreMenu) {
