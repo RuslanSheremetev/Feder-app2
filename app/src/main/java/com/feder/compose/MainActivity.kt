@@ -830,44 +830,7 @@ fun FederApp() {
                         contentPadding = PaddingValues(bottom = 72.dp)
                     ) {
                         item { Spacer(Modifier.height(64.dp)) }
-                        // Поиск — появляется по нажатию на лупу
-                        item {
-                            AnimatedVisibility(
-                                visible = viewModel.isSearchVisible,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 8.dp),
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = SurfaceContainerHigh
-                                ) {
-                                    Row(
-                                        modifier = Modifier.height(40.dp).padding(horizontal = 16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
-                                        Spacer(Modifier.width(8.dp))
-                                        BasicTextField(
-                                            value = viewModel.searchQuery,
-                                            onValueChange = { viewModel.searchQuery = it },
-                                            singleLine = true,
-                                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
-                                            cursorBrush = SolidColor(Primary),
-                                            modifier = Modifier.weight(1f),
-                                            decorationBox = { innerTextField ->
-                                                Box {
-                                                    if (viewModel.searchQuery.isEmpty()) {
-                                                        Text("Search chats...", color = Outline, fontSize = 14.sp)
-                                                    }
-                                                    innerTextField()
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
+
                         
             // Stories Block
             item {
@@ -943,6 +906,45 @@ fun FederApp() {
             }
 
                         // Список чатов
+                                                // Поиск — появляется по нажатию на лупу
+                        item {
+                            AnimatedVisibility(
+                                visible = viewModel.isSearchVisible,
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 8.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = SurfaceContainerHigh
+                                ) {
+                                    Row(
+                                        modifier = Modifier.height(40.dp).padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Filled.Search, "search", tint = Outline, modifier = Modifier.size(20.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        BasicTextField(
+                                            value = viewModel.searchQuery,
+                                            onValueChange = { viewModel.searchQuery = it },
+                                            singleLine = true,
+                                            textStyle = TextStyle(color = OnSurface, fontSize = 14.sp),
+                                            cursorBrush = SolidColor(Primary),
+                                            modifier = Modifier.weight(1f),
+                                            decorationBox = { innerTextField ->
+                                                Box {
+                                                    if (viewModel.searchQuery.isEmpty()) {
+                                                        Text("Search chats...", color = Outline, fontSize = 14.sp)
+                                                    }
+                                                    innerTextField()
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         items(viewModel.filteredChats) { chat ->
                             val avColor = try { 
     if (chat.avatarColor.isNotEmpty() && chat.avatarColor.startsWith("#")) Color(android.graphics.Color.parseColor(chat.avatarColor)) else Primary 
