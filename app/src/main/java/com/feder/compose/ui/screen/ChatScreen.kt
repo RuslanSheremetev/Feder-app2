@@ -1,5 +1,6 @@
 package com.feder.compose.ui.screen
 
+import com.feder.compose.R
 import androidx.activity.compose.BackHandler
 import com.feder.compose.ChatItem
 import android.Manifest
@@ -56,6 +57,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import android.provider.MediaStore
 import androidx.compose.ui.text.TextStyle
@@ -1756,7 +1758,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         verticalAlignment = Alignment.Bottom
                     ) {
                         IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
+                            Icon(painter = painterResource(R.drawable.ic_attach_clip), contentDescription = "attach", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         Box(modifier = Modifier.weight(1f)) {
                             BasicTextField(
@@ -2304,7 +2306,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.Bottom) {
                     IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
-                        Icon(Icons.Filled.Add, "add", tint = Color.White, modifier = Modifier.size(24.dp))
+                        Icon(painter = painterResource(R.drawable.ic_attach_clip), contentDescription = "attach", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
                     Box(modifier = Modifier.weight(1f).then(if (expandInput) Modifier.fillMaxHeight() else Modifier)) {
                         BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
