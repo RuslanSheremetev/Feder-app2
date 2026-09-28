@@ -825,6 +825,22 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
 
+    fun formatHeaderDate(timeVal: Long): String {
+        if (timeVal == 0L) return ""
+        val msgDate = java.util.Date(timeVal * 1000)
+        val today = java.util.Calendar.getInstance()
+        val msgCal = java.util.Calendar.getInstance().apply { time = msgDate }
+        val sdf = SimpleDateFormat("d MMMM", java.util.Locale("en"))
+        val sdfYear = SimpleDateFormat("d MMMM yyyy", java.util.Locale("en"))
+        return when {
+            today.get(java.util.Calendar.DAY_OF_YEAR) == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Today"
+            today.get(java.util.Calendar.DAY_OF_YEAR) - 1 == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Yesterday"
+            today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> sdf.format(msgDate)
+            else -> sdfYear.format(msgDate)
+        }
+    }
 
     var internalToken = token
 
@@ -2561,23 +2577,5 @@ private fun pluralMessages(n: Int): String {
         mod10 == 1 && mod100 != 11 -> "сообщение"
         mod10 in 2..4 && (mod100 !in 12..14) -> "сообщения"
         else -> "сообщений"
-    }
-}
-
-// ─── Top-level helper для dateInHeader (вне Composable) ───
-private fun formatHeaderDate(timeVal: Long): String {
-    if (timeVal == 0L) return ""
-    val msgDate = java.util.Date(timeVal * 1000)
-    val today = java.util.Calendar.getInstance()
-    val msgCal = java.util.Calendar.getInstance().apply { time = msgDate }
-    val sdf = SimpleDateFormat("d MMMM", java.util.Locale("en"))
-    val sdfYear = SimpleDateFormat("d MMMM yyyy", java.util.Locale("en"))
-    return when {
-        today.get(java.util.Calendar.DAY_OF_YEAR) == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
-        today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Today"
-        today.get(java.util.Calendar.DAY_OF_YEAR) - 1 == msgCal.get(java.util.Calendar.DAY_OF_YEAR) &&
-        today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Yesterday"
-        today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> sdf.format(msgDate)
-        else -> sdfYear.format(msgDate)
     }
 }
