@@ -789,11 +789,11 @@ fun FederApp() {
                             }
                         },
                         label = "tab_slide"
-                    ) { _ ->
+                    ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
-                    if (viewModel.selectedTab == 1) {
+                    if (targetTab == 1) {
                         ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" }, onBack = { viewModel.selectedTab = 0 })
-                    } else if (viewModel.selectedTab == 2) {
+                    } else if (targetTab == 2) {
                         MyProfileScreen(
                             username = viewModel.currentUsername.ifEmpty { "demo" },
                             displayName = viewModel.chats.find { it.username == "demo" }?.name ?: "Demo",
@@ -804,7 +804,7 @@ fun FederApp() {
                             onSettings = { viewModel.selectedTab = 3 },
                             onAddPost = { }
                         )
-                    } else if (viewModel.selectedTab == 3) {
+                    } else if (targetTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {
                     if (viewModel.isRefreshing) {
