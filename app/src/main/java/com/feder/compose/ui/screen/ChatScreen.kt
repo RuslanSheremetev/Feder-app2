@@ -1882,12 +1882,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         Column {
                             if (!showAllReactions) {
-                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(Modifier.padding(horizontal = 10.dp, vertical = 5.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
                                     allReactions.take(6).forEach { emoji ->
-                                        Box(Modifier.size(36.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 22.sp) }
+                                        Box(Modifier.size(30.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 18.sp) }
                                     }
-                                    Box(Modifier.size(36.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
-                                        Text("›", color = OnSurfaceVariant, fontSize = 20.sp)
+                                    Box(Modifier.size(30.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
+                                        Text("›", color = OnSurfaceVariant, fontSize = 16.sp)
                                     }
                                 }
                             } else {
