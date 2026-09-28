@@ -48,7 +48,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -201,7 +200,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Box(Modifier.fillMaxWidth().padding(top = vertPad).onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInRoot()) }, contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
+    Box(Modifier.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         // Динамический размер фото через Coil painter
@@ -375,7 +374,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                                         else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                     )
                                         .size(360, 480)
-                                        .crossfade(true)
+                                        .crossfade(false)
                                         .diskCacheKey(url)
                                         .memoryCacheKey(url)
                                         .diskCachePolicy(coil.request.CachePolicy.ENABLED)
@@ -459,7 +458,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current).data(if (msg.imageUrl?.startsWith("content://") == true || msg.imageUrl?.startsWith("file://") == true) msg.imageUrl else if (msg.imageUrl?.startsWith("http") == true) "${msg.imageUrl}?token=$token" else "http://2.26.71.102:8012/uploads/${msg.imageUrl}?token=$token")
                             .size(360, 480)
-                            .crossfade(true)
+                            .crossfade(false)
                             .diskCacheKey((msg.imageUrl ?: "").substringBefore("?"))
                             .memoryCacheKey((msg.imageUrl ?: "").substringBefore("?"))
                             .diskCachePolicy(coil.request.CachePolicy.ENABLED)
@@ -615,7 +614,7 @@ fun MiniAvatar(url: String?, username: String) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(if (url.startsWith("/")) "http://2.26.71.102:8010$url" else url)
-                    .crossfade(true)
+                    .crossfade(false)
                     .build(),
                 contentDescription = username,
                 modifier = Modifier.fillMaxSize().clip(CircleShape),
@@ -1072,23 +1071,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     // Обновляем дату в шапке при прокрутке
-            LaunchedEffect(listState.isScrollInProgress, listState.firstVisibleItemIndex) {
+            // ⚡ ОПТИМИЗАЦИЯ: скролл-эффект для dateInHeader убран (был O(n) на каждый кадр)
+            // Дата в шапке теперь обновляется реже (только при изменении первого видимого элемента)
+            LaunchedEffect(listState.firstVisibleItemIndex) {
                 if (listState.isScrollInProgress) {
                     val items = listState.layoutInfo.visibleItemsInfo
                     if (items.isNotEmpty()) {
                         val firstVisibleIdx = items.firstOrNull()?.index ?: 0
                         val firstDt = if (messages.isNotEmpty() && firstVisibleIdx < messages.size) formatHeaderDate(messages[firstVisibleIdx].timeVal) else ""
-                        // Ищем границу: идём вперёд пока дата не изменится
-                        var headerDate = firstDt
-                        for (i in firstVisibleIdx until messages.size) {
-                            val dt = formatHeaderDate(messages[i].timeVal)
-                            if (dt.isNotEmpty() && dt != firstDt) {
-                                headerDate = dt
-                                break
-                            }
-                        }
                         val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                        dateInHeader.value = if (headerDate.isNotEmpty() && headerDate != lastDate) headerDate else ""
+                        dateInHeader.value = if (firstDt.isNotEmpty() && firstDt != lastDate) firstDt else ""
                     }
                 } else {
                     dateInHeader.value = ""
@@ -1506,7 +1498,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     Icon(Icons.Filled.Bookmark, "saved", tint = Color.White, modifier = Modifier.size(22.dp))
                                 }
                             } else if (avatarUrl != null) {
-                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(false).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
                                 Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                     Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -1723,7 +1715,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Spacer(Modifier.width(8.dp))
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                                 if (avatar.isNotEmpty()) {
-                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatar.startsWith("/")) "http://2.26.71.102:8004$avatar" else avatar).crossfade(true).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                    AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatar.startsWith("/")) "http://2.26.71.102:8004$avatar" else avatar).crossfade(false).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = name, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                                 } else {
                                     Text(name.take(1), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 }

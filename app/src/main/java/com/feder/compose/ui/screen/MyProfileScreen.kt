@@ -100,7 +100,7 @@ fun MyProfileScreen(
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(avatarFullUrl)
-                        .crossfade(true)
+                        .crossfade(false)
                         .build(),
                     contentDescription = displayName,
                     contentScale = ContentScale.Crop,

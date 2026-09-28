@@ -122,7 +122,7 @@ fun TelegramContactProfile(
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(avatarFullUrl)
-                        .crossfade(true)
+                        .crossfade(false)
                         .build(),
                     contentDescription = contactName,
                     contentScale = ContentScale.Crop,
@@ -332,7 +332,7 @@ private fun MediaThumb(url: String, onClick: () -> Unit = {}) {
             .clickable { onClick() }
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(context).data(fullUrl).crossfade(true).build(),
+            model = ImageRequest.Builder(context).data(fullUrl).crossfade(false).build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -528,7 +528,7 @@ private fun LinkRow(
         ) {
             if (!p?.image.isNullOrEmpty()) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(p!!.image).crossfade(true).build(),
+                    model = ImageRequest.Builder(LocalContext.current).data(p!!.image).crossfade(false).build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()

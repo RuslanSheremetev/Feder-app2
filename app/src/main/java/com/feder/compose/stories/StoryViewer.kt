@@ -239,7 +239,7 @@ fun StoryViewer(
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(currentStory.fullUrl)
-                            .crossfade(true)
+                            .crossfade(false)
                             .build(),
                         contentDescription = "story",
                         contentScale = ContentScale.Fit,

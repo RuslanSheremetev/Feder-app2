@@ -74,7 +74,7 @@ fun PhotoViewer(
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(fullUrl)
-                        .crossfade(true)
+                        .crossfade(false)
                         .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,

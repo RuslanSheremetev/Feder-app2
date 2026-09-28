@@ -73,7 +73,7 @@ fun ContactProfileScreen(contactName: String, onBack: () -> Unit, avatarUrl: Str
         Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(120.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         if (avatarUrl != null) {
-                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(userAvatar ?: "").crossfade(true).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(userAvatar ?: "").crossfade(false).build(), contentDescription = "avatar", modifier = Modifier.size(120.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                         } else {
                             Icon(Icons.Filled.Person, "avatar", tint = Primary, modifier = Modifier.size(64.dp))
                         }

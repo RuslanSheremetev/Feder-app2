@@ -35,7 +35,7 @@ class FederApplication : Application(), ImageLoaderFactory {
                     .build()
             }
             .respectCacheHeaders(false)
-            .crossfade(true)
+            .crossfade(false)
             .build()
     }
 }

@@ -197,7 +197,7 @@ fun AppearanceScreen(onBack: () -> Unit) {
                             .clickable { selectedWallpaper = index }
                     ) {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current).data(url).crossfade(true).build(),
+                            model = ImageRequest.Builder(LocalContext.current).data(url).crossfade(false).build(),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop

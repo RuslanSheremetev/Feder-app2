@@ -100,7 +100,7 @@ private fun YouTubeCard(
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
             if (!p.image.isNullOrEmpty()) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(true).build(),
+                    model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(false).build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -189,7 +189,7 @@ private fun ArticleCard(
     ) {
         if (!p.image.isNullOrEmpty()) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(true).build(),
+                model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(false).build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -247,7 +247,7 @@ private fun ImageCard(
     ) {
         if (!p.image.isNullOrEmpty()) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(true).build(),
+                model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(false).build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f)

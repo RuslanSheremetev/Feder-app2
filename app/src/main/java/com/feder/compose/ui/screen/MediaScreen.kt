@@ -153,7 +153,7 @@ private fun MediaGridItem(item: MediaItem) {
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current).data(item.url).crossfade(true).build(),
+            model = ImageRequest.Builder(LocalContext.current).data(item.url).crossfade(false).build(),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
