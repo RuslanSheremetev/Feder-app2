@@ -778,7 +778,9 @@ fun FederApp() {
                     viewModel.isSearchVisible = !viewModel.isSearchVisible
                     if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
                 }) {
-                    Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
+                    if (viewModel.selectedTab != 1) {
+                        Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
+                    }
                 }
                 Box(Modifier.align(Alignment.CenterVertically)) {
                     var showMoreMenu by remember { mutableStateOf(false) }
