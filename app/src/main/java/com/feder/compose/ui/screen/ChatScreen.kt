@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -247,13 +248,18 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val photoWidth = computedSize.first.dp
         val photoHeight = computedSize.second.dp
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
-        Surface(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(280.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
+        Box(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(280.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                 onLongClick?.invoke()
             }
-        ) else Modifier), shape = RoundedCornerShape(ts, te, be, bs), color = if (isMine) PrimaryContainer else SecondaryContainer) {
+        ) else Modifier).clip(RoundedCornerShape(ts, te, be, bs)).background(
+            Brush.verticalGradient(
+                colors = if (isMine) listOf(Color(0xFF7B87DA), Color(0xFF4F3AC4))
+                         else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
+            )
+        )) {
             Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
                         // ═══ Reply to story preview ═══
                         // ─── Forwarded from плашка (внутри bubble) ───
