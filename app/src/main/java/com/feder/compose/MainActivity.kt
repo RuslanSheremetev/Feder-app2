@@ -1014,11 +1014,12 @@ fun FederApp() {
                                     }
                                     Box(
                                         modifier = Modifier
-                                            .size(24.dp)
+                                            .size(28.dp)
                                             .clip(CircleShape)
-                                            .then(
-                                                if (selected) Modifier.border(2.dp, Primary, CircleShape)
-                                                else Modifier.border(1.dp, OnSurfaceVariant.copy(alpha = 0.5f), CircleShape)
+                                            .border(
+                                                width = if (selected) 1.5.dp else 0.dp,
+                                                color = if (selected) Color(0xFFA1C9FF) else Color.Transparent,
+                                                shape = CircleShape
                                             ),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -1050,10 +1051,15 @@ fun FederApp() {
                                         }
                                     }
                                 } else {
-                                    Icon(icon, label, tint = if (selected) Primary else OnSurfaceVariant, modifier = Modifier.size(22.dp))
+                                    Box(
+                                        modifier = Modifier.size(if (selected) 32.dp else 28.dp).clip(CircleShape).then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(if (selected) 24.dp else 22.dp))
+                                    }
                                 }
-                                Spacer(Modifier.height(4.dp))
-                                Text(label, fontSize = 11.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.W500, color = if (selected) Primary else OnSurfaceVariant)
+                                Spacer(Modifier.height(2.dp))
+                                Text(label, fontSize = 10.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, color = if (selected) Color(0xFFA1C9FF) else Color(0xFFC0C7D4))
                             }
                         }
                     }
