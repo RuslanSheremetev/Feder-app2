@@ -1059,10 +1059,9 @@ fun FederApp() {
                                 } else {
                                     Box(
                                         modifier = Modifier
-                                            .width(if (selected) 56.dp else 28.dp)
-                                            .height(32.dp)
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
+                                            .size(if (selected) 32.dp else 28.dp)
+                                            .clip(CircleShape)
+                                            .then(if (selected) Modifier.background(Color(0xFFA1C9FF)).shadow(4.dp, CircleShape) else Modifier),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(22.dp))

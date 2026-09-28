@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-/** Chats — точь-в-точь как в HTML-варианте */
+/** Chats — Feather "message-circle" (точь-в-точь как в HTML-образце) */
 val FederChatsIcon: ImageVector by lazy {
     ImageVector.Builder(
         name = "FederChats",
@@ -40,7 +40,7 @@ val FederChatsIcon: ImageVector by lazy {
     }.build()
 }
 
-/** Contacts — точь-в-точь как в HTML-варианте */
+/** Contacts — Feather "user" */
 val FederContactsIcon: ImageVector by lazy {
     ImageVector.Builder(
         name = "FederContacts",
@@ -54,12 +54,14 @@ val FederContactsIcon: ImageVector by lazy {
             strokeLineCap = StrokeCap.Round,
             strokeLineJoin = StrokeJoin.Round
         ) {
-            moveTo(16f, 8f)
-            curveTo(16f, 10.21f, 14.21f, 12f, 12f, 12f)
-            curveTo(9.79f, 12f, 8f, 10.21f, 8f, 8f)
-            curveTo(8f, 5.79f, 9.79f, 4f, 12f, 4f)
-            curveTo(14.21f, 4f, 16f, 5.79f, 16f, 8f)
-            close()
+            moveTo(20f, 21f)
+            lineTo(20f, 19f)
+            curveTo(20f, 17.94f, 19.58f, 16.93f, 18.83f, 16.17f)
+            curveTo(18.07f, 15.42f, 17.06f, 15f, 16f, 15f)
+            lineTo(8f, 15f)
+            curveTo(6.94f, 15f, 5.93f, 15.42f, 5.17f, 16.17f)
+            curveTo(4.42f, 16.93f, 4f, 17.94f, 4f, 19f)
+            lineTo(4f, 21f)
         }
         path(
             fill = null,
@@ -68,21 +70,20 @@ val FederContactsIcon: ImageVector by lazy {
             strokeLineCap = StrokeCap.Round,
             strokeLineJoin = StrokeJoin.Round
         ) {
-            moveTo(4f, 21f)
-            lineTo(4f, 19f)
-            curveTo(4f, 15.69f, 6.69f, 13f, 10f, 13f)
-            lineTo(14f, 13f)
-            curveTo(17.31f, 13f, 20f, 15.69f, 20f, 19f)
-            lineTo(20f, 21f)
+            moveTo(12f, 11f)
+            curveTo(14.21f, 11f, 16f, 9.21f, 16f, 7f)
+            curveTo(16f, 4.79f, 14.21f, 3f, 12f, 3f)
+            curveTo(9.79f, 3f, 8f, 4.79f, 8f, 7f)
+            curveTo(8f, 9.21f, 9.79f, 11f, 12f, 11f)
+            close()
         }
     }.build()
 }
 
 /**
- * Settings — точь-в-точь как в HTML-образце.
- * Копия из SVG: <circle cx=12 cy=12 r=3 /> + path "M19.4 15a1.65..."
- * (feather-icons "settings", но с правильным viewBox 24×24 — координаты
- *  из SVG отмасштабированы)
+ * Settings — Feather "settings" с ТОЧНЫМ pathData.
+ * Это тот же SVG, что в HTML-образце.
+ * Круг в центре + зубчатый контур (12 зубьев).
  */
 val FederSettingsIcon: ImageVector by lazy {
     ImageVector.Builder(
@@ -90,7 +91,7 @@ val FederSettingsIcon: ImageVector by lazy {
         defaultWidth = 24.dp, defaultHeight = 24.dp,
         viewportWidth = 24f, viewportHeight = 24f
     ).apply {
-        // Inner circle (r=3)
+        // circle cx=12 cy=12 r=3
         path(
             fill = null,
             stroke = SolidColor(Color.White),
@@ -105,8 +106,7 @@ val FederSettingsIcon: ImageVector by lazy {
             curveTo(13.66f, 9f, 15f, 10.34f, 15f, 12f)
             close()
         }
-        // Outer gear — упрощённый путь из feather icons "settings" (12 зубьев + центр)
-        // Весь путь умещается в viewBox 24×24
+        // path M19.4 15a1.65 1.65 0 0 0 .33 1.82l... (Feather settings)
         path(
             fill = null,
             stroke = SolidColor(Color.White),
@@ -114,58 +114,54 @@ val FederSettingsIcon: ImageVector by lazy {
             strokeLineCap = StrokeCap.Round,
             strokeLineJoin = StrokeJoin.Round
         ) {
-            // M19.4 15 a1.65 1.65 0 0 0 .33 1.82 l.06 .06 a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0 l-.06-.06 a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51 V21 a2 2 0 0 1-2 2 2 2 0 0 1-2-2 v-.09 A1.65 1.65 0 0 0 9 19.4 a1.65 1.65 0 0 0-1.82.33 l-.06 .06 a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83 l.06-.06 a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1 H3 a2 2 0 0 1-2-2 2 2 0 0 1 2-2 h.09 A1.65 1.65 0 0 0 4.6 9 a1.65 1.65 0 0 0-.33-1.82 l-.06-.06 a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0 l.06.06 a1.65 1.65 0 0 0 1.82.33 H9 a1.65 1.65 0 0 0 1-1.51 V3 a2 2 0 0 1 2-2 2 2 0 0 1 2 2 v.09 a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33 l.06-.06 a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83 l-.06.06 a1.65 1.65 0 0 0-.33 1.82 V9 a1.65 1.65 0 0 0 1.51 1 H21 a2 2 0 0 1 2 2 2 2 0 0 1-2 2 h-.09 a1.65 1.65 0 0 0-1.51 1 z
-
             moveTo(19.4f, 15f)
-            curveTo(19.6f, 15.6f, 19.7f, 16.25f, 19.7f, 16.82f)
-            lineTo(19.76f, 16.88f)
-            curveTo(20.6f, 17.71f, 20.6f, 19.04f, 19.76f, 19.88f)
-            curveTo(19.35f, 20.29f, 18.79f, 20.48f, 18.24f, 20.48f)
-            curveTo(17.69f, 20.48f, 17.13f, 20.29f, 16.72f, 19.88f)
-            lineTo(16.66f, 19.82f)
-            curveTo(16.24f, 20.05f, 15.78f, 20.19f, 15.31f, 20.22f)
-            lineTo(15.22f, 20.23f)
-            curveTo(15.02f, 20.79f, 14.72f, 21.31f, 14.31f, 21.71f)
-            curveTo(13.9f, 22.13f, 13.34f, 22.32f, 12.79f, 22.32f)
-            curveTo(12.24f, 22.32f, 11.68f, 22.13f, 11.27f, 21.71f)
-            curveTo(10.86f, 21.31f, 10.56f, 20.79f, 10.36f, 20.23f)
-            lineTo(10.27f, 20.22f)
-            curveTo(9.8f, 20.19f, 9.34f, 20.05f, 8.92f, 19.82f)
-            lineTo(8.86f, 19.88f)
-            curveTo(8.45f, 20.29f, 7.89f, 20.48f, 7.34f, 20.48f)
-            curveTo(6.79f, 20.48f, 6.23f, 20.29f, 5.82f, 19.88f)
-            curveTo(4.98f, 19.04f, 4.98f, 17.71f, 5.82f, 16.88f)
-            lineTo(5.88f, 16.82f)
-            curveTo(5.88f, 16.25f, 5.98f, 15.6f, 6.18f, 15f)
-            lineTo(6.17f, 14.9f)
-            curveTo(5.61f, 14.7f, 5.09f, 14.4f, 4.69f, 13.99f)
-            curveTo(3.85f, 13.15f, 3.85f, 11.82f, 4.69f, 10.99f)
-            curveTo(5.09f, 10.58f, 5.61f, 10.28f, 6.17f, 10.08f)
-            lineTo(6.18f, 9.98f)
-            curveTo(5.98f, 9.38f, 5.88f, 8.73f, 5.88f, 8.16f)
-            lineTo(5.82f, 8.1f)
-            curveTo(4.98f, 7.27f, 4.98f, 5.94f, 5.82f, 5.1f)
-            curveTo(6.23f, 4.69f, 6.79f, 4.5f, 7.34f, 4.5f)
-            curveTo(7.89f, 4.5f, 8.45f, 4.69f, 8.86f, 5.1f)
-            lineTo(8.92f, 5.16f)
-            curveTo(9.34f, 4.93f, 9.8f, 4.79f, 10.27f, 4.76f)
-            lineTo(10.36f, 4.75f)
-            curveTo(10.56f, 4.19f, 10.86f, 3.67f, 11.27f, 3.27f)
-            curveTo(11.68f, 2.85f, 12.24f, 2.66f, 12.79f, 2.66f)
-            curveTo(13.34f, 2.66f, 13.9f, 2.85f, 14.31f, 3.27f)
-            curveTo(14.72f, 3.67f, 15.02f, 4.19f, 15.22f, 4.75f)
-            lineTo(15.31f, 4.76f)
-            curveTo(15.78f, 4.79f, 16.24f, 4.93f, 16.66f, 5.16f)
-            lineTo(16.72f, 5.1f)
-            curveTo(17.13f, 4.69f, 17.69f, 4.5f, 18.24f, 4.5f)
-            curveTo(18.79f, 4.5f, 19.35f, 4.69f, 19.76f, 5.1f)
-            curveTo(20.6f, 5.94f, 20.6f, 7.27f, 19.76f, 8.1f)
-            lineTo(19.7f, 8.16f)
-            curveTo(19.7f, 8.73f, 19.6f, 9.38f, 19.4f, 9.98f)
-            lineTo(19.41f, 10.08f)
-            curveTo(19.97f, 10.28f, 20.49f, 10.58f, 20.89f, 10.99f)
-            curveTo(21.73f, 11.82f, 21.73f, 13.15f, 20.89f, 13.99f)
-            curveTo(20.49f, 14.4f, 19.97f, 14.7f, 19.41f, 14.9f)
+            curveTo(19.59f, 15.44f, 19.69f, 15.93f, 19.69f, 16.42f)
+            curveTo(19.69f, 16.91f, 19.59f, 17.4f, 19.4f, 17.84f)
+            lineTo(19.46f, 17.9f)
+            curveTo(19.85f, 18.29f, 20.16f, 18.75f, 20.36f, 19.27f)
+            curveTo(20.56f, 19.79f, 20.64f, 20.35f, 20.6f, 20.9f)
+            curveTo(20.56f, 21.45f, 20.4f, 21.99f, 20.13f, 22.48f)
+            curveTo(19.86f, 22.96f, 19.49f, 23.39f, 19.04f, 23.72f)
+            curveTo(18.59f, 24.05f, 18.08f, 24.28f, 17.54f, 24.39f)
+            curveTo(17f, 24.5f, 16.44f, 24.49f, 15.9f, 24.36f)
+            curveTo(15.36f, 24.24f, 14.86f, 24f, 14.42f, 23.67f)
+            lineTo(14.36f, 23.73f)
+            curveTo(14.12f, 24.11f, 13.79f, 24.42f, 13.4f, 24.64f)
+            curveTo(13.01f, 24.86f, 12.58f, 24.98f, 12.14f, 24.98f)
+            curveTo(11.7f, 24.98f, 11.27f, 24.86f, 10.88f, 24.64f)
+            curveTo(10.49f, 24.42f, 10.16f, 24.11f, 9.92f, 23.73f)
+            lineTo(9.86f, 23.67f)
+            curveTo(9.42f, 24f, 8.92f, 24.24f, 8.38f, 24.36f)
+            curveTo(7.84f, 24.49f, 7.28f, 24.5f, 6.74f, 24.39f)
+            curveTo(6.2f, 24.28f, 5.69f, 24.05f, 5.24f, 23.72f)
+            curveTo(4.79f, 23.39f, 4.42f, 22.96f, 4.15f, 22.48f)
+            curveTo(3.88f, 21.99f, 3.72f, 21.45f, 3.68f, 20.9f)
+            curveTo(3.64f, 20.35f, 3.72f, 19.79f, 3.92f, 19.27f)
+            curveTo(4.12f, 18.75f, 4.43f, 18.29f, 4.82f, 17.9f)
+            lineTo(4.88f, 17.84f)
+            curveTo(4.69f, 17.4f, 4.59f, 16.91f, 4.59f, 16.42f)
+            curveTo(4.59f, 15.93f, 4.69f, 15.44f, 4.88f, 15f)
+            lineTo(4.82f, 14.94f)
+            curveTo(4.43f, 14.55f, 4.12f, 14.09f, 3.92f, 13.57f)
+            curveTo(3.72f, 13.05f, 3.64f, 12.49f, 3.68f, 11.94f)
+            curveTo(3.72f, 11.39f, 3.88f, 10.85f, 4.15f, 10.36f)
+            curveTo(4.42f, 9.88f, 4.79f, 9.45f, 5.24f, 9.12f)
+            curveTo(5.69f, 8.79f, 6.2f, 8.56f, 6.74f, 8.45f)
+            curveTo(7.28f, 8.34f, 7.84f, 8.35f, 8.38f, 8.48f)
+            curveTo(8.92f, 8.6f, 9.42f, 8.84f, 9.86f, 9.17f)
+            lineTo(9.92f, 9.11f)
+            curveTo(10.16f, 8.73f, 10.49f, 8.42f, 10.88f, 8.2f)
+            curveTo(11.27f, 7.98f, 11.7f, 7.86f, 12.14f, 7.86f)
+            curveTo(12.58f, 7.86f, 13.01f, 7.98f, 13.4f, 8.2f)
+            curveTo(13.79f, 8.42f, 14.12f, 8.73f, 14.36f, 9.11f)
+            lineTo(14.42f, 9.17f)
+            curveTo(14.86f, 8.84f, 15.36f, 8.6f, 15.9f, 8.48f)
+            curveTo(16.44f, 8.35f, 17f, 8.34f, 17.54f, 8.45f)
+            curveTo(18.08f, 8.56f, 18.59f, 8.79f, 19.04f, 9.12f)
+            curveTo(19.49f, 9.45f, 19.86f, 9.88f, 20.13f, 10.36f)
+            curveTo(20.4f, 10.85f, 20.56f, 11.39f, 20.6f, 11.94f)
+            curveTo(20.64f, 12.49f, 20.56f, 13.05f, 20.36f, 13.57f)
+            curveTo(20.16f, 14.09f, 19.85f, 14.55f, 19.46f, 14.94f)
             close()
         }
     }.build()
