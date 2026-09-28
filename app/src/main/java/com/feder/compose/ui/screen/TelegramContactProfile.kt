@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.OpenInNew
 import com.feder.compose.repository.LinkPreviewRepository
 import com.feder.compose.data.entity.LinkPreviewEntity
@@ -459,21 +457,18 @@ private fun LinksList(
     // Группируем по дню
     val grouped = entries.groupBy { dayLabel(it.second.timeVal) }
 
-    LazyColumn(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
         grouped.forEach { (day, dayEntries) ->
-            item(key = "header_$day") {
-                Text(
-                    day,
-                    color = Color(0xFFC0C7D4),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 14.dp, bottom = 6.dp)
-                )
-            }
-            items(dayEntries, key = { it.first }) { (url, msg) ->
+            Text(
+                day,
+                color = Color(0xFFC0C7D4),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 14.dp, bottom = 6.dp)
+            )
+            dayEntries.forEach { (url, msg) ->
                 LinkRow(
                     url = url,
                     timeText = timeLabel(msg.timeVal),
@@ -493,7 +488,7 @@ private fun LinksList(
                 )
             }
         }
-        item { Spacer(Modifier.height(24.dp)) }
+        Spacer(Modifier.height(24.dp))
     }
 }
 

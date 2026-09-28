@@ -70,6 +70,7 @@ import com.feder.compose.ui.screen.SettingsScreen
 import com.feder.compose.ui.screen.ContactProfileScreen
 import com.feder.compose.ui.screen.TelegramContactProfile
 import com.feder.compose.ui.screen.ChatScreen
+import com.feder.compose.ui.screen.MyProfileScreen
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -764,6 +765,17 @@ fun FederApp() {
                     // Если выбраны Contacts или Settings — показываем их
                     if (viewModel.selectedTab == 1) {
                         ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" }, onBack = { viewModel.selectedTab = 0 })
+                    } else if (viewModel.selectedTab == 2) {
+                        MyProfileScreen(
+                            username = viewModel.currentUsername.ifEmpty { "demo" },
+                            displayName = viewModel.chats.find { it.username == "demo" }?.name ?: "Demo",
+                            phone = "",
+                            avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl,
+                            onSetPhoto = { },
+                            onEditInfo = { },
+                            onSettings = { viewModel.selectedTab = 3 },
+                            onAddPost = { }
+                        )
                     } else if (viewModel.selectedTab == 3) {
                         SettingsScreen(onBack = { viewModel.selectedTab = 0 }, avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl, username = "Demo")
                     } else {
