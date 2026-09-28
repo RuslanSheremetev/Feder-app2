@@ -1417,7 +1417,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             showForward = true
                             forwardSelected = emptySet()
                         }
-                    }) { Icon(Icons.Filled.Forward, "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    }) { Icon(painter = painterResource(R.drawable.ic_forward_outline), contentDescription = "forward", tint = Color.White, modifier = Modifier.size(24.dp)) }
                     IconButton(onClick = {
                         if (selectedMessages.isEmpty()) return@IconButton
                         val ids = selectedMessages.toList()
@@ -1449,7 +1449,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         // Выход из режима выбора
                         selectedMessages = emptySet()
                         selectionMode = false
-                    }) { Icon(Icons.Filled.Delete, "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
+                    }) { Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = "delete", tint = Color.White, modifier = Modifier.size(24.dp)) }
                 }
             } else {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1733,7 +1733,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Filled.Forward, "fwd", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
+                            Icon(painter = painterResource(R.drawable.ic_forward_outline), contentDescription = "fwd", tint = OnSurfaceVariant, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text(
                                 forwardSelected.size.toString() + " " + pluralMessages(forwardSelected.size) + " переслать",
@@ -1917,15 +1917,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Column(Modifier.width(240.dp)) {
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Reply, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
+                                Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
                             if (selectedMessage?.from == myUsername) {
                                 Row(Modifier.fillMaxWidth().clickable { editMessage = selectedMessage; inputText = selectedMessage?.text ?: ""; selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Filled.Edit, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
+                                    Icon(painter = painterResource(R.drawable.ic_edit_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
                                 }
                             }
                             Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); android.util.Log.d("ChatScreen", "Copied"); selectedMessage = null }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.ContentCopy, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
+                                Icon(painter = painterResource(R.drawable.ic_copy_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
                             }
                             Row(Modifier.fillMaxWidth().clickable {
                                 // Forward из popup: добавить текущее сообщение в selectedMessages
@@ -1937,7 +1937,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 forwardSelected = emptySet()
                                 selectedMessage = null
                             }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Forward, null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                                Icon(painter = painterResource(R.drawable.ic_forward_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
                                 Surface(shape = RoundedCornerShape(12.dp), color = SecondaryContainer) { Text("Group", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), fontSize = 10.sp, color = Primary) }
                             }
                             Row(Modifier.fillMaxWidth().clickable {
@@ -1951,7 +1951,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
                             Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Delete, null, tint = Error, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
                                 Icon(if (showDeleteSub) Icons.Filled.ExpandMore else Icons.Filled.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
                             }
                             if (showDeleteSub) {
