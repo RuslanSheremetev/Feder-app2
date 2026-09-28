@@ -1026,10 +1026,14 @@ fun FederApp() {
                                                     chat.avatarUrl.startsWith("/") -> "http://2.26.71.102:8010${chat.avatarUrl}"
                                                     else -> "http://2.26.71.102:8010/avatars/${chat.username}/avatar.jpg"
                                                 }
-                                            ).crossfade(true).build(),
+                                            )
+                                                .crossfade(false)
+                                                .placeholder(android.graphics.drawable.ColorDrawable(0xFF353534.toInt()))
+                                                .error(android.graphics.drawable.ColorDrawable(0xFF353534.toInt()))
+                                                .build(),
                                             contentDescription = chat.name,
                                             contentScale = ContentScale.Crop,
-                                            modifier = Modifier.size(56.dp).clip(CircleShape)
+                                            modifier = Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF353534))
                                         )
                                     } else {
                                         Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
@@ -1104,7 +1108,7 @@ fun FederApp() {
                                             AsyncImage(
                                                 model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
                                                     .data(avatarFullUrl)
-                                                    .crossfade(true)
+                                                    .crossfade(false)
                                                     .build(),
                                                 contentDescription = "Profile",
                                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
