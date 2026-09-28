@@ -24,5 +24,8 @@ interface ChatDao {
     suspend fun markRead(username: String)
 
     @Query("DELETE FROM chats")
+    @Query("DELETE FROM chats WHERE username = :username")
+    suspend fun deleteByUsername(username: String)
+
     suspend fun clearAll()
 }

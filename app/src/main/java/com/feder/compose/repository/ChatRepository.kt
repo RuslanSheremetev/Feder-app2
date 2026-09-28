@@ -40,6 +40,11 @@ class ChatRepository(
         messageDao.updateReactions(id, json)
     }
 
+    suspend fun deleteConversation(username: String, me: String) {
+        messageDao.deleteConversation(me, username)
+        chatDao.deleteByUsername(username)
+    }
+
     suspend fun clearMessages() {
         messageDao.clearAll()
     }

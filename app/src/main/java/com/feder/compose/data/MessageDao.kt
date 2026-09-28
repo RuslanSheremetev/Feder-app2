@@ -30,5 +30,8 @@ interface MessageDao {
     suspend fun updateReactions(id: Long, json: String?)
 
     @Query("DELETE FROM messages")
+    @Query("DELETE FROM messages WHERE (fromUser = :me AND toUser = :user) OR (fromUser = :user AND toUser = :me)")
+    suspend fun deleteConversation(me: String, user: String)
+
     suspend fun clearAll()
 }

@@ -6,6 +6,9 @@ import com.feder.compose.stories.StoryPicker
 import com.feder.compose.stories.StoryViewer
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.foundation.BorderStroke
 
 import android.os.Bundle
@@ -492,6 +495,33 @@ logWs("ProfileMedia: URLS=${urls.size}")
             }
         }
     }
+
+    fun deleteChat(username: String) {
+        viewModelScope.launch {
+            // 1. Мгновенно убираем из UI
+            chats = chats.filter { it.username != username }
+
+            // 2. Удаляем из Room
+            try {
+                withContext(Dispatchers.IO) {
+                    repository?.deleteConversation(username, currentUsername.ifEmpty { "demo" })
+                }
+            } catch (_: Exception) { }
+
+            // 3. Просим сервер удалить (для нас)
+            try {
+                withContext(Dispatchers.IO) {
+                    val body = "{\"to_user\":\"$username\",\"mode\":\"me\"}"
+                    val request = Request.Builder()
+                        .url("$server/api/chat/delete")
+                        .header("Authorization", "Bearer $token")
+                        .post(body.toRequestBody("application/json".toMediaType()))
+                        .build()
+                    client.newCall(request).execute().close()
+                }
+            } catch (_: Exception) { }
+        }
+    }
 }
 
 class MainActivity : ComponentActivity() {
@@ -952,8 +982,28 @@ fun FederApp() {
                             val lastMsg = chat.lastMessage ?: ""
                             val time = chat.timestamp ?: ""
                             
+                            val dismissState = rememberSwipeToDismissBoxState(
+                                confirmValueChange = { value ->
+                                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                                        viewModel.deleteChat(chat.username)
+                                        true
+                                    } else false
+                                }
+                            )
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                enableDismissFromStartToEnd = false,
+                                backgroundContent = {
+                                    Box(
+                                        Modifier.fillMaxSize().background(Color(0xFFE53935)),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Icon(Icons.Filled.Delete, "Delete", tint = Color.White, modifier = Modifier.padding(end = 24.dp).size(24.dp))
+                                    }
+                                }
+                            ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
+                                modifier = Modifier.fillMaxWidth().background(Background).clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Аватар + онлайн-точка
@@ -1012,6 +1062,7 @@ fun FederApp() {
                                         }
                                     }
                                 }
+                            }
                             }
 
                         }
