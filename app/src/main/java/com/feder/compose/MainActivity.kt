@@ -1018,7 +1018,7 @@ fun FederApp() {
             }
             // Bottom menu overlay
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
-                Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFF1C1B1B).copy(alpha = 0.96f), shadowElevation = 0.dp, tonalElevation = 0.dp, border = BorderStroke(1.dp, Color(0xFF404752).copy(alpha = 0.3f)), modifier = Modifier.shadow(24.dp, shape = RoundedCornerShape(20.dp))) {
+                Surface(shape = RoundedCornerShape(28.dp), color = Color(0xFF1C1B1B), shadowElevation = 8.dp, tonalElevation = 0.dp, border = BorderStroke(1.dp, Color(0xFF404752).copy(alpha = 0.3f))) {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         listOf("Chats" to FederChatsIcon, "Contacts" to FederContactsIcon, "Profile" to Icons.Outlined.Person, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
@@ -1058,10 +1058,14 @@ fun FederApp() {
                                     }
                                 } else {
                                     Box(
-                                        modifier = Modifier.size(if (selected) 32.dp else 28.dp).clip(CircleShape).then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
+                                        modifier = Modifier
+                                            .width(if (selected) 56.dp else 28.dp)
+                                            .height(32.dp)
+                                            .clip(RoundedCornerShape(16.dp))
+                                            .then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(if (selected) 24.dp else 22.dp))
+                                        Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(22.dp))
                                     }
                                 }
                                 Spacer(Modifier.height(2.dp))
