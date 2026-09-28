@@ -49,7 +49,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -1588,7 +1588,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Spacer(Modifier.width(8.dp))
                             }
                             Box(modifier = Modifier.onGloballyPositioned { coords ->
-                                msgPositions[msg.id] = coords.positionInRoot()
+                                msgPositions[msg.id] = coords.positionInWindow()
                             }) {
                                 MessageBubble(
                             msg,
@@ -1843,17 +1843,29 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val isMyMsg = msg.from == myUsername
             val msgY = msg.posY
             val msgX = msg.posX
-            // Y: под сообщением, если влезает; иначе над
-            val menuY = if (msgY + menuHeightPx + 100 < screenHeightPx) {
-                (msgY + 16).toInt().coerceAtLeast(80)
+
+            // Реальный размер меню (примерный, для расчёта влезает ли снизу)
+            val menuHeightRealPx = with(density) { 420.dp.toPx() }
+            val topSafePx = with(density) { 80.dp.toPx() }      // отступ от верха экрана
+            val bottomSafePx = with(density) { 100.dp.toPx() }  // отступ от низа
+
+            // Y: под сообщением, если влезает; иначе над сообщением; иначе clamp
+            val menuY = if (msgY + menuHeightRealPx + bottomSafePx < screenHeightPx) {
+                // Влезает под — ставим под
+                (msgY + 16).toInt()
             } else {
-                (msgY - menuHeightPx).toInt().coerceAtLeast(80)
+                // Не влезает — ставим над, но не выше topSafePx
+                val above = (msgY - menuHeightRealPx).toInt()
+                above.coerceAtLeast(topSafePx.toInt())
             }
-            // X: справа для "моих", слева для чужих
+
+            // X: справа для "моих", слева для чужих, с учётом границ экрана
             val menuX = if (isMyMsg) {
-                (msgX - menuWidthPx - 16).toInt().coerceAtLeast(16)
+                // "мои" — выравниваем правый край меню по правому краю сообщения
+                (msgX + 260f - menuWidthPx).toInt().coerceIn(16, (screenWidthPx - menuWidthPx - 16).toInt())
             } else {
-                (msgX + 16).toInt().coerceAtMost((screenWidthPx - menuWidthPx - 16).toInt())
+                // чужие — выравниваем левый край меню по левому краю сообщения
+                msgX.toInt().coerceIn(16, (screenWidthPx - menuWidthPx - 16).toInt())
             }
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
