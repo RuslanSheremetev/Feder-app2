@@ -1450,7 +1450,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         // Локально убрать
                         messages = messages.filter { it.id.toString() !in selectedMessages }
                         // Отправить на сервер
-                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                             ids.forEach { idStr ->
                                 try {
                                     val idLong = idStr.toLongOrNull() ?: return@forEach
@@ -1800,7 +1800,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     if (forwardSelected.isNotEmpty()) {
                                         val recipients = forwardSelected.toList()
                                         val text = forwardMessage
-                                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                             recipients.forEach { to ->
                                                 try {
                                                     val origMsg = messages.firstOrNull { it.id.toString() == selectedMessages.firstOrNull() } ?: messages.firstOrNull()
@@ -1945,7 +1945,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         selectedMessage = null
                                         showDeleteSub = false
                                         if (m != null && m.id > 0) {
-                                            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                                 try {
                                                     val body = org.json.JSONObject().apply {
                                                         put("id", m.id)
@@ -1975,7 +1975,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessage = null
                                             showDeleteSub = false
                                             if (m != null && m.id > 0) {
-                                                kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                                     try {
                                                         val body = org.json.JSONObject().apply {
                                                             put("id", m.id)

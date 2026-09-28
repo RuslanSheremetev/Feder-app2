@@ -827,11 +827,12 @@ fun FederApp() {
                     if (targetTab == 1) {
                         ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" }, onBack = { viewModel.selectedTab = 0 })
                     } else if (targetTab == 2) {
+                        val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(
                             username = viewModel.currentUsername.ifEmpty { "demo" },
-                            displayName = viewModel.chats.find { it.username == "demo" }?.name ?: "Demo",
+                            displayName = myProfileItem?.name ?: "Demo",
                             phone = "",
-                            avatarUrl = viewModel.chats.find { it.username == "demo" }?.avatarUrl,
+                            avatarUrl = myProfileItem?.avatarUrl,
                             onSetPhoto = { },
                             onEditInfo = { },
                             onSettings = { viewModel.selectedTab = 3 },
@@ -1089,7 +1090,9 @@ fun FederApp() {
                                 if (i == 2) {
                                     // Profile tab — круглая аватарка (как в Telegram)
                                     val meUsername = viewModel.currentUsername.ifEmpty { "demo" }
-                                    val meAvatar = viewModel.chats.find { it.username == meUsername }?.avatarUrl
+                                    val meAvatar = remember(meUsername, viewModel.chats) {
+                                        viewModel.chats.find { it.username == meUsername }?.avatarUrl
+                                    }
                                     val avatarFullUrl = when {
                                         meAvatar.isNullOrEmpty() -> "http://2.26.71.102:8010/avatars/$meUsername/avatar.jpg"
                                         meAvatar.startsWith("http") -> meAvatar
