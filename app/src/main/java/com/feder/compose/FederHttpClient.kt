@@ -331,26 +331,9 @@ class FederHttpClient(
     }
 
     fun sendLog(message: String) {
-        try {
-            kotlin.concurrent.thread {
-                try {
-                    val logUrl = URL("http://2.26.71.102:8006/api/logs")
-                    val conn = logUrl.openConnection() as HttpURLConnection
-                    conn.requestMethod = "POST"
-                    conn.doOutput = true
-                    conn.setRequestProperty("Content-Type", "application/json")
-                    conn.connectTimeout = 3000
-                    conn.readTimeout = 3000
-                    val json = """{"log":"$message"}"""
-                    conn.outputStream.write(json.toByteArray())
-                    conn.outputStream.flush()
-                    conn.outputStream.close()
-                    conn.inputStream.close()
-                } catch (e: Exception) {
-                    android.util.Log.e("FederHttp", "Log failed: ${e.message}")
-                }
-            }
-        } catch (e: Exception) {}
+        // ❌ ОТКЛЮЧЕНО для производительности — HTTP POST + новый Thread на каждый вызов тормозили UI.
+        // Раньше вызывался из каждого рендера (LinkPreviewCard, ChatScreen.rlog, FederVideoPlayer).
+        // Для отладки — см. git history.
     }
 
     private fun encodeTokenForUrl(token: String): String {
