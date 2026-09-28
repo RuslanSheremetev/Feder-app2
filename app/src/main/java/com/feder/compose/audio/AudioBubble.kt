@@ -99,7 +99,7 @@ fun AudioBubble(
 
     Row(
         modifier = Modifier
-            .widthIn(min = 200.dp, max = 260.dp)
+            
             .combinedClickable(onClick = { togglePlay() }, onLongClick = onLongClick)
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
