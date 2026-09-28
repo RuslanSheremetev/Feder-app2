@@ -115,12 +115,10 @@ import java.util.concurrent.TimeUnit
 private val rlogClient by lazy { com.feder.compose.FederHttpClient() }
 
 fun rlog(tag: String, message: String) {
-    android.util.Log.d(tag, message)
-    Thread {
-        try {
-            rlogClient.sendLog("[$tag] $message")
-        } catch (_: Exception) { }
-    }.start()
+    // ❌ ОТКЛЮЧЕНО: HTTP POST + новый Thread на каждый вызов тормозили UI
+    // Для отладки — раскомментировать:
+    // android.util.Log.d(tag, message)
+    // Thread { try { rlogClient.sendLog("[$tag] $message") } catch (_: Exception) {} }.start()
 }
 
 
@@ -1568,7 +1566,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    val grouped = messages.groupBy { formatHeaderDate(it.timeVal) }
+                    val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
+                    val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
                 @OptIn(ExperimentalFoundationApi::class)
@@ -1581,7 +1580,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                         }
                         items(msgs, key = { it.id }) { msg ->
-                            val index = messages.indexOf(msg)
+                            val index = msgIndexMap[msg.id] ?: -1
                             val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
                         val sameAsPrev = prevMsg != null && prevMsg.from == msg.from && kotlin.math.abs((msg.timeVal ?: 0) - (prevMsg.timeVal ?: 0)) < 300 && 
