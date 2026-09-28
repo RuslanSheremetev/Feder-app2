@@ -124,6 +124,7 @@ class ChatViewModel : ViewModel() {
     var selectedChat by mutableStateOf<String?>(null)
     var selectedProfile by mutableStateOf<String?>(null)
     var profileMediaUrls by mutableStateOf<List<String>>(emptyList())
+    var profileMessages by mutableStateOf<List<com.feder.compose.ui.screen.MsgItem>>(emptyList())
     var showSavedProfile by mutableStateOf(false)
     private val client = OkHttpClient()
     
@@ -212,6 +213,7 @@ class ChatViewModel : ViewModel() {
                     .reversed()
 logWs("ProfileMedia: URLS=${urls.size}")
                 profileMediaUrls = urls
+                profileMessages = messages
             } catch (e: Exception) {
                 logWs("ProfileMedia FAIL: ${e.javaClass.simpleName}: ${e.message}\n${e.stackTraceToString().take(600)}")
                 profileMediaUrls = emptyList()
@@ -613,6 +615,7 @@ fun FederApp() {
                 viewModel.loadProfileMedia(uname)
             } else {
                 viewModel.profileMediaUrls = emptyList()
+                viewModel.profileMessages = emptyList()
             }
         }
     }
@@ -649,6 +652,9 @@ fun FederApp() {
                         bio = "",
                         lastSeen = if (prof?.online == true) "online" else "last seen recently",
                         mediaUrls = viewModel.profileMediaUrls,
+                        messages = viewModel.profileMessages,
+                        token = viewModel.token,
+                        linkPreviewRepo = viewModel.linkPreviewRepository,
                         isMuted = prof?.isMuted ?: false,
                         onMessage = {
                             viewModel.selectedChat = viewModel.selectedProfile

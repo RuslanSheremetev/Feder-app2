@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.OpenInNew
+import com.feder.compose.repository.LinkPreviewRepository
+import com.feder.compose.data.entity.LinkPreviewEntity
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +48,9 @@ fun TelegramContactProfile(
     bio: String = "",
     lastSeen: String = "last seen recently",
     mediaUrls: List<String> = emptyList(),
+    messages: List<com.feder.compose.ui.screen.MsgItem> = emptyList(),
+    token: String = "",
+    linkPreviewRepo: LinkPreviewRepository? = null,
     isMuted: Boolean = false,
     onMessage: () -> Unit = {},
     onCall: () -> Unit = {},
@@ -252,6 +260,8 @@ fun TelegramContactProfile(
                         }
                     }
                 }
+            } else if (selectedTab == 2) {
+                LinksList(messages = messages, linkPreviewRepo = linkPreviewRepo, token = token)
             } else {
                 Box(
                     Modifier.fillMaxWidth().height(200.dp),
@@ -363,5 +373,206 @@ private fun MenuRow(
             fontSize = 15.sp,
             fontWeight = FontWeight.Normal
         )
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LINKS — список ссылок из сообщений, сгруппированный по дням
+// ═══════════════════════════════════════════════════════════════════
+
+private data class LinkEntry(
+    val url: String,
+    val msg: MsgItem,
+    val host: String,
+    val title: String?,
+    val image: String?,
+    val siteName: String?
+)
+
+private fun extractFirstUrlLocal(text: String): String? {
+    if (text.isBlank()) return null
+    val regex = Regex("""https?://[^\s<>"']+""", RegexOption.IGNORE_CASE)
+    val m = regex.find(text) ?: return null
+    return m.value.trimEnd('.', ',', ';', ':', '!', '?', ')', ']', '}')
+}
+
+private fun hostOf(url: String): String {
+    return try {
+        val u = java.net.URL(url)
+        u.host.removePrefix("www.")
+    } catch (_: Exception) { url }
+}
+
+private fun dayLabel(timeVal: Long): String {
+    if (timeVal <= 0L) return "Earlier"
+    val now = System.currentTimeMillis()
+    val dayMs = 24L * 60 * 60 * 1000
+    val todayStart = (now / dayMs) * dayMs
+    val entryStart = (timeVal / dayMs) * dayMs
+    val diff = ((todayStart - entryStart) / dayMs).toInt()
+    return when (diff) {
+        0 -> "Today"
+        1 -> "Yesterday"
+        in 2..6 -> "${diff} days ago"
+        else -> {
+            val sdf = java.text.SimpleDateFormat("MMM d", java.util.Locale.US)
+            sdf.format(java.util.Date(timeVal))
+        }
+    }
+}
+
+private fun timeLabel(timeVal: Long): String {
+    if (timeVal <= 0L) return ""
+    val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.US)
+    return sdf.format(java.util.Date(timeVal))
+}
+
+@Composable
+private fun LinksList(
+    messages: List<MsgItem>,
+    linkPreviewRepo: LinkPreviewRepository?,
+    token: String
+) {
+    val context = LocalContext.current
+
+    // Собираем все уникальные ссылки, сортируем по времени убыв.
+    val entries = remember(messages) {
+        val seen = HashSet<String>()
+        messages
+            .sortedByDescending { it.timeVal }
+            .mapNotNull { m ->
+                val u = extractFirstUrlLocal(m.text) ?: return@mapNotNull null
+                if (!seen.add(u)) null else u to m
+            }
+    }
+
+    if (entries.isEmpty()) {
+        Box(
+            Modifier.fillMaxWidth().height(200.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No links yet", color = Color(0xFFC0C7D4), fontSize = 14.sp)
+        }
+        return
+    }
+
+    // Группируем по дню
+    val grouped = entries.groupBy { dayLabel(it.second.timeVal) }
+
+    LazyColumn(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        grouped.forEach { (day, dayEntries) ->
+            item(key = "header_$day") {
+                Text(
+                    day,
+                    color = Color(0xFFC0C7D4),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 14.dp, bottom = 6.dp)
+                )
+            }
+            items(dayEntries, key = { it.first }) { (url, msg) ->
+                LinkRow(
+                    url = url,
+                    timeText = timeLabel(msg.timeVal),
+                    linkPreviewRepo = linkPreviewRepo,
+                    token = token,
+                    onClick = {
+                        try {
+                            val intent = android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse(url)
+                            ).apply {
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
+                    }
+                )
+            }
+        }
+        item { Spacer(Modifier.height(24.dp)) }
+    }
+}
+
+@Composable
+private fun LinkRow(
+    url: String,
+    timeText: String,
+    linkPreviewRepo: LinkPreviewRepository?,
+    token: String,
+    onClick: () -> Unit
+) {
+    var preview by remember(url) { mutableStateOf<LinkPreviewEntity?>(null) }
+    LaunchedEffect(url) {
+        if (linkPreviewRepo != null && token.isNotEmpty()) {
+            try { preview = linkPreviewRepo.getPreview(url, token) } catch (_: Exception) {}
+        }
+    }
+    val p = preview
+    val displayTitle = p?.title?.takeIf { it.isNotBlank() } ?: hostOf(url)
+    val displaySub = p?.siteName?.takeIf { it.isNotBlank() } ?: hostOf(url)
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Превью 56x56
+        Box(
+            Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFF2A2A2A)),
+            contentAlignment = Alignment.Center
+        ) {
+            if (!p?.image.isNullOrEmpty()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current).data(p!!.image).crossfade(true).build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    Icons.Filled.OpenInNew,
+                    contentDescription = null,
+                    tint = Color(0xFFA1C9FF),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                displayTitle,
+                color = Color(0xFFE5E2E1),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                displaySub,
+                color = Color(0xFF8A919E),
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+        }
+        if (timeText.isNotEmpty()) {
+            Spacer(Modifier.width(8.dp))
+            Text(
+                timeText,
+                color = Color(0xFF8A919E),
+                fontSize = 11.sp
+            )
+        }
     }
 }
