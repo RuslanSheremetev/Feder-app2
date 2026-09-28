@@ -752,7 +752,9 @@ fun FederApp() {
                 }
             }
             }
-            }   // закрытие if (selectedTab != 2)
+            } else {
+                Box(Modifier.height(0.dp))
+            }
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
