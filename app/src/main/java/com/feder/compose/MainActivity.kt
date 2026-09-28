@@ -42,6 +42,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -997,7 +998,7 @@ fun FederApp() {
             }
             // Bottom menu overlay
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
-                Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 12.dp, tonalElevation = 0.dp, border = BorderStroke(0.1.dp, Color(0xFF3A3A3A))) {
+                Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFF1C1B1B).copy(alpha = 0.96f), shadowElevation = 0.dp, tonalElevation = 0.dp, border = BorderStroke(1.dp, Color(0xFF404752).copy(alpha = 0.3f)), modifier = Modifier.shadow(24.dp, shape = RoundedCornerShape(20.dp))) {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         listOf("Chats" to FederChatsIcon, "Contacts" to FederContactsIcon, "Profile" to Icons.Outlined.Person, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
