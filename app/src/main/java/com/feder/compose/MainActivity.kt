@@ -701,6 +701,8 @@ fun FederApp() {
     Scaffold(
         containerColor = Background,
         topBar = {
+            // Скрываем шапку для Profile (tab 2) — там своя шапка внутри MyProfileScreen
+            if (viewModel.selectedTab != 2) {
             Box(
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Surface).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
@@ -749,6 +751,7 @@ fun FederApp() {
                 }
             }
             }
+            }   // закрытие if (selectedTab != 2)
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
