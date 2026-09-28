@@ -103,19 +103,6 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
 
             }
 
-            // FAB
-            FloatingActionButton(
-                onClick = { },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp, bottom = 110.dp)
-                    .size(40.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape
-            ) {
-                Icon(Icons.Filled.PersonAdd, "Add contact", modifier = Modifier.size(24.dp))
-        }
     }
 }
 
