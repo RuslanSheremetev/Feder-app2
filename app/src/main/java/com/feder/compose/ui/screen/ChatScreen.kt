@@ -1556,10 +1556,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
             if (isLoading || preloading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Primary) }
             else {
+                val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
+                val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
-                    val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
-                    val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
                             item(key = "header_$date") {
