@@ -248,7 +248,9 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val photoWidth = computedSize.first.dp
         val photoHeight = computedSize.second.dp
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
-        Box(Modifier.then(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) Modifier.width(280.dp) else Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp)).then(if (onClick != null) Modifier.combinedClickable(
+        val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+val isAudioMsg = firstImageOrAudioUrl != null && com.feder.compose.audio.IsAudio.isAudioFile(firstImageOrAudioUrl)
+Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.combinedClickable(
             onClick = onClick ?: {},
             onLongClick = {
                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
