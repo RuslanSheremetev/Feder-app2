@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +76,7 @@ import com.feder.compose.ui.theme.LocalDarkTheme
 import com.feder.compose.ui.theme.updateThemeColors
 import com.feder.compose.ui.theme.ThemeController
 import com.feder.compose.ui.screen.ContactsScreen
+import com.feder.compose.R
 import com.feder.compose.ui.screen.SettingsScreen
 import com.feder.compose.ui.screen.ContactProfileScreen
 import com.feder.compose.ui.screen.TelegramContactProfile
@@ -1132,7 +1134,17 @@ fun FederApp() {
                                             .then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(22.dp))
+                                        if (i == 3) {
+            // Settings — своя Material Symbols иконка (как в HTML варианте 3)
+            Icon(
+                painter = painterResource(R.drawable.ic_settings_symbols),
+                contentDescription = label,
+                tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4),
+                modifier = Modifier.size(22.dp)
+            )
+        } else {
+            Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(22.dp))
+        }
                                     }
                                 }
                                 Spacer(Modifier.height(2.dp))
