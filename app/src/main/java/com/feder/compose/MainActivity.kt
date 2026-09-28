@@ -998,9 +998,12 @@ fun FederApp() {
                                     }
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                         if (lastMsg.isNotEmpty()) {
-                                            Text(lastMsg.take(24), color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                            Text(lastMsg.take(24), color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                                        } else {
+                                            Spacer(Modifier.weight(1f))
                                         }
                                         if (chat.unread > 0) {
+                                            Spacer(Modifier.width(8.dp))
                                             Box(Modifier.size(22.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
                                                 Text(chat.unread.toString(), color = OnPrimaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                             }
