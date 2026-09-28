@@ -1776,7 +1776,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             )
                         }
                         IconButton(onClick = { showEmojiSheet = true }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                            Icon(painter = painterResource(R.drawable.ic_stickers), contentDescription = "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         Box(
                             modifier = Modifier
@@ -2328,7 +2328,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     if (!inputText.contains("\n")) {
                         IconButton(onClick = { showEmojiSheet = true }, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.Filled.EmojiEmotions, "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
+                            Icon(painter = painterResource(R.drawable.ic_stickers), contentDescription = "sticker", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
                     if (inputText.contains("\n")) {
