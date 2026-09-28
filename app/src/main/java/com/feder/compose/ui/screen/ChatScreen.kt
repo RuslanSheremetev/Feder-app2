@@ -1541,7 +1541,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     item { Spacer(Modifier.height(16.dp)) }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
-                            item(key = "header_$date") {
+                            stickyHeader(key = "header_$date") {
                                 Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp), contentAlignment = Alignment.Center) {
                                     Surface(shape = RoundedCornerShape(12.dp), color = SurfaceContainerHigh, shadowElevation = 2.dp) {
                                         Text(date, color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
