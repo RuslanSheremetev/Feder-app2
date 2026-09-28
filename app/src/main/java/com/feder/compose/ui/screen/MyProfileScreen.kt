@@ -73,7 +73,7 @@ fun MyProfileScreen(
 
         // ─── Скроллируемая часть ───
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 100.dp),
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
