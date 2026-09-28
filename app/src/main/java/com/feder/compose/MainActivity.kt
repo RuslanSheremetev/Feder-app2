@@ -701,14 +701,16 @@ fun FederApp() {
                         }
                     )
                 }
-                viewModel.selectedChat != null -> ChatScreen(
-                    chatName = viewModel.chats.find { it.username == viewModel.selectedChat }?.name ?: "",
+                viewModel.selectedChat != null -> {
+                    val selectedChatItem = viewModel.chats.find { it.username == viewModel.selectedChat }
+                    ChatScreen(
+                    chatName = selectedChatItem?.name ?: "",
                     chatUsername = viewModel.selectedChat ?: "",
                     myUsername = "demo",
                     token = viewModel.token,
-                    avatarUrl = viewModel.chats.find { it.username == viewModel.selectedChat }?.avatarUrl,
-                    lastSeen = viewModel.chats.find { it.username == viewModel.selectedChat }?.lastSeen ?: 0,
-                    isOnline = viewModel.chats.find { it.username == viewModel.selectedChat }?.online ?: false,
+                    avatarUrl = selectedChatItem?.avatarUrl,
+                    lastSeen = selectedChatItem?.lastSeen ?: 0,
+                    isOnline = selectedChatItem?.online ?: false,
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
@@ -731,6 +733,7 @@ fun FederApp() {
                     },
                     onSavedProfileClick = { viewModel.showSavedProfile = true }
                 )
+                }
             }
         }
         return
