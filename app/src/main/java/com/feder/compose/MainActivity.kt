@@ -700,6 +700,7 @@ fun FederApp() {
     
     Scaffold(
         containerColor = Background,
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         topBar = {
             // Скрываем шапку для Profile (tab 2) — там своя шапка внутри MyProfileScreen
             if (viewModel.selectedTab != 2) {
