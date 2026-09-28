@@ -35,6 +35,7 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("../feder-release.keystore")
+            storeType = "PKCS12"
             // Читает из env (GitHub Secrets) или fallback на локальные значения
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "feder2026"
             keyAlias = System.getenv("KEY_ALIAS") ?: "feder"
