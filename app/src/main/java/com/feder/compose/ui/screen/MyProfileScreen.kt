@@ -106,16 +106,7 @@ fun MyProfileScreen(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(120.dp).clip(CircleShape)
                 )
-                Box(
-                    Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(CardBg)
-                        .clickable(onClick = onSetPhoto),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Filled.Add, "Set Photo", tint = Accent, modifier = Modifier.size(20.dp))
-                }
+
             }
             Spacer(Modifier.height(16.dp))
             Text(displayName, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
