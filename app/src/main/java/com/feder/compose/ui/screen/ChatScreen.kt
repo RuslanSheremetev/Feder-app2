@@ -216,7 +216,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
         val measurePainter = if (fullUrl != null)
             coil.compose.rememberAsyncImagePainter(model = fullUrl) else null
         val painterState = measurePainter?.state
-        rlog("PhotoDebug", "id=${msg.id} state=${painterState?.javaClass?.simpleName} fullUrl=${fullUrl?.take(80)}")
+        // removed rlog for perf
         val painterSuccess = painterState as? coil.compose.AsyncImagePainter.State.Success
         val computedSize = remember(painterSuccess, msg.id) {
             val drawable = painterSuccess?.result?.drawable
@@ -237,7 +237,7 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                         else -> { newW = 220f; newH = 220f / ratio }
                     }
                     if (newH > maxH) { newH = maxH; newW = maxH * ratio }
-                    rlog("PhotoSize", "id=${msg.id} src=${w.toInt()}x${h.toInt()} ratio=$ratio new=${newW}x${newH}")
+                    // removed rlog for perf
                     newW to newH
                 } else 200f to 200f
             } else 200f to 200f
@@ -328,11 +328,11 @@ fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, tok
                             }
                         }
                         }
-                rlog("PhotoDebug", "BUBBLE_START id=${msg.id} hasUrls=${msg.imageUrls != null} size=${msg.imageUrls.size} imageUrl=${msg.imageUrl}")
+                // removed rlog for perf
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
-                    rlog("PhotoDisplay", "Rendering ${if (isAudio) "audio" else "photo"}: $firstUrl, count=${msg.imageUrls.size}")
+                    // removed rlog for perf
                     val isVideo = com.feder.compose.audio.IsVideo.isVideoFile(firstUrl)
                     if (isAudio) {
                         // ═══ AUDIO BUBBLE ═══
@@ -1604,7 +1604,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 )
                                 Spacer(Modifier.width(8.dp))
                             }
-                            Box(modifier = Modifier.onGloballyPositioned { coords -> msgPositions[msg.id] = coords.positionInRoot() }) {
+                            Box(modifier = Modifier) {
                                 MessageBubble(
                             msg,
                             msg.text,

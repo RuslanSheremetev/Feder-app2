@@ -61,7 +61,7 @@ class FederHttpClient(
         4, 32, 60L, TimeUnit.SECONDS,
         PriorityBlockingQueue(1000),
         ThreadFactory { r ->
-            Thread(r, "FederHttp-Worker-${Thread.activeCount()}").apply {
+            Thread(r, "FederHttp-Worker").apply {
                 isDaemon = true
                 priority = Thread.NORM_PRIORITY
             }

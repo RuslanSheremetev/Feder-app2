@@ -60,7 +60,7 @@ fun NameScreen(onBack: () -> Unit) {
             val json = """{"username":"demo","first_name":"$firstName","last_name":"$lastName","bio":"$bio","phone":"$phone","birthday":"$birthday"}"""
             val body = RequestBody.create("application/json".toMediaType(), json)
             val request = Request.Builder().url("http://2.26.71.102:8004/api/user/update").put(body).build()
-            val response = client.newCall(request).execute()
+            val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
         } catch (_: Exception) { }
     }
 

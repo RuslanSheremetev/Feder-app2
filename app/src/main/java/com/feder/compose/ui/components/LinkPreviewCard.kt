@@ -93,7 +93,7 @@ private fun YouTubeCard(
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .clickable {
-                com.feder.compose.FederHttpClient().sendLog("YouTubeCard CLICK videoId=${p.videoId}")
+                // com.feder.compose.FederHttpClient().sendLog("YouTubeCard CLICK videoId=${p.videoId}")
                 p.videoId?.let(onPlay)
             }
     ) {
@@ -288,18 +288,18 @@ fun extractFirstUrl(text: String): String? {
     if (text.isBlank()) return null
     // 1. Декодируем \uXXXX (Gson escape): \u003d -> =
     val decoded = decodeUnicodeEscapes(text)
-    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: in=$text decoded=$decoded")
+    // com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: in=$text decoded=$decoded")
     // 2. Ищем URL
     val regex = Regex("""https?://[^\s<>"']+""", RegexOption.IGNORE_CASE)
-    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: BEFORE regex find")
+    // com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: BEFORE regex find")
     val match = regex.find(decoded)
-    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: AFTER regex find match=${match?.value}")
+    // com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: AFTER regex find match=${match?.value}")
     if (match == null) {
-        com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: NO MATCH return null")
+        // com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: NO MATCH return null")
         return null
     }
     val url = match.value.trimEnd('.', ',', ';', ':', '!', '?', ')', ']', '}')
-    com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: extracted=$url")
+    // com.feder.compose.FederHttpClient().sendLog("extractFirstUrl: extracted=$url")
     return url
 }
 
