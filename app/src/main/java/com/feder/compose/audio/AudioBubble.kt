@@ -99,7 +99,7 @@ fun AudioBubble(
 
     Row(
         modifier = Modifier
-            .width(240.dp)
+            .widthIn(min = 200.dp, max = 260.dp)
             .combinedClickable(onClick = { togglePlay() }, onLongClick = onLongClick)
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -118,10 +118,10 @@ fun AudioBubble(
             )
         }
         Spacer(Modifier.width(10.dp))
-        Column(Modifier.weight(1f)) {
+        Column {
             // Waveform (условные полоски, прогресс — синий)
             val progress = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f
-            Canvas(Modifier.fillMaxWidth().height(24.dp)) {
+            Canvas(Modifier.width(140.dp).height(24.dp)) {
                 val bars = 28
                 val barW = size.width / bars
                 val gap = 1.5f
@@ -150,7 +150,7 @@ fun AudioBubble(
                     color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f),
                     fontSize = 11.sp
                 )
-                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.width(8.dp))
                 Text(time, color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f), fontSize = 11.sp)
                 if (isMine) {
                     Spacer(Modifier.width(3.dp))
