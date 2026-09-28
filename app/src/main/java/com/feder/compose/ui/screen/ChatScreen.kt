@@ -1938,7 +1938,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 selectedMessage = null
                             }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_forward_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                                Surface(shape = RoundedCornerShape(12.dp), color = SecondaryContainer) { Text("Group", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), fontSize = 10.sp, color = Primary) }
                             }
                             Row(Modifier.fillMaxWidth().clickable {
                                 selectedMessage?.let { m ->
