@@ -1005,12 +1005,13 @@ fun FederApp() {
                             Column(Modifier.weight(1f).fillMaxHeight().clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 if (i == 2) {
                                     // Profile tab — круглая аватарка (как в Telegram)
-                                    val meAvatar = viewModel.chats.find { it.username == viewModel.currentUsername.ifEmpty { "demo" } }?.avatarUrl
+                                    val meUsername = viewModel.currentUsername.ifEmpty { "demo" }
+                                    val meAvatar = viewModel.chats.find { it.username == meUsername }?.avatarUrl
                                     val avatarFullUrl = when {
-                                        meAvatar.isNullOrEmpty() -> null
+                                        meAvatar.isNullOrEmpty() -> "http://2.26.71.102:8010/avatars/$meUsername/avatar.jpg"
                                         meAvatar.startsWith("http") -> meAvatar
                                         meAvatar.startsWith("/") -> "http://2.26.71.102:8010$meAvatar"
-                                        else -> "http://2.26.71.102:8010/$meAvatar"
+                                        else -> "http://2.26.71.102:8010/avatars/$meUsername/avatar.jpg"
                                     }
                                     Box(
                                         modifier = Modifier
@@ -1033,21 +1034,6 @@ fun FederApp() {
                                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                                 modifier = Modifier.fillMaxSize().clip(CircleShape)
                                             )
-                                        } else {
-                                            // fallback — иконка Person внутри кружка
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .background(if (selected) Primary.copy(alpha = 0.25f) else OnSurfaceVariant.copy(alpha = 0.2f)),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Outlined.Person,
-                                                    contentDescription = "Profile",
-                                                    tint = if (selected) Primary else OnSurfaceVariant,
-                                                    modifier = Modifier.size(14.dp)
-                                                )
-                                            }
                                         }
                                     }
                                 } else {
