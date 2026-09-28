@@ -23,9 +23,9 @@ interface ChatDao {
     @Query("UPDATE chats SET unread = 0 WHERE username = :username")
     suspend fun markRead(username: String)
 
-    @Query("DELETE FROM chats")
     @Query("DELETE FROM chats WHERE username = :username")
     suspend fun deleteByUsername(username: String)
 
+    @Query("DELETE FROM chats")
     suspend fun clearAll()
 }
