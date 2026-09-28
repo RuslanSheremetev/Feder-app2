@@ -96,7 +96,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
                             )
                         }
                     }
-                    items(contacts) { contact ->
+                    items(contacts, key = { it.username }) { contact ->
                         ContactRow(contact)
                     }
                 }

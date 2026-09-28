@@ -799,7 +799,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     val msgPositions = remember { mutableMapOf<Long, androidx.compose.ui.geometry.Offset>() }
 
-    val dateInHeader = remember { mutableStateOf("") }
+    // derivedStateOf — не дёргает recomposition если значение не изменилось
+    val dateInHeader = androidx.compose.runtime.derivedStateOf {
+        if (!listState.isScrollInProgress) ""
+        else {
+            val idx = listState.firstVisibleItemIndex
+            if (messages.isNotEmpty() && idx < messages.size)
+                formatHeaderDate(messages[idx].timeVal)
+            else ""
+        }
+    }
     
     // Функция для получения даты из timeVal
     fun formatLastSeen(timestamp: Long): String {
@@ -1071,21 +1080,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     // Обновляем дату в шапке при прокрутке
-            // ⚡ ОПТИМИЗАЦИЯ: скролл-эффект для dateInHeader убран (был O(n) на каждый кадр)
-            // Дата в шапке теперь обновляется реже (только при изменении первого видимого элемента)
-            LaunchedEffect(listState.firstVisibleItemIndex) {
-                if (listState.isScrollInProgress) {
-                    val items = listState.layoutInfo.visibleItemsInfo
-                    if (items.isNotEmpty()) {
-                        val firstVisibleIdx = items.firstOrNull()?.index ?: 0
-                        val firstDt = if (messages.isNotEmpty() && firstVisibleIdx < messages.size) formatHeaderDate(messages[firstVisibleIdx].timeVal) else ""
-                        val lastDate = formatHeaderDate(messages.lastOrNull()?.timeVal ?: 0L)
-                        dateInHeader.value = if (firstDt.isNotEmpty() && firstDt != lastDate) firstDt else ""
-                    }
-                } else {
-                    dateInHeader.value = ""
-                }
-            }
+            // dateInHeader теперь derivedStateOf — не нужен LaunchedEffect
             // При открытии чата — мгновенно вниз к ПОСЛЕДНЕМУ элементу LazyColumn
     LaunchedEffect(chatUsername) {
         kotlinx.coroutines.delay(100)
@@ -1570,7 +1565,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
-                        items(msgs, key = { it.id }) { msg ->
+                        items(
+                            msgs,
+                            key = { it.id },
+                            contentType = { msg ->
+                                when {
+                                    msg.imageUrls.isNotEmpty() -> "photo"
+                                    msg.imageUrl != null -> "photo"
+                                    msg.replyToStoryId > 0 -> "story"
+                                    !msg.forwardedFrom.isNullOrEmpty() -> "forwarded"
+                                    else -> "text"
+                                }
+                            }
+                        ) { msg ->
                             val index = msgIndexMap[msg.id] ?: -1
                             val isMine = msg.from == myUsername
                         val prevMsg = if (index > 0) messages[index - 1] else null
@@ -1689,7 +1696,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 
                 // Chat list for forward
                 LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
-                    items(allChats.filter { it.username != myUsername && it.username != "123" }) { contact ->
+                    items(allChats.filter { it.username != myUsername && it.username != "123" }, key = { it.username }) { contact ->
                         val name = contact.name
                         val avatar = contact.avatarUrl ?: ""
                         Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp).combinedClickable(
@@ -2088,7 +2095,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
                         }
                     }, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(photos.size) { i ->
+                    items(photos.size, key = { i -> photos[i].hashCode() }) { i ->
                         Box(modifier = Modifier.aspectRatio(1f).clip(RoundedCornerShape(8.dp)).clickable {
                             val uri = photos[i]
                             selectedPhotos = if (uri in selectedPhotos) selectedPhotos - uri else selectedPhotos + uri

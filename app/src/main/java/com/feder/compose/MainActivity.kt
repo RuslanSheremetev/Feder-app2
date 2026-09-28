@@ -185,9 +185,11 @@ class ChatViewModel : ViewModel() {
     var isSearchVisible by mutableStateOf(false)
     var searchQuery by mutableStateOf("")
     
-    val filteredChats: List<ChatItem>
-        get() = if (searchQuery.isEmpty()) chats
-                else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    // ⚡ derivedStateOf — Compose не пересчитывает filter каждый рендер, только при изменении chats/searchQuery
+    val filteredChats: List<ChatItem> by androidx.compose.runtime.derivedStateOf {
+        if (searchQuery.isEmpty()) chats
+        else chats.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    }
     
     fun loadProfileMedia(username: String) {
         logWs("ProfileMedia: CALLED for $username")
@@ -979,7 +981,7 @@ fun FederApp() {
                             }
                         }
 
-                        items(viewModel.filteredChats) { chat ->
+                        items(viewModel.filteredChats, key = { it.username }) { chat ->
                             val avColor = try { 
     if (chat.avatarColor.isNotEmpty() && chat.avatarColor.startsWith("#")) Color(android.graphics.Color.parseColor(chat.avatarColor)) else Primary 
 } catch (e: Exception) { Primary }
