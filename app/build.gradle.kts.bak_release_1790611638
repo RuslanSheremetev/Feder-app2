@@ -32,18 +32,8 @@ android {
         }
     }
     buildFeatures { compose = true }
-    signingConfigs {
-        create("release") {
-            storeFile = file("../feder-release.keystore")
-            // Читает из env (GitHub Secrets) или fallback на локальные значения
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "feder2026"
-            keyAlias = System.getenv("KEY_ALIAS") ?: "feder"
-            keyPassword = System.getenv("KEY_PASSWORD") ?: "feder2026"
-        }
-    }
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

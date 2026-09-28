@@ -1,1 +1,15 @@
-*.bak_*
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.log
+*~
+feder-release.keystore
+*.keystore
+*.jks

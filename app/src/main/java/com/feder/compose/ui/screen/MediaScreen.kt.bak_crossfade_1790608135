@@ -100,14 +100,14 @@ fun MediaScreen(onBack: () -> Unit) {
                     item(span = { GridItemSpan(3) }) {
                         Text("Today", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, modifier = Modifier.padding(8.dp))
                     }
-                    items(todayItems, key = { it.url }) { item ->
+                    items(todayItems) { item ->
                         MediaGridItem(item)
                     }
                     // Yesterday
                     item(span = { GridItemSpan(3) }) {
                         Text("Yesterday", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
                     }
-                    items(yesterdayItems, key = { it.url }) { item ->
+                    items(yesterdayItems) { item ->
                         MediaGridItem(item)
                     }
                 }
@@ -153,7 +153,7 @@ private fun MediaGridItem(item: MediaItem) {
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current).data(item.url).crossfade(false).build(),
+            model = ImageRequest.Builder(LocalContext.current).data(item.url).crossfade(true).build(),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
