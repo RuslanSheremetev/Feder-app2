@@ -62,12 +62,26 @@ fun MyProfileScreen(
             Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* QR */ }) {
-                Icon(Icons.Filled.QrCode, "QR", tint = TextMain, modifier = Modifier.size(24.dp))
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F1F1F))
+                    .clickable { /* QR */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.QrCode, "QR", tint = TextMain, modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = { /* More */ }) {
-                Icon(Icons.Filled.MoreVert, "More", tint = TextMain, modifier = Modifier.size(24.dp))
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F1F1F))
+                    .clickable { /* More */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.MoreVert, "More", tint = TextMain, modifier = Modifier.size(20.dp))
             }
         }
 
