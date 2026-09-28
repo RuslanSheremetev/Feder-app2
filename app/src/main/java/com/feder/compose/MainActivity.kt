@@ -73,7 +73,6 @@ import com.feder.compose.ui.screen.ChatScreen
 import com.feder.compose.ui.screen.MyProfileScreen
 import com.feder.compose.ui.components.FederChatsIcon
 import com.feder.compose.ui.components.FederContactsIcon
-import com.feder.compose.ui.components.FederSettingsIcon
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -1000,7 +999,7 @@ fun FederApp() {
             Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(horizontal = 16.dp).navigationBarsPadding().padding(bottom = 8.dp)) {
                 Surface(shape = RoundedCornerShape(28.dp), color = SurfaceContainerHigh, shadowElevation = 12.dp, tonalElevation = 0.dp, border = BorderStroke(0.1.dp, Color(0xFF3A3A3A))) {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                        listOf("Chats" to FederChatsIcon, "Contacts" to FederContactsIcon, "Profile" to Icons.Outlined.Person, "Settings" to FederSettingsIcon).forEachIndexed { i, (label, icon) ->
+                        listOf("Chats" to FederChatsIcon, "Contacts" to FederContactsIcon, "Profile" to Icons.Outlined.Person, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
                             Column(Modifier.weight(1f).fillMaxHeight().clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 if (i == 2) {
