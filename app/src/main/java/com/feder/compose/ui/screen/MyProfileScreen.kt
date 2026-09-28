@@ -245,11 +245,11 @@ private fun ProfileActionButton(
         color = CardBg
     ) {
         Column(
-            Modifier.padding(vertical = 14.dp, horizontal = 8.dp),
+            Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, label, tint = TextMain, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.height(8.dp))
+            Icon(icon, label, tint = TextMain, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.height(4.dp))
             Text(label, color = TextMain, fontSize = 12.sp, fontWeight = FontWeight.Medium)
         }
     }
