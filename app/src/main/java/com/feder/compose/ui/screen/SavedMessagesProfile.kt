@@ -257,6 +257,8 @@ fun SavedMessagesProfile(
             PhotoViewer(
                 urls = mediaUrls,
                 initialIndex = idx,
+                senderName = "Saved Messages",
+                timeText = "",
                 onClose = { photoViewerIndex = null }
             )
         }

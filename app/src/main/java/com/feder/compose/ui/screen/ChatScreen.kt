@@ -2471,21 +2471,18 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
         // Кнопка прокрутки вниз
         // Полноэкранный просмотр
+        // FIX_VIEWER_IN_CHAT: заменяем на Telegram-style PhotoViewer
         if (fullScreenPhoto != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-                    .clickable { fullScreenPhoto = null },
-                contentAlignment = Alignment.Center
-            ) {
-                AsyncImage(
-                    model = fullScreenPhoto,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
-            }
+            com.feder.compose.ui.components.PhotoViewer(
+                urls = listOf(fullScreenPhoto!!),
+                initialIndex = 0,
+                senderName = chatName,
+                timeText = "",
+                onClose = { fullScreenPhoto = null },
+                onEdit = { /* TODO */ },
+                onShare = { /* TODO */ },
+                onMore = { /* TODO */ }
+            )
         }
 
         AnimatedVisibility(

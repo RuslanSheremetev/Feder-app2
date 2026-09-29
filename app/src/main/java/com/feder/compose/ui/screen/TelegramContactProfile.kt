@@ -275,9 +275,12 @@ fun TelegramContactProfile(
 
         // ─── PhotoViewer (fullscreen) ───
         photoViewerIndex?.let { idx ->
+            // FIX_VIEWER_CALL_V2: Telegram-style viewer
             PhotoViewer(
                 urls = mediaUrls,
                 initialIndex = idx,
+                senderName = contactName,
+                timeText = "",
                 onClose = { photoViewerIndex = null }
             )
         }
