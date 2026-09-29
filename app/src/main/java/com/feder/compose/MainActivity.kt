@@ -778,9 +778,7 @@ fun FederApp() {
                     viewModel.isSearchVisible = !viewModel.isSearchVisible
                     if (!viewModel.isSearchVisible) viewModel.searchQuery = ""
                 }) {
-                    if (viewModel.selectedTab != 1) {
-                        Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
-                    }
+                    Icon(Icons.Filled.Search, "search", tint = Color.White, modifier = Modifier.size(24.dp))
                 }
                 Box(Modifier.align(Alignment.CenterVertically)) {
                     var showMoreMenu by remember { mutableStateOf(false) }
@@ -833,7 +831,7 @@ fun FederApp() {
                     ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (targetTab == 1) {
-                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it })
                     } else if (targetTab == 2) {
                         val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(

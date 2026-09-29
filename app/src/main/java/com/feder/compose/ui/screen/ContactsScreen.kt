@@ -14,6 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.foundation.border
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +47,7 @@ data class Contact(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick: (String) -> Unit = {}) {
+fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick: (String) -> Unit = {}, isSearchVisible: Boolean = false, searchQuery: String = "", onSearchChange: (String) -> Unit = {}) {
     var searchText by remember { mutableStateOf("") }
 
 
@@ -52,6 +58,44 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick:
     Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp)) {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
 
+                // Поиск — появляется по нажатию на лупу
+                item {
+                    AnimatedVisibility(
+                        visible = isSearchVisible,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 8.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh
+                        ) {
+                            Row(
+                                modifier = Modifier.height(40.dp).padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.Search, "search", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(8.dp))
+                                BasicTextField(
+                                    value = searchQuery,
+                                    onValueChange = onSearchChange,
+                                    singleLine = true,
+                                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp),
+                                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                    modifier = Modifier.weight(1f),
+                                    decorationBox = { innerTextField ->
+                                        Box {
+                                            if (searchQuery.isEmpty()) {
+                                                Text("Search contacts...", color = MaterialTheme.colorScheme.outline, fontSize = 14.sp)
+                                            }
+                                            innerTextField()
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
                 // New Group, New Secret Chat, New Channel
                 item {
                     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
