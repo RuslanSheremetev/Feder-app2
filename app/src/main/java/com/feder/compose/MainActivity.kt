@@ -1093,7 +1093,7 @@ fun FederApp() {
                     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         listOf("Chats" to FederChatsIcon, "Contacts" to FederContactsIcon, "Profile" to Icons.Outlined.Person, "Settings" to Icons.Outlined.Settings).forEachIndexed { i, (label, icon) ->
                             val selected = viewModel.selectedTab == i
-                            Column(Modifier.weight(1f).fillMaxHeight().clickable { viewModel.selectedTab = i }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                            Column(Modifier.weight(1f).fillMaxHeight().clickable { viewModel.selectedTab = i; viewModel.isSearchVisible = false; viewModel.searchQuery = "" }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 if (i == 2) {
                                     // Profile tab — круглая аватарка (как в Telegram)
                                     val meUsername = viewModel.currentUsername.ifEmpty { "demo" }
