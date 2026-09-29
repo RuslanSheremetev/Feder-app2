@@ -49,7 +49,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick:
 
     val groupedContacts = contacts.groupBy { it.name.first().uppercase() }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 80.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = 64.dp)) {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 80.dp)) {
 
                 // New Group, New Secret Chat, New Channel
