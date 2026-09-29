@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 
 // ─── Хардкод цветов (не тянем из Theme.kt, чтобы файл компилировался сам) ───
 private val Bg               = Color(0xFF131313)
@@ -42,6 +43,7 @@ private val OnSurfaceVar     = Color(0xFFC0C7D4)
 private val Outline          = Color(0xFF8A919E)
 private val OutlineVariant   = Color(0xFF404752)
 
+@kotlin.OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun SavedMessagesProfile(
     onBack: () -> Unit = {},
