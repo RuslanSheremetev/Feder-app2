@@ -1429,14 +1429,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     IconButton(onClick = {
                         if (selectedMessages.isEmpty()) return@IconButton
                         val ids = selectedMessages.toList()
-                        // FIX_DELETE_ROOM: чистим Room-кэш, иначе при перезаходе сообщения воскреснут
-                        try {
-                            ids.forEach { idStr ->
-                                idStr.toLongOrNull()?.let { numericId ->
-                                    repository?.deleteMessage(numericId)
+                        // FIX_DELETE_ROOM + FIX_SUSPEND_DELETE: чистим Room в корутине
+                        // (deleteMessage — suspend, нельзя звать из onClick напрямую)
+                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                            try {
+                                ids.forEach { idStr ->
+                                    idStr.toLongOrNull()?.let { numericId ->
+                                        repository?.deleteMessage(numericId)
+                                    }
                                 }
-                            }
-                        } catch (_: Exception) {}
+                            } catch (_: Exception) {}
+                        }
 
                         // Локально убрать
                         messages = messages.filter { it.id.toString() !in selectedMessages }
