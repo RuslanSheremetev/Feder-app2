@@ -1019,9 +1019,10 @@ fun FederApp() {
                             ) {
                                 // Аватар + онлайн-точка
                                 Box(Modifier.size(56.dp).clickable {
+                                // FIX_AVATAR_CLICK_V1: аватарка → диалог (не профиль)
                                 if (chat.username != "saved_messages") {
-                                    viewModel.selectedProfile = chat.username
-                                    viewModel.selectedChat = null
+                                    viewModel.selectedChat = chat.username
+                                    viewModel.markChatRead(chat.username)
                                 }
                             }) {
                                     if (chat.username == "saved_messages" || chat.name == "Saved Messages") {
