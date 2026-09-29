@@ -681,7 +681,8 @@ fun FederApp() {
                 viewModel.showSavedProfile -> {
                     com.feder.compose.ui.screen.SavedMessagesProfile(
                         onBack = { viewModel.showSavedProfile = false },
-                        mediaUrls = viewModel.profileMediaUrls
+                        mediaUrls = viewModel.profileMediaUrls,
+                        messages = viewModel.profileMessages
                     )
                 }
                 viewModel.selectedProfile != null -> {

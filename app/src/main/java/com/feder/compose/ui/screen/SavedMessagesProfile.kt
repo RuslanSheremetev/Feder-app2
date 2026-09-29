@@ -45,7 +45,8 @@ private val OutlineVariant   = Color(0xFF404752)
 @Composable
 fun SavedMessagesProfile(
     onBack: () -> Unit = {},
-    mediaUrls: List<String> = emptyList()
+    mediaUrls: List<String> = emptyList(),
+    messages: List<com.feder.compose.ui.screen.MsgItem> = emptyList()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var photoViewerIndex by remember { mutableStateOf<Int?>(null) }
@@ -160,6 +161,35 @@ fun SavedMessagesProfile(
 
             Spacer(Modifier.height(20.dp))
 
+            // ─── Music tab (3) ───
+            if (selectedTab == 3) {
+                val audioMsgs = messages.filter { msg ->
+                    val u = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+                    u != null && com.feder.compose.audio.IsAudio.isAudioFile(u)
+                }.reversed()
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (audioMsgs.isEmpty()) {
+                        Box(Modifier.fillMaxWidth().height(160.dp), contentAlignment = Alignment.Center) {
+                            Text("Нет музыки", color = OnSurfaceVar, fontSize = 14.sp)
+                        }
+                    } else {
+                        audioMsgs.forEach { msg ->
+                            val u = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+                            if (u != null) {
+                                com.feder.compose.audio.AudioBubble(
+                                    audioUrl = u, token = "",
+                                    isMine = msg.from == "demo",
+                                    time = msg.time, msgStatus = msg.status,
+                                    onLongClick = { }
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
             // ── Empty state ──
             Column(
                 modifier = Modifier
