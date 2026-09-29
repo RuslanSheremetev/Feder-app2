@@ -41,7 +41,7 @@ data class Contact(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
+fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick: (String) -> Unit = {}) {
     var searchText by remember { mutableStateOf("") }
 
 
@@ -79,7 +79,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit) {
                         }
                     }
                     items(contacts, key = { it.username }) { contact ->
-                        ContactRow(contact)
+                        ContactRow(contact, onClick = { onContactClick(contact.username) })
                     }
                 }
 
@@ -125,11 +125,11 @@ private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 }
 
 @Composable
-private fun ContactRow(contact: ChatItem) {
+private fun ContactRow(contact: ChatItem, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
