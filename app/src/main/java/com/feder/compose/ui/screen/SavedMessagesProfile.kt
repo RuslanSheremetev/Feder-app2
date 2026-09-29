@@ -248,6 +248,7 @@ fun SavedMessagesProfile(
             }
         }
     }
+            }
 
         // ─── PhotoViewer (fullscreen) ───
         photoViewerIndex?.let { idx ->
