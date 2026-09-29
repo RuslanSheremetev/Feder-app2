@@ -2485,6 +2485,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             )
         }
 
+        if (fullScreenPhoto == null) {
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < listState.layoutInfo.totalItemsCount - 2 } ?: false,
             modifier = Modifier.padding(end = 20.dp, bottom = 110.dp).align(Alignment.BottomEnd),
@@ -2504,6 +2505,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ) {
                 Icon(Icons.Filled.KeyboardArrowDown, "scroll down", modifier = Modifier.size(24.dp))
             }
+        }
         }
 
         
