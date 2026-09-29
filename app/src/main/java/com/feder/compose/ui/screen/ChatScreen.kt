@@ -1429,6 +1429,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     IconButton(onClick = {
                         if (selectedMessages.isEmpty()) return@IconButton
                         val ids = selectedMessages.toList()
+                        // FIX_DELETE_ROOM: чистим Room-кэш, иначе при перезаходе сообщения воскреснут
+                        try {
+                            ids.forEach { idStr ->
+                                idStr.toLongOrNull()?.let { numericId ->
+                                    repository?.deleteMessage(numericId)
+                                }
+                            }
+                        } catch (_: Exception) {}
+
                         // Локально убрать
                         messages = messages.filter { it.id.toString() !in selectedMessages }
                         // Отправить на сервер
@@ -1438,7 +1447,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     val idLong = idStr.toLongOrNull() ?: return@forEach
                                     val body = org.json.JSONObject().apply {
                                         put("id", idLong)
-                                        put("forAll", false)     // для себя; изменить на true для «у всех»
+                                        put("forAll", true)      // FIX_FORALL_TRUE: массовое удаление = у всех
                                         put("user", myUsername)
                                     }
                                     val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
