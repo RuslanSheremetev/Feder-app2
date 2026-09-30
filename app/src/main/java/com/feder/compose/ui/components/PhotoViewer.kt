@@ -45,15 +45,26 @@ fun PhotoViewer(
     timeText: String = "",
     onEdit: (() -> Unit)? = null,
     onShare: (() -> Unit)? = null,
-    onMore: (() -> Unit)? = null
+    onMore: (() -> Unit)? = null,
+    // FIX_HERO_STEP2: координаты миниатюры в окне для hero-анимации
+    sourceX: Float = 0f,
+    sourceY: Float = 0f,
+    sourceWidth: Float = 100f,
+    sourceHeight: Float = 100f
 ) {
     if (urls.isEmpty()) return
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = initialIndex) { urls.size }
     val offsetY = remember { Animatable(0f) }
+    // FIX_HERO_STEP2: offsetX тоже анимируем для полёта в миниатюру
+    val offsetX = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
     var uiVisible by remember { mutableStateOf(true) }
+    // FIX_HERO_STEP2: получаем размеры экрана для hero-анимации
+    val config = androidx.compose.ui.platform.LocalConfiguration.current
+    val screenW = config.screenWidthDp.toFloat() * context.resources.displayMetrics.density
+    val screenH = config.screenHeightDp.toFloat() * context.resources.displayMetrics.density
 
     // Расчёт scale и alpha от offsetY
     val currentOffset = offsetY.value
@@ -72,19 +83,35 @@ fun PhotoViewer(
                         isDragging = false
                         scope.launch {
                             if (abs(offsetY.value) > 200f) {
-                                // Закрыть: улетает за экран
-                                val target = if (offsetY.value > 0) 2000f else -2000f
-                                offsetY.animateTo(target, tween(durationMillis = 220))
+                                // FIX_HERO_STEP2: летим в миниатюру
+                                // Рассчитываем целевую позицию (центр экрана → центр миниатюры)
+                                val targetX = sourceX + sourceWidth / 2f - screenW / 2f
+                                val targetY = sourceY + sourceHeight / 2f - screenH / 2f
+                                // Целевой scale (размер миниатюры относительно экрана)
+                                val targetScale = (sourceWidth / screenW).coerceIn(0.1f, 1f)
+
+                                // Анимируем X, Y одновременно + scale через offsetY
+                                kotlinx.coroutines.coroutineScope {
+                                    kotlinx.coroutines.launch {
+                                        offsetX.animateTo(targetX, tween(durationMillis = 280))
+                                    }
+                                    kotlinx.coroutines.launch {
+                                        offsetY.animateTo(targetY, tween(durationMillis = 280))
+                                    }
+                                }
                                 onClose()
                             } else {
                                 // Возврат на место
-                                offsetY.animateTo(
-                                    0f,
-                                    spring(
-                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessMedium
+                                scope.launch {
+                                    offsetY.animateTo(
+                                        0f,
+                                        spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessMedium
+                                        )
                                     )
-                                )
+                                }
+                                scope.launch { offsetX.animateTo(0f, spring()) }
                             }
                         }
                     },
@@ -110,6 +137,7 @@ fun PhotoViewer(
             Modifier
                 .fillMaxSize()
                 .graphicsLayer {
+                    translationX = offsetX.value
                     translationY = offsetY.value
                     scaleX = scale
                     scaleY = scale

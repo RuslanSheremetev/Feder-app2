@@ -133,6 +133,11 @@ private val loggerClient: okhttp3.OkHttpClient by lazy {
 
 
 var fullScreenPhoto: String? = null
+// FIX_HERO_STEP1: координаты миниатюры фото для hero-анимации
+var photoSourceX by mutableStateOf(0f)
+var photoSourceY by mutableStateOf(0f)
+var photoSourceW by mutableStateOf(0f)
+var photoSourceH by mutableStateOf(0f)
 var uploadingPhotos: Boolean = false
 
 data class Reaction(
@@ -395,6 +400,15 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                     modifier = Modifier
                                         .sizeIn(maxWidth = 280.dp, maxHeight = 600.dp)
                                         .aspectRatio(if (imageAspectRatio != null && imageAspectRatio!! > 0.05f) imageAspectRatio!! else 0.75f)
+                                        // FIX_HERO_STEP1: сохраняем координаты этого фото в окне
+                                        .onGloballyPositioned { coords ->
+                                            val pos = coords.positionInWindow()
+                                            val size = coords.size
+                                            photoSourceX = pos.x
+                                            photoSourceY = pos.y
+                                            photoSourceW = size.width.toFloat()
+                                            photoSourceH = size.height.toFloat()
+                                        }
                                         .combinedClickable(
                                             onClick = {
                                                 // FIX_SELECT_PHOTO_V2: в режиме выбора — toggle, иначе — открыть фото
@@ -2485,7 +2499,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 onClose = { fullScreenPhoto = null },
                 onEdit = { /* TODO */ },
                 onShare = { /* TODO */ },
-                onMore = { /* TODO */ }
+                onMore = { /* TODO */ },
+                // FIX_HERO_STEP1: координаты миниатюры фото
+                sourceX = photoSourceX,
+                sourceY = photoSourceY,
+                sourceWidth = photoSourceW,
+                sourceHeight = photoSourceH
             )
         }
 
