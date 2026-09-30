@@ -102,7 +102,7 @@ fun AudioBubble(
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // ─── Play/pause кнопка ───
+        // ─── Play/pause ───
         Box(
             Modifier.size(44.dp).clip(CircleShape)
                 .background(if (isMine) Color.White.copy(alpha = 0.25f) else Color.White),
@@ -117,32 +117,55 @@ fun AudioBubble(
         }
         Spacer(Modifier.width(10.dp))
 
-        // ─── Waveform + нижняя строка (без →A) ───
-        Column(Modifier.weight(1f)) {
-            val progress = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f
-            Canvas(Modifier.fillMaxWidth().height(24.dp)) {
-                val bars = 28
-                val barW = size.width / bars
-                val gap = 1.5f
-                val seed = audioUrl.hashCode()
-                for (i in 0 until bars) {
-                    val h = ((kotlin.math.abs(seed xor (i * 7919)) % 60) + 30) / 100f
-                    val barH = size.height * h
-                    val x = i * barW
-                    val yTop = (size.height - barH) / 2
-                    val paint = if ((i.toFloat() / bars) <= progress)
-                        Color(0xFF339DFF) else Color.White.copy(alpha = 0.55f)
-                    drawLine(
-                        color = paint,
-                        start = Offset(x, yTop),
-                        end = Offset(x, yTop + barH),
-                        strokeWidth = barW - gap,
-                        cap = StrokeCap.Round
+        // ─── Column: waveform + →A (одна строка), потом время ───
+        Column {
+            // Верхняя строка: waveform + →A на одной высоте
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val progress = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f
+                Canvas(Modifier.width(140.dp).height(28.dp)) {
+                    val bars = 28
+                    val barW = size.width / bars
+                    val gap = 1.5f
+                    val seed = audioUrl.hashCode()
+                    for (i in 0 until bars) {
+                        val h = ((kotlin.math.abs(seed xor (i * 7919)) % 60) + 30) / 100f
+                        val barH = size.height * h
+                        val x = i * barW
+                        val yTop = (size.height - barH) / 2
+                        val paint = if ((i.toFloat() / bars) <= progress)
+                            Color(0xFF339DFF) else Color.White.copy(alpha = 0.55f)
+                        drawLine(
+                            color = paint,
+                            start = Offset(x, yTop),
+                            end = Offset(x, yTop + barH),
+                            strokeWidth = barW - gap,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
+                // →A рядом с waveform, на одной высоте
+                Box(
+                    modifier = Modifier
+                        .size(width = 36.dp, height = 28.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            if (isMine) Color.White.copy(alpha = 0.35f)
+                            else Color(0xFF339DFF).copy(alpha = 0.25f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "→A",
+                        color = if (isMine) Color.White else Color(0xFF339DFF),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
-            Spacer(Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(3.dp))
+            // Нижняя строка: время слева + время прихода справа
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.width(186.dp)) {
                 Text(
                     if (durationMs > 0) fmt(positionMs) else "0:00",
                     color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f),
@@ -172,27 +195,6 @@ fun AudioBubble(
                     )
                 }
             }
-        }
-
-        Spacer(Modifier.width(10.dp))
-
-        // ─── Кнопка →A — ОТДЕЛЬНЫЙ блок справа, НЕПРОЗРАЧНАЯ ───
-        Box(
-            modifier = Modifier
-                .size(width = 40.dp, height = 26.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(
-                    if (isMine) Color.White.copy(alpha = 0.35f)   // непрозрачная светлая для "моих"
-                    else Color(0xFF339DFF).copy(alpha = 0.25f)    // непрозрачная синяя для чужих
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "→A",
-                color = if (isMine) Color.White else Color(0xFF339DFF),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }
