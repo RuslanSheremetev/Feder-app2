@@ -1657,10 +1657,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
+                                        // FIX_MENU_CLEAN_V1: сохраняем координаты для popup
                                         val pos = msgPositions[msg.id]
-                                        if (pos != null) {
+                                        if (pos != null && (pos.x > 1f || pos.y > 1f)) {
                                             msg.posX = pos.x
                                             msg.posY = pos.y
+                                            selectedMessageOffset = pos
+                                        } else {
+                                            // fallback: сохраняем msg.posX/posY как есть
+                                            selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         }
                                         selectedMessage = msg
                                     }
@@ -1896,8 +1901,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val menuWidthPx = with(density) { 260.dp.toPx() }
             val msg = selectedMessage!!
             val isMyMsg = msg.from == myUsername
-            val msgY = msg.posY
-            val msgX = msg.posX
+            // FIX_MENU_CLEAN_V1: используем selectedMessageOffset, если валиден; иначе msg.posX/Y
+            val msgY = if (selectedMessageOffset.y > 1f) selectedMessageOffset.y else msg.posY
+            val msgX = if (selectedMessageOffset.x > 1f) selectedMessageOffset.x else msg.posX
 
             // Реальный размер меню (примерный, для расчёта влезает ли снизу)
             val menuHeightRealPx = with(density) { 420.dp.toPx() }
