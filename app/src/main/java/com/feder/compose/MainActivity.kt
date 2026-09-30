@@ -109,6 +109,9 @@ data class ChatItem(
     @SerializedName("is_muted") val isMuted: Boolean = false,
     @SerializedName("last_seen") val lastSeen: Long? = null,
     @SerializedName("lastMessage") val lastMessage: String? = null,
+    // FIX_LASTPHOTO_CLIENT_V1: последнее фото в чате
+    @SerializedName("lastImageUrl") val lastImageUrl: String? = null,
+    @SerializedName("lastImageCount") val lastImageCount: Int = 0,
     val timestamp: String? = null,
     @SerializedName("time") val timeVal: Long = 0
 )
@@ -1069,6 +1072,34 @@ fun FederApp() {
                                             Text(lastMsg.take(24), color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                                         } else {
                                             Spacer(Modifier.weight(1f))
+                                        }
+                                        // FIX_LASTPHOTO_CLIENT_V1: мини-превью последнего фото + счётчик
+                                        if (!chat.lastImageUrl.isNullOrEmpty()) {
+                                            val isAudioOrVideo = chat.lastImageUrl.endsWith(".m4a", true) || chat.lastImageUrl.endsWith(".mp4", true) || chat.lastImageUrl.endsWith(".mp3", true)
+                                            if (!isAudioOrVideo) {
+                                                Spacer(Modifier.width(6.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(20.dp)
+                                                        .clip(RoundedCornerShape(4.dp))
+                                                        .background(Color(0xFF2A2A2A)),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    AsyncImage(
+                                                        model = ImageRequest.Builder(LocalContext.current)
+                                                            .data("http://2.26.71.102:8012/uploads/${chat.lastImageUrl}")
+                                                            .crossfade(false)
+                                                            .build(),
+                                                        contentDescription = null,
+                                                        contentScale = ContentScale.Crop,
+                                                        modifier = Modifier.fillMaxSize()
+                                                    )
+                                                }
+                                                if (chat.lastImageCount > 1) {
+                                                    Spacer(Modifier.width(2.dp))
+                                                    Text("${chat.lastImageCount}", color = OnSurfaceVariant, fontSize = 11.sp)
+                                                }
+                                            }
                                         }
                                         if (chat.unread > 0) {
                                             Spacer(Modifier.width(8.dp))
