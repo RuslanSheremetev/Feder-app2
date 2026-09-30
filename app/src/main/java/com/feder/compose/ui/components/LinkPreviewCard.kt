@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.data.entity.LinkPreviewEntity
 import com.feder.compose.repository.LinkPreviewRepository
-import com.feder.compose.video.InlineYouTubePlayer
+import com.feder.compose.video.ResolvedYouTubePlayer
 
 private val CardBg     = Color(0xFF1F1F1F)
 private val CardBgMine = Color(0x33000000)
@@ -99,7 +99,7 @@ private fun YouTubeCard(
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color.Black)
         ) {
-            InlineYouTubePlayer(
+            ResolvedYouTubePlayer(
                 videoId = p.videoId!!,
                 modifier = Modifier.fillMaxSize(),
                 showCloseButton = true,
