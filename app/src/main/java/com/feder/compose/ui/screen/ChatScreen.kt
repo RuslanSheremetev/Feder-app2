@@ -201,7 +201,10 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {}) {
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
+onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
+    // FIX_HERO_STEP3_V4: локальный Rect тапнутого фото
+    var lastPhotoRect by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -400,14 +403,16 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                     modifier = Modifier
                                         .sizeIn(maxWidth = 280.dp, maxHeight = 600.dp)
                                         .aspectRatio(if (imageAspectRatio != null && imageAspectRatio!! > 0.05f) imageAspectRatio!! else 0.75f)
-                                        // FIX_HERO_STEP1: сохраняем координаты этого фото в окне
+                                        // FIX_HERO_STEP3_V4: сохраняем в ЛОКАЛЬНЫЙ state
                                         .onGloballyPositioned { coords ->
                                             val pos = coords.positionInWindow()
                                             val size = coords.size
-                                            photoSourceX = pos.x
-                                            photoSourceY = pos.y
-                                            photoSourceW = size.width.toFloat()
-                                            photoSourceH = size.height.toFloat()
+                                            lastPhotoRect = androidx.compose.ui.geometry.Rect(
+                                                pos.x,
+                                                pos.y,
+                                                pos.x + size.width,
+                                                pos.y + size.height
+                                            )
                                         }
                                         .combinedClickable(
                                             onClick = {
@@ -415,6 +420,8 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                                 if (selectionMode) {
                                                     onClick?.invoke()
                                                 } else {
+                                                    // FIX_HERO_STEP3_V4: передаём координаты ЭТОГО фото
+                                                    lastPhotoRect?.let { r -> onPhotoRectReady?.invoke(r) }
                                                     fullScreenPhoto = if (url.startsWith("content://") || url.startsWith("file://")) url else if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                                 }
                                             },
@@ -1658,7 +1665,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     }
                                 },
                             
-                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() }
+                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
+                            // FIX_HERO_STEP3_V4: сохраняем координаты тапнутого фото в top-level
+                            onPhotoRectReady = { rect ->
+                                photoSourceX = rect.left
+                                photoSourceY = rect.top
+                                photoSourceW = rect.width
+                                photoSourceH = rect.height
+                            }
                         )
                             }
                         }
