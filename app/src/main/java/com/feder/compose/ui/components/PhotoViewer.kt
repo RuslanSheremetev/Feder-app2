@@ -34,6 +34,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlin.math.abs
+// FIX_HERO_STEP3_V3: импорты для coroutineScope + launch + delay
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 // FIX_TELEGRAM_VIEWER_V2 — Telegram-style swipe with animation
 @Composable
@@ -59,6 +62,9 @@ fun PhotoViewer(
     val offsetY = remember { Animatable(0f) }
     // FIX_HERO_STEP2: offsetX тоже анимируем для полёта в миниатюру
     val offsetX = remember { Animatable(0f) }
+    // FIX_HERO_STEP3_V3: scaleAnim + alphaAnim
+    val scaleAnim = remember { Animatable(1f) }
+    val alphaAnim = remember { Animatable(1f) }
     var isDragging by remember { mutableStateOf(false) }
     var uiVisible by remember { mutableStateOf(true) }
     // FIX_HERO_STEP2: получаем размеры экрана для hero-анимации
@@ -66,10 +72,10 @@ fun PhotoViewer(
     val screenW = config.screenWidthDp.toFloat() * context.resources.displayMetrics.density
     val screenH = config.screenHeightDp.toFloat() * context.resources.displayMetrics.density
 
-    // Расчёт scale и alpha от offsetY
-    val currentOffset = offsetY.value
-    val scale = (1f - abs(currentOffset) / 1500f).coerceIn(0.7f, 1f)
-    val bgAlpha = (1f - abs(currentOffset) / 800f).coerceIn(0.2f, 1f)
+    // FIX_HERO_STEP3_V3: dragDistance от максимума |X|,|Y|
+    val dragDistance = maxOf(abs(offsetX.value), abs(offsetY.value))
+    val baseScale = (1f - dragDistance / 1500f).coerceIn(0.3f, 1f)
+    val bgAlpha = (1f - dragDistance / 500f).coerceIn(0f, 1f)
 
     Box(
         Modifier
@@ -83,25 +89,22 @@ fun PhotoViewer(
                         isDragging = false
                         scope.launch {
                             if (abs(offsetY.value) > 200f) {
-                                // FIX_HERO_STEP2: летим в миниатюру
-                                // Рассчитываем целевую позицию (центр экрана → центр миниатюры)
+                                // FIX_HERO_STEP3_V3: полный hero-полёт
                                 val targetX = sourceX + sourceWidth / 2f - screenW / 2f
                                 val targetY = sourceY + sourceHeight / 2f - screenH / 2f
-                                // Целевой scale (размер миниатюры относительно экрана)
-                                val targetScale = (sourceWidth / screenW).coerceIn(0.1f, 1f)
+                                val targetScale = maxOf(
+                                    sourceWidth / screenW,
+                                    sourceHeight / screenH
+                                ).coerceIn(0.05f, 1f)
 
-                                // Анимируем X, Y одновременно + scale через offsetY
-                                kotlinx.coroutines.coroutineScope {
-                                    kotlinx.coroutines.launch {
-                                        offsetX.animateTo(targetX, tween(durationMillis = 280))
-                                    }
-                                    kotlinx.coroutines.launch {
-                                        offsetY.animateTo(targetY, tween(durationMillis = 280))
-                                    }
+                                coroutineScope {
+                                    launch { offsetX.animateTo(targetX, tween(durationMillis = 320)) }
+                                    launch { offsetY.animateTo(targetY, tween(durationMillis = 320)) }
+                                    launch { scaleAnim.animateTo(targetScale, tween(durationMillis = 320)) }
+                                    launch { alphaAnim.animateTo(0f, tween(durationMillis = 320)) }
                                 }
                                 onClose()
                             } else {
-                                // Возврат на место
                                 scope.launch {
                                     offsetY.animateTo(
                                         0f,
@@ -112,14 +115,17 @@ fun PhotoViewer(
                                     )
                                 }
                                 scope.launch { offsetX.animateTo(0f, spring()) }
+                                scope.launch { scaleAnim.animateTo(1f, spring()) }
+                                scope.launch { alphaAnim.animateTo(1f, spring()) }
                             }
                         }
                     },
                     onDragCancel = {
                         isDragging = false
-                        scope.launch {
-                            offsetY.animateTo(0f, spring())
-                        }
+                        scope.launch { offsetY.animateTo(0f, spring()) }
+                        scope.launch { offsetX.animateTo(0f, spring()) }
+                        scope.launch { scaleAnim.animateTo(1f, spring()) }
+                        scope.launch { alphaAnim.animateTo(1f, spring()) }
                     }
                 ) { _, dragAmount ->
                     scope.launch {
@@ -139,9 +145,11 @@ fun PhotoViewer(
                 .graphicsLayer {
                     translationX = offsetX.value
                     translationY = offsetY.value
-                    scaleX = scale
-                    scaleY = scale
-                    alpha = (1f - abs(offsetY.value) / 1200f).coerceIn(0.4f, 1f)
+                    // FIX_HERO_STEP3_V3: общий scale = base × animated
+                    val totalScale = baseScale * scaleAnim.value
+                    scaleX = totalScale
+                    scaleY = totalScale
+                    alpha = alphaAnim.value * (1f - dragDistance / 1500f).coerceIn(0.15f, 1f)
                 }
         ) {
             HorizontalPager(
@@ -165,7 +173,7 @@ fun PhotoViewer(
         }
 
         // ─── Верхняя панель ───
-        if (uiVisible) {
+        if (uiVisible && !isDragging) {
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -233,7 +241,7 @@ fun PhotoViewer(
         }
 
         // ─── Счётчик N of M ───
-        if (uiVisible) {
+        if (uiVisible && !isDragging) {
             Text(
                 "${pagerState.currentPage + 1} of ${urls.size}",
                 color = Color.White,
