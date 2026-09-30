@@ -1,6 +1,7 @@
 package com.feder.compose.ui.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -75,7 +76,8 @@ fun PhotoViewer(
     // FIX_HERO_STEP3_V3: dragDistance от максимума |X|,|Y|
     val dragDistance = maxOf(abs(offsetX.value), abs(offsetY.value))
     val baseScale = (1f - dragDistance / 1500f).coerceIn(0.3f, 1f)
-    val bgAlpha = (1f - dragDistance / 500f).coerceIn(0f, 1f)
+    // FIX_SMOOTH_HERO_V1: bgAlpha плавнее (медленнее пропадает)
+    val bgAlpha = (1f - dragDistance / 900f).coerceIn(0f, 1f)
 
     Box(
         Modifier
@@ -97,20 +99,27 @@ fun PhotoViewer(
                                     sourceHeight / screenH
                                 ).coerceIn(0.05f, 1f)
 
-                                // FIX_HERO_CLOSE_V1: параллельные launch + delay — гарантирует onClose
-                                launch { offsetX.animateTo(targetX, tween(durationMillis = 320)) }
-                                launch { offsetY.animateTo(targetY, tween(durationMillis = 320)) }
-                                launch { scaleAnim.animateTo(targetScale, tween(durationMillis = 320)) }
-                                launch { alphaAnim.animateTo(0f, tween(durationMillis = 320)) }
-                                kotlinx.coroutines.delay(340)
+                                // FIX_SMOOTH_HERO_V1: плавный hero-полёт с easing
+                                val dur = 420
+                                val curve = tween<androidx.compose.ui.geometry.Offset>(durationMillis = dur, easing = FastOutSlowInEasing)
+                                launch { offsetX.animateTo(targetX, tween(durationMillis = dur, easing = FastOutSlowInEasing)) }
+                                launch { offsetY.animateTo(targetY, tween(durationMillis = dur, easing = FastOutSlowInEasing)) }
+                                launch { scaleAnim.animateTo(targetScale, tween(durationMillis = dur, easing = FastOutSlowInEasing)) }
+                                // Alpha чуть позже — фото сначала летит, потом растворяется
+                                launch {
+                                    kotlinx.coroutines.delay(140)
+                                    alphaAnim.animateTo(0f, tween(durationMillis = dur - 140, easing = FastOutSlowInEasing))
+                                }
+                                // onClose чуть позже завершения анимации
+                                kotlinx.coroutines.delay(dur + 60L)
                                 onClose()
                             } else {
                                 scope.launch {
                                     offsetY.animateTo(
                                         0f,
                                         spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMedium
+                                            dampingRatio = 0.85f,   // FIX_SMOOTH_HERO_V1: мягче, без отскока
+                                            stiffness = 380f
                                         )
                                     )
                                 }
@@ -122,10 +131,11 @@ fun PhotoViewer(
                     },
                     onDragCancel = {
                         isDragging = false
-                        scope.launch { offsetY.animateTo(0f, spring()) }
-                        scope.launch { offsetX.animateTo(0f, spring()) }
-                        scope.launch { scaleAnim.animateTo(1f, spring()) }
-                        scope.launch { alphaAnim.animateTo(1f, spring()) }
+                        val softSpring = spring<Float>(dampingRatio = 0.85f, stiffness = 380f)
+                        scope.launch { offsetY.animateTo(0f, softSpring) }
+                        scope.launch { offsetX.animateTo(0f, softSpring) }
+                        scope.launch { scaleAnim.animateTo(1f, softSpring) }
+                        scope.launch { alphaAnim.animateTo(1f, softSpring) }
                     }
                 ) { _, dragAmount ->
                     scope.launch {
