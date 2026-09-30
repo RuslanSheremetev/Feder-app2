@@ -46,30 +46,10 @@ fun ResolvedYouTubePlayer(
     var player by remember { mutableStateOf<ExoPlayer?>(null) }
 
     LaunchedEffect(videoId) {
+        // Сервер проксирует поток: отдаёт mp4 напрямую.
+        // Клиент просто играет URL.
+        resolvedUrl = "$proxyBaseUrl/youtube/stream?id=$videoId"
         error = null
-        resolvedUrl = null
-        try {
-            val url = withContext(Dispatchers.IO) {
-                val conn = (URL("$proxyBaseUrl/youtube/resolve?id=$videoId")
-                        .openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 10000
-                    readTimeout = 15000
-                    requestMethod = "GET"
-                }
-                try {
-                    if (conn.responseCode != 200) {
-                        throw RuntimeException("HTTP ${conn.responseCode}")
-                    }
-                    val body = conn.inputStream.bufferedReader().readText()
-                    val json = JSONObject(body)
-                    if (json.has("error")) throw RuntimeException(json.getString("error"))
-                    json.getString("url")
-                } finally { conn.disconnect() }
-            }
-            resolvedUrl = url
-        } catch (e: Exception) {
-            error = e.message ?: "resolve failed"
-        }
     }
 
     LaunchedEffect(resolvedUrl) {
