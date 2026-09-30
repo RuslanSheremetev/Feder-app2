@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
@@ -43,7 +44,6 @@ fun AudioBubble(
     val fullUrl = if (audioUrl.startsWith("http")) "$audioUrl?token=$token"
                   else "http://2.26.71.102:8014/$audioUrl?token=$token"
 
-    // Обновление позиции, когда играет
     LaunchedEffect(isPlaying) {
         while (isPlaying) {
             player?.let { positionMs = it.currentPosition }
@@ -91,7 +91,6 @@ fun AudioBubble(
         }
     }
 
-    // Формат M:SS
     fun fmt(ms: Int): String {
         val s = ms / 1000
         return "%d:%02d".format(s / 60, s % 60)
@@ -99,12 +98,11 @@ fun AudioBubble(
 
     Row(
         modifier = Modifier
-            
             .combinedClickable(onClick = { togglePlay() }, onLongClick = onLongClick)
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Play/pause button
+        // ─── Play/pause кнопка ───
         Box(
             Modifier.size(44.dp).clip(CircleShape)
                 .background(if (isMine) Color.White.copy(alpha = 0.25f) else Color.White),
@@ -118,53 +116,88 @@ fun AudioBubble(
             )
         }
         Spacer(Modifier.width(10.dp))
-        Column {
-            // Waveform (условные полоски, прогресс — синий)
-            val progress = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f
-            Canvas(Modifier.width(140.dp).height(24.dp)) {
-                val bars = 28
-                val barW = size.width / bars
-                val gap = 1.5f
-                val seed = audioUrl.hashCode()
-                for (i in 0 until bars) {
-                    val h = ((kotlin.math.abs(seed xor (i * 7919)) % 60) + 30) / 100f
-                    val barH = size.height * h
-                    val x = i * barW
-                    val yTop = (size.height - barH) / 2
-                    val paint = if ((i.toFloat() / bars) <= progress)
-                        Color(0xFF339DFF) else Color.White.copy(alpha = 0.55f)
-                    drawLine(
-                        color = paint,
-                        start = Offset(x, yTop),
-                        end = Offset(x, yTop + barH),
-                        strokeWidth = barW - gap,
-                        cap = StrokeCap.Round
+
+        // ─── Waveform + кнопка →A + время ───
+        Box(modifier = Modifier.width(170.dp)) {
+            Column {
+                // Waveform (полоски)
+                val progress = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f
+                Canvas(Modifier.fillMaxWidth().height(24.dp)) {
+                    val bars = 28
+                    val barW = size.width / bars
+                    val gap = 1.5f
+                    val seed = audioUrl.hashCode()
+                    for (i in 0 until bars) {
+                        val h = ((kotlin.math.abs(seed xor (i * 7919)) % 60) + 30) / 100f
+                        val barH = size.height * h
+                        val x = i * barW
+                        val yTop = (size.height - barH) / 2
+                        val paint = if ((i.toFloat() / bars) <= progress)
+                            Color(0xFF339DFF) else Color.White.copy(alpha = 0.55f)
+                        drawLine(
+                            color = paint,
+                            start = Offset(x, yTop),
+                            end = Offset(x, yTop + barH),
+                            strokeWidth = barW - gap,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                // Нижняя строка: длительность + время справа
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    // Длительность слева
+                    Text(
+                        if (durationMs > 0) fmt(positionMs) else "0:00",
+                        color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f),
+                        fontSize = 11.sp
                     )
+                    // Точка "не прослушано" (если ещё не играли)
+                    if (durationMs == 0) {
+                        Spacer(Modifier.width(3.dp))
+                        Box(Modifier.size(5.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f)))
+                    }
+                    Spacer(Modifier.weight(1f))
+                    // Время + галочка справа
+                    Text(
+                        time,
+                        color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f),
+                        fontSize = 11.sp
+                    )
+                    if (isMine) {
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            when (msgStatus) {
+                                "read" -> "✓✓"
+                                "received" -> "✓✓"
+                                else -> "✓"
+                            },
+                            color = if (msgStatus == "read") Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.height(3.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    if (durationMs > 0) fmt(positionMs) + " / " + fmt(durationMs)
-                    else "0:00",
-                    color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f),
-                    fontSize = 11.sp
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(time, color = if (isMine) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.7f), fontSize = 11.sp)
-                if (isMine) {
-                    Spacer(Modifier.width(3.dp))
-                    Text(
-                        when (msgStatus) {
-                            "read" -> "✓✓"
-                            "received" -> "✓✓"
-                            else -> "✓"
-                        },
-                        color = if (msgStatus == "read") Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
+
+            // ─── Кнопка →A (транскрипция, только UI) ───
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 6.dp, y = (-2).dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        if (isMine) Color.White.copy(alpha = 0.25f)
+                        else Color(0xFF339DFF).copy(alpha = 0.15f)
                     )
-                }
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    "→A",
+                    color = if (isMine) Color.White else Color(0xFF339DFF),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
