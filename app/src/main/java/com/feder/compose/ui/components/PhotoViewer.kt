@@ -1,5 +1,9 @@
 package com.feder.compose.ui.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -20,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,8 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlin.math.abs
 
-// FIX_TELEGRAM_VIEWER_V1
+// FIX_TELEGRAM_VIEWER_V2 — Telegram-style swipe with animation
 @Composable
 fun PhotoViewer(
     urls: List<String>,
@@ -43,44 +49,94 @@ fun PhotoViewer(
 ) {
     if (urls.isEmpty()) return
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = initialIndex) { urls.size }
-    var dragOffset by remember { mutableFloatStateOf(0f) }
+    val offsetY = remember { Animatable(0f) }
+    var isDragging by remember { mutableStateOf(false) }
     var uiVisible by remember { mutableStateOf(true) }
+
+    // Расчёт scale и alpha от offsetY
+    val currentOffset = offsetY.value
+    val scale = (1f - abs(currentOffset) / 1500f).coerceIn(0.7f, 1f)
+    val bgAlpha = (1f - abs(currentOffset) / 800f).coerceIn(0.2f, 1f)
 
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color.Black.copy(alpha = bgAlpha))
+            // Свайп вверх/вниз — тянем фото за пальцем
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
+                    onDragStart = { isDragging = true },
                     onDragEnd = {
-                        if (dragOffset > 150f) onClose()
-                        dragOffset = 0f
+                        isDragging = false
+                        scope.launch {
+                            if (abs(offsetY.value) > 200f) {
+                                // Закрыть: улетает за экран
+                                val target = if (offsetY.value > 0) 2000f else -2000f
+                                offsetY.animateTo(target, tween(durationMillis = 220))
+                                onClose()
+                            } else {
+                                // Возврат на место
+                                offsetY.animateTo(
+                                    0f,
+                                    spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                )
+                            }
+                        }
+                    },
+                    onDragCancel = {
+                        isDragging = false
+                        scope.launch {
+                            offsetY.animateTo(0f, spring())
+                        }
                     }
-                ) { _, dragAmount -> dragOffset += dragAmount }
+                ) { _, dragAmount ->
+                    scope.launch {
+                        offsetY.snapTo(offsetY.value + dragAmount)
+                    }
+                }
             }
+            // Тап → скрыть/показать UI
             .pointerInput(Unit) {
                 detectTapGestures { uiVisible = !uiVisible }
             }
     ) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            pageSpacing = 0.dp
-        ) { page ->
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(urls[page])
-                        .crossfade(false)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxSize()
-                )
+        // Контент с трансформацией
+        Box(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    translationY = offsetY.value
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = (1f - abs(offsetY.value) / 1200f).coerceIn(0.4f, 1f)
+                }
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                pageSpacing = 0.dp,
+                userScrollEnabled = !isDragging   // отключить пока тащат вертикально
+            ) { page ->
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(urls[page])
+                            .crossfade(false)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
 
+        // ─── Верхняя панель ───
         if (uiVisible) {
             Row(
                 Modifier
@@ -148,6 +204,7 @@ fun PhotoViewer(
             }
         }
 
+        // ─── Счётчик N of M ───
         if (uiVisible) {
             Text(
                 "${pagerState.currentPage + 1} of ${urls.size}",
