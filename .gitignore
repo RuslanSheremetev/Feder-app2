@@ -13,3 +13,8 @@ local.properties
 feder-release.keystore
 *.keystore
 *.jks
+
+# Временные бэкапы (не коммитить)
+*.bak
+*.bak_*
+*.bak.*

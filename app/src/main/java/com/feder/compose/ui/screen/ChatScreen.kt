@@ -85,7 +85,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.feder.compose.video.VideoBubble
-import com.feder.compose.video.FullscreenVideoPlayer
 import com.feder.compose.ui.components.LinkPreviewCard
 import com.feder.compose.ui.components.extractFirstUrl
 import com.feder.compose.repository.LinkPreviewRepository
