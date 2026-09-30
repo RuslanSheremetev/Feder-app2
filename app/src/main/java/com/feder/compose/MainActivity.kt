@@ -1109,7 +1109,8 @@ fun FederApp() {
                                     }
                                     Box(
                                         modifier = Modifier
-                                            .size(28.dp)
+                                            // FIX_BOTTOM_NAV_V1: аватар тоже уменьшен
+                                            .size(26.dp)
                                             .clip(CircleShape)
                                             .border(
                                                 width = if (selected) 1.5.dp else 0.dp,
@@ -1133,7 +1134,8 @@ fun FederApp() {
                                 } else {
                                     Box(
                                         modifier = Modifier
-                                            .size(if (selected) 32.dp else 28.dp)
+                                            // FIX_BOTTOM_NAV_V1: уменьшено чтобы не выходило за панель
+                                            .size(if (selected) 28.dp else 26.dp)
                                             .clip(CircleShape)
                                             .then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
                                         contentAlignment = Alignment.Center
@@ -1144,10 +1146,10 @@ fun FederApp() {
                 painter = painterResource(R.drawable.ic_settings_symbols),
                 contentDescription = label,
                 tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4),
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(20.dp)
             )
         } else {
-            Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(22.dp))
+            Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
         }
                                     }
                                 }
