@@ -1068,16 +1068,15 @@ fun FederApp() {
                                         }
                                     }
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                        if (lastMsg.isNotEmpty()) {
-                                            Text(lastMsg.take(24), color = if (chat.unread > 0) OnSurface else Secondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                                        } else {
-                                            Spacer(Modifier.weight(1f))
-                                        }
-                                        // FIX_LASTPHOTO_CLIENT_V1: мини-превью последнего фото + счётчик
-                                        if (!chat.lastImageUrl.isNullOrEmpty()) {
-                                            val isAudioOrVideo = chat.lastImageUrl.endsWith(".m4a", true) || chat.lastImageUrl.endsWith(".mp4", true) || chat.lastImageUrl.endsWith(".mp3", true)
-                                            if (!isAudioOrVideo) {
-                                                Spacer(Modifier.width(6.dp))
+                                        // FIX_CHATROW_TG_V1: как в Telegram — тип последнего сообщения
+                                        val hasImg = !chat.lastImageUrl.isNullOrEmpty()
+                                        val isAudio = hasImg && chat.lastImageUrl!!.endsWith(".m4a", true)
+                                        val isVideo = hasImg && chat.lastImageUrl!!.endsWith(".mp4", true)
+                                        val isPhoto = hasImg && !isAudio && !isVideo
+                                        
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f, fill = false)) {
+                                            // Мини-превью или иконка типа — СЛЕВА от текста
+                                            if (isPhoto) {
                                                 Box(
                                                     modifier = Modifier
                                                         .size(20.dp)
@@ -1095,12 +1094,46 @@ fun FederApp() {
                                                         modifier = Modifier.fillMaxSize()
                                                     )
                                                 }
-                                                if (chat.lastImageCount > 1) {
-                                                    Spacer(Modifier.width(2.dp))
-                                                    Text("${chat.lastImageCount}", color = OnSurfaceVariant, fontSize = 11.sp)
-                                                }
+                                                Spacer(Modifier.width(6.dp))
+                                            } else if (isAudio) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Mic,
+                                                    contentDescription = null,
+                                                    tint = Secondary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(Modifier.width(6.dp))
+                                            } else if (isVideo) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.PlayArrow,
+                                                    contentDescription = null,
+                                                    tint = Secondary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(Modifier.width(6.dp))
+                                            }
+                                            
+                                            // Текст: если есть lastMsg — текст. Иначе — "Фото"/"N фото"/"Голосовое"/"Видео"
+                                            val displayText = when {
+                                                lastMsg.isNotEmpty() -> lastMsg
+                                                isPhoto && chat.lastImageCount > 1 -> "${chat.lastImageCount} фото"
+                                                isPhoto -> "Фото"
+                                                isAudio -> "Голосовое сообщение"
+                                                isVideo -> "Видео"
+                                                else -> ""
+                                            }
+                                            if (displayText.isNotEmpty()) {
+                                                Text(
+                                                    displayText.take(28),
+                                                    color = if (chat.unread > 0) OnSurface else Secondary,
+                                                    fontSize = 14.sp,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier.weight(1f, fill = false)
+                                                )
                                             }
                                         }
+                                        
                                         if (chat.unread > 0) {
                                             Spacer(Modifier.width(8.dp))
                                             Box(Modifier.size(22.dp).clip(CircleShape).background(PrimaryContainer), contentAlignment = Alignment.Center) {
