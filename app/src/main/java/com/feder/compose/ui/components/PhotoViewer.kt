@@ -97,12 +97,12 @@ fun PhotoViewer(
                                     sourceHeight / screenH
                                 ).coerceIn(0.05f, 1f)
 
-                                coroutineScope {
-                                    launch { offsetX.animateTo(targetX, tween(durationMillis = 320)) }
-                                    launch { offsetY.animateTo(targetY, tween(durationMillis = 320)) }
-                                    launch { scaleAnim.animateTo(targetScale, tween(durationMillis = 320)) }
-                                    launch { alphaAnim.animateTo(0f, tween(durationMillis = 320)) }
-                                }
+                                // FIX_HERO_CLOSE_V1: параллельные launch + delay — гарантирует onClose
+                                launch { offsetX.animateTo(targetX, tween(durationMillis = 320)) }
+                                launch { offsetY.animateTo(targetY, tween(durationMillis = 320)) }
+                                launch { scaleAnim.animateTo(targetScale, tween(durationMillis = 320)) }
+                                launch { alphaAnim.animateTo(0f, tween(durationMillis = 320)) }
+                                kotlinx.coroutines.delay(340)
                                 onClose()
                             } else {
                                 scope.launch {

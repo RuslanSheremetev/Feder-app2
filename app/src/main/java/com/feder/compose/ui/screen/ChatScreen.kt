@@ -132,7 +132,8 @@ private val loggerClient: okhttp3.OkHttpClient by lazy {
 
 
 
-var fullScreenPhoto: String? = null
+// FIX_HERO_CLOSE_V1: fullScreenPhoto должен быть state, иначе закрытие не триггерит рекомпозицию
+var fullScreenPhoto by mutableStateOf<String?>(null)
 // FIX_HERO_STEP1: координаты миниатюры фото для hero-анимации
 var photoSourceX by mutableStateOf(0f)
 var photoSourceY by mutableStateOf(0f)
