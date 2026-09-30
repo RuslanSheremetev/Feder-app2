@@ -91,7 +91,6 @@ class FederVideoPlayer(private val ctx: Context) {
     fun prepare(url: String) {
         currentUrl = url
         lastError = null
-        // YouTube теперь обрабатывается через InlineYouTubePlayer (WebView).
         // Здесь — только прямые ссылки / HLS.
         prepareDirect(url)
     }
