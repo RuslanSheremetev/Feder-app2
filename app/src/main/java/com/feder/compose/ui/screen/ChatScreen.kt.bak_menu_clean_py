@@ -1657,15 +1657,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
-                                        // FIX_MENU_CLEAN_V1: сохраняем координаты для popup
                                         val pos = msgPositions[msg.id]
-                                        if (pos != null && (pos.x > 1f || pos.y > 1f)) {
+                                        if (pos != null) {
                                             msg.posX = pos.x
                                             msg.posY = pos.y
-                                            selectedMessageOffset = pos
-                                        } else {
-                                            // fallback: сохраняем msg.posX/posY как есть
-                                            selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         }
                                         selectedMessage = msg
                                     }
@@ -1901,9 +1896,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val menuWidthPx = with(density) { 260.dp.toPx() }
             val msg = selectedMessage!!
             val isMyMsg = msg.from == myUsername
-            // FIX_MENU_CLEAN_V1: используем selectedMessageOffset, если валиден; иначе msg.posX/Y
-            val msgY = if (selectedMessageOffset.y > 1f) selectedMessageOffset.y else msg.posY
-            val msgX = if (selectedMessageOffset.x > 1f) selectedMessageOffset.x else msg.posX
+            val msgY = msg.posY
+            val msgX = msg.posX
 
             // Реальный размер меню (примерный, для расчёта влезает ли снизу)
             val menuHeightRealPx = with(density) { 420.dp.toPx() }
@@ -2222,8 +2216,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Emoji Sheet
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
-            com.feder.compose.video.FullscreenYouTubePlayer(
-                videoId = vid,
+            com.feder.compose.video.FullscreenVideoPlayer(
+                videoUrl = "https://www.youtube.com/watch?v=$vid",
+                token = token,
                 onClose = { youtubeVideoId = null }
             )
         }

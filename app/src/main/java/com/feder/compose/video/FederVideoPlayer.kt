@@ -17,10 +17,6 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import java.util.concurrent.atomic.AtomicBoolean
-import at.huber.youtubeExtractor.YouTubeUriExtractor
-import at.huber.youtubeExtractor.YtFile
-import at.huber.youtubeExtractor.VideoMeta
-import android.util.SparseArray
 
 /**
  * FederVideoPlayer v2 — на Media3/ExoPlayer.
@@ -95,11 +91,9 @@ class FederVideoPlayer(private val ctx: Context) {
     fun prepare(url: String) {
         currentUrl = url
         lastError = null
-        if (isYouTube(url)) {
-            prepareYouTube(url)
-        } else {
-            prepareDirect(url)
-        }
+        // YouTube теперь обрабатывается через InlineYouTubePlayer (WebView).
+        // Здесь — только прямые ссылки / HLS.
+        prepareDirect(url)
     }
 
     private fun prepareDirect(url: String) {
@@ -119,42 +113,7 @@ class FederVideoPlayer(private val ctx: Context) {
         player?.prepare()
     }
 
-    private fun prepareYouTube(url: String) {
-        // YouTubeUriExtractor — абстрактный класс, наследуемся анонимно
-        val extractor = object : YouTubeUriExtractor(ctx) {
-            override fun onUrisAvailable(
-                videoId: String?,
-                videoTitle: String?,
-                ytFiles: SparseArray<YtFile>?
-            ) {
-                if (ytFiles == null || ytFiles.size() == 0) {
-                    onError?.invoke("YouTube: no playable URLs (age-restricted or blocked)")
-                    return
-                }
-                // Приоритет: 22 = 720p, 18 = 360p, 17 = 144p; fallback — последний
-                val ytFile = ytFiles.get(22)
-                    ?: ytFiles.get(18)
-                    ?: ytFiles.get(17)
-                    ?: ytFiles.valueAt(ytFiles.size() - 1)
-                val playUrl = ytFile?.url
-                if (playUrl.isNullOrEmpty()) {
-                    onError?.invoke("YouTube: unable to pick URL")
-                } else {
-                    com.feder.compose.FederHttpClient().sendLog("FederVideoPlayer: YouTube OK title=$videoTitle url=$playUrl")
-                    prepareDirect(playUrl)
-                }
-            }
-        }
-        extractor.extract(url, false, false)
-    }
 
-private fun isYouTube(url: String): Boolean {
-        return url.contains("youtube.com/watch") ||
-               url.contains("youtu.be/") ||
-               url.contains("youtube.com/shorts/") ||
-               url.contains("youtube.com/embed/") ||
-               url.contains("m.youtube.com/watch")
-    }
 
     fun play() {
         player?.playWhenReady = true

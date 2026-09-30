@@ -2222,8 +2222,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Emoji Sheet
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
-            com.feder.compose.video.FullscreenYouTubePlayer(
-                videoId = vid,
+            com.feder.compose.video.FullscreenVideoPlayer(
+                videoUrl = "https://www.youtube.com/watch?v=$vid",
+                token = token,
                 onClose = { youtubeVideoId = null }
             )
         }

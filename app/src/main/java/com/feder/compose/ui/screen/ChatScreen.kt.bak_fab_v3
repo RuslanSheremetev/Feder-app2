@@ -132,13 +132,7 @@ private val loggerClient: okhttp3.OkHttpClient by lazy {
 
 
 
-// FIX_HERO_CLOSE_V1: fullScreenPhoto должен быть state, иначе закрытие не триггерит рекомпозицию
-var fullScreenPhoto by mutableStateOf<String?>(null)
-// FIX_HERO_STEP1: координаты миниатюры фото для hero-анимации
-var photoSourceX by mutableStateOf(0f)
-var photoSourceY by mutableStateOf(0f)
-var photoSourceW by mutableStateOf(0f)
-var photoSourceH by mutableStateOf(0f)
+var fullScreenPhoto: String? = null
 var uploadingPhotos: Boolean = false
 
 data class Reaction(
@@ -202,10 +196,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
-onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
-    // FIX_HERO_STEP3_V4: локальный Rect тапнутого фото
-    var lastPhotoRect by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {}) {
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
     val bottomRadius = when (position) { 0 -> 4.dp; 1 -> 4.dp; 2 -> 20.dp; else -> 20.dp }
     val vertPad = when (position) { 0 -> 8.dp; 1 -> 1.dp; 2 -> 1.dp; else -> 8.dp }
@@ -404,27 +395,10 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                     modifier = Modifier
                                         .sizeIn(maxWidth = 280.dp, maxHeight = 600.dp)
                                         .aspectRatio(if (imageAspectRatio != null && imageAspectRatio!! > 0.05f) imageAspectRatio!! else 0.75f)
-                                        // FIX_HERO_STEP3_V4: сохраняем в ЛОКАЛЬНЫЙ state
-                                        .onGloballyPositioned { coords ->
-                                            val pos = coords.positionInWindow()
-                                            val size = coords.size
-                                            lastPhotoRect = androidx.compose.ui.geometry.Rect(
-                                                pos.x,
-                                                pos.y,
-                                                pos.x + size.width,
-                                                pos.y + size.height
-                                            )
-                                        }
                                         .combinedClickable(
                                             onClick = {
-                                                // FIX_SELECT_PHOTO_V2: в режиме выбора — toggle, иначе — открыть фото
-                                                if (selectionMode) {
-                                                    onClick?.invoke()
-                                                } else {
-                                                    // FIX_HERO_STEP3_V4: передаём координаты ЭТОГО фото
-                                                    lastPhotoRect?.let { r -> onPhotoRectReady?.invoke(r) }
-                                                    fullScreenPhoto = if (url.startsWith("content://") || url.startsWith("file://")) url else if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
-                                                }
+                                                // короткий тап на фото → fullscreen
+                                                fullScreenPhoto = if (url.startsWith("content://") || url.startsWith("file://")) url else if (url.contains("?")) url else if (url.startsWith("http")) "$url?token=$token" else "http://2.26.71.102:8012/uploads/$url?token=$token"
                                             },
                                             onLongClick = {
                                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
@@ -1657,28 +1631,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
-                                        // FIX_MENU_CLEAN_V1: сохраняем координаты для popup
                                         val pos = msgPositions[msg.id]
-                                        if (pos != null && (pos.x > 1f || pos.y > 1f)) {
+                                        if (pos != null) {
                                             msg.posX = pos.x
                                             msg.posY = pos.y
-                                            selectedMessageOffset = pos
-                                        } else {
-                                            // fallback: сохраняем msg.posX/posY как есть
-                                            selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         }
                                         selectedMessage = msg
                                     }
                                 },
                             
-                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
-                            // FIX_HERO_STEP3_V4: сохраняем координаты тапнутого фото в top-level
-                            onPhotoRectReady = { rect ->
-                                photoSourceX = rect.left
-                                photoSourceY = rect.top
-                                photoSourceW = rect.width
-                                photoSourceH = rect.height
-                            }
+                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() }
                         )
                             }
                         }
@@ -1901,9 +1863,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val menuWidthPx = with(density) { 260.dp.toPx() }
             val msg = selectedMessage!!
             val isMyMsg = msg.from == myUsername
-            // FIX_MENU_CLEAN_V1: используем selectedMessageOffset, если валиден; иначе msg.posX/Y
-            val msgY = if (selectedMessageOffset.y > 1f) selectedMessageOffset.y else msg.posY
-            val msgX = if (selectedMessageOffset.x > 1f) selectedMessageOffset.x else msg.posX
+            val msgY = msg.posY
+            val msgX = msg.posX
 
             // Реальный размер меню (примерный, для расчёта влезает ли снизу)
             val menuHeightRealPx = with(density) { 420.dp.toPx() }
@@ -2222,8 +2183,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         // Emoji Sheet
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
-            com.feder.compose.video.FullscreenYouTubePlayer(
-                videoId = vid,
+            com.feder.compose.video.FullscreenVideoPlayer(
+                videoUrl = "https://www.youtube.com/watch?v=$vid",
+                token = token,
                 onClose = { youtubeVideoId = null }
             )
         }
@@ -2519,16 +2481,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 onClose = { fullScreenPhoto = null },
                 onEdit = { /* TODO */ },
                 onShare = { /* TODO */ },
-                onMore = { /* TODO */ },
-                // FIX_HERO_STEP1: координаты миниатюры фото
-                sourceX = photoSourceX,
-                sourceY = photoSourceY,
-                sourceWidth = photoSourceW,
-                sourceHeight = photoSourceH
+                onMore = { /* TODO */ }
             )
         }
 
-        if (fullScreenPhoto == null) {
         AnimatedVisibility(
             visible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.let { it < listState.layoutInfo.totalItemsCount - 2 } ?: false,
             modifier = Modifier.padding(end = 20.dp, bottom = 110.dp).align(Alignment.BottomEnd),
@@ -2548,7 +2504,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ) {
                 Icon(Icons.Filled.KeyboardArrowDown, "scroll down", modifier = Modifier.size(24.dp))
             }
-        }
         }
 
         

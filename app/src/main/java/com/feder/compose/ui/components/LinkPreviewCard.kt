@@ -23,6 +23,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.feder.compose.data.entity.LinkPreviewEntity
 import com.feder.compose.repository.LinkPreviewRepository
+import com.feder.compose.video.InlineYouTubePlayer
 
 private val CardBg     = Color(0xFF1F1F1F)
 private val CardBgMine = Color(0x33000000)
@@ -86,21 +87,47 @@ private fun YouTubeCard(
     msgStatus: String,
     onPlay: (String) -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
     val bg = if (isMine) CardBgMine else CardBg
+
+    // ─── Развёрнутый: встроенный YouTube-плеер прямо в чате ───
+    if (expanded && !p.videoId.isNullOrEmpty()) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.Black)
+        ) {
+            InlineYouTubePlayer(
+                videoId = p.videoId!!,
+                modifier = Modifier.fillMaxSize(),
+                showCloseButton = true,
+                onClose = { expanded = false }
+            )
+        }
+        return
+    }
+
+    // ─── Свёрнутый: обычная карточка, тап — разворот ───
     Column(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .clickable {
-                // com.feder.compose.FederHttpClient().sendLog("YouTubeCard CLICK videoId=${p.videoId}")
-                p.videoId?.let(onPlay)
+                if (!p.videoId.isNullOrEmpty()) {
+                    expanded = true
+                } else {
+                    onPlay(p.videoId ?: "")
+                }
             }
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f)) {
             if (!p.image.isNullOrEmpty()) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(p.image).crossfade(false).build(),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(p.image).crossfade(false).build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -114,7 +141,11 @@ private fun YouTubeCard(
                     .background(Color(0xCC000000)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.PlayArrow, "Play", tint = Color.White, modifier = Modifier.size(36.dp))
+                Icon(
+                    Icons.Filled.PlayArrow, "Play",
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
+                )
             }
         }
         Column(Modifier.padding(10.dp)) {
@@ -140,19 +171,14 @@ private fun YouTubeCard(
                         fontSize = 11.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = true)   // ← fill = true!
+                        modifier = Modifier.weight(1f, fill = true)
                     )
                 } else {
                     Spacer(Modifier.weight(1f))
                 }
                 if (time.isNotEmpty()) {
-                    Spacer(Modifier.width(4.dp))                          // ← небольшой отступ
-                    Text(
-                        time,
-                        color = TextSite,
-                        fontSize = 10.sp,
-                        maxLines = 1
-                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(time, color = TextSite, fontSize = 10.sp, maxLines = 1)
                     if (isMine) {
                         Spacer(Modifier.width(2.dp))
                         Text(
