@@ -2231,9 +2231,40 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             com.feder.compose.ui.components.StickerSheet(
                 onDismiss = { showEmojiSheet = false; emojiExpanded = false },
                 onStickerClick = { sticker ->
-                    // Вставляем ID стикера как спец-сообщение
-                    // Формат: <sticker:ID> — сервер распознаёт и отрисует
-                    inputText = inputText + " "  // placeholder
+                    // Отправляем стикер на сервер
+                    scope.launch {
+                        try {
+                            val client = okhttp3.OkHttpClient()
+                            val json = org.json.JSONObject().apply {
+                                put("to_user", chatUsername)
+                                put("sticker_id", sticker.id)
+                                put("sticker_text", sticker.text)
+                            }
+                            val body = json.toString()
+                                .toRequestBody("application/json".toMediaType())
+                            val req = okhttp3.Request.Builder()
+                                .url("http://2.26.71.102:8018/api/stickers/send")
+                                .addHeader("Authorization", "Bearer $token")
+                                .post(body)
+                                .build()
+                            val resp = withContext(Dispatchers.IO) {
+                                client.newCall(req).execute()
+                            }
+                            android.util.Log.d("STICKER", "sent: ${resp.code}")
+                            // Оптимистично добавляем в чат
+                            val newMsg = MsgItem(
+                                from = myUsername,
+                                to = chatUsername,
+                                text = "",
+                                time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date()),
+                                status = "sent",
+                                id = System.currentTimeMillis(),
+                            )
+                            messages = messages + newMsg
+                        } catch (e: Exception) {
+                            android.util.Log.e("STICKER", "error: ${e.message}")
+                        }
+                    }
                     showEmojiSheet = false
                 }
             )
