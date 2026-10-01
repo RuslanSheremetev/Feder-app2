@@ -2228,41 +2228,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         if (showEmojiSheet) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showEmojiSheet = false })
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(if (emojiExpanded) Modifier.fillMaxHeight() else Modifier)
-                    .align(Alignment.BottomCenter)
-                    .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(16.dp)
-                    .navigationBarsPadding()
-            ) {
-                // Drag handle
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .pointerInput(Unit) {
-                            detectVerticalDragGestures { _, dragAmount ->
-                                if (dragAmount < -50) emojiExpanded = true
-                                if (dragAmount > 50 && emojiExpanded) emojiExpanded = false
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(OnSurfaceVariant.copy(alpha = 0.5f))
-                    )
+            com.feder.compose.ui.components.StickerSheet(
+                onDismiss = { showEmojiSheet = false; emojiExpanded = false },
+                onStickerClick = { sticker ->
+                    // Вставляем ID стикера как спец-сообщение
+                    // Формат: <sticker:ID> — сервер распознаёт и отрисует
+                    inputText = inputText + " "  // placeholder
+                    showEmojiSheet = false
                 }
-                // Заглушка для эмодзи
-                Spacer(Modifier.height(200.dp))
-                Spacer(Modifier.height(80.dp))
-            }
+            )
         }
         // Дата в овале — под шапкой по центру
         // Поле ввода поверх сообщений
