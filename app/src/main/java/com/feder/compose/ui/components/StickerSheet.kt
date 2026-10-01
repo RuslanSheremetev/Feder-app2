@@ -292,7 +292,7 @@ fun MatryoshkaSticker(sticker: StickerItem) {
         val cx = w / 2f
         val scale = minOf(w, h) / 100f
 
-        fun s(v: Float) = v * scale
+        fun s(v: Number) = v.toFloat() * scale
 
         // ─── Тело (синее платье) ───
         val bodyPath = Path().apply {
