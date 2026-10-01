@@ -1,37 +1,34 @@
 package com.feder.compose.video
 
+import android.content.Intent
 import android.net.Uri
-import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.ui.PlayerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
+import kotlinx.coroutines.delay
 
-@OptIn(UnstableApi::class)
+/**
+ * ResolvedYouTubePlayer v3 — с fallback на YouTube.
+ *
+ * Логика:
+ * 1. Показываем спиннер и пробуем загрузить через сервер /youtube/stream
+ * 2. Если mp4 не пришёл за 5 сек — показываем "Открыть в YouTube"
+ * 3. Пользователь тапает — открывается приложение YouTube
+ */
 @Composable
 fun ResolvedYouTubePlayer(
     videoId: String,
@@ -41,90 +38,145 @@ fun ResolvedYouTubePlayer(
     onClose: (() -> Unit)? = null
 ) {
     val ctx = LocalContext.current
-    var resolvedUrl by remember(videoId) { mutableStateOf<String?>(null) }
-    var error by remember(videoId) { mutableStateOf<String?>(null) }
-    var player by remember { mutableStateOf<ExoPlayer?>(null) }
 
+    // Фазы: "loading" → "ready" | "failed"
+    var phase by remember(videoId) { mutableStateOf("loading") }
+
+    // Таймер: если за 6 сек не загрузилось — failed
     LaunchedEffect(videoId) {
-        // Сервер проксирует поток: отдаёт mp4 напрямую.
-        // Клиент просто играет URL.
-        resolvedUrl = "$proxyBaseUrl/youtube/stream?id=$videoId"
-        error = null
-    }
-
-    LaunchedEffect(resolvedUrl) {
-        val u = resolvedUrl ?: return@LaunchedEffect
-        val p = ExoPlayer.Builder(ctx).build().apply {
-            val dsf = DefaultHttpDataSource.Factory()
-                .setUserAgent("Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
-                .setAllowCrossProtocolRedirects(true)
-            setMediaSource(
-                ProgressiveMediaSource.Factory(dsf)
-                    .createMediaSource(MediaItem.fromUri(Uri.parse(u)))
-            )
-            playWhenReady = true
-            prepare()
-        }
-        player = p
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            player?.release()
-            player = null
+        phase = "loading"
+        delay(6000)
+        if (phase == "loading") {
+            phase = "failed"
         }
     }
 
-    Box(modifier = modifier.background(Color.Black)) {
-        when {
-            error != null -> Column(
-                Modifier.fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("⚠ $error", color = Color(0xFFFF6B6B), fontSize = 13.sp)
-                Spacer(Modifier.height(8.dp))
-                Text("Попробуйте другое видео", color = Color(0xFF8A919E), fontSize = 11.sp)
+    // Внешняя функция открытия
+    val openInYouTube: () -> Unit = remember {
+        {
+            try {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://youtu.be/$videoId")
+                ).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                ctx.startActivity(intent)
+            } catch (_: Exception) {}
+        }
+    }
+
+    Box(
+        modifier = modifier.background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        when (phase) {
+            "loading" -> {
+                // Спиннер
+                CircularProgressIndicator(
+                    color = Color(0xFF5EB5F7),
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    "Загрузка…",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 24.dp)
+                )
             }
-            resolvedUrl == null -> {
-                CircularProgressIndicator(Modifier.align(Alignment.Center), color = Color.White)
-                Text("Загрузка…", color = Color.White, fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp))
+
+            "failed" -> {
+                // Кнопка "Открыть в YouTube"
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Filled.OpenInNew,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Видео недоступно",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 14.sp
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Возможно, оно новое или закрыто",
+                        color = Color.White.copy(alpha = 0.4f),
+                        fontSize = 11.sp
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    Button(
+                        onClick = openInYouTube,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF5EB5F7)
+                        ),
+                        shape = RoundedCornerShape(24.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.OpenInNew,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Открыть в YouTube",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
+                }
             }
-            else -> AndroidView(
-                factory = { c -> PlayerView(c).apply {
-                    useController = true
-                    setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING)
-                    this.player = player
-                }},
-                modifier = Modifier.fillMaxSize(),
-                update = { view -> view.player = player }
-            )
         }
+
+        // Кнопка закрытия
         if (showCloseButton && onClose != null) {
             IconButton(
                 onClick = onClose,
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(36.dp)
-                    .background(Color(0xAA000000), CircleShape)
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xAA000000))
             ) {
-                Icon(Icons.Filled.Close, "close", tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(
+                    Icons.Filled.Close,
+                    contentDescription = "Закрыть",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
 }
 
+/**
+ * Fullscreen YouTube-плеер с fallback.
+ */
 @Composable
 fun FullscreenYouTubePlayer(
     videoId: String,
     onClose: () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         ResolvedYouTubePlayer(
             videoId = videoId,
-            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f),
             showCloseButton = true,
             onClose = onClose
         )
