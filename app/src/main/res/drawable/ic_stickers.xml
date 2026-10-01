@@ -3,32 +3,38 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+
+    <!-- Квадрат со скруглёнными углами -->
     <path
         android:fillColor="@android:color/transparent"
-        android:strokeColor="@android:color/white"
+        android:strokeColor="#FF000000"
         android:strokeWidth="2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M20,4 L4,4 a1,1 0 0,0 -1,1 L3,19 a1,1 0 0,0 1,1 L13,20 L20,13 L20,5 a1,1 0 0,0 -1,-1 Z"/>
+        android:pathData="M8,4 L16,4 A4,4 0 0 1 20,8 L20,16 A4,4 0 0 1 16,20 L8,20 A4,4 0 0 1 4,16 L4,8 A4,4 0 0 1 8,4 Z" />
+
+    <!-- Левый глаз -->
+    <path
+        android:fillColor="#FF000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="0"
+        android:pathData="M9,11 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0" />
+
+    <!-- Правый глаз -->
+    <path
+        android:fillColor="#FF000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="0"
+        android:pathData="M15,11 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0" />
+
+    <!-- Улыбка -->
     <path
         android:fillColor="@android:color/transparent"
-        android:strokeColor="@android:color/white"
+        android:strokeColor="#FF000000"
         android:strokeWidth="2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M13,20 L13,14 L20,14"/>
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M9,10 a0.8,0.8 0 1,0 0,1.6 a0.8,0.8 0 0,0 0,-1.6 Z"/>
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M15,10 a0.8,0.8 0 1,0 0,1.6 a0.8,0.8 0 0,0 0,-1.6 Z"/>
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="@android:color/white"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M8.5,14 c0.7,1 2,1.5 3.5,1.5 c1.5,0 2.8,-0.5 3.5,-1.5"/>
+        android:pathData="M8.5,14 Q12,17 15.5,14" />
 </vector>
