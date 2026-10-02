@@ -1245,8 +1245,7 @@ fun FederApp() {
                                         modifier = Modifier
                                             // FIX_BOTTOM_NAV_V1: уменьшено чтобы не выходило за панель
                                             .size(if (selected) 28.dp else 26.dp)
-                                            .clip(CircleShape)
-                                            .then(if (selected) Modifier.background(Color(0xFFA1C9FF)) else Modifier),
+                                            .background(color = if (selected) Color(0xFFA1C9FF) else Color.Transparent, shape = CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         if (i == 3) {
@@ -1258,39 +1257,24 @@ fun FederApp() {
                 modifier = Modifier.size(20.dp)
             )
         } else if (i == 0) {
-            // Chats — синий кружок с числом непрочитанных (как в Telegram)
-            Box(contentAlignment = Alignment.TopEnd) {
-                Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
-                val totalUnread = viewModel.chats.sumOf { it.unread }
-                if (totalUnread > 0) {
-                    Box(
-                        modifier = Modifier
-                            .offset(x = 8.dp, y = (-6).dp)
-                            .defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF339DFF))
-                            .padding(horizontal = 5.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            if (totalUnread > 99) "99+" else totalUnread.toString(),
-                            color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-            Box(contentAlignment = Alignment.Center) {
-                Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
-                val totalUnread = viewModel.chats.sumOf { it.unread }
-                if (totalUnread > 0) {
+            // Chats — бейдж поверх иконки (родитель БЕЗ clip)
+            Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
+            val totalUnread = viewModel.chats.sumOf { it.unread }
+            if (totalUnread > 0) {
+                Box(
+                    modifier = Modifier
+                        .offset(x = 10.dp, y = (-8).dp)
+                        .defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF339DFF))
+                        .padding(horizontal = 5.dp, vertical = 1.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        if (totalUnread > 99) "99+" else totalUnread.toString(),
-                        color = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
+                        text = if (totalUnread > 99) "99+" else totalUnread.toString(),
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
