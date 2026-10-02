@@ -1974,19 +1974,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             val msgY = if (selectedMessageOffset.y > 1f) selectedMessageOffset.y else msg.posY
             val msgX = if (selectedMessageOffset.x > 1f) selectedMessageOffset.x else msg.posX
 
-            // Реальный размер меню (примерный, для расчёта влезает ли снизу)
-            val menuHeightRealPx = with(density) { 420.dp.toPx() }
-            val topSafePx = with(density) { 80.dp.toPx() }      // отступ от верха экрана
-            val bottomSafePx = with(density) { 100.dp.toPx() }  // отступ от низа
+            // FIX_MENU_POS_V2: реальная высота меню ~ 180dp (реакции + список действий)
+            val menuHeightRealPx = with(density) { 180.dp.toPx() }
+            val topSafePx  = with(density) { 80.dp.toPx() }
+            val bottomSafePx = with(density) { 60.dp.toPx() }
 
-            // Y: под сообщением, если влезает; иначе над сообщением; иначе clamp
-            val menuY = if (msgY + menuHeightRealPx + bottomSafePx < screenHeightPx) {
-                // Влезает под — ставим под
-                (msgY + 16).toInt()
+            // Высота сообщения ~ 60dp — учитываем, чтобы меню не перекрывало само сообщение
+            val msgHeightPx = with(density) { 60.dp.toPx() }
+
+            // Y: стараемся поставить ПОД сообщением; если не влезает — над ним;
+            // если и там места нет — clamp в видимую область
+            val spaceBelow = screenHeightPx - (msgY + msgHeightPx + bottomSafePx)
+            val menuY = if (spaceBelow >= menuHeightRealPx) {
+                // Влезает под сообщением
+                (msgY + msgHeightPx + 8).toInt()
             } else {
-                // Не влезает — ставим над, но не выше topSafePx
-                val above = (msgY - menuHeightRealPx).toInt()
-                above.coerceAtLeast(topSafePx.toInt())
+                // Пробуем над сообщением
+                val above = (msgY - menuHeightRealPx - 8).toInt()
+                if (above >= topSafePx.toInt()) {
+                    above
+                } else {
+                    // Ни сверху, ни снизу — кладём под сообщением как можно ниже, но в экране
+                    ((screenHeightPx - menuHeightRealPx - bottomSafePx).toInt())
+                        .coerceAtLeast((msgY + msgHeightPx + 8).toInt())
+                }
             }
 
             // X: справа для "моих", слева для чужих, с учётом границ экрана
