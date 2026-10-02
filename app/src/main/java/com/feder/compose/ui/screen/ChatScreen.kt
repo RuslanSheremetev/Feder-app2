@@ -808,6 +808,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var inputText by remember { mutableStateOf("") }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var menuAbsOffset by remember { mutableStateOf<androidx.compose.ui.geometry.Offset?>(null) }
     var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var editMessage by remember { mutableStateOf<MsgItem?>(null) }
@@ -873,6 +874,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     val msgPositions = remember { mutableMapOf<Long, androidx.compose.ui.geometry.Offset>() }
+    val msgSizesGlobal = remember { mutableMapOf<Long, androidx.compose.ui.unit.IntSize>() }
 
     // derivedStateOf — не дёргает recomposition если значение не изменилось
     val dateInHeader = androidx.compose.runtime.derivedStateOf {
@@ -1704,9 +1706,27 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 )
                                 Spacer(Modifier.width(8.dp))
                             }
-                            Box(modifier = Modifier.onGloballyPositioned { coords ->
-                                msgPositions[msg.id] = coords.positionInWindow()
-                            }) {
+                            Box(modifier = Modifier
+                                .onGloballyPositioned { coords ->
+                                    // FIX_TAPCOORDS: сохраняем и позицию, и размер
+                                    msgPositions[msg.id] = coords.positionInWindow()
+                                    msgSizesGlobal[msg.id] = coords.size
+                                }
+                                .pointerInput(msg.id) {
+                                    // FIX_TAPCOORDS: ловим координаты тапа
+                                    detectTapGestures { local ->
+                                        if (!selectionMode) {
+                                            val base = msgPositions[msg.id]
+                                            if (base != null) {
+                                                menuAbsOffset = androidx.compose.ui.geometry.Offset(
+                                                    base.x + local.x,
+                                                    base.y + local.y
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            ) {
                                 MessageBubble(
                             msg,
                             msg.text,
@@ -1963,31 +1983,27 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
-            // FIX_MENU_ABSOLUTE: используем PopupPositionProvider с абсолютными координатами
-            val msgPos = selectedMessage!!
-            val screenH = context.resources.displayMetrics.heightPixels
-            val screenW = context.resources.displayMetrics.widthPixels
-            val menuHPx = with(LocalDensity.current) { 400.dp.toPx() }
-            val menuWPx = with(LocalDensity.current) { 240.dp.toPx() }
-            val gapPx   = with(LocalDensity.current) { 8.dp.toPx() }
-
-            // Абсолютная точка: под сообщением, прижато к левому краю сообщения
-            val absX = msgPos.posX.coerceIn(0f, (screenW - menuWPx).coerceAtLeast(0f))
-            val absY = (msgPos.posY + 60f).coerceIn(0f, (screenH - menuHPx).coerceAtLeast(0f))
-
+            val _anchor = menuAbsOffset
             Popup(
-                onDismissRequest = { selectedMessage = null; showDeleteSub = false },
-                popupPositionProvider = object : androidx.compose.ui.window.PopupPositionProvider {
-                    override fun calculatePosition(
-                        anchorBounds: androidx.compose.ui.unit.IntRect,
-                        windowSize: androidx.compose.ui.unit.IntSize,
-                        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
-                        popupContentSize: androidx.compose.ui.unit.IntSize
-                    ): androidx.compose.ui.unit.IntOffset {
-                        return androidx.compose.ui.unit.IntOffset(absX.toInt(), absY.toInt())
+                onDismissRequest = { selectedMessage = null; showDeleteSub = false; menuAbsOffset = null },
+                popupPositionProvider = remember {
+                    object : androidx.compose.ui.window.PopupPositionProvider {
+                        override fun calculatePosition(
+                            anchorBounds: androidx.compose.ui.unit.IntRect,
+                            windowSize: androidx.compose.ui.unit.IntSize,
+                            layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+                            popupContentSize: androidx.compose.ui.unit.IntSize
+                        ): androidx.compose.ui.unit.IntOffset {
+                            val a = _anchor
+                            if (a == null) return androidx.compose.ui.unit.IntOffset(40, 200)
+                            // FIX_TAPCOORDS: меню появляется в точке тапа, со сдвигом чтобы не под пальцем
+                            val x = a.x.toInt().coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0))
+                            val y = (a.y.toInt() - popupContentSize.height - 20)
+                                .coerceIn(0, (windowSize.height - popupContentSize.height).coerceAtLeast(0))
+                            return androidx.compose.ui.unit.IntOffset(x, y)
+                        }
                     }
-                },
-                properties = PopupProperties(focusable = true)
+                }
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
