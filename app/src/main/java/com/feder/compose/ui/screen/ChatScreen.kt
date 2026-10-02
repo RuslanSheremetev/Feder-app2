@@ -1963,55 +1963,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
-            val density = LocalDensity.current
-            val screenHeightPx = context.resources.displayMetrics.heightPixels
-            val screenWidthPx = context.resources.displayMetrics.widthPixels
-            val menuHeightPx = with(density) { 480.dp.toPx() }
-            val menuWidthPx = with(density) { 260.dp.toPx() }
-            val msg = selectedMessage!!
-            val isMyMsg = msg.from == myUsername
-            // FIX_MENU_CLEAN_V1: используем selectedMessageOffset, если валиден; иначе msg.posX/Y
-            val msgY = if (selectedMessageOffset.y > 1f) selectedMessageOffset.y else msg.posY
-            val msgX = if (selectedMessageOffset.x > 1f) selectedMessageOffset.x else msg.posX
-
-            // FIX_MENU_POS_V2: реальная высота меню ~ 180dp (реакции + список действий)
-            val menuHeightRealPx = with(density) { 180.dp.toPx() }
-            val topSafePx  = with(density) { 80.dp.toPx() }
-            val bottomSafePx = with(density) { 60.dp.toPx() }
-
-            // Высота сообщения ~ 60dp — учитываем, чтобы меню не перекрывало само сообщение
-            val msgHeightPx = with(density) { 60.dp.toPx() }
-
-            // Y: стараемся поставить ПОД сообщением; если не влезает — над ним;
-            // если и там места нет — clamp в видимую область
-            val spaceBelow = screenHeightPx - (msgY + msgHeightPx + bottomSafePx)
-            val menuY = if (spaceBelow >= menuHeightRealPx) {
-                // Влезает под сообщением
-                (msgY + msgHeightPx + 8).toInt()
-            } else {
-                // Пробуем над сообщением
-                val above = (msgY - menuHeightRealPx - 8).toInt()
-                if (above >= topSafePx.toInt()) {
-                    above
-                } else {
-                    // Ни сверху, ни снизу — кладём под сообщением как можно ниже, но в экране
-                    ((screenHeightPx - menuHeightRealPx - bottomSafePx).toInt())
-                        .coerceAtLeast((msgY + msgHeightPx + 8).toInt())
-                }
-            }
-
-            // X: справа для "моих", слева для чужих, с учётом границ экрана
-            val menuX = if (isMyMsg) {
-                // "мои" — выравниваем правый край меню по правому краю сообщения
-                (msgX + 260f - menuWidthPx).toInt().coerceIn(16, (screenWidthPx - menuWidthPx - 16).toInt())
-            } else {
-                // чужие — выравниваем левый край меню по левому краю сообщения
-                msgX.toInt().coerceIn(16, (screenWidthPx - menuWidthPx - 16).toInt())
-            }
+            // FIX_MENU_V5: вернули рабочую логику из f81b432b (5 авг)
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 alignment = Alignment.TopStart,
-                offset = IntOffset(menuX, menuY)
+                offset = IntOffset(
+                    selectedMessage!!.posX.toInt(),
+                    (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0)
+                )
             ) {
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
