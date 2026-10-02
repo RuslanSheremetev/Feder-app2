@@ -167,6 +167,12 @@ data class MsgItem(
     val forwardedText: String? = null,
     val forwardedName: String? = null,
     val reactions: List<Reaction> = emptyList(),
+    @com.google.gson.annotations.SerializedName("message_type")
+    val messageType: String = "text",
+    @com.google.gson.annotations.SerializedName("sticker_id")
+    val stickerId: String? = null,
+    @com.google.gson.annotations.SerializedName("sticker_text")
+    val stickerText: String? = null
 )
 
 @Composable
@@ -203,6 +209,17 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 @Composable
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
 onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
+
+    // ═══ Стикер? Рисуем матрёшку + текст и ВЫХОДИМ ═══
+    if (msg.messageType == "sticker" && !msg.stickerId.isNullOrEmpty()) {
+        com.feder.compose.ui.components.StickerMessage(
+            stickerId = msg.stickerId,
+            stickerText = msg.stickerText,
+            time = time,
+            isMine = isMine
+        )
+        return
+    }
     // FIX_HERO_STEP3_V4: локальный Rect тапнутого фото
     var lastPhotoRect by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
     val topRadius = when (position) { 0 -> 20.dp; 1 -> 4.dp; 2 -> 4.dp; else -> 20.dp }
