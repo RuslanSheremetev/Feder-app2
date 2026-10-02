@@ -1257,25 +1257,18 @@ fun FederApp() {
                 modifier = Modifier.size(20.dp)
             )
         } else if (i == 0) {
-            // Chats — бейдж с суммой непрочитанных
-            Box(contentAlignment = Alignment.TopEnd) {
+            // Chats — число непрочитанных ПО ЦЕНТРУ иконки
+            Box(contentAlignment = Alignment.Center) {
                 Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
                 val totalUnread = viewModel.chats.sumOf { it.unread }
                 if (totalUnread > 0) {
-                    Box(
-                        modifier = Modifier
-                            .offset(x = 6.dp, y = (-4).dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFE53935))
-                            .padding(horizontal = 5.dp, vertical = 1.dp)
-                    ) {
-                        Text(
-                            if (totalUnread > 99) "99+" else totalUnread.toString(),
-                            color = Color.White,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        if (totalUnread > 99) "99+" else totalUnread.toString(),
+                        color = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
         } else {
