@@ -1969,7 +1969,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 alignment = Alignment.TopStart,
                 offset = IntOffset(
                     selectedMessage!!.posX.toInt(),
-                    (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0)
+                    // FIX_MENU_UNDER: меню ПОД сообщением, с clamp по низу экрана
+                    run {
+                        val screenH = context.resources.displayMetrics.heightPixels
+                        val menuH   = with(LocalDensity.current) { 420.dp.toPx() }
+                        val desired = (selectedMessage!!.posY.toInt() + 20)
+                        val maxY    = (screenH - menuH - with(LocalDensity.current) { 16.dp.toPx() }).toInt()
+                        desired.coerceAtMost(maxY).coerceAtLeast(0)
+                    }
                 )
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
