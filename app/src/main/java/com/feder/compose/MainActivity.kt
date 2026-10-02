@@ -627,6 +627,32 @@ fun FederApp() {
         cm.registerDefaultNetworkCallback(callback)
     }
     LaunchedEffect(Unit) { viewModel.initDatabase(context) }
+    // ─── FEATURE_CHAT_MUTES: загрузка mute-списка ───
+    LaunchedEffect(viewModel.token) {
+        if (viewModel.token.isNotEmpty()) {
+            try {
+                val url = "http://2.26.71.102:8004/api/mute/list?user=demo"
+                val req = okhttp3.Request.Builder().url(url)
+                    .addHeader("Authorization", "Bearer ${viewModel.token}")
+                    .build()
+                val resp = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    okhttp3.OkHttpClient().newCall(req).execute()
+                }
+                val body = resp.body?.string() ?: "{}"
+                val json = org.json.JSONObject(body)
+                val arr = json.optJSONArray("mutes")
+                if (arr != null) {
+                    val mutedSet = mutableSetOf<String>()
+                    for (i in 0 until arr.length()) mutedSet.add(arr.optString(i))
+                    viewModel.chats = viewModel.chats.map { chat ->
+                        chat.copy(isMuted = mutedSet.contains(chat.username))
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MUTE", "load list: ${e.message}")
+            }
+        }
+    }
     LaunchedEffect(viewModel.token) {
         if (viewModel.token.isNotEmpty()) {
             viewModel.storiesFeed = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -1062,8 +1088,14 @@ fun FederApp() {
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                        Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                                         if (time.isNotEmpty()) {
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                            Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            if (chat.isMuted) {
+                                                Spacer(Modifier.width(4.dp))
+                                                Icon(Icons.Filled.VolumeOff, "muted", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
+                                            }
+                                        }
                                             Text(formatTimestamp(time), color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
                                         }
                                     }
