@@ -1263,9 +1263,9 @@ fun FederApp() {
             if (totalUnread > 0) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 6.dp, y = (-4).dp)
+                        // FIX_BADGE_INSIDE: привязан к иконке 20dp, не вылезает за пилюлю
                         .size(16.dp)
+                        .offset(x = 5.dp, y = (-5).dp)
                         .clip(CircleShape)
                         .background(Color(0xFF339DFF)),
                     contentAlignment = Alignment.Center
