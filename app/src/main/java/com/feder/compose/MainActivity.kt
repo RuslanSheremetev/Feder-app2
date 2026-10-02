@@ -1101,7 +1101,6 @@ fun FederApp() {
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                        if (time.isNotEmpty()) {
                                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                                             Text(chat.name, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                             if (chat.isMuted) {
@@ -1109,6 +1108,7 @@ fun FederApp() {
                                                 Icon(Icons.Filled.VolumeOff, "muted", tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
                                             }
                                         }
+                                        if (time.isNotEmpty()) {
                                             Text(formatTimestamp(time), color = if (chat.unread > 0) Primary else OnSurfaceVariant, fontSize = 12.sp)
                                         }
                                     }
