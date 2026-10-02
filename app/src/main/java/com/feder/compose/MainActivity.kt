@@ -428,7 +428,7 @@ logWs("ProfileMedia: URLS=${urls.size}")
             try {
                 val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
                 val type = obj.get("type")?.asString ?: ""
-                logWs("CHATSWS_RAW: " + json.take(800))
+                logWs("CHATSWS_RAW_B64: " + android.util.Base64.encodeToString(json.take(800).toByteArray(Charsets.UTF_8), android.util.Base64.NO_WRAP))
                 
                 if (type == "chats_list") {
                     val data = obj?.getAsJsonArray("data") ?: com.google.gson.JsonArray()
