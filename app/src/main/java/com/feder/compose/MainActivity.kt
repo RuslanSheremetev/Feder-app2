@@ -1263,17 +1263,17 @@ fun FederApp() {
             if (totalUnread > 0) {
                 Box(
                     modifier = Modifier
-                        .offset(x = 10.dp, y = (-8).dp)
-                        .defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
+                        .offset(x = 7.dp, y = (-5).dp)
+                        .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
                         .clip(CircleShape)
                         .background(Color(0xFF339DFF))
-                        .padding(horizontal = 5.dp, vertical = 1.dp),
+                        .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = if (totalUnread > 99) "99+" else totalUnread.toString(),
                         color = Color.White,
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
