@@ -704,6 +704,28 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     val scope = rememberCoroutineScope()
+    // ─── FEATURE_CHAT_MUTES ───
+    var isMuted by remember { mutableStateOf(false) }
+    LaunchedEffect(chatUsername) {
+        try {
+            val url = "http://2.26.71.102:8004/api/mute/list?user=$myUsername"
+            val req = okhttp3.Request.Builder().url(url)
+                .addHeader("Authorization", "Bearer $token").build()
+            val resp = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                okhttp3.OkHttpClient().newCall(req).execute()
+            }
+            val body = resp.body?.string() ?: "{}"
+            val json = org.json.JSONObject(body)
+            val arr = json.optJSONArray("mutes")
+            if (arr != null) {
+                for (i in 0 until arr.length()) {
+                    if (arr.optString(i) == chatUsername) { isMuted = true; break }
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MUTE", "load: ${e.message}")
+        }
+    }
     var messages by remember { mutableStateOf<List<MsgItem>>(emptyList()) }
 
     // ═══ Запись голосовых сообщений ═══
@@ -1551,8 +1573,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(if (chatUsername == "saved_messages") "Saved Messages" else chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(if (chatUsername == "saved_messages") "Saved Messages" else chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (isMuted) {
+                                    Spacer(Modifier.width(4.dp))
+                                    Icon(Icons.Filled.VolumeOff, "muted", tint = OutlineVariant, modifier = Modifier.size(14.dp))
+                                }
+                            }
                                 when {
                                     isOnline -> "online"
                                     lastSeen > 0 -> formatLastSeen(lastSeen)
@@ -1586,8 +1614,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 ) {
                                     Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false; searchMode = true }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Search, "Search", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Search", color = OnSurface, fontSize = 14.sp) }
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.VolumeOff, "Mute", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Mute", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Videocam, "Video Call", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Video Call", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable {
+                                            showMoreMenu = false
+                                            scope.launch {
+                                                try {
+                                                    val json = org.json.JSONObject().apply {
+                                                        put("user_from", myUsername)
+                                                        put("to_user", chatUsername)
+                                                        put("muted", !isMuted)
+                                                    }
+                                                    val req = okhttp3.Request.Builder()
+                                                        .url("http://2.26.71.102:8004/api/mute")
+                                                        .addHeader("Authorization", "Bearer $token")
+                                                        .post(json.toString().toRequestBody("application/json".toMediaType()))
+                                                        .build()
+                                                    withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                                        okhttp3.OkHttpClient().newCall(req).execute()
+                                                    }
+                                                    isMuted = !isMuted
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("MUTE", "set: ${e.message}")
+                                                }
+                                            }
+                                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(if (isMuted) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff, "Mute", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text(if (isMuted) "Unmute" else "Mute", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Wallpaper, "Change Wallpaper", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Change Wallpaper", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.DeleteSweep, "Clear History", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Clear History", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Delete, "Delete Chat", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Delete Chat", color = OnSurface, fontSize = 14.sp) }
