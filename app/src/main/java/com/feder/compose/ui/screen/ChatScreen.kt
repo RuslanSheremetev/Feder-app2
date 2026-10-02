@@ -2272,10 +2272,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             val newMsg = MsgItem(
                                 from = myUsername,
                                 to = chatUsername,
-                                text = "",
+                                text = sticker.text,
                                 time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date()),
                                 status = "sent",
                                 id = System.currentTimeMillis(),
+                                messageType = "sticker",
+                                stickerId = sticker.id,
+                                stickerText = sticker.text,
                             )
                             messages = messages + newMsg
                         } catch (e: Exception) {
