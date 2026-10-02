@@ -179,6 +179,16 @@ class ChatViewModel : ViewModel() {
     var currentUsername by mutableStateOf("")
     var wsManager: ProWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
+    // FEATURE_CHAT_MUTES: список замьюченных юзеров
+    var mutedUsers by mutableStateOf<Set<String>>(emptySet())
+
+    // FEATURE_CHAT_MUTES_D2: обновление значка из ChatScreen
+    fun setMute(username: String, muted: Boolean) {
+        mutedUsers = if (muted) mutedUsers + username else mutedUsers - username
+        chats = chats.map { chat ->
+            if (chat.username == username) chat.copy(isMuted = muted) else chat
+        }
+    }
     var isLoading by mutableStateOf(true)
     var isRefreshing by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
@@ -423,7 +433,7 @@ logWs("ProfileMedia: URLS=${urls.size}")
                     val data = obj?.getAsJsonArray("data") ?: com.google.gson.JsonArray()
                     val typeToken = object : com.google.gson.reflect.TypeToken<List<ChatItem>>() {}.type
                     val loadedChats = gson.fromJson<List<ChatItem>>(data, typeToken)
-                    chats = loadedChats
+                    chats = loadedChats.map { it.copy(isMuted = it.username in mutedUsers) }
                     isLoading = false
                     
                     // Сохраняем в Room (в корутине)
@@ -644,8 +654,9 @@ fun FederApp() {
                 if (arr != null) {
                     val mutedSet = mutableSetOf<String>()
                     for (i in 0 until arr.length()) mutedSet.add(arr.optString(i))
+                    viewModel.mutedUsers = mutedSet
                     viewModel.chats = viewModel.chats.map { chat ->
-                        chat.copy(isMuted = mutedSet.contains(chat.username))
+                        chat.copy(isMuted = chat.username in mutedSet)
                     }
                 }
             } catch (e: Exception) {
@@ -750,6 +761,7 @@ fun FederApp() {
                     repository = viewModel.repository,
                     linkPreviewRepo = viewModel.linkPreviewRepository,
                     reactionUpdates = viewModel.reactionUpdates,
+                    onMuteChanged = { user, muted -> viewModel.setMute(user, muted) },
                     onBack = { viewModel.selectedChat = null },
                     onMessageSent = { username, text ->
                         viewModel.chats = viewModel.chats.map { chat ->
