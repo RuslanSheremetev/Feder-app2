@@ -1591,6 +1591,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Wallpaper, "Change Wallpaper", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Change Wallpaper", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.DeleteSweep, "Clear History", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Clear History", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Delete, "Delete Chat", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Delete Chat", color = OnSurface, fontSize = 14.sp) }
+                                    }
                                 }
                             }
                         }
