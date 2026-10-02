@@ -1261,26 +1261,21 @@ fun FederApp() {
             Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
             val totalUnread = viewModel.chats.sumOf { it.unread }
             if (totalUnread > 0) {
-                // FIX_BADGE_PERFECT: строго круглый бейдж 14dp, снаружи-справа иконки
-                val badgeText = if (totalUnread > 99) "99+" else totalUnread.toString()
-                val isOneDigit = badgeText.length == 1
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .offset(x = 6.dp, y = (-4).dp)
-                        .size(
-                            width  = if (isOneDigit) 14.dp else 18.dp,
-                            height = 14.dp
-                        )
+                        .size(16.dp)
                         .clip(CircleShape)
                         .background(Color(0xFF339DFF)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = badgeText,
+                        text = if (totalUnread > 99) "99+" else totalUnread.toString(),
                         color = Color.White,
-                        fontSize = if (isOneDigit) 9.sp else 8.sp,
+                        fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
+                        letterSpacing = (-1).sp,
                         maxLines = 1
                     )
                 }
