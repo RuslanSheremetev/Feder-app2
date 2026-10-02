@@ -1963,21 +1963,31 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
-            // FIX_MENU_V5: вернули рабочую логику из f81b432b (5 авг)
+            // FIX_MENU_ABSOLUTE: используем PopupPositionProvider с абсолютными координатами
+            val msgPos = selectedMessage!!
+            val screenH = context.resources.displayMetrics.heightPixels
+            val screenW = context.resources.displayMetrics.widthPixels
+            val menuHPx = with(LocalDensity.current) { 400.dp.toPx() }
+            val menuWPx = with(LocalDensity.current) { 240.dp.toPx() }
+            val gapPx   = with(LocalDensity.current) { 8.dp.toPx() }
+
+            // Абсолютная точка: под сообщением, прижато к левому краю сообщения
+            val absX = msgPos.posX.coerceIn(0f, (screenW - menuWPx).coerceAtLeast(0f))
+            val absY = (msgPos.posY + 60f).coerceIn(0f, (screenH - menuHPx).coerceAtLeast(0f))
+
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
-                alignment = Alignment.TopStart,
-                offset = IntOffset(
-                    selectedMessage!!.posX.toInt(),
-                    // FIX_MENU_UNDER: меню ПОД сообщением, с clamp по низу экрана
-                    run {
-                        val screenH = context.resources.displayMetrics.heightPixels
-                        val menuH   = with(LocalDensity.current) { 420.dp.toPx() }
-                        val desired = (selectedMessage!!.posY.toInt() + 20)
-                        val maxY    = (screenH - menuH - with(LocalDensity.current) { 16.dp.toPx() }).toInt()
-                        desired.coerceAtMost(maxY).coerceAtLeast(0)
+                popupPositionProvider = object : androidx.compose.ui.window.PopupPositionProvider {
+                    override fun calculatePosition(
+                        anchorBounds: androidx.compose.ui.unit.IntRect,
+                        windowSize: androidx.compose.ui.unit.IntSize,
+                        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+                        popupContentSize: androidx.compose.ui.unit.IntSize
+                    ): androidx.compose.ui.unit.IntOffset {
+                        return androidx.compose.ui.unit.IntOffset(absX.toInt(), absY.toInt())
                     }
-                )
+                },
+                properties = PopupProperties(focusable = true)
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
