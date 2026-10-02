@@ -1972,8 +1972,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     (selectedMessage!!.posY.toInt() - 300).coerceAtLeast(0)
                 )
             ) {
+                // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
-                Column(Modifier.fillMaxWidth().padding(end = 16.dp), horizontalAlignment = Alignment.End) {
+                Column(Modifier.padding(end = 16.dp), horizontalAlignment = Alignment.End) {
                         var showAllReactions by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
                     Surface(shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
