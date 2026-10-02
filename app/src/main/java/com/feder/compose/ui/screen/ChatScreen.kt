@@ -1573,7 +1573,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(if (chatUsername == "saved_messages") "Saved Messages" else chatName, color = OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 if (isMuted) {
@@ -1581,6 +1580,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     Icon(Icons.Filled.VolumeOff, "muted", tint = OutlineVariant, modifier = Modifier.size(14.dp))
                                 }
                             }
+                            Text(
                                 when {
                                     isOnline -> "online"
                                     lastSeen > 0 -> formatLastSeen(lastSeen)
