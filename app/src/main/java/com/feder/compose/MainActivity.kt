@@ -200,6 +200,7 @@ class ChatViewModel : ViewModel() {
     var showNewGroup by mutableStateOf(false)
     var showGroupInfo by mutableStateOf<String?>(null)
     var showAddMembers by mutableStateOf<String?>(null)
+    var groupReloadCounter by mutableIntStateOf(0)
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
     var storyUserIndex by mutableIntStateOf(-1)
@@ -771,7 +772,11 @@ fun FederApp() {
                         myUsername = viewModel.currentUsername.ifEmpty { "demo" },
                         token = viewModel.token,
                         onBack = { viewModel.showAddMembers = null; viewModel.showGroupInfo = null },
-                        onAdded = { viewModel.showAddMembers = null }
+                        onAdded = {
+                            viewModel.showAddMembers = null
+                            viewModel.showGroupInfo = viewModel.selectedChat
+                            viewModel.groupReloadCounter += 1
+                        }
                     )
                 }
                 viewModel.showGroupInfo != null -> {
@@ -779,6 +784,7 @@ fun FederApp() {
                         groupName = viewModel.showGroupInfo!!.removePrefix("group:"),
                         myUsername = viewModel.currentUsername.ifEmpty { "demo" },
                         token = viewModel.token,
+                        reloadKey = viewModel.groupReloadCounter,
                         onBack = { viewModel.showGroupInfo = null },
                         onMembersChanged = { viewModel.showGroupInfo = null },
                         onAddMembers = {

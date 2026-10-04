@@ -40,7 +40,8 @@ fun GroupInfoScreen(
     onMembersChanged: () -> Unit = {},
     onAddMembers: () -> Unit = {},
     onMemberClick: (String) -> Unit = {},
-    onMemberLongClick: (String) -> Unit = {}
+    onMemberLongClick: (String) -> Unit = {},
+    reloadKey: Int = 0
 ) {
     var groupInfo by remember { mutableStateOf<GroupInfo?>(null) }
     var members by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -52,7 +53,7 @@ fun GroupInfoScreen(
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
-    LaunchedEffect(groupName) {
+    LaunchedEffect(groupName, reloadKey) {
         try {
             val encoded = java.net.URLEncoder.encode(groupName, "UTF-8")
             val url = "http://2.26.71.102:8004/api/group/info?name=$encoded"
