@@ -1114,30 +1114,67 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
         LaunchedEffect(internalToken) {
         if (internalToken.isEmpty()) return@LaunchedEffect
-        /* ws.onMessage = { json ->
-            val sender = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("from_user")?.asString ?: "unknown" } catch (e: Exception) { "unknown" }
-            val text = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("text")?.asString ?: "" } catch (e: Exception) { "" }
-            val timeVal = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("time")?.asLong ?: System.currentTimeMillis() / 1000 } catch (e: Exception) { System.currentTimeMillis() / 1000 }
-            val msgId = try { com.google.gson.JsonParser.parseString(json).asJsonObject.get("id")?.asInt ?: 0 } catch (e: Exception) { 0 }
-            val timeStr = if (timeVal > 0) SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeVal * 1000)) else "now"
-            // Для своих сообщений - обновляем pending
-            if (sender == myUsername) {
-                messages = messages.map { item ->
-                    val isPhotoMsg = item.imageUrls.isNotEmpty() && text.contains(".jpg")
-                    if (item.from == myUsername && (item.text == text || isPhotoMsg) && item.status == "pending") {
-                        item.copy(time = timeStr, status = "sent", timeVal = if (timeVal > 0) timeVal else item.timeVal, imageUrls = item.imageUrls)
-                    } else item
+    // === WS_ONMESSAGE_V1 ===
+    ws.onMessage = { json ->
+        try {
+            val obj = com.google.gson.JsonParser.parseString(json).asJsonObject
+            val type = obj.get("type")?.asString ?: ""
+            if (type == "message") {
+                val fromUser = obj.get("from")?.asString ?: ""
+                val toUser = obj.get("to")?.asString ?: ""
+                val text = obj.get("text")?.asString ?: ""
+                val timeVal = try { obj.get("time")?.asLong ?: (System.currentTimeMillis() / 1000) } catch (_: Exception) { System.currentTimeMillis() / 1000 }
+                val msgId = try { obj.get("id")?.asLong ?: System.currentTimeMillis() } catch (_: Exception) { System.currentTimeMillis() }
+                val urls: List<String> = try {
+                    val arr = obj.getAsJsonArray("imageUrls")
+                    if (arr == null) emptyList() else arr.map { it.asString }.filter { it.isNotBlank() }
+                } catch (_: Exception) { emptyList() }
+
+                // К какому чату относится?
+                val isForThisChat = when {
+                    chatUsername.startsWith("group:") -> toUser == chatUsername
+                    else -> fromUser == chatUsername
                 }
-            } else {
-                val existing = messages.find { it.from == sender && it.text == text }
-                if (existing == null) {
-                    val urls = if (text.contains(".jpg")) listOf(text) else if (text.contains(",")) text.split(",") else emptyList()
-                    val cleanText = text   // ← сохраняем подпись
-                    val newMsg = MsgItem(sender ?: "unknown", myUsername, cleanText, timeStr, "received", if (timeVal > 0) timeVal else System.currentTimeMillis() / 1000, id = System.currentTimeMillis(), imageUrls = urls)
-                    messages = messages + newMsg
+
+                if (isForThisChat && fromUser != myUsername) {
+                    val timeStr = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                        .format(java.util.Date(timeVal * 1000))
+                    val newMsg = MsgItem(
+                        from = fromUser,
+                        to = toUser,
+                        text = text,
+                        time = timeStr,
+                        status = "received",
+                        timeVal = timeVal,
+                        id = msgId,
+                        imageUrls = urls
+                    )
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        if (messages.none { it.id == newMsg.id && it.id > 0 }) {
+                            messages = messages + newMsg
+                        }
+                    }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            repository?.saveMessage(
+                                com.feder.compose.data.entity.MessageEntity(
+                                    id = msgId,
+                                    fromUser = fromUser,
+                                    toUser = toUser,
+                                    text = text,
+                                    timeVal = timeVal,
+                                    isRead = false
+                                )
+                            )
+                        } catch (_: Exception) {}
+                    }
                 }
             }
-        } */
+        } catch (e: Exception) {
+            android.util.Log.e("ChatScreen", "WS onMessage error: ${e.message}")
+        }
+    }
+    // === /WS_ONMESSAGE_V1 ===
         // ws уже подключен из ViewModel
     }
 
