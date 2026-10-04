@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import com.feder.compose.ChatItem
 
 /**

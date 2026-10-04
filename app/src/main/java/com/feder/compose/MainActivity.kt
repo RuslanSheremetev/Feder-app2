@@ -853,9 +853,8 @@ fun FederApp() {
                                 timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
                             ) else chat
                         }
-                    },
-                    onGroupInfoClick = { viewModel.showGroupInfo = targetUser },
-                    onProfileClick = {
+                    onGroupInfoClick = { viewModel.showGroupInfo = viewModel.selectedChat },
+                    },                    onProfileClick = {
                         val targetUser = viewModel.selectedChat
                         viewModel.selectedProfile = targetUser
                         viewModel.selectedChat = null
