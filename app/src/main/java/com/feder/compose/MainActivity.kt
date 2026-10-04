@@ -752,7 +752,7 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
                 viewModel.showNewGroup -> {
