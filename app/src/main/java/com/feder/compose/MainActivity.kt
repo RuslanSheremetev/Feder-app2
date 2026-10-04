@@ -68,6 +68,7 @@ import androidx.lifecycle.viewModelScope
 import com.feder.compose.data.FederDatabase
 import com.feder.compose.repository.ChatRepository
 import com.feder.compose.ui.screen.NewGroupScreen
+import com.feder.compose.ui.screen.GroupInfoScreen
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -196,6 +197,7 @@ class ChatViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
     var showNewGroup by mutableStateOf(false)
+    var showGroupInfo by mutableStateOf<String?>(null)
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
     var storyUserIndex by mutableIntStateOf(-1)
@@ -754,9 +756,18 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
+                viewModel.showGroupInfo != null -> {
+                    GroupInfoScreen(
+                        groupName = viewModel.showGroupInfo!!.removePrefix("group:"),
+                        myUsername = viewModel.currentUsername.ifEmpty { "demo" },
+                        token = viewModel.token,
+                        onBack = { viewModel.showGroupInfo = null },
+                        onMembersChanged = { viewModel.showGroupInfo = null }
+                    )
+                }
                 viewModel.showNewGroup -> {
                     NewGroupScreen(
                         contacts = viewModel.chats.filter {
@@ -820,6 +831,7 @@ fun FederApp() {
                             ) else chat
                         }
                     },
+                    onGroupInfoClick = { viewModel.showGroupInfo = targetUser },
                     onProfileClick = {
                         val targetUser = viewModel.selectedChat
                         viewModel.selectedProfile = targetUser
