@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Chat
@@ -238,15 +239,29 @@ fun GroupInfoScreen(
                             .padding(horizontal = 20.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Аватарка — если есть URL, иначе буква
-                        Box(
-                            modifier = Modifier.size(44.dp).clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(username.firstOrNull()?.uppercase() ?: "?",
-                                fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        // Аватарка — реальная через feder-avatars (8010), fallback на букву
+                        var avatarError by remember(username) { mutableStateOf(false) }
+                        if (!avatarError) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data("http://2.26.71.102:8010/avatars/$username/avatar.jpg")
+                                    .crossfade(false)
+                                    .build(),
+                                contentDescription = username,
+                                modifier = Modifier.size(44.dp).clip(CircleShape),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                onError = { avatarError = true }
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier.size(44.dp).clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(username.firstOrNull()?.uppercase() ?: "?",
+                                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            }
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
