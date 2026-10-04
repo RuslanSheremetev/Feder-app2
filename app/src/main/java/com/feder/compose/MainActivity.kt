@@ -854,7 +854,8 @@ fun FederApp() {
                             ) else chat
                         }
                     onGroupInfoClick = { viewModel.showGroupInfo = viewModel.selectedChat },
-                    },                    onProfileClick = {
+                    },
+                    onProfileClick = {
                         val targetUser = viewModel.selectedChat
                         viewModel.selectedProfile = targetUser
                         viewModel.selectedChat = null
