@@ -10,6 +10,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -41,7 +48,11 @@ fun GroupInfoScreen(
     onAddMembers: () -> Unit = {},
     onMemberClick: (String) -> Unit = {},
     onMemberLongClick: (String) -> Unit = {},
-    reloadKey: Int = 0
+    reloadKey: Int = 0,
+    onMessage: () -> Unit = {},
+    isMuted: Boolean = false,
+    onMuteToggle: () -> Unit = {},
+    onVideoCall: () -> Unit = {}
 ) {
     var groupInfo by remember { mutableStateOf<GroupInfo?>(null) }
     var members by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -143,27 +154,76 @@ fun GroupInfoScreen(
                     }
                 }
 
-                // Add Members
+                // Сетка действий — как в Telegram
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                            .clickable { onAddMembers() }
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Filled.PersonAdd, null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(16.dp))
-                        Text("Add Members", fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.primary)
+                        // Message
+                        ActionTile(
+                            icon = Icons.Filled.Chat,
+                            label = "Message",
+                            modifier = Modifier.weight(1f),
+                            onClick = onMessage
+                        )
+                        // Mute / Unmute
+                        ActionTile(
+                            icon = if (isMuted) Icons.Filled.NotificationsOff else Icons.Filled.Notifications,
+                            label = if (isMuted) "Unmute" else "Mute",
+                            modifier = Modifier.weight(1f),
+                            onClick = onMuteToggle
+                        )
+                        // Video Chat
+                        ActionTile(
+                            icon = Icons.Filled.Videocam,
+                            label = "Video Chat",
+                            modifier = Modifier.weight(1f),
+                            onClick = onVideoCall
+                        )
+                        // Leave
+                        ActionTile(
+                            icon = Icons.Filled.ExitToApp,
+                            label = "Leave",
+                            modifier = Modifier.weight(1f),
+                            tint = MaterialTheme.colorScheme.error,
+                            onClick = { /* confirmed ниже */ }
+                        )
                     }
                 }
 
-                // Участники
+                // Add Members — отдельная карточка
+                item {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clickable { onAddMembers() },
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Filled.PersonAdd, null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp))
+                            Spacer(Modifier.width(16.dp))
+                            Text("Add Members", fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
+
+                // MEMBERS заголовок
                 item {
                     Text("MEMBERS", fontSize = 12.sp, fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp))
                 }
+
+                // Участники — карточка со списком
                 items(members) { username ->
                     Row(
                         modifier = Modifier.fillMaxWidth()
@@ -178,26 +238,41 @@ fun GroupInfoScreen(
                             .padding(horizontal = 20.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Аватарка — если есть URL, иначе буква
                         Box(
-                            modifier = Modifier.size(40.dp).clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            modifier = Modifier.size(44.dp).clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(username.firstOrNull()?.uppercase() ?: "?",
-                                fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
-                        Spacer(Modifier.width(16.dp))
-                        Text(username, fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.weight(1f))
+                        Spacer(Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(username, fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface)
+                            Text(if (username == groupInfo?.createdBy) "online" else "last seen recently",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                         if (username == groupInfo?.createdBy) {
-                            Text("owner", fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary)
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                            ) {
+                                Text("Owner",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                            }
                         }
                     }
                 }
 
-                // Leave group
+                // Leave Group — отдельно внизу
+// Leave group
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth()
@@ -343,3 +418,29 @@ data class GroupInfo(
     val members: List<String>,
     val avatarUrl: String? = null
 )
+
+@Composable
+private fun ActionTile(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    modifier: Modifier = Modifier,
+    tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier.clickable { onClick() },
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.height(6.dp))
+            Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1)
+        }
+    }
+}
+

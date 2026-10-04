@@ -795,6 +795,13 @@ fun FederApp() {
                             viewModel.selectedProfile = username
                             viewModel.showGroupInfo = null
                         },
+                        onMessage = {
+                            viewModel.selectedChat = viewModel.showGroupInfo
+                            viewModel.showGroupInfo = null
+                        },
+                        isMuted = false,
+                        onMuteToggle = { /* TODO mute toggle */ },
+                        onVideoCall = { /* TODO video call */ },
                         onMemberLongClick = { /* handled inline in GroupInfoScreen */ }
                     )
                 }
