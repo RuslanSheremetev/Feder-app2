@@ -788,7 +788,8 @@ fun FederApp() {
                         onMemberClick = { username ->
                             viewModel.selectedProfile = username
                             viewModel.showGroupInfo = null
-                        }
+                        },
+                        onMemberLongClick = { /* handled inline in GroupInfoScreen */ }
                     )
                 }
                 viewModel.showNewGroup -> {

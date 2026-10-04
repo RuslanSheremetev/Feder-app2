@@ -2,6 +2,8 @@ package com.feder.compose.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,7 +30,7 @@ import com.feder.compose.ChatItem
  * FIX_STAGE5: Info-экран группы.
  * Показывает: имя, участников, кнопки Leave/Add/Rename (для админа).
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GroupInfoScreen(
     groupName: String,
@@ -37,11 +39,13 @@ fun GroupInfoScreen(
     onBack: () -> Unit,
     onMembersChanged: () -> Unit = {},
     onAddMembers: () -> Unit = {},
-    onMemberClick: (String) -> Unit = {}
+    onMemberClick: (String) -> Unit = {},
+    onMemberLongClick: (String) -> Unit = {}
 ) {
     var groupInfo by remember { mutableStateOf<GroupInfo?>(null) }
     var members by remember { mutableStateOf<List<String>>(emptyList()) }
     var isOwner by remember { mutableStateOf(false) }
+    var memberToRemove by remember { mutableStateOf<String?>(null) }
     var showRenameDialog by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf(groupName) }
     var loading by remember { mutableStateOf(true) }
@@ -162,7 +166,14 @@ fun GroupInfoScreen(
                 items(members) { username ->
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                            .clickable { onMemberClick(username) }
+                            .combinedClickable(
+                                onClick = { onMemberClick(username) },
+                                onLongClick = {
+                                    if (isOwner && username != myUsername) {
+                                        memberToRemove = username
+                                    }
+                                }
+                            )
                             .padding(horizontal = 20.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -223,6 +234,58 @@ fun GroupInfoScreen(
                     }
                 }
             }
+        }
+
+        // Remove member dialog
+        if (memberToRemove != null) {
+            AlertDialog(
+                onDismissRequest = { memberToRemove = null },
+                title = { Text("Remove member") },
+                text = { Text("Remove ${memberToRemove} from the group?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val uname = memberToRemove ?: return@TextButton
+                        memberToRemove = null
+                        scope.launch {
+                            try {
+                                val json = org.json.JSONObject().apply {
+                                    put("name", groupName)
+                                    put("user_to_remove", uname)
+                                    put("admin", myUsername)
+                                }
+                                val req = okhttp3.Request.Builder()
+                                    .url("http://2.26.71.102:8004/api/group/remove_member")
+                                    .addHeader("Authorization", "Bearer $token")
+                                    .post(okhttp3.RequestBody.create(
+                                        "application/json".toMediaType(),
+                                        json.toString()))
+                                    .build()
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                    okhttp3.OkHttpClient().newCall(req).execute()
+                                }
+                                // перезагружаем участников
+                                val encoded = java.net.URLEncoder.encode(groupName, "UTF-8")
+                                val r2 = okhttp3.Request.Builder()
+                                    .url("http://2.26.71.102:8004/api/group/info?name=$encoded").build()
+                                val resp2 = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                    okhttp3.OkHttpClient().newCall(r2).execute()
+                                }
+                                val b2 = resp2.body?.string() ?: "{}"
+                                val j2 = org.json.JSONObject(b2)
+                                val a2 = j2.optJSONArray("members")
+                                val l2 = mutableListOf<String>()
+                                if (a2 != null) for (ii in 0 until a2.length()) l2.add(a2.getString(ii))
+                                members = l2
+                            } catch (e: Exception) {
+                                android.util.Log.e("GroupInfo", "remove: ${e.message}")
+                            }
+                        }
+                    }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { memberToRemove = null }) { Text("Cancel") }
+                }
+            )
         }
 
         // Rename dialog

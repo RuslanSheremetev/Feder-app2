@@ -41,11 +41,31 @@ fun AddMembersScreen(
     onAdded: () -> Unit = {}
 ) {
     val selected = remember { mutableStateListOf<String>() }
+    var existingFromServer by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(groupName) {
+        try {
+            val encoded = java.net.URLEncoder.encode(groupName, "UTF-8")
+            val url = "http://2.26.71.102:8004/api/group/info?name=$encoded"
+            val req = okhttp3.Request.Builder().url(url)
+                .addHeader("Authorization", "Bearer $token").build()
+            val resp = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                okhttp3.OkHttpClient().newCall(req).execute()
+            }
+            val body = resp.body?.string() ?: "{}"
+            val arr = org.json.JSONObject(body).optJSONArray("members")
+            val l = mutableListOf<String>()
+            if (arr != null) for (i in 0 until arr.length()) l.add(arr.getString(i))
+            existingFromServer = l
+        } catch (e: Exception) {
+            android.util.Log.e("AddMembers", "load: ${e.message}")
+        }
+    }
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
     // Исключаем уже участников
-    val available = contacts.filter { it.username !in existingMembers }
+    val available = contacts.filter { it.username !in existingMembers && it.username !in existingFromServer }
     val canAdd = selected.isNotEmpty()
 
     Column(
