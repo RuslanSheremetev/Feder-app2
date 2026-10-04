@@ -1112,8 +1112,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             isLoading = false
         }
     }
-        LaunchedEffect(internalToken) {
-        if (internalToken.isEmpty()) return@LaunchedEffect
     // === WS_ONMESSAGE_V1 ===
     ws.onMessage = { json ->
         try {
@@ -1175,6 +1173,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
     }
     // === /WS_ONMESSAGE_V1 ===
+
+        LaunchedEffect(internalToken) {
+        if (internalToken.isEmpty()) return@LaunchedEffect
         // ws уже подключен из ViewModel
     }
 
