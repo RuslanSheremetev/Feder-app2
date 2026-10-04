@@ -846,6 +846,7 @@ fun FederApp() {
                     reactionUpdates = viewModel.reactionUpdates,
                     onMuteChanged = { user, muted -> viewModel.setMute(user, muted) },
                     onBack = { viewModel.selectedChat = null },
+                    onGroupInfoClick = { viewModel.showGroupInfo = viewModel.selectedChat },
                     onMessageSent = { username, text ->
                         viewModel.chats = viewModel.chats.map { chat ->
                             if (chat.username == username) chat.copy(
@@ -853,7 +854,6 @@ fun FederApp() {
                                 timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
                             ) else chat
                         }
-                    onGroupInfoClick = { viewModel.showGroupInfo = viewModel.selectedChat },
                     },
                     onProfileClick = {
                         val targetUser = viewModel.selectedChat
