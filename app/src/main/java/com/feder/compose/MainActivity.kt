@@ -69,6 +69,7 @@ import com.feder.compose.data.FederDatabase
 import com.feder.compose.repository.ChatRepository
 import com.feder.compose.ui.screen.NewGroupScreen
 import com.feder.compose.ui.screen.GroupInfoScreen
+import com.feder.compose.ui.screen.AddMembersScreen
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -198,6 +199,7 @@ class ChatViewModel : ViewModel() {
     var selectedTab by mutableIntStateOf(0)
     var showNewGroup by mutableStateOf(false)
     var showGroupInfo by mutableStateOf<String?>(null)
+    var showAddMembers by mutableStateOf<String?>(null)
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
     var storyUserIndex by mutableIntStateOf(-1)
@@ -756,16 +758,37 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null || viewModel.showAddMembers != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
+                viewModel.showAddMembers != null -> {
+                    AddMembersScreen(
+                        groupName = viewModel.showAddMembers!!.removePrefix("group:"),
+                        existingMembers = emptyList(),
+                        contacts = viewModel.chats.filter {
+                            it.username != "demo" && it.username != "123" && it.username != "saved_messages"
+                        },
+                        myUsername = viewModel.currentUsername.ifEmpty { "demo" },
+                        token = viewModel.token,
+                        onBack = { viewModel.showAddMembers = null; viewModel.showGroupInfo = null },
+                        onAdded = { viewModel.showAddMembers = null }
+                    )
+                }
                 viewModel.showGroupInfo != null -> {
                     GroupInfoScreen(
                         groupName = viewModel.showGroupInfo!!.removePrefix("group:"),
                         myUsername = viewModel.currentUsername.ifEmpty { "demo" },
                         token = viewModel.token,
                         onBack = { viewModel.showGroupInfo = null },
-                        onMembersChanged = { viewModel.showGroupInfo = null }
+                        onMembersChanged = { viewModel.showGroupInfo = null },
+                        onAddMembers = {
+                            viewModel.showAddMembers = viewModel.showGroupInfo
+                            viewModel.showGroupInfo = null
+                        },
+                        onMemberClick = { username ->
+                            viewModel.selectedProfile = username
+                            viewModel.showGroupInfo = null
+                        }
                     )
                 }
                 viewModel.showNewGroup -> {

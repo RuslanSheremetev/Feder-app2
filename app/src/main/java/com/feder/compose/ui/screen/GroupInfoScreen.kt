@@ -33,7 +33,9 @@ fun GroupInfoScreen(
     myUsername: String,
     token: String,
     onBack: () -> Unit,
-    onMembersChanged: () -> Unit = {}
+    onMembersChanged: () -> Unit = {},
+    onAddMembers: () -> Unit = {},
+    onMemberClick: (String) -> Unit = {}
 ) {
     var groupInfo by remember { mutableStateOf<GroupInfo?>(null) }
     var members by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -57,10 +59,11 @@ fun GroupInfoScreen(
             val json = org.json.JSONObject(body)
             val gname = json.optString("name", groupName)
             val createdBy = json.optString("created_by", "")
+            val avatarUrl = json.optString("avatar_url", "").ifEmpty { null }
             val arr = json.optJSONArray("members") ?: org.json.JSONArray()
             val list = mutableListOf<String>()
             for (i in 0 until arr.length()) list.add(arr.getString(i))
-            groupInfo = GroupInfo(gname, createdBy, list)
+            groupInfo = GroupInfo(gname, createdBy, list, avatarUrl)
             members = list
             isOwner = createdBy == myUsername
         } catch (e: Exception) {
@@ -102,16 +105,28 @@ fun GroupInfoScreen(
                         modifier = Modifier.fillMaxWidth().padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
-                            modifier = Modifier.size(96.dp).clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                groupName.firstOrNull()?.uppercase() ?: "G",
-                                fontSize = 40.sp, fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                        val avatarUrl = groupInfo?.avatarUrl
+                        if (!avatarUrl.isNullOrEmpty()) {
+                            val fullUrl = if (avatarUrl.startsWith("http")) avatarUrl
+                                          else "http://2.26.71.102:8010$avatarUrl"
+                            AsyncImage(
+                                model = ImageRequest.Builder(ctx).data(fullUrl).crossfade(false).build(),
+                                contentDescription = groupName,
+                                modifier = Modifier.size(96.dp).clip(CircleShape),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
                             )
+                        } else {
+                            Box(
+                                modifier = Modifier.size(96.dp).clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    groupName.firstOrNull()?.uppercase() ?: "G",
+                                    fontSize = 40.sp, fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
                         }
                         Spacer(Modifier.height(12.dp))
                         Text(groupName, fontSize = 24.sp, fontWeight = FontWeight.Bold,
@@ -125,7 +140,7 @@ fun GroupInfoScreen(
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                            .clickable { /* TODO: add members screen */ }
+                            .clickable { onAddMembers() }
                             .padding(horizontal = 20.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -145,7 +160,7 @@ fun GroupInfoScreen(
                 items(members) { username ->
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                            .clickable { /* TODO: profile */ }
+                            .clickable { onMemberClick(username) }
                             .padding(horizontal = 20.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -259,5 +274,6 @@ fun GroupInfoScreen(
 data class GroupInfo(
     val name: String,
     val createdBy: String,
-    val members: List<String>
+    val members: List<String>,
+    val avatarUrl: String? = null
 )
