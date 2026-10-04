@@ -14,5 +14,6 @@ data class ChatEntity(
     val unread: Int = 0,
     val isMuted: Boolean = false,
     val online: Boolean = false,
-    val lastSeen: Long? = null
+    val lastSeen: Long? = null,
+    val isGroup: Boolean = false
 )

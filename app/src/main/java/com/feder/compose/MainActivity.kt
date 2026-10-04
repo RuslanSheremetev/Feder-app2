@@ -114,7 +114,8 @@ data class ChatItem(
     @SerializedName("lastImageUrl") val lastImageUrl: String? = null,
     @SerializedName("lastImageCount") val lastImageCount: Int = 0,
     val timestamp: String? = null,
-    @SerializedName("time") val timeVal: Long = 0
+    @SerializedName("time") val timeVal: Long = 0,
+    @SerializedName("is_group") val isGroup: Boolean = false
 )
 
 fun formatTimestamp(timestamp: String?): String {
@@ -453,7 +454,8 @@ logWs("ProfileMedia: URLS=${urls.size}")
                                     unread = chat.unread,
                                     isMuted = chat.isMuted,
                                     online = chat.online,
-                                    lastSeen = chat.lastSeen
+                                    lastSeen = chat.lastSeen,
+                                    isGroup = chat.isGroup
                                 )
                             }
                             repo.saveChats(chatEntities)
