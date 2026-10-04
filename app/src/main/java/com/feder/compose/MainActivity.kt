@@ -67,6 +67,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.feder.compose.data.FederDatabase
 import com.feder.compose.repository.ChatRepository
+import com.feder.compose.ui.screen.NewGroupScreen
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -193,6 +194,7 @@ class ChatViewModel : ViewModel() {
     var isRefreshing by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
+    var showNewGroup by mutableStateOf(false)
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
     var storyUserIndex by mutableIntStateOf(-1)
@@ -540,6 +542,40 @@ logWs("ProfileMedia: URLS=${urls.size}")
             } catch (_: Exception) { }
         }
     }
+fun createGroupViaOkHttp(name: String, members: List<String>) {
+    viewModelScope.launch {
+        try {
+            val json = org.json.JSONObject().apply {
+                put("created_by", currentUsername.ifEmpty { "demo" })
+                put("name", name)
+                put("members", org.json.JSONArray(members))
+            }
+            val body = okhttp3.RequestBody.create(
+                "application/json".toMediaType(),
+                json.toString()
+            )
+            val req = okhttp3.Request.Builder()
+                .url("http://2.26.71.102:8004/api/group/create")
+                .addHeader("Authorization", "Bearer $token")
+                .post(body)
+                .build()
+            val resp = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                client.newCall(req).execute()
+            }
+            val ok = resp.isSuccessful
+            resp.close()
+            if (ok) {
+                showNewGroup = false
+                android.util.Log.d("FederVM", "Group created: $name")
+            } else {
+                android.util.Log.e("FederVM", "Group create failed")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FederVM", "createGroup: ${e.message}")
+        }
+    }
+}
+
 }
 
 class MainActivity : ComponentActivity() {
@@ -719,7 +755,17 @@ fun FederApp() {
     if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
-                viewModel.showSavedProfile -> {
+                viewModel.showNewGroup -> {
+                    NewGroupScreen(
+                        contacts = viewModel.chats.filter {
+                            it.username != "demo" && it.username != "123" && it.username != "saved_messages"
+                        },
+                        myUsername = viewModel.currentUsername.ifEmpty { "demo" },
+                        onBack = { viewModel.showNewGroup = false },
+                        onCreate = { name, members -> viewModel.createGroupViaOkHttp(name, members) }
+                    )
+                }
+                                viewModel.showSavedProfile -> {
                     com.feder.compose.ui.screen.SavedMessagesProfile(
                         onBack = { viewModel.showSavedProfile = false },
                         mediaUrls = viewModel.profileMediaUrls,
@@ -874,7 +920,7 @@ fun FederApp() {
                     ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (targetTab == 1) {
-                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it })
                     } else if (targetTab == 2) {
                         val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(

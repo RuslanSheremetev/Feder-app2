@@ -47,7 +47,7 @@ data class Contact(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick: (String) -> Unit = {}, isSearchVisible: Boolean = false, searchQuery: String = "", onSearchChange: (String) -> Unit = {}) {
+fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick: (String) -> Unit = {}, onNewGroup: () -> Unit = {}, isSearchVisible: Boolean = false, searchQuery: String = "", onSearchChange: (String) -> Unit = {}) {
     var searchText by remember { mutableStateOf("") }
 
 
@@ -99,7 +99,7 @@ fun ContactsScreen(contacts: List<ChatItem>, onBack: () -> Unit, onContactClick:
                 // New Group, New Secret Chat, New Channel
                 item {
                     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
-                        ActionButton(Icons.Filled.GroupAdd, "New Group")
+                        ActionButton(Icons.Filled.GroupAdd, "New Group", onClick = onNewGroup)
                         ActionButton(Icons.Filled.Lock, "New Secret Chat")
                         ActionButton(Icons.Filled.Campaign, "New Channel")
                     }
@@ -145,12 +145,12 @@ fun formatLastSeen(timestamp: Long): String {
 }
 
 @Composable
-private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
+private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(28.dp))
-            .clickable { }
+            .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
