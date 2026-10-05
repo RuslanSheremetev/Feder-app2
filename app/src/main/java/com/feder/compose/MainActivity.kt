@@ -13,7 +13,6 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.LocalTextStyle
 import androidx.compose.foundation.layout.wrapContentSize
 
 import android.os.Bundle
@@ -1367,31 +1366,9 @@ if (chat.isGroup) {
             Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
             val totalUnread = viewModel.chats.sumOf { it.unread }
             if (totalUnread > 0) {
-// === BADGE_CENTER_FIX ===
+// === BADGE_CENTER_FIX_V2 ===
                 Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 6.dp, y = (-6).dp)
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(Primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (totalUnread > 99) "99+" else totalUnread.toString(),
-                        color = Color.White,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        style = LocalTextStyle.current.copy(
-                            lineHeight = 9.sp,
-                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                        ),
-                        modifier = Modifier.wrapContentSize(Alignment.Center)
-                    )
-                }
-// === /BADGE_CENTER_FIX ===
-                        // FIX_BADGE_INSIDE: привязан к иконке 20dp, не вылезает за пилюлю
                         .size(16.dp)
                         .offset(x = 5.dp, y = (-5).dp)
                         .clip(CircleShape)
@@ -1401,12 +1378,18 @@ if (chat.isGroup) {
                     Text(
                         text = if (totalUnread > 99) "99+" else totalUnread.toString(),
                         color = Color.White,
-                        fontSize = 8.sp,
+                        fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = (-1).sp,
-                        maxLines = 1
+                        textAlign = TextAlign.Center,
+                        style = androidx.compose.ui.text.TextStyle(
+                            lineHeight = 9.sp,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        maxLines = 1,
+                        modifier = Modifier.wrapContentSize(Alignment.Center)
                     )
                 }
+// === /BADGE_CENTER_FIX_V2 ===
             }
         } else {
             Icon(icon, label, tint = if (selected) Color(0xFF00325A) else Color(0xFFC0C7D4), modifier = Modifier.size(20.dp))
