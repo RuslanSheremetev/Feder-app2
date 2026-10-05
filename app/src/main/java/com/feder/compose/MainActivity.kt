@@ -1,4 +1,5 @@
 package com.feder.compose
+import com.feder.compose.ui.components.GroupAvatar
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.feder.compose.stories.StoryApi
@@ -1187,9 +1188,13 @@ fun FederApp() {
                                             modifier = Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF353534))
                                         )
                                     } else {
-                                        Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                                            Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                        }
+if (chat.isGroup) {
+    GroupAvatar(size = 56.dp)
+} else {
+                                            Box(Modifier.size(56.dp).clip(CircleShape).background(avColor.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                                Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                            }
+}
                                     }
                                     if (chat.online && chat.username != "demo") {
                                         Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
