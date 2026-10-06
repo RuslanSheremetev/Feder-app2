@@ -95,27 +95,27 @@ fun GroupInfoScreen(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         // TopAppBar
-// === HEADER_PILL_V1 ===
+// === HEADER_PILL_V2 ===
         Row(
             modifier = Modifier.fillMaxWidth()
                 .padding(top = 40.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
-        ) {{
+        ) {
             // Круглая кнопка «Назад»
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    .clickable {{ onBack() }},
+                    .clickable { onBack() },
                 contentAlignment = Alignment.Center
-            ) {{
+            ) {
                 Icon(
                     Icons.Filled.ArrowBack, "Back",
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(20.dp)
                 )
-            }}
+            }
 
             Spacer(Modifier.weight(1f))
 
@@ -134,27 +134,27 @@ fun GroupInfoScreen(
             Spacer(Modifier.weight(1f))
 
             // Круглая кнопка «Редактировать» (только для owner)
-            if (isOwner) {{
+            if (isOwner) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .clickable {{ showRenameDialog = true }},
+                        .clickable { showRenameDialog = true },
                     contentAlignment = Alignment.Center
-                ) {{
+                ) {
                     Icon(
                         Icons.Filled.Edit, "Rename",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
-                }}
-            }} else {{
+                }
+            } else {
                 // Пустое место, чтобы название оставалось по центру
                 Spacer(Modifier.size(40.dp))
-            }}
-        }}
-// === /HEADER_PILL_V1 ===
+            }
+        }
+// === /HEADER_PILL_V2 ===
 
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
