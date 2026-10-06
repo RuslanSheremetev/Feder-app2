@@ -95,22 +95,66 @@ fun GroupInfoScreen(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         // TopAppBar
+// === HEADER_PILL_V1 ===
         Row(
             modifier = Modifier.fillMaxWidth()
                 .padding(top = 40.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onSurface)
-            }
-            Text("Group Info", fontSize = 20.sp, fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
-            if (isOwner) {
-                IconButton(onClick = { showRenameDialog = true }) {
-                    Icon(Icons.Filled.Edit, "Rename", tint = MaterialTheme.colorScheme.primary)
-                }
-            }
-        }
+        ) {{
+            // Круглая кнопка «Назад»
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .clickable {{ onBack() }},
+                contentAlignment = Alignment.Center
+            ) {{
+                Icon(
+                    Icons.Filled.ArrowBack, "Back",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
+                )
+            }}
+
+            Spacer(Modifier.weight(1f))
+
+            // Овал с названием группы
+            Text(
+                "Group Info",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .padding(horizontal = 18.dp, vertical = 8.dp)
+            )
+
+            Spacer(Modifier.weight(1f))
+
+            // Круглая кнопка «Редактировать» (только для owner)
+            if (isOwner) {{
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .clickable {{ showRenameDialog = true }},
+                    contentAlignment = Alignment.Center
+                ) {{
+                    Icon(
+                        Icons.Filled.Edit, "Rename",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }}
+            }} else {{
+                // Пустое место, чтобы название оставалось по центру
+                Spacer(Modifier.size(40.dp))
+            }}
+        }}
+// === /HEADER_PILL_V1 ===
 
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
