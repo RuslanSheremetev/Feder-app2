@@ -197,8 +197,11 @@ fun GroupInfoScreen(
                         Spacer(Modifier.height(12.dp))
                         Text(groupName, fontSize = 24.sp, fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface)
-                        Text("${members.size} members", fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            if (loading) "Loading members…" else "${members.size} members",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
