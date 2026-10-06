@@ -1608,8 +1608,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Box(Modifier.size(40.dp).clip(CircleShape).background(Color(0xFF339DFF)), contentAlignment = Alignment.Center) {
                                     Icon(Icons.Filled.Bookmark, "saved", tint = Color.White, modifier = Modifier.size(22.dp))
                                 }
-                            } else if (avatarUrl != null) {
-                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(false).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                            } else if (!avatarUrl.isNullOrEmpty()) {
+                                AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8010$avatarUrl" else avatarUrl).crossfade(false).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
 // === CHAT_HEADER_GROUP_AVATAR ===
                                 if (isGroup) {
