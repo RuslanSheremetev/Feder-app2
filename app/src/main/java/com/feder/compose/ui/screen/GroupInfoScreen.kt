@@ -288,42 +288,7 @@ fun GroupInfoScreen(
 
                 // Leave Group — отдельно внизу
 // Leave group
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .clickable {
-                                scope.launch {
-                                    try {
-                                        val json = org.json.JSONObject().apply {
-                                            put("name", groupName)
-                                            put("user", myUsername)
-                                        }
-                                        val req = okhttp3.Request.Builder()
-                                            .url("http://2.26.71.102:8004/api/group/leave")
-                                            .addHeader("Authorization", "Bearer $token")
-                                            .post(okhttp3.RequestBody.create(
-                                                "application/json".toMediaType(),
-                                                json.toString()))
-                                            .build()
-                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                                            okhttp3.OkHttpClient().newCall(req).execute()
-                                        }
-                                        onMembersChanged()
-                                        onBack()
-                                    } catch (e: Exception) {
-                                        android.util.Log.e("GroupInfo", "leave: ${e.message}")
-                                    }
-                                }
-                            }
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Filled.ExitToApp, null, tint = MaterialTheme.colorScheme.error)
-                        Spacer(Modifier.width(16.dp))
-                        Text("Leave Group", fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.error)
-                    }
-                }
+                // === REMOVE_LEAVE_BOTTOM_V3: кнопка Leave Group удалена (item) ===
             }
         }
 
