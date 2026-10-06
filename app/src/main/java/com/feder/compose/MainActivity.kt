@@ -187,6 +187,10 @@ class ChatViewModel : ViewModel() {
     var currentUsername by mutableStateOf("")
     var wsManager: ProWebSocket? = null
     var chats by mutableStateOf<List<ChatItem>>(emptyList())
+    // === GROUP_CACHE_V1 ===
+    val groupMembersCache = androidx.compose.runtime.mutableStateMapOf<String, List<String>>()
+    val groupInfoCache = androidx.compose.runtime.mutableStateMapOf<String, org.json.JSONObject>()
+    // === /GROUP_CACHE_V1 ===
     // FEATURE_CHAT_MUTES: список замьюченных юзеров
     var mutedUsers by mutableStateOf<Set<String>>(emptySet())
 
@@ -808,7 +812,9 @@ fun FederApp() {
                         isMuted = false,
                         onMuteToggle = { /* TODO mute toggle */ },
                         onVideoCall = { /* TODO video call */ },
-                        onMemberLongClick = { /* handled inline in GroupInfoScreen */ }
+                        onMemberLongClick = { /* handled inline in GroupInfoScreen */ },
+                        groupMembersCache = viewModel.groupMembersCache,
+                        groupInfoCache = viewModel.groupInfoCache
                     )
                 }
                 viewModel.showNewGroup -> {

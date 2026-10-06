@@ -53,15 +53,20 @@ fun GroupInfoScreen(
     onMessage: () -> Unit = {},
     isMuted: Boolean = false,
     onMuteToggle: () -> Unit = {},
-    onVideoCall: () -> Unit = {}
+    onVideoCall: () -> Unit = {},
+    groupMembersCache: MutableMap<String, List<String>>? = null,
+    groupInfoCache: MutableMap<String, org.json.JSONObject>? = null
 ) {
-    var groupInfo by remember { mutableStateOf<GroupInfo?>(null) }
-    var members by remember { mutableStateOf<List<String>>(emptyList()) }
+    // === GROUPINFO_CACHE_V1 ===
+    // Сначала берём из кэша (мгновенно), потом обновляем с сервера
+    val cachedMembers = groupMembersCache?.get(groupName)
+    var groupInfo by remember(groupName) { mutableStateOf<GroupInfo?>(null) }
+    var members by remember(groupName) { mutableStateOf<List<String>>(cachedMembers ?: emptyList()) }
     var isOwner by remember { mutableStateOf(false) }
     var memberToRemove by remember { mutableStateOf<String?>(null) }
     var showRenameDialog by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf(groupName) }
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember(groupName) { mutableStateOf(cachedMembers.isNullOrEmpty()) }
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
@@ -85,6 +90,10 @@ fun GroupInfoScreen(
             groupInfo = GroupInfo(gname, createdBy, list, avatarUrl)
             members = list
             isOwner = createdBy == myUsername
+            // === GROUPINFO_CACHE_SAVE_V1 ===
+            groupMembersCache?.put(groupName, list)
+            groupInfoCache?.put(groupName, json)
+            // === /GROUPINFO_CACHE_SAVE_V1 ===
         } catch (e: Exception) {
             android.util.Log.e("GroupInfo", "load: ${e.message}")
         }
