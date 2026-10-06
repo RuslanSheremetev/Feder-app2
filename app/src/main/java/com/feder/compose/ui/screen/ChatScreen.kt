@@ -1611,9 +1611,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             } else if (avatarUrl != null) {
                                 AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(if (avatarUrl?.startsWith("/") == true) "http://2.26.71.102:8004$avatarUrl" else avatarUrl).crossfade(false).diskCachePolicy(coil.request.CachePolicy.ENABLED).memoryCachePolicy(coil.request.CachePolicy.ENABLED).build(), contentDescription = chatName, modifier = Modifier.size(40.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                             } else {
-                                Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
-                                    Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+// === CHAT_HEADER_GROUP_AVATAR ===
+                                if (chatUsername.startsWith("group:")) {
+                                    com.feder.compose.ui.components.GroupAvatar(size = 40.dp)
+                                } else {
+                                    Box(Modifier.size(40.dp).clip(CircleShape).background(Primary.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                                        Text(chatName.take(1).uppercase(), color = Primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                    }
                                 }
+// === /CHAT_HEADER_GROUP_AVATAR ===
                             }
                         }
                         Spacer(Modifier.width(12.dp))
