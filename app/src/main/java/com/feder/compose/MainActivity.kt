@@ -857,6 +857,7 @@ fun FederApp() {
                     avatarUrl = selectedChatItem?.avatarUrl,
                     lastSeen = selectedChatItem?.lastSeen ?: 0,
                     isOnline = selectedChatItem?.online ?: false,
+                    isGroup = selectedChatItem?.isGroup ?: false,
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,
