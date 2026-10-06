@@ -135,17 +135,11 @@ fun GroupInfoScreen(
                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
                             )
                         } else {
-                            Box(
-                                modifier = Modifier.size(96.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    groupName.firstOrNull()?.uppercase() ?: "G",
-                                    fontSize = 40.sp, fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
+// === GROUPINFO_AVATAR_ELSE_FIX ===
+                            com.feder.compose.ui.components.GroupAvatar(
+                                size = 96.dp
+                            )
+// === /GROUPINFO_AVATAR_ELSE_FIX ===
                         }
                         Spacer(Modifier.height(12.dp))
                         Text(groupName, fontSize = 24.sp, fontWeight = FontWeight.Bold,
