@@ -101,14 +101,26 @@ class ProWebSocket {
             output?.write(handshake.toByteArray(StandardCharsets.UTF_8))
             output?.flush()
             
+            // === HANDSHAKE_BYTE_BY_BYTE_V1 ===
+            // Читаем handshake по 1 байту, чтобы НЕ съесть первый WS-фрейм
+            // (сервер сразу после 101 шлёт chats_list — его нельзя проглотить здесь)
             val response = StringBuilder()
-            val buffer = ByteArray(1024)
+            var prev3 = 0
+            var prev2 = 0
+            var prev1 = 0
             while (true) {
-                val read = input?.read(buffer) ?: -1
-                if (read <= 0) break
-                response.append(String(buffer, 0, read, StandardCharsets.UTF_8))
-                if (response.contains("\r\n\r\n")) break
+                val b = input?.read() ?: -1
+                if (b < 0) break
+                response.append(b.toChar())
+                // Проверяем 
+
+
+                if (prev3 == 13 && prev2 == 10 && prev1 == 13 && b == 10) break
+                prev3 = prev2
+                prev2 = prev1
+                prev1 = b
             }
+            // === /HANDSHAKE_BYTE_BY_BYTE_V1 ===
             
             logToDb("PRO_WS_HANDSHAKE: ${response.take(100)}")
             
