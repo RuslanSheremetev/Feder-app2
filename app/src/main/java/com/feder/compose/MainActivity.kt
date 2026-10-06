@@ -376,7 +376,8 @@ logWs("ProfileMedia: URLS=${urls.size}")
                             isMuted = entity.isMuted,
                             lastSeen = entity.lastSeen ?: 0L,
                             lastMessage = entity.lastMessage,
-                            timestamp = entity.lastTime?.toString() ?: ""
+                            timestamp = entity.lastTime?.toString() ?: "",
+                            isGroup = entity.isGroup
                         )
                     }.sortedByDescending { it.timestamp }
                     // Saved Messages — всегда первым
@@ -422,7 +423,8 @@ logWs("ProfileMedia: URLS=${urls.size}")
                             isMuted = entity.isMuted,
                             lastSeen = entity.lastSeen ?: 0L,
                             lastMessage = entity.lastMessage,
-                            timestamp = entity.lastTime?.toString() ?: ""
+                            timestamp = entity.lastTime?.toString() ?: "",
+                            isGroup = entity.isGroup
                         )
                     }
                     isLoading = false
