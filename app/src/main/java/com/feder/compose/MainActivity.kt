@@ -454,6 +454,29 @@ logWs("ProfileMedia: URLS=${urls.size}")
                     val loadedChats = gson.fromJson<List<ChatItem>>(data, typeToken)
                     chats = loadedChats.map { it.copy(isMuted = it.username in mutedUsers) }
                     isLoading = false
+                    // === PREFETCH_GROUP_MEMBERS_V1 ===
+                    // Один раз грузим участников всех групп в кэш.
+                    // GroupInfoScreen потом рендерит мгновенно из памяти (как Contacts).
+                    viewModelScope.launch(Dispatchers.IO) {
+                        loadedChats.filter { it.isGroup }.forEach { chat ->
+                            val gname = chat.username.removePrefix("group:")
+                            try {
+                                val url = "http://2.26.71.102:8004/api/group/info?name=" +
+                                    java.net.URLEncoder.encode(gname, "UTF-8")
+                                val req = okhttp3.Request.Builder().url(url)
+                                    .addHeader("Authorization", "Bearer $token").build()
+                                val resp = okhttp3.OkHttpClient().newCall(req).execute()
+                                val body = resp.body?.string() ?: "{}"
+                                val json = org.json.JSONObject(body)
+                                val arr = json.optJSONArray("members") ?: org.json.JSONArray()
+                                val list = mutableListOf<String>()
+                                for (i in 0 until arr.length()) list.add(arr.getString(i))
+                                groupMembersCache[gname] = list
+                                groupInfoCache[gname] = json
+                            } catch (_: Exception) {}
+                        }
+                    }
+                    // === /PREFETCH_GROUP_MEMBERS_V1 ===
                     
                     // Сохраняем в Room (в корутине)
                     viewModelScope.launch {

@@ -71,6 +71,20 @@ fun GroupInfoScreen(
     val ctx = LocalContext.current
 
     LaunchedEffect(groupName, reloadKey) {
+        // === GROUPINFO_NO_FETCH_IF_CACHED_V1 ===
+        // Как Contacts: если данные уже в кэше (префетч в loadChats), НЕ делаем HTTP.
+        if (!groupMembersCache?.get(groupName).isNullOrEmpty()) {
+            loading = false
+            groupInfoCache?.get(groupName)?.let { cached ->
+                val createdBy = cached.optString("created_by", "")
+                isOwner = createdBy == myUsername
+                val gname = cached.optString("name", groupName)
+                val avatarUrl = cached.optString("avatar_url", "").ifEmpty { null }
+                groupInfo = GroupInfo(gname, createdBy, members, avatarUrl)
+            }
+            return@LaunchedEffect
+        }
+        // === /GROUPINFO_NO_FETCH_IF_CACHED_V1 ===
         try {
             val encoded = java.net.URLEncoder.encode(groupName, "UTF-8")
             val url = "http://2.26.71.102:8004/api/group/info?name=$encoded"
@@ -90,10 +104,8 @@ fun GroupInfoScreen(
             groupInfo = GroupInfo(gname, createdBy, list, avatarUrl)
             members = list
             isOwner = createdBy == myUsername
-            // === GROUPINFO_CACHE_SAVE_V1 ===
             groupMembersCache?.put(groupName, list)
             groupInfoCache?.put(groupName, json)
-            // === /GROUPINFO_CACHE_SAVE_V1 ===
         } catch (e: Exception) {
             android.util.Log.e("GroupInfo", "load: ${e.message}")
         }
