@@ -112,14 +112,16 @@ fun GroupInfoScreen(
         loading = false
     }
 
-    Column(
+    androidx.compose.foundation.layout.Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         // TopAppBar
 // === HEADER_PILL_V2 ===
         Row(
             modifier = Modifier.fillMaxWidth()
-                .padding(top = 40.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Круглая кнопка «Назад»
@@ -182,7 +184,10 @@ fun GroupInfoScreen(
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 96.dp, bottom = 24.dp)
+            ) {
                 // Аватарка + имя
                 item {
                     Column(
