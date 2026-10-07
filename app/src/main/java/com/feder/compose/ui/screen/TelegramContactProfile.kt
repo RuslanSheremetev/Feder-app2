@@ -132,9 +132,10 @@ fun TelegramContactProfile(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = 72.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            // Спацер под хедер, фон Column покрывает верх и сливается с фоном Box
+            Spacer(Modifier.height(72.dp))
 
             // ─── Аватарка + имя + статус ───
             Column(
