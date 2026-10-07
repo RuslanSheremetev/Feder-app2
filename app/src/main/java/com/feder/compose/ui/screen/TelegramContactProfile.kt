@@ -81,14 +81,28 @@ fun TelegramContactProfile(
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, "back", tint = Color(0xFFE5E2E1), modifier = Modifier.size(24.dp))
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F1F1F))
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.ArrowBack, "back", tint = Color(0xFFE5E2E1), modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.weight(1f))
             var showMoreMenu by remember { mutableStateOf(false) }
             Box {
-                IconButton(onClick = { showMoreMenu = true }) {
-                    Icon(Icons.Filled.MoreVert, "more", tint = Color(0xFFE5E2E1), modifier = Modifier.size(24.dp))
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1F1F1F))
+                        .clickable { showMoreMenu = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Filled.MoreVert, "more", tint = Color(0xFFE5E2E1), modifier = Modifier.size(20.dp))
                 }
                 if (showMoreMenu) {
                     androidx.compose.ui.window.Popup(
@@ -119,7 +133,7 @@ fun TelegramContactProfile(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = 96.dp)
+                .padding(top = 56.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
