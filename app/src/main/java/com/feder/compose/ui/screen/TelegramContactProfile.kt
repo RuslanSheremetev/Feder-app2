@@ -66,13 +66,18 @@ fun TelegramContactProfile(
         else -> "http://2.26.71.102:8010/avatars/$contactUsername/avatar.jpg"
     }
 
-    Column(
+    androidx.compose.foundation.layout.Box(
         Modifier.fillMaxSize().background(Color(0xFF131313))
     ) {
 
         // ─── Top bar ───
         Row(
-            Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 8.dp, vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(10f)
+                .statusBarsPadding()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
@@ -111,7 +116,10 @@ fun TelegramContactProfile(
         }
 
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            Modifier
+                .fillMaxSize()
+                .padding(top = 96.dp)
+                .verticalScroll(rememberScrollState())
         ) {
 
             // ─── Аватарка + имя + статус ───
