@@ -924,7 +924,17 @@ fun FederApp() {
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         topBar = {
             // Скрываем шапку для Profile (tab 2) — там своя шапка внутри MyProfileScreen
-            if (viewModel.selectedTab != 2) {
+            // === HIDE_TOPBAR_WHEN_OVERLAY_V1 ===
+            // Скрываем также, когда открыт профиль/группа/чат/доп. экран —
+            // у них свой плавающий хедер
+            val hideTopBar =
+                viewModel.selectedTab == 2 ||
+                viewModel.selectedProfile != null ||
+                viewModel.showGroupInfo != null ||
+                viewModel.showAddMembers != null ||
+                viewModel.showNewGroup ||
+                viewModel.showSavedProfile
+            if (!hideTopBar) {
             Box(
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().background(Surface).padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
