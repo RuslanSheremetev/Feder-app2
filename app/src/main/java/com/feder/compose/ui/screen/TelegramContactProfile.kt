@@ -68,7 +68,7 @@ fun TelegramContactProfile(
     }
 
     androidx.compose.foundation.layout.Box(
-        Modifier.fillMaxSize().background(Color(0xFF131313))
+        Modifier.fillMaxSize().statusBarsPadding()
     ) {
 
         // ─── Top bar ───
@@ -77,7 +77,6 @@ fun TelegramContactProfile(
                 .fillMaxWidth()
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(10f)
-                .statusBarsPadding()
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -133,7 +132,6 @@ fun TelegramContactProfile(
         Column(
             Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
                 .padding(top = 72.dp)
                 .verticalScroll(rememberScrollState())
         ) {
