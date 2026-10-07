@@ -679,10 +679,7 @@ class MainActivity : ComponentActivity() {
         // Запрашиваем разрешения при первом входе
         requestMediaPermissions()
         try {
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-        }
+        window.statusBarColor = android.graphics.Color.parseColor("#131313")
             // Прозрачные бары для Android 11+
             setContent {
         val prefs = this@MainActivity.getSharedPreferences("feder_theme", Context.MODE_PRIVATE)

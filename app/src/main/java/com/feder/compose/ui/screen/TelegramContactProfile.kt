@@ -133,7 +133,7 @@ fun TelegramContactProfile(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = 56.dp)
+                .padding(top = 96.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
