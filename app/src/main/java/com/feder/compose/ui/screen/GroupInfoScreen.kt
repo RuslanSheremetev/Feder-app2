@@ -120,6 +120,7 @@ fun GroupInfoScreen(
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(10f)
                 .statusBarsPadding()
                 .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
