@@ -1180,6 +1180,8 @@ fun FederApp() {
                             
                             val dismissState = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { value ->
+                                    // Saved Messages нельзя удалить свайпом
+                                    if (chat.username == "saved_messages") return@rememberSwipeToDismissBoxState false
                                     if (value == SwipeToDismissBoxValue.EndToStart) {
                                         viewModel.deleteChat(chat.username)
                                         true
@@ -1190,11 +1192,14 @@ fun FederApp() {
                                 state = dismissState,
                                 enableDismissFromStartToEnd = false,
                                 backgroundContent = {
-                                    Box(
-                                        Modifier.fillMaxSize().background(Color(0xFFE53935)),
-                                        contentAlignment = Alignment.CenterEnd
-                                    ) {
-                                        Icon(Icons.Filled.Delete, "Delete", tint = Color.White, modifier = Modifier.padding(end = 24.dp).size(24.dp))
+                                    // Не показываем красный фон для Saved Messages
+                                    if (chat.username != "saved_messages") {
+                                        Box(
+                                            Modifier.fillMaxSize().background(Color(0xFFE53935)),
+                                            contentAlignment = Alignment.CenterEnd
+                                        ) {
+                                            Icon(Icons.Filled.Delete, "Delete", tint = Color.White, modifier = Modifier.padding(end = 24.dp).size(24.dp))
+                                        }
                                     }
                                 }
                             ) {
