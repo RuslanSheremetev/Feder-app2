@@ -1256,7 +1256,7 @@ fun FederApp() {
                                 AlertDialog(
                                     onDismissRequest = { showDeleteDialog = false },
                                     title = { Text("Delete chat?") },
-                                    text = { Text("Delete \"${chat.name}\"?") },
+                                    text = { Text("Delete chat with " + chat.name + "?") },
                                     confirmButton = {
                                         TextButton(onClick = {
                                             viewModel.deleteChat(chat.username)
