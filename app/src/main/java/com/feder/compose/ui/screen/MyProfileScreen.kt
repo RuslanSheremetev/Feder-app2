@@ -66,7 +66,7 @@ fun MyProfileScreen(
             Spacer(Modifier.height(72.dp))
 
             // ─── Аватар + имя + статус ───
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(20.dp))
             Box(
                 Modifier.size(120.dp),
                 contentAlignment = Alignment.BottomEnd
