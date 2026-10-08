@@ -156,22 +156,29 @@ fun ContactsScreen(
             }
         }
 
-        // ═══ АНИМИРОВАННЫЙ ХЕДЕР ═══
-        // progress: 0 = овал+кружок раздельно, 1 = единый прямоугольник
-        val outerPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (16 - progress * 16).dp, label = "outerPad"
+        // ═══ ЕДИНЫЙ АНИМИРОВАННЫЙ ХЕДЕР ═══
+        // progress: 0 = овал + кружок (раздельно), 1 = сплошная полоса
+        val outerHPad by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (16 - progress * 16).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (12 - progress * 6).dp, label = "outerVPad"
+            targetValue = (12 - progress * 4).dp, label = "outerVPad"
         )
-        val ovalMaxWidth by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (140 + progress * 200).dp, label = "ovalMaxWidth"
-        )
-        val ovalRadius by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (24 - progress * 14).dp, label = "ovalRadius"
-        )
+        // Внутренний зазор между овалом и кружком (12 → 0)
         val gap by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (12 - progress * 8).dp, label = "gap"
+            targetValue = (12 - progress * 12).dp, label = "gap"
+        )
+        // Радиус овала и кружка → прямоугольник (24 → 8)
+        val radius by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (24 - progress * 16).dp, label = "radius"
+        )
+        // Радиус кружка лупы (22 = идеальный круг при 44dp; при progress=1 → 8 = прямоугольник)
+        val searchRadius by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (22 - progress * 14).dp, label = "searchRadius"
+        )
+        // Ширина кружка лупы (44 → растягивается на всю доступную ширину)
+        val searchWidth by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (44 + progress * 60).dp, label = "searchWidth"
         )
 
         Row(
@@ -179,15 +186,15 @@ fun ContactsScreen(
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(horizontal = outerPad, vertical = outerVPad)
+                .padding(horizontal = outerHPad, vertical = outerVPad)
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Овал — растёт от компактного до широкого
+            // Овал — растёт, но с ограничением
             Box(
                 modifier = Modifier
-                    .widthIn(max = ovalMaxWidth)
-                    .clip(RoundedCornerShape(ovalRadius))
+                    .weight(1f)
+                    .clip(RoundedCornerShape(radius))
                     .background(ContactsSurface)
                     .padding(horizontal = 22.dp, vertical = 10.dp)
             ) {
@@ -196,15 +203,18 @@ fun ContactsScreen(
                     color = ContactsTextMain,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.3).sp
+                    letterSpacing = (-0.3).sp,
+                    maxLines = 1
                 )
             }
-            androidx.compose.foundation.layout.Spacer(Modifier.width(gap))
-            // Кружок лупы — всегда круглый
+            // Зазор — сжимается до 0 при progress=1
+            Spacer(Modifier.width(gap))
+            // Кружок лупы — растёт и превращается в прямоугольный блок
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
+                    .width(searchWidth)
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(searchRadius))
                     .background(ContactsSurface)
                     .clickable { onToggleSearch() },
                 contentAlignment = Alignment.Center
