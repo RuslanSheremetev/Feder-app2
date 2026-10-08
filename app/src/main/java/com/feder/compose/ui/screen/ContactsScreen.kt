@@ -56,7 +56,8 @@ fun ContactsScreen(
     onNewGroup: () -> Unit = {},
     isSearchVisible: Boolean = false,
     searchQuery: String = "",
-    onSearchChange: (String) -> Unit = {}
+    onSearchChange: (String) -> Unit = {},
+    onToggleSearch: () -> Unit = {}
 ) {
     val groupedContacts = contacts.groupBy { it.name.firstOrNull()?.uppercase() ?: "#" }
 
