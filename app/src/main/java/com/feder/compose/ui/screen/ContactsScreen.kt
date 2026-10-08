@@ -79,6 +79,23 @@ fun ContactsScreen(
         animationSpec = androidx.compose.animation.core.tween(150),
         label = "header-progress"
     )
+    // Статус-бар: плавно меняется от #131313 к #1A1A1A (в тон хедера)
+    val context = LocalContext.current
+    SideEffect {
+        try {
+            val window = (context as? android.app.Activity)?.window
+            if (window != null) {
+                val from = 0xFF131313.toInt()
+                val to   = 0xFF1A1A1A.toInt()
+                val fromR = (from shr 16) and 0xFF; val fromG = (from shr 8) and 0xFF; val fromB = from and 0xFF
+                val toR   = (to   shr 16) and 0xFF; val toG   = (to   shr 8) and 0xFF; val toB   = to   and 0xFF
+                val r = (fromR + (toR - fromR) * progress).toInt()
+                val g = (fromG + (toG - fromG) * progress).toInt()
+                val b = (fromB + (toB - fromB) * progress).toInt()
+                window.statusBarColor = android.graphics.Color.rgb(r, g, b)
+            }
+        } catch (_: Exception) {}
+    }
 
     Box(
         modifier = Modifier
