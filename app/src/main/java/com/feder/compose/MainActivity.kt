@@ -1251,27 +1251,8 @@ fun FederApp() {
                                         }
                                     }
                                 }
+                                ) {
 
-                            if (showDeleteDialog) {
-                                AlertDialog(
-                                    onDismissRequest = { showDeleteDialog = false },
-                                    title = { Text("Delete chat?") },
-                                    text = { Text("Delete chat with " + chat.name + "?") },
-                                    confirmButton = {
-                                        TextButton(onClick = {
-                                            viewModel.deleteChat(chat.username)
-                                            showDeleteDialog = false
-                                        }) {
-                                            Text("Delete", color = Color(0xFFE53935))
-                                        }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick = { showDeleteDialog = false }) {
-                                            Text("Cancel")
-                                        }
-                                    }
-                                )
-                            }
                             Row(
                                 modifier = Modifier.fillMaxWidth().background(Background).clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -1312,6 +1293,27 @@ if (chat.isGroup) {
                                                 Text(chat.name.take(1).uppercase(), color = avColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                             }
 }
+
+                            if (showDeleteDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showDeleteDialog = false },
+                                    title = { Text("Delete chat?") },
+                                    text = { Text("Delete chat with " + chat.name + "?") },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            viewModel.deleteChat(chat.username)
+                                            showDeleteDialog = false
+                                        }) {
+                                            Text("Delete", color = Color(0xFFE53935))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showDeleteDialog = false }) {
+                                            Text("Cancel")
+                                        }
+                                    }
+                                )
+                            }
                                     }
                                     if (chat.online && chat.username != "demo") {
                                         Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
