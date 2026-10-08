@@ -135,7 +135,7 @@ fun SavedMessagesProfile(
                 Text(
                     "Ваши сохранённые сообщения",
                     color = OnSurfaceVar,
-                    fontSize = 13.sp
+                    fontSize = 12.sp
                 )
             }
 
@@ -145,7 +145,7 @@ fun SavedMessagesProfile(
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
                     .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 tabs.forEachIndexed { index, tab ->
                     val active = index == selectedTab
@@ -153,17 +153,17 @@ fun SavedMessagesProfile(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
                             .background(if (active) Primary else Surface)
-                            .padding(horizontal = 18.dp, vertical = 8.dp)
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
                     ) {
                         Text(
                             tab,
                             color = if (active) OnPrimary else OnSurfaceVar,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium
                         )
                     }
                 }
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(8.dp))
             }
 
             Spacer(Modifier.height(20.dp))
