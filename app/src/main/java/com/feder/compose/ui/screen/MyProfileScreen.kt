@@ -58,7 +58,7 @@ fun MyProfileScreen(
     androidx.compose.foundation.layout.Box(
         Modifier.fillMaxSize().background(Bg)
     ) {
-        // ─── Top bar: QR слева, More справа ───
+        // ─── Скроллируемая часть ───
         Column(
             Modifier.fillMaxSize().padding(top = 72.dp).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -194,7 +194,7 @@ fun MyProfileScreen(
             Spacer(Modifier.height(24.dp))
         }
 
-        // ─── Скроллируемая часть ───
+        // ─── Top bar: QR слева, More справа ───
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -226,6 +226,7 @@ fun MyProfileScreen(
                 Icon(Icons.Filled.MoreVert, "More", tint = TextMain, modifier = Modifier.size(20.dp))
             }
         }
+    }
 }
 
 @Composable
