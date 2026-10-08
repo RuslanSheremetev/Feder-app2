@@ -194,25 +194,29 @@ fun ContactsScreen(
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Овал — плотный wrap-content + weight-заполнитель после него
+            // Контейнер овала — тянется на всё свободное место
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(radius))
-                    .background(ContactsSurface)
-                    .padding(horizontal = ovalInnerH, vertical = 8.dp)
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
             ) {
-                Text(
-                    "Contacts",
-                    color = ContactsTextMain,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.3).sp,
-                    maxLines = 1
-                )
+                // Овал — сам растёт: 35% → 100% от контейнера
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.35f + progress * 0.65f)
+                        .clip(RoundedCornerShape(radius))
+                        .background(ContactsSurface)
+                        .padding(horizontal = ovalInnerH, vertical = 8.dp)
+                ) {
+                    Text(
+                        "Contacts",
+                        color = ContactsTextMain,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.3).sp,
+                        maxLines = 1
+                    )
+                }
             }
-            // Заполнитель — занимает всё свободное место между овалом и кружком
-            // Распорка — сжимается при скролле
-            Spacer(Modifier.weight(1f - progress * 0.999f + 0.001f))
             // Зазор между полосой и кружком (сжимается до 0 при progress=1)
             Spacer(Modifier.width(gap))
             // Кружок лупы
