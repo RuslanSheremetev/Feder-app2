@@ -856,7 +856,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            selectedPhotos = setOf(uri)
+            selectedPhotos = selectedPhotos + uri
             // Меню остаётся открытым до нажатия Send
 
         }
@@ -1318,7 +1318,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     async {
                         val uploadedUrl = try {
                             val input = context.applicationContext.contentResolver.openInputStream(uri)
-                            if (input != null) PhotoUploader.uploadPhoto(input, "photo.jpg", token, chatUsername) else null
+                            if (input != null) {
+                                val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                                val ext = when {
+                                    mime.contains("pdf") -> "pdf"
+                                    mime.contains("word") -> "docx"
+                                    mime.contains("excel") -> "xlsx"
+                                    mime.contains("zip") -> "zip"
+                                    mime.contains("text") -> "txt"
+                                    mime.contains("image/png") -> "png"
+                                    mime.contains("image/gif") -> "gif"
+                                    mime.contains("image/") -> "jpg"
+                                    mime.contains("video/") -> "mp4"
+                                    mime.contains("audio/") -> "mp3"
+                                    else -> "bin"
+                                }
+                                PhotoUploader.uploadPhoto(input, "file.$ext", token, chatUsername)
+                            } else null
                         } catch (e: Exception) { null }
                         tempId to uploadedUrl
                     }
@@ -2230,12 +2246,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     ) {
                         selectedPhotos.forEach { uri ->
                             Box(modifier = Modifier.size(48.dp)) {
-                                AsyncImage(
-                                    model = uri,
-                                    contentDescription = "selected",
-                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
-                                    contentScale = ContentScale.Crop
-                                )
+                                val mime = context.contentResolver.getType(uri)
+                                val isImg = mime?.startsWith("image/") == true
+                                if (isImg) {
+                                    AsyncImage(
+                                        model = uri,
+                                        contentDescription = "selected",
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Filled.Description, "file", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                                    }
+                                }
                                 Box(
                                     modifier = Modifier
                                         .size(20.dp)
@@ -2331,7 +2358,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
 }
                     AttachOption(Icons.Filled.PhotoCamera, "Камера")
-                    AttachOption(Icons.Filled.Description, "Файл")
+                    AttachOption(Icons.Filled.Description, "Файл") {
+                        filePicker.launch(arrayOf("*/*"))
+                    }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
                     AttachOption(Icons.Filled.Person, "Контакт")
                 }
