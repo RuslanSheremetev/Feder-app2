@@ -60,9 +60,10 @@ fun MyProfileScreen(
     ) {
         // ─── Скроллируемая часть ───
         Column(
-            Modifier.fillMaxSize().padding(top = 72.dp).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(72.dp))
 
             // ─── Аватар + имя + статус ───
             Spacer(Modifier.height(8.dp))
@@ -201,7 +202,7 @@ fun MyProfileScreen(
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(10f)
                 .statusBarsPadding()
-                .padding(horizontal = 4.dp, vertical = 4.dp),
+                .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
