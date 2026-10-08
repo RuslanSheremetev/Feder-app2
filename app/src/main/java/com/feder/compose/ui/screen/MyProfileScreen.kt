@@ -60,10 +60,12 @@ fun MyProfileScreen(
     ) {
         // ─── Top bar: QR слева, More справа ───
         Row(
-            .align(androidx.compose.ui.Alignment.TopCenter)
-            .zIndex(10f)
-            .statusBarsPadding()
-            .padding(horizontal = 4.dp, vertical = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(10f)
+                .statusBarsPadding()
+                .padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
