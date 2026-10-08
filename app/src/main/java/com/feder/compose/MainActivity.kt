@@ -1,6 +1,6 @@
+package com.feder.compose
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.zIndex
-package com.feder.compose
 import com.feder.compose.ui.components.GroupAvatar
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
