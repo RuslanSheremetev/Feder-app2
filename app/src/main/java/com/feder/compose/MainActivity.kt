@@ -573,13 +573,30 @@ logWs("ProfileMedia: URLS=${urls.size}")
             // 3. Просим сервер удалить (для нас)
             try {
                 withContext(Dispatchers.IO) {
-                    val body = "{\"to_user\":\"$username\",\"mode\":\"me\"}"
-                    val request = Request.Builder()
-                        .url("$server/api/chat/delete")
-                        .header("Authorization", "Bearer $token")
-                        .post(body.toRequestBody("application/json".toMediaType()))
-                        .build()
-                    client.newCall(request).execute().close()
+                    // Если это группа (username в формате "group:ИМЯ" или isGroup) →
+                    // удаляем через /api/group/leave, чтобы убрать из group_members
+                    val isGroupChat = username.startsWith("group:") ||
+                        chats.none { it.username == username } == false &&
+                        chats.firstOrNull { it.username == username }?.isGroup == true
+
+                    if (isGroupChat) {
+                        val groupName = if (username.startsWith("group:")) username.removePrefix("group:") else username
+                        val body = "{\"name\":\"$groupName\",\"user\":\"${currentUsername.ifEmpty { "demo" }}\"}"
+                        val request = Request.Builder()
+                            .url("$server/api/group/leave")
+                            .header("Authorization", "Bearer $token")
+                            .post(body.toRequestBody("application/json".toMediaType()))
+                            .build()
+                        client.newCall(request).execute().close()
+                    } else {
+                        val body = "{\"to_user\":\"$username\",\"mode\":\"me\"}"
+                        val request = Request.Builder()
+                            .url("$server/api/chat/delete")
+                            .header("Authorization", "Bearer $token")
+                            .post(body.toRequestBody("application/json".toMediaType()))
+                            .build()
+                        client.newCall(request).execute().close()
+                    }
                 }
             } catch (_: Exception) { }
         }
