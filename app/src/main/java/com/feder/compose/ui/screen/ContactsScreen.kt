@@ -133,18 +133,49 @@ fun ContactsScreen(
             }
         }
 
-        // ═══ FLOATING ХЕДЕР ═══
-        Text(
-            "Contacts",
-            color = ContactsTextMain,
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
+        // ═══ FLOATING ХЕДЕР: Contacts в овале + лупа в кружке ═══
+        Row(
             modifier = Modifier
-                .align(Alignment.TopStart)
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(start = 16.dp, top = 16.dp)
-                .zIndex(10f)
-        )
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .zIndex(10f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Овал с "Contacts"
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(ContactsSurface)
+                    .padding(horizontal = 22.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    "Contacts",
+                    color = ContactsTextMain,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.3).sp
+                )
+            }
+            Spacer(Modifier.weight(1f))
+            // Кружок с лупой
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(ContactsSurface)
+                    .clickable { onSearchChange(searchQuery) },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Filled.Search,
+                    "search",
+                    tint = ContactsTextMain,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
     }
 }
 
