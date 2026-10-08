@@ -861,6 +861,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
         }
     }
+
+    // File picker — тот же Set, что фото
+    val filePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            uris.forEach { uri ->
+                try {
+                    context.contentResolver.takePersistableUriPermission(
+                        uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: Exception) {}
+            }
+            selectedPhotos = selectedPhotos + uris.toSet()
+            android.util.Log.d("ChatScreen", "Files picked: ${uris.size}")
+        }
+    }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     var forwardMultiSelect by remember { mutableStateOf(false) }
