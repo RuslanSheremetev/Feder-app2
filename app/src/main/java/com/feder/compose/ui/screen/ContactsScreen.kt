@@ -202,7 +202,7 @@ fun ContactsScreen(
                 // Овал — сам растёт: 35% → 100% от контейнера
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.35f + progress * 0.65f)
+                        .fillMaxWidth(0.55f + progress * 0.45f)
                         .clip(RoundedCornerShape(radius))
                         .background(ContactsSurface)
                         .padding(horizontal = ovalInnerH, vertical = 8.dp)
