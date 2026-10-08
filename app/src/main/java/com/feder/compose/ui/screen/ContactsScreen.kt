@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -60,6 +61,19 @@ fun ContactsScreen(
     onToggleSearch: () -> Unit = {}
 ) {
     val groupedContacts = contacts.groupBy { it.name.firstOrNull()?.uppercase() ?: "#" }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val ovalAlpha by remember {
+        androidx.compose.runtime.derivedStateOf {
+            val index = listState.firstVisibleItemIndex
+            val offset = listState.firstVisibleItemScrollOffset
+            when {
+                index > 0 -> 0f
+                offset > 100 -> 0f
+                offset < 30 -> 1f
+                else -> 1f - (offset - 30) / 70f
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -67,6 +81,7 @@ fun ContactsScreen(
             .background(ContactsBg)
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = 100.dp, bottom = 100.dp)
         ) {
@@ -151,6 +166,7 @@ fun ContactsScreen(
                 modifier = Modifier
                     .clip(RoundedCornerShape(24.dp))
                     .background(ContactsSurface)
+                    .alpha(ovalAlpha)
                     .padding(horizontal = 22.dp, vertical = 10.dp)
             ) {
                 Text(
