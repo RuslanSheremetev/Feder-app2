@@ -64,7 +64,6 @@ fun MyProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(72.dp))
-
             // ─── Аватар + имя + статус ───
             Spacer(Modifier.height(20.dp))
             Box(
