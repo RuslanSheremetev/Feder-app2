@@ -193,7 +193,6 @@ fun MyProfileScreen(
 
             Spacer(Modifier.height(24.dp))
         }
-    }
 
         // ─── Скроллируемая часть ───
         Row(
