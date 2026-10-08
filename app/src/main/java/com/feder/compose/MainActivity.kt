@@ -1,3 +1,5 @@
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.zIndex
 package com.feder.compose
 import com.feder.compose.ui.components.GroupAvatar
 import androidx.compose.ui.window.Popup
@@ -944,15 +946,44 @@ fun FederApp() {
                     if (viewModel.showStories) {
                         Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp).clickable { viewModel.showStories = false })
                     } else {
-                        Box(Modifier.width(56.dp).height(36.dp)) {
-                            Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterStart).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8010/avatars/alex/avatar.jpg", contentDescription = "Alex", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-                            }
-                            Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.Center).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8010/avatars/david/avatar.jpg", contentDescription = "Jordan", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-                            }
-                            Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface).align(Alignment.CenterEnd).padding(1.dp)) {
-                                AsyncImage(model = "http://2.26.71.102:8010/avatars/elena/avatar.jpg", contentDescription = "Riley", modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                        // ─── Аватарки авторов историй (0..3) ───
+                        val feed = viewModel.storiesFeed.take(3)
+                        if (feed.isNotEmpty()) {
+                            val visible = feed.size
+                            val slot = 28.dp
+                            val overlap = 14.dp   // насколько перекрываются
+                            val totalWidth = slot + overlap * (visible - 1).coerceAtLeast(0)
+                            Box(Modifier.width(totalWidth).height(36.dp)) {
+                                // рисуем справа налево, чтобы левый был ПОВЕРХ
+                                feed.reversed().forEachIndexed { idx, user ->
+                                    val z = (visible - idx).toFloat()
+                                    val xOffset = overlap * (visible - 1 - idx)
+                                    val hasUnread = user.stories.any { !it.viewed }
+                                    val ringColor = if (hasUnread) Color(0xFF2AABEE) else Color(0xFF555555)
+                                    val avatarFullUrl = if (user.avatarUrl.startsWith("http")) user.avatarUrl
+                                        else "http://2.26.71.102:8010" + user.avatarUrl
+                                    Box(
+                                        modifier = Modifier
+                                            .size(slot)
+                                            .offset(x = xOffset)
+                                            .zIndex(z)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .border(2.dp, ringColor, CircleShape)
+                                            .padding(1.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(avatarFullUrl)
+                                                .crossfade(false)
+                                                .build(),
+                                            contentDescription = user.username,
+                                            modifier = Modifier.size(slot - 4.dp).clip(CircleShape),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
