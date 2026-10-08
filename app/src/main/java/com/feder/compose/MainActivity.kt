@@ -1295,26 +1295,6 @@ if (chat.isGroup) {
                                             }
 }
 
-                            if (showDeleteDialog) {
-                                AlertDialog(
-                                    onDismissRequest = { showDeleteDialog = false },
-                                    title = { Text("Delete chat?") },
-                                    text = { Text("Delete chat with " + chat.name + "?") },
-                                    confirmButton = {
-                                        TextButton(onClick = {
-                                            viewModel.deleteChat(chat.username)
-                                            showDeleteDialog = false
-                                        }) {
-                                            Text("Delete", color = Color(0xFFE53935))
-                                        }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick = { showDeleteDialog = false }) {
-                                            Text("Cancel")
-                                        }
-                                    }
-                                )
-                            }
                                     }
                                     if (chat.online && chat.username != "demo") {
                                         Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF41B35D)).align(Alignment.BottomEnd).offset(x = 2.dp, y = 2.dp))
@@ -1412,6 +1392,26 @@ if (chat.isGroup) {
                             }
                             }
 
+                            if (showDeleteDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showDeleteDialog = false },
+                                    title = { Text("Delete chat?") },
+                                    text = { Text("Delete this chat?") },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            viewModel.deleteChat(chat.username)
+                                            showDeleteDialog = false
+                                        }) {
+                                            Text("Delete", color = Color(0xFFE53935))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showDeleteDialog = false }) {
+                                            Text("Cancel")
+                                        }
+                                    }
+                                )
+                            }
                         }
                     }
                 }
