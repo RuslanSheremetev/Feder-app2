@@ -54,7 +54,7 @@ fun SavedMessagesProfile(
     var photoViewerIndex by remember { mutableStateOf<Int?>(null) }
     val tabs = listOf("Медиа", "Файлы", "Ссылки", "Музыка", "Голосовые", "Заметки")
 
-    Column(
+    androidx.compose.foundation.layout.Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Bg)
@@ -63,6 +63,9 @@ fun SavedMessagesProfile(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(10f)
+                .statusBarsPadding()
                 .padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
