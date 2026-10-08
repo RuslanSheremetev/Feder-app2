@@ -62,18 +62,23 @@ fun ContactsScreen(
 ) {
     val groupedContacts = contacts.groupBy { it.name.firstOrNull()?.uppercase() ?: "#" }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
-    val ovalAlpha by remember {
+    val rawProgress by remember {
         androidx.compose.runtime.derivedStateOf {
-            val index = listState.firstVisibleItemIndex
-            val offset = listState.firstVisibleItemScrollOffset
+            val idx = listState.firstVisibleItemIndex
+            val off = listState.firstVisibleItemScrollOffset
             when {
-                index > 0 -> 0f
-                offset > 100 -> 0f
-                offset < 30 -> 1f
-                else -> 1f - (offset - 30) / 70f
+                idx > 0 -> 1f
+                off > 100 -> 1f
+                off < 20 -> 0f
+                else -> (off - 20) / 80f
             }
         }
     }
+    val progress by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = rawProgress,
+        animationSpec = androidx.compose.animation.core.tween(150),
+        label = "header-progress"
+    )
 
     Box(
         modifier = Modifier
@@ -151,22 +156,36 @@ fun ContactsScreen(
             }
         }
 
-        // ═══ FLOATING ХЕДЕР: Contacts в овале + лупа в кружке ═══
+        // ═══ АНИМИРОВАННЫЙ ХЕДЕР ═══
+        // progress: 0 = овал+кружок раздельно, 1 = единый прямоугольник
+        val outerPad by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (16 - progress * 16).dp, label = "outerPad"
+        )
+        val outerVPad by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (12 - progress * 6).dp, label = "outerVPad"
+        )
+        val ovalRadius by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (24 - progress * 14).dp, label = "ovalRadius"
+        )
+        val gap by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (12 - progress * 8).dp, label = "gap"
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = outerPad, vertical = outerVPad)
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Овал с "Contacts"
+            // Овал → расширяется в полосу на всю ширину
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(24.dp))
+                    .weight(1f)
+                    .clip(RoundedCornerShape(ovalRadius))
                     .background(ContactsSurface)
-                    .alpha(ovalAlpha)
                     .padding(horizontal = 22.dp, vertical = 10.dp)
             ) {
                 Text(
@@ -177,8 +196,8 @@ fun ContactsScreen(
                     letterSpacing = (-0.3).sp
                 )
             }
-            Spacer(Modifier.weight(1f))
-            // Кружок с лупой
+            androidx.compose.foundation.layout.Spacer(Modifier.width(gap))
+            // Кружок лупы — всегда круглый
             Box(
                 modifier = Modifier
                     .size(44.dp)
