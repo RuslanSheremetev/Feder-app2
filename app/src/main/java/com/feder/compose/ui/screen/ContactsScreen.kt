@@ -70,7 +70,8 @@ fun ContactsScreen(
             contentPadding = PaddingValues(top = 100.dp, bottom = 100.dp)
         ) {
 
-            // ═══ ПОИСК (пилюля) ═══
+            // ═══ ПОИСК (пилюля) — только при isSearchVisible ═══
+            if (isSearchVisible) {
             item {
                 Box(
                     modifier = Modifier
@@ -105,6 +106,7 @@ fun ContactsScreen(
                         )
                     }
                 }
+            }
             }
 
             // ═══ БОЛЬШИЕ ДЕЙСТВИЯ ═══
@@ -165,7 +167,7 @@ fun ContactsScreen(
                     .size(44.dp)
                     .clip(CircleShape)
                     .background(ContactsSurface)
-                    .clickable { onSearchChange(searchQuery) },
+                    .clickable { onToggleSearch() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
