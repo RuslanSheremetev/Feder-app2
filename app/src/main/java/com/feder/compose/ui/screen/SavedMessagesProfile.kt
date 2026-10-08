@@ -147,7 +147,6 @@ fun SavedMessagesProfile(
                     .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Spacer(Modifier.width(12.dp))
                 tabs.forEachIndexed { index, tab ->
                     val active = index == selectedTab
                     Box(
