@@ -1272,7 +1272,6 @@ fun FederApp() {
                                     }
                                 )
                             }
-                            ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().background(Background).clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
