@@ -211,7 +211,8 @@ fun ContactsScreen(
                 )
             }
             // Заполнитель — занимает всё свободное место между овалом и кружком
-            Spacer(Modifier.weight(1f))
+            // Распорка — сжимается при скролле
+            Spacer(Modifier.weight(1f - progress * 0.999f + 0.001f))
             // Зазор между полосой и кружком (сжимается до 0 при progress=1)
             Spacer(Modifier.width(gap))
             // Кружок лупы
