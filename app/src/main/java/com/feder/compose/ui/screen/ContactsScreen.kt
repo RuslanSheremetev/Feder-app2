@@ -164,6 +164,9 @@ fun ContactsScreen(
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12 - progress * 6).dp, label = "outerVPad"
         )
+        val ovalMaxWidth by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (140 + progress * 200).dp, label = "ovalMaxWidth"
+        )
         val ovalRadius by androidx.compose.animation.core.animateDpAsState(
             targetValue = (24 - progress * 14).dp, label = "ovalRadius"
         )
@@ -180,10 +183,10 @@ fun ContactsScreen(
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Овал → расширяется в полосу на всю ширину
+            // Овал — растёт от компактного до широкого
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .widthIn(max = ovalMaxWidth)
                     .clip(RoundedCornerShape(ovalRadius))
                     .background(ContactsSurface)
                     .padding(horizontal = 22.dp, vertical = 10.dp)
