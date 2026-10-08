@@ -1065,7 +1065,7 @@ fun FederApp() {
                     ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (targetTab == 1) {
-                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it }, onToggleSearch = { viewModel.isSearchVisible = !viewModel.isSearchVisible })
                     } else if (targetTab == 2) {
                         val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(
