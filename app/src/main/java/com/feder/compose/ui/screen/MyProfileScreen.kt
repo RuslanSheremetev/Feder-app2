@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -54,12 +55,15 @@ fun MyProfileScreen(
         else -> "http://2.26.71.102:8010/avatars/$username/avatar.jpg"
     }
 
-    Column(
+    androidx.compose.foundation.layout.Box(
         Modifier.fillMaxSize().background(Bg)
     ) {
         // ─── Top bar: QR слева, More справа ───
         Row(
-            Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
+            .align(androidx.compose.ui.Alignment.TopCenter)
+            .zIndex(10f)
+            .statusBarsPadding()
+            .padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -87,7 +91,7 @@ fun MyProfileScreen(
 
         // ─── Скроллируемая часть ───
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
+            Modifier.fillMaxSize().padding(top = 72.dp).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
