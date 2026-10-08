@@ -1226,13 +1226,14 @@ fun FederApp() {
                             val lastMsg = chat.lastMessage ?: ""
                             val time = chat.timestamp ?: ""
                             
+                            var showDeleteDialog by remember { mutableStateOf(false) }
                             val dismissState = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { value ->
                                     // Saved Messages нельзя удалить свайпом
                                     if (chat.username == "saved_messages") return@rememberSwipeToDismissBoxState false
                                     if (value == SwipeToDismissBoxValue.EndToStart) {
-                                        viewModel.deleteChat(chat.username)
-                                        true
+                                        showDeleteDialog = true
+                                        false  // откатываем свайп, показываем диалог
                                     } else false
                                 }
                             )
@@ -1250,6 +1251,27 @@ fun FederApp() {
                                         }
                                     }
                                 }
+
+                            if (showDeleteDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showDeleteDialog = false },
+                                    title = { Text("Удалить чат?") },
+                                    text = { Text("Удалить «${chat.name}» из списка?") },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            viewModel.deleteChat(chat.username)
+                                            showDeleteDialog = false
+                                        }) {
+                                            Text("Удалить", color = Color(0xFFE53935))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showDeleteDialog = false }) {
+                                            Text("Отмена")
+                                        }
+                                    }
+                                )
+                            }
                             ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().background(Background).clickable { viewModel.selectedChat = chat.username; viewModel.markChatRead(chat.username) }.padding(horizontal = 16.dp, vertical = 12.dp),
