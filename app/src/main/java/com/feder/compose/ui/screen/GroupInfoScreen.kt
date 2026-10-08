@@ -144,17 +144,6 @@ fun GroupInfoScreen(
 
             Spacer(Modifier.weight(1f))
 
-            // Овал с названием группы
-            Text(
-                "Group Info",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    .padding(horizontal = 18.dp, vertical = 8.dp)
-            )
 
             Spacer(Modifier.weight(1f))
 
