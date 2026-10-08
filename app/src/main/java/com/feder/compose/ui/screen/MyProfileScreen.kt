@@ -158,7 +158,7 @@ fun MyProfileScreen(
                 }
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(8.dp))
 
             // ─── Пустой контент ───
             Text("No posts yet…", color = TextMain, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)

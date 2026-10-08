@@ -177,7 +177,7 @@ fun GroupInfoScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 96.dp, bottom = 24.dp)
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 8.dp, bottom = 24.dp)
             ) {
                 // Аватарка + имя
                 item {
