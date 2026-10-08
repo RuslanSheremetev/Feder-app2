@@ -144,9 +144,10 @@ fun SavedMessagesProfile(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Spacer(Modifier.width(12.dp))
                 tabs.forEachIndexed { index, tab ->
                     val active = index == selectedTab
                     Box(
@@ -163,6 +164,7 @@ fun SavedMessagesProfile(
                         )
                     }
                 }
+                Spacer(Modifier.width(12.dp))
             }
 
             Spacer(Modifier.height(20.dp))
