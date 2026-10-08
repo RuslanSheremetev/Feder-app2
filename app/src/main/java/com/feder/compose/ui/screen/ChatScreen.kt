@@ -2374,7 +2374,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     AttachOption(Icons.Filled.Image, "Галерея", true) {
     photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
 }
-                    AttachOption(Icons.Filled.PhotoCamera, "Камера")
                     AttachOption(Icons.Filled.Description, "Файл") {
                         filePicker.launch(arrayOf("*/*"))
                     }
