@@ -1640,7 +1640,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
                             )
                         }
-                        if (chatUsername != myUsername) {
+                        if (chatUsername != myUsername && chatUsername != "saved_messages") {
                             IconButton(onClick = { }) { Icon(painter = painterResource(R.drawable.ic_video_outline), contentDescription = "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                             IconButton(onClick = { }) { Icon(painter = painterResource(R.drawable.ic_phone_outline), contentDescription = "call", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
                         }
