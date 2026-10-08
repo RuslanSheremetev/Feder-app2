@@ -947,6 +947,7 @@ fun FederApp() {
             // Скрываем также, когда открыт профиль/группа/чат/доп. экран —
             // у них свой плавающий хедер
             val hideTopBar =
+                viewModel.selectedTab == 1 ||
                 viewModel.selectedTab == 2 ||
                 viewModel.selectedProfile != null ||
                 viewModel.showGroupInfo != null ||
