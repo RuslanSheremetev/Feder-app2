@@ -59,39 +59,6 @@ fun MyProfileScreen(
         Modifier.fillMaxSize().background(Bg)
     ) {
         // ─── Top bar: QR слева, More справа ───
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(androidx.compose.ui.Alignment.TopCenter)
-                .zIndex(10f)
-                .statusBarsPadding()
-                .padding(horizontal = 4.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1F1F1F))
-                    .clickable { /* QR */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Filled.QrCode, "QR", tint = TextMain, modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.weight(1f))
-            Box(
-                Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1F1F1F))
-                    .clickable { /* More */ },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Filled.MoreVert, "More", tint = TextMain, modifier = Modifier.size(20.dp))
-            }
-        }
-
-        // ─── Скроллируемая часть ───
         Column(
             Modifier.fillMaxSize().padding(top = 72.dp).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -227,6 +194,39 @@ fun MyProfileScreen(
             Spacer(Modifier.height(24.dp))
         }
     }
+
+        // ─── Скроллируемая часть ───
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(10f)
+                .statusBarsPadding()
+                .padding(horizontal = 4.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F1F1F))
+                    .clickable { /* QR */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.QrCode, "QR", tint = TextMain, modifier = Modifier.size(20.dp))
+            }
+            Spacer(Modifier.weight(1f))
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1F1F1F))
+                    .clickable { /* More */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.MoreVert, "More", tint = TextMain, modifier = Modifier.size(20.dp))
+            }
+        }
 }
 
 @Composable
