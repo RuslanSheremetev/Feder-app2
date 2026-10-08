@@ -63,7 +63,7 @@ fun MyProfileScreen(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(72.dp))
+            Spacer(Modifier.height(8.dp))
             // ─── Аватар + имя + статус ───
             Spacer(Modifier.height(20.dp))
             Box(
