@@ -1255,19 +1255,19 @@ fun FederApp() {
                             if (showDeleteDialog) {
                                 AlertDialog(
                                     onDismissRequest = { showDeleteDialog = false },
-                                    title = { Text("Удалить чат?") },
-                                    text = { Text("Удалить «${chat.name}» из списка?") },
+                                    title = { Text("Delete chat?") },
+                                    text = { Text("Delete \"${chat.name}\"?") },
                                     confirmButton = {
                                         TextButton(onClick = {
                                             viewModel.deleteChat(chat.username)
                                             showDeleteDialog = false
                                         }) {
-                                            Text("Удалить", color = Color(0xFFE53935))
+                                            Text("Delete", color = Color(0xFFE53935))
                                         }
                                     },
                                     dismissButton = {
                                         TextButton(onClick = { showDeleteDialog = false }) {
-                                            Text("Отмена")
+                                            Text("Cancel")
                                         }
                                     }
                                 )
