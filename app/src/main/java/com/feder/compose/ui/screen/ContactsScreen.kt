@@ -157,28 +157,32 @@ fun ContactsScreen(
         }
 
         // ═══ ЕДИНЫЙ АНИМИРОВАННЫЙ ХЕДЕР ═══
-        // progress: 0 = овал + кружок (раздельно), 1 = сплошная полоса
+        // progress: 0 = плотный овал + круглый кружок, 1 = единый прямоугольник
         val outerHPad by androidx.compose.animation.core.animateDpAsState(
             targetValue = (16 - progress * 16).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12 - progress * 4).dp, label = "outerVPad"
         )
-        // Внутренний зазор между овалом и кружком (12 → 0)
+        // Зазор между овалом и кружком (12 → 0)
         val gap by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12 - progress * 12).dp, label = "gap"
         )
-        // Радиус овала и кружка → прямоугольник (24 → 8)
+        // Радиус овала: 24dp (облегающий) → 2dp (почти прямоугольник)
         val radius by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (24 - progress * 16).dp, label = "radius"
+            targetValue = (24 - progress * 22).dp, label = "radius"
         )
-        // Радиус кружка лупы (22 = идеальный круг при 44dp; при progress=1 → 8 = прямоугольник)
+        // Радиус кружка лупы: 22dp (круг) → 2dp (прямоугольник)
         val searchRadius by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (22 - progress * 14).dp, label = "searchRadius"
+            targetValue = (22 - progress * 20).dp, label = "searchRadius"
         )
-        // Ширина кружка лупы (44 → растягивается на всю доступную ширину)
+        // Ширина кружка лупы
         val searchWidth by androidx.compose.animation.core.animateDpAsState(
             targetValue = (44 + progress * 60).dp, label = "searchWidth"
+        )
+        // Внутренний padding овала: плотный (14×8) → 8×8
+        val ovalInnerH by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (14 + progress * 8).dp, label = "ovalInnerH"
         )
 
         Row(
@@ -190,13 +194,12 @@ fun ContactsScreen(
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Овал — растёт, но с ограничением
+            // Овал — плотный wrap-content + weight-заполнитель после него
             Box(
                 modifier = Modifier
-                    .weight(1f)
                     .clip(RoundedCornerShape(radius))
                     .background(ContactsSurface)
-                    .padding(horizontal = 22.dp, vertical = 10.dp)
+                    .padding(horizontal = ovalInnerH, vertical = 8.dp)
             ) {
                 Text(
                     "Contacts",
@@ -207,9 +210,11 @@ fun ContactsScreen(
                     maxLines = 1
                 )
             }
-            // Зазор — сжимается до 0 при progress=1
+            // Заполнитель — занимает всё свободное место между овалом и кружком
+            Spacer(Modifier.weight(1f))
+            // Зазор между полосой и кружком (сжимается до 0 при progress=1)
             Spacer(Modifier.width(gap))
-            // Кружок лупы — растёт и превращается в прямоугольный блок
+            // Кружок лупы
             Box(
                 modifier = Modifier
                     .width(searchWidth)
