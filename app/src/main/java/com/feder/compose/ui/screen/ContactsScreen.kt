@@ -88,7 +88,7 @@ fun ContactsScreen(
         try {
             val window = (context as? android.app.Activity)?.window
             if (window != null) {
-                val from = 0xFF131313.toInt()
+                val from = 0xFF0D0D0D.toInt()  // фон Contacts
                 val to   = 0xFF1A1A1A.toInt()
                 val fromR = (from shr 16) and 0xFF; val fromG = (from shr 8) and 0xFF; val fromB = from and 0xFF
                 val toR   = (to   shr 16) and 0xFF; val toG   = (to   shr 8) and 0xFF; val toB   = to   and 0xFF
