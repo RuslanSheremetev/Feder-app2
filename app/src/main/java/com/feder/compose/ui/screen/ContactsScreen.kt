@@ -76,7 +76,10 @@ fun ContactsScreen(
     }
     val progress by androidx.compose.animation.core.animateFloatAsState(
         targetValue = rawProgress,
-        animationSpec = androidx.compose.animation.core.tween(150),
+        animationSpec = androidx.compose.animation.core.tween(
+            durationMillis = 300,
+            easing = androidx.compose.animation.core.LinearOutSlowInEasing
+        ),
         label = "header-progress"
     )
     // Статус-бар: плавно меняется от #131313 к #1A1A1A (в тон хедера)
