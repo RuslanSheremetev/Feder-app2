@@ -173,6 +173,15 @@ fun ContactsScreen(
             }
         }
 
+        // Фон статус-бара — растёт с progress
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((progress * 60).dp)
+                .background(ContactsSurface)
+                .align(Alignment.TopCenter)
+                .zIndex(9f)
+        )
         // ═══ ЕДИНЫЙ АНИМИРОВАННЫЙ ХЕДЕР ═══
         // progress: 0 = плотный овал + круглый кружок, 1 = единый прямоугольник
         val outerHPad by androidx.compose.animation.core.animateDpAsState(
