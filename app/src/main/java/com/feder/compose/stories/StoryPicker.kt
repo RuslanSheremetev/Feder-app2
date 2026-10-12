@@ -90,6 +90,7 @@ object StoryPicker {
         ) { uri: Uri? ->
             if (uri == null) {
                 Log.d("StoryPicker", "Cancelled")
+                onResult(Result.Error("cancelled"))
                 return@rememberLauncherForActivityResult
             }
             scope.launch {

@@ -769,7 +769,7 @@ fun FederApp() {
     }
 
     val storyPicker = StoryPicker.rememberStoryPicker(
-        user = "demo",
+        user = viewModel.currentUsername.ifEmpty { "demo" },
         token = viewModel.token,
         onResult = { result ->
             viewModel.isUploadingStory = false
