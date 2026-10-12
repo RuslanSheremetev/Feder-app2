@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -94,6 +96,16 @@ fun GroupInfoScreen(
         ),
         label = "group-header-progress"
     )
+
+    // ═══ GROUPINFO_BANNER_V1 ═══
+    val bannerProgress  = (progress / 0.75f).coerceIn(0f, 1f)
+    val bannerWidthFrac = (1f - 0.62f * bannerProgress).coerceIn(0.35f, 1f)
+    val bannerHeight    = (200f - 164f * bannerProgress).dp
+    val bannerOffsetX   = (-140f * bannerProgress).dp
+    val bannerOffsetY   = (-80f * bannerProgress).dp
+    val bannerCorner    = (20f - 20f * bannerProgress).dp
+    val bannerAlpha     = (1f - 0.92f * bannerProgress).coerceIn(0f, 1f)
+    val infoAlpha       = (1f - (progress / 0.35f)).coerceIn(0f, 1f)
  
 
     // ═══ ПЛАВНЫЙ КАСКАД БЕЗ ПЕРЕСЕЧЕНИЙ ═══
@@ -275,40 +287,75 @@ fun GroupInfoScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 72.dp, bottom = 24.dp)
             ) {
-                // Аватарка + имя
+                // ═══ GROUPINFO_BANNER_V1 ═══
                 item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp, start = 24.dp, end = 24.dp).alpha(avatarAlpha),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        val avatarUrl = groupInfo?.avatarUrl
-                        if (!avatarUrl.isNullOrEmpty()) {
-                            val fullUrl = if (avatarUrl.startsWith("http")) avatarUrl
-                                          else "http://2.26.71.102:8010$avatarUrl"
-                            AsyncImage(
-                                model = ImageRequest.Builder(ctx).data(fullUrl).crossfade(false).build(),
-                                contentDescription = groupName,
-                                modifier = Modifier.size(avatarSize).clip(CircleShape),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        Box(
+                            Modifier
+                                .fillMaxWidth(bannerWidthFrac)
+                                .height(bannerHeight)
+                                .offset(x = bannerOffsetX, y = bannerOffsetY)
+                                .clip(RoundedCornerShape(bannerCorner))
+                                .alpha(bannerAlpha)
+                        ) {
+                            val avatarUrl = groupInfo?.avatarUrl
+                            if (!avatarUrl.isNullOrEmpty()) {
+                                val fullUrl = if (avatarUrl.startsWith("http")) avatarUrl
+                                              else "http://2.26.71.102:8010$avatarUrl"
+                                AsyncImage(
+                                    model = ImageRequest.Builder(ctx).data(fullUrl).crossfade(false).build(),
+                                    contentDescription = groupName,
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                Box(Modifier.fillMaxSize()) {
+                                    com.feder.compose.ui.components.GroupAvatar(size = 200.dp)
+                                }
+                            }
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                Color(0x00000000),
+                                                Color(0xCC000000)
+                                            )
+                                        )
+                                    )
                             )
-                        } else {
-                            com.feder.compose.ui.components.GroupAvatar(size = avatarSize)
+                            Column(
+                                Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                                    .alpha(infoAlpha)
+                            ) {
+                                Text(
+                                    groupName,
+                                    color = Color.White,
+                                    fontSize = 26.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    if (loading) "Loading members…" else "${members.size} members",
+                                    color = Color(0xFFDDDDDD),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
-                        Spacer(Modifier.height((12f - progress * 12f / 0.4f).coerceIn(0f, 12f).dp))
-                        Text(
-                            groupName,
-                            fontSize = nameFontSize,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = nameAlpha)
-                        )
-                        Text(
-                            if (loading) "Loading members…" else "${members.size} members",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = nameAlpha)
-                        )
                     }
                 }
-
                 // Сетка действий — как в Telegram
                 item {
                     Row(
