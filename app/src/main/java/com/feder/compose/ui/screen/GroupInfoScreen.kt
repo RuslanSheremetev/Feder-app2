@@ -98,11 +98,11 @@ fun GroupInfoScreen(
 
     // ═══ КАСКАДНОЕ ИСЧЕЗНОВЕНИЕ ═══
     // 1) Аватар + имя + members — исчезает ПЕРВЫМ (progress 0.0..0.3)
-    val avatarAlpha = (1f - progress / 0.3f).coerceIn(0f, 1f)
+    val avatarAlpha = (1f - progress / 0.35f).coerceIn(0f, 1f)  // 0.0..0.35
     // 2) 4 кнопки — ВТОРЫМИ (progress 0.25..0.55)
-    val actionsAlpha = (1f - (progress - 0.25f) / 0.3f).coerceIn(0f, 1f)
+    val actionsAlpha = (1f - (progress - 0.3f) / 0.3f).coerceIn(0f, 1f)  // 0.3..0.6
     // 3) Add Members — ТРЕТЬИМ (progress 0.5..0.8)
-    val addMembersAlpha = (1f - (progress - 0.5f) / 0.3f).coerceIn(0f, 1f)
+    val addMembersAlpha = (1f - (progress - 0.55f) / 0.3f).coerceIn(0f, 1f)  // 0.55..0.85
     // 4) Фон шапки — ПОСЛЕ всего (progress 0.75..0.9)
     val headerBgAlpha = ((progress - 0.75f) / 0.15f).coerceIn(0f, 1f)
     // 5) Имя в шапке — САМЫМ ПОСЛЕДНИМ (progress 0.85..1.0)
@@ -235,12 +235,12 @@ fun GroupInfoScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 80.dp, bottom = 24.dp)
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 72.dp, bottom = 24.dp)
             ) {
                 // Аватарка + имя
                 item {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(24.dp).alpha(avatarAlpha),
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp, start = 24.dp, end = 24.dp).alpha(avatarAlpha),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val avatarUrl = groupInfo?.avatarUrl
