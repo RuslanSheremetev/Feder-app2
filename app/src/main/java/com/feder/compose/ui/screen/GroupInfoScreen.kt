@@ -97,9 +97,9 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
 
-    // ═══ GROUPINFO_BANNER_V5 ═══
+    // ═══ GROUPINFO_BANNER_V6 ═══
     // Фаза 1 [0.00..0.20]: фото → круг ~128dp по ЦЕНТРУ
-    val phase1 = (progress / 0.20f).coerceIn(0f, 1f)
+    val phase1 = if (progress > 0.01f) 1f else 0f
     // Фаза 2 [0.30..0.75]: круг уезжает ВЛЕВО в шапку
     val phase2 = ((progress - 0.30f) / 0.45f).coerceIn(0f, 1f)
 
@@ -293,7 +293,7 @@ fun GroupInfoScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
-                // ═══ GROUPINFO_BANNER_V5 ═══
+                // ═══ GROUPINFO_BANNER_V6 ═══
                 item {
                     Box(
                         Modifier
