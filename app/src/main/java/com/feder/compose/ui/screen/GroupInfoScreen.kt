@@ -228,7 +228,7 @@ fun GroupInfoScreen(
                 // Аватарка + имя
                 item {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(24.dp).alpha(contentAlpha),
+                        modifier = Modifier.fillMaxWidth().padding(24.dp).alpha(avatarAlpha),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val avatarUrl = groupInfo?.avatarUrl
@@ -262,7 +262,7 @@ fun GroupInfoScreen(
                 // Сетка действий — как в Telegram
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth().alpha(contentAlpha).padding(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().alpha(actionsAlpha).padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         // Message
@@ -300,7 +300,7 @@ fun GroupInfoScreen(
                 // Add Members — отдельная карточка
                 item {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().alpha(contentAlpha).padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.fillMaxWidth().alpha(addMembersAlpha).padding(horizontal = 16.dp, vertical = 8.dp)
                             .clickable { onAddMembers() },
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.surfaceContainerHigh
