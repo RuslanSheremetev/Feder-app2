@@ -101,16 +101,16 @@ fun GroupInfoScreen(
     // Аватарка летит по кривой к стрелке [0.00..0.35]
     val pAvatar = (progress / 0.35f).coerceIn(0f, 1f)
     // X — линейно к -180dp
-    val avatarX = (-180f * pAvatar).dp
+    val avatarX = (-160f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (-100f * kotlin.math.sin((pAvatar * Math.PI / 2).toFloat())).dp
+    val avatarY = (-25f * kotlin.math.sin((pAvatar * Math.PI / 2).toFloat())).dp
     val avatarSz = (96f - 60f * pAvatar).dp
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
     val pName = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
-    val nameX  = (-180f * pName).dp
-    val nameY  = (-100f * kotlin.math.sin((pName * Math.PI / 2).toFloat())).dp
+    val nameX  = (-160f * pName).dp
+    val nameY  = (-25f * kotlin.math.sin((pName * Math.PI / 2).toFloat())).dp
     val nameA  = (1f - pName).coerceIn(0f, 1f)
 
     // 9 members — гаснет на месте [0.50..0.65]
