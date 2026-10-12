@@ -80,9 +80,9 @@ fun GroupInfoScreen(
             val off = listState.firstVisibleItemScrollOffset
             when {
                 idx > 0 -> 1f
-                off > 500 -> 1f
+                off > 1000 -> 1f
                 off < 10 -> 0f
-                else -> (off - 10) / 490f
+                else -> (off - 10) / 990f
             }
         }
     }
@@ -96,25 +96,37 @@ fun GroupInfoScreen(
     )
  
 
-    // ═══ ПЛАВНАЯ ТРАНСФОРМАЦИЯ В ХЕДЕР ═══
-    // 1) Аватар 96dp → 0, "уезжает" (сжимается)  0.0..0.4
-    val avatarSize = (96f - progress * 96f / 0.4f).coerceIn(0f, 96f).dp
-    val avatarAlpha = (1f - progress / 0.4f).coerceIn(0f, 1f)
-    // 2) Имя 24sp → 20sp, "уезжает" влево  0.2..0.5
-    val nameFontSize = (24f - (progress - 0.2f) * 10f / 0.3f).coerceIn(20f, 24f).sp
-    val nameAlpha = (1f - (progress - 0.2f) / 0.3f).coerceIn(0f, 1f)
-    // 3) Кнопки сжимаются по высоте 56dp → 0  0.3..0.6
-    val actionsHeight = (56f - (progress - 0.3f) * 56f / 0.3f).coerceIn(0f, 56f).dp
-    val actionsAlpha = (1f - (progress - 0.3f) / 0.3f).coerceIn(0f, 1f)
-    // 4) Add Members сжимается 56dp → 0  0.55..0.85
-    val addMembersHeight = (56f - (progress - 0.55f) * 56f / 0.3f).coerceIn(0f, 56f).dp
-    val addMembersAlpha = (1f - (progress - 0.55f) / 0.3f).coerceIn(0f, 1f)
-    // 5) Маленький аватар в хедере (36dp) — появляется  0.15..0.45
-    val headerAvatarAlpha = ((progress - 0.15f) / 0.3f).coerceIn(0f, 1f)
-    // 6) Фон шапки — появляется  0.5..0.75
-    val headerBgAlpha = ((progress - 0.5f) / 0.25f).coerceIn(0f, 1f)
-    // 7) Имя в шапке — появляется  0.55..0.8
-    val headerNameAlpha = ((progress - 0.55f) / 0.25f).coerceIn(0f, 1f)
+    // ═══ ПЛАВНЫЙ КАСКАД БЕЗ ПЕРЕСЕЧЕНИЙ ═══
+    // Фаза 1: Аватар 96→0dp  [0.00..0.20]
+    val avatarSize = (96f - progress * 96f / 0.20f).coerceIn(0f, 96f).dp
+    val avatarAlpha = (1f - progress / 0.20f).coerceIn(0f, 1f)
+    // Пауза [0.20..0.25]
+
+    // Фаза 2: Имя 24→20sp, alpha 1→0  [0.25..0.40]
+    val nameProgress = ((progress - 0.25f) / 0.15f).coerceIn(0f, 1f)
+    val nameFontSize = (24f - nameProgress * 4f).sp
+    val nameAlpha = (1f - nameProgress).coerceIn(0f, 1f)
+    // Пауза [0.40..0.45]
+
+    // Фаза 3: Кнопки 56→0dp  [0.45..0.65]
+    val actionsProgress = ((progress - 0.45f) / 0.20f).coerceIn(0f, 1f)
+    val actionsHeight = (56f - actionsProgress * 56f).coerceIn(0f, 56f).dp
+    val actionsAlpha = (1f - actionsProgress).coerceIn(0f, 1f)
+    // Пауза [0.65..0.70]
+
+    // Фаза 4: Add Members 56→0dp  [0.70..0.85]
+    val addMembersProgress = ((progress - 0.70f) / 0.15f).coerceIn(0f, 1f)
+    val addMembersHeight = (56f - addMembersProgress * 56f).coerceIn(0f, 56f).dp
+    val addMembersAlpha = (1f - addMembersProgress).coerceIn(0f, 1f)
+
+    // Фон шапки — появляется [0.60..0.75]
+    val headerBgAlpha = ((progress - 0.60f) / 0.15f).coerceIn(0f, 1f)
+    // Маленький аватар в хедере — появляется [0.30..0.45] (после аватара)
+    val headerAvatarAlpha = ((progress - 0.30f) / 0.15f).coerceIn(0f, 1f)
+    // Имя в шапке — появляется [0.65..0.85]
+    val headerNameAlpha = ((progress - 0.65f) / 0.20f).coerceIn(0f, 1f)
+    // Общая (для старого кода)
+    val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
     // Общая (для старого кода, если остался)
     val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
 
