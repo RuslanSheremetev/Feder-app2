@@ -97,15 +97,17 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
 
-    // ═══ GROUPINFO_BANNER_V7 ═══
-    // Фаза 1 [0.00..0.20]: фото → круг ~128dp по ЦЕНТРУ
-    val phase1 = if (progress > 0.01f) 1f else 0f
-    // Фаза 2 [0.30..0.75]: круг уезжает ВЛЕВО в шапку
-    val phase2 = ((progress - 0.01f) / 0.99f).coerceIn(0f, 1f)
+    // ═══ GROUPINFO_BANNER_V8 ═══
+    // Фаза 1: МГНОВЕННО круг 128dp по центру
+    val phase1 = if (progress > 0.005f) 1f else 0f
+
+    // Фаза 2: медленно уезжает влево-вверх, начиная с 0.15
+    val phase2 = ((progress - 0.15f) / 0.85f).coerceIn(0f, 1f)
 
     val bannerWidthFrac = (1f - 0.68f * phase1).coerceIn(0.32f, 1f)
     val bannerHeight    = (280f - 160f * phase1).dp
     val bannerCorner    = (16f + 44f * phase1).dp
+    // Уезжает ТОЛЬКО на phase2
     val bannerOffsetX   = (-140f * phase2).dp
     val bannerOffsetY   = (-100f * phase2).dp
     val bannerAlpha     = (1f - 0.5f * phase2).coerceIn(0f, 1f)
