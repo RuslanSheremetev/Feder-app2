@@ -228,14 +228,10 @@ fun GroupInfoScreen(
                 // Аватарка + имя
                 item {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(24.dp),
+                        modifier = Modifier.fillMaxWidth().padding(24.dp).alpha(contentAlpha),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val avatarUrl = groupInfo?.avatarUrl
-                        // Аватар группы — исчезает при скролле
-                        androidx.compose.foundation.layout.Box(
-                            modifier = Modifier.alpha(contentAlpha)
-                        ) {
                         if (!avatarUrl.isNullOrEmpty()) {
                             val fullUrl = if (avatarUrl.startsWith("http")) avatarUrl
                                           else "http://2.26.71.102:8010$avatarUrl"
@@ -246,23 +242,20 @@ fun GroupInfoScreen(
                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
                             )
                         } else {
-// === GROUPINFO_AVATAR_ELSE_FIX ===
-                            com.feder.compose.ui.components.GroupAvatar(
-                                size = 96.dp
-                            )
-// === /GROUPINFO_AVATAR_ELSE_FIX ===
+                            com.feder.compose.ui.components.GroupAvatar(size = 96.dp)
                         }
                         Spacer(Modifier.height(12.dp))
-                        Text(groupName, fontSize = 24.sp, fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.alpha(contentAlpha))
+                        Text(
+                            groupName,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         Text(
                             if (loading) "Loading members…" else "${members.size} members",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.alpha(contentAlpha)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        }  // конец Box(alpha)
                     }
                 }
 
