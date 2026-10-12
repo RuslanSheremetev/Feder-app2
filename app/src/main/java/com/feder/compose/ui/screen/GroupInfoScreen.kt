@@ -300,7 +300,7 @@ fun GroupInfoScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .height(280.dp),
+                            .height(400.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // ФОТО — от края до края, сжимается в круг (фаза 1), уезжает влево (фаза 2)
@@ -356,8 +356,8 @@ fun GroupInfoScreen(
                         // ИМЯ + участники — по ЦЕНТРУ, под кругом
                         Column(
                             Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 76.dp)
+                                .align(Alignment.TopCenter)
+                                .offset(y = bannerHeight + 8.dp)
                                 .alpha(infoAlpha),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
