@@ -103,14 +103,14 @@ fun GroupInfoScreen(
     // X — линейно к -180dp
     val avatarX = (-160f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (0f).dp
+    val avatarY = (4f * 30f * pAvatar * (1f - pAvatar)).dp
     val avatarSz = (96f - 60f * pAvatar).dp
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
     val pName = progress.coerceIn(0f, 1f)
     val nameX  = (-160f * pName).dp
-    val nameY  = (0f).dp
+    val nameY  = (4f * 20f * pName * (1f - pName)).dp
     val nameA  = (1f - pName).coerceIn(0f, 1f)
 
     // 9 members — гаснет на месте [0.50..0.65]
