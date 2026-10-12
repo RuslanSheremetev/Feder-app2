@@ -97,15 +97,21 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
 
-    // ═══ GROUPINFO_BANNER_V1 ═══
-    val bannerProgress  = (progress / 0.75f).coerceIn(0f, 1f)
-    val bannerWidthFrac = (1f - 0.62f * bannerProgress).coerceIn(0.35f, 1f)
-    val bannerHeight    = (200f - 164f * bannerProgress).dp
-    val bannerOffsetX   = (-140f * bannerProgress).dp
-    val bannerOffsetY   = (-80f * bannerProgress).dp
-    val bannerCorner    = (20f - 20f * bannerProgress).dp
-    val bannerAlpha     = (1f - 0.92f * bannerProgress).coerceIn(0f, 1f)
-    val infoAlpha       = (1f - (progress / 0.35f)).coerceIn(0f, 1f)
+    // ═══ GROUPINFO_BANNER_V5 ═══
+    // Фаза 1 [0.00..0.20]: фото → круг ~128dp по ЦЕНТРУ
+    val phase1 = (progress / 0.20f).coerceIn(0f, 1f)
+    // Фаза 2 [0.30..0.75]: круг уезжает ВЛЕВО в шапку
+    val phase2 = ((progress - 0.30f) / 0.45f).coerceIn(0f, 1f)
+
+    val bannerWidthFrac = (1f - 0.68f * phase1).coerceIn(0.32f, 1f)
+    val bannerHeight    = (280f - 160f * phase1).dp
+    val bannerCorner    = (16f + 44f * phase1).dp
+    val bannerOffsetX   = (-160f * phase2).dp
+    val bannerOffsetY   = (-120f * phase2).dp
+    val bannerAlpha     = (1f - 0.5f * phase2).coerceIn(0f, 1f)
+
+    // Имя/статус — гаснут на Фазе 1
+    val infoAlpha = (1f - phase1).coerceIn(0f, 1f)
  
 
     // ═══ ПЛАВНЫЙ КАСКАД БЕЗ ПЕРЕСЕЧЕНИЙ ═══
@@ -285,17 +291,17 @@ fun GroupInfoScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 72.dp, bottom = 24.dp)
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
-                // ═══ GROUPINFO_BANNER_V1 ═══
+                // ═══ GROUPINFO_BANNER_V5 ═══
                 item {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .height(260.dp)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                            .height(280.dp),
+                        contentAlignment = Alignment.TopCenter
                     ) {
+                        // ФОТО — от края до края, сжимается в круг (фаза 1), уезжает влево (фаза 2)
                         Box(
                             Modifier
                                 .fillMaxWidth(bannerWidthFrac)
@@ -344,48 +350,50 @@ fun GroupInfoScreen(
                                         )
                                     )
                             )
-                            Column(
-                                Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 16.dp, bottom = 72.dp, end = 16.dp)
-                                    .alpha(infoAlpha)
-                            ) {
-                                Text(
-                                    groupName,
-                                    color = Color.White,
-                                    fontSize = 26.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    if (loading) "Loading members…" else "${members.size} members",
-                                    color = Color(0xFFDDDDDD),
-                                    fontSize = 14.sp
-                                )
-                            }
-                            // GROUPINFO_BUTTONS_IN_BANNER
-                            Row(
-                                Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
-                                    .alpha(infoAlpha),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                ActionTile(icon = Icons.Filled.Chat, label = "Message",
-                                    modifier = Modifier.weight(1f), onClick = onMessage)
-                                ActionTile(
-                                    icon = if (isMuted) Icons.Filled.NotificationsOff else Icons.Filled.Notifications,
-                                    label = if (isMuted) "Unmute" else "Mute",
-                                    modifier = Modifier.weight(1f), onClick = onMuteToggle)
-                                ActionTile(icon = Icons.Filled.Videocam, label = "Video",
-                                    modifier = Modifier.weight(1f), onClick = onVideoCall)
-                                ActionTile(icon = Icons.Filled.ExitToApp, label = "Leave",
-                                    modifier = Modifier.weight(1f),
-                                    tint = MaterialTheme.colorScheme.error,
-                                    onClick = { })
-                            }
+                        }
+                        // ИМЯ + участники — по ЦЕНТРУ, под кругом
+                        Column(
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 76.dp)
+                                .alpha(infoAlpha),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                groupName,
+                                color = Color.White,
+                                fontSize = 26.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                if (loading) "Loading members…" else "${members.size} members",
+                                color = Color(0xFFDDDDDD),
+                                fontSize = 14.sp
+                            )
+                        }
+                        // КНОПКИ — не сжимаются, только alpha
+                        Row(
+                            Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                                .alpha(infoAlpha),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            ActionTile(icon = Icons.Filled.Chat, label = "Message",
+                                modifier = Modifier.weight(1f), onClick = onMessage)
+                            ActionTile(
+                                icon = if (isMuted) Icons.Filled.NotificationsOff else Icons.Filled.Notifications,
+                                label = if (isMuted) "Unmute" else "Mute",
+                                modifier = Modifier.weight(1f), onClick = onMuteToggle)
+                            ActionTile(icon = Icons.Filled.Videocam, label = "Video",
+                                modifier = Modifier.weight(1f), onClick = onVideoCall)
+                            ActionTile(icon = Icons.Filled.ExitToApp, label = "Leave",
+                                modifier = Modifier.weight(1f),
+                                tint = MaterialTheme.colorScheme.error,
+                                onClick = { })
                         }
                     }
                 }
