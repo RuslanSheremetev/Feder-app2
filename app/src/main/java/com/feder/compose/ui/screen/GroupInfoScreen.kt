@@ -126,7 +126,6 @@ fun GroupInfoScreen(
     // Имя в шапке — появляется [0.65..0.85]
     val headerNameAlpha = ((progress - 0.65f) / 0.20f).coerceIn(0f, 1f)
     // Общая (для старого кода)
-    val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
     // Общая (для старого кода, если остался)
     val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
 
