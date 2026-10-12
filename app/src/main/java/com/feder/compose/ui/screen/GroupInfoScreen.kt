@@ -99,26 +99,26 @@ fun GroupInfoScreen(
 
     // ═══ GROUPINFO_BANNER_MAGNET ═══
     // Аватарка летит по кривой к стрелке [0.00..0.35]
-    val pAvatar = (progress / 0.35f).coerceIn(0f, 1f)
+    val pAvatar = progress.coerceIn(0f, 1f)
     // X — линейно к -180dp
     val avatarX = (-160f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (-25f * kotlin.math.sin((pAvatar * Math.PI / 2).toFloat())).dp
+    val avatarY = (0f).dp
     val avatarSz = (96f - 60f * pAvatar).dp
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
-    val pName = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
+    val pName = progress.coerceIn(0f, 1f)
     val nameX  = (-160f * pName).dp
-    val nameY  = (-25f * kotlin.math.sin((pName * Math.PI / 2).toFloat())).dp
+    val nameY  = (0f).dp
     val nameA  = (1f - pName).coerceIn(0f, 1f)
 
     // 9 members — гаснет на месте [0.50..0.65]
-    val pMembers = ((progress - 0.50f) / 0.15f).coerceIn(0f, 1f)
+    val pMembers = progress.coerceIn(0f, 1f)
     val membersA = (1f - pMembers).coerceIn(0f, 1f)
 
     // Кнопки — гаснут на месте [0.65..0.85]
-    val pActions = ((progress - 0.65f) / 0.20f).coerceIn(0f, 1f)
+    val pActions = progress.coerceIn(0f, 1f)
     val actionsA = (1f - pActions).coerceIn(0f, 1f)
 
     val infoAlpha = membersA
