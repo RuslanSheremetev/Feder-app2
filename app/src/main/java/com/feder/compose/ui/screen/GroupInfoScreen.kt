@@ -80,17 +80,17 @@ fun GroupInfoScreen(
             val off = listState.firstVisibleItemScrollOffset
             when {
                 idx > 0 -> 1f
-                off > 150 -> 1f
-                off < 20 -> 0f
-                else -> (off - 20) / 130f
+                off > 500 -> 1f
+                off < 10 -> 0f
+                else -> (off - 10) / 490f
             }
         }
     }
     val progress by androidx.compose.animation.core.animateFloatAsState(
         targetValue = rawProgress,
         animationSpec = androidx.compose.animation.core.tween(
-            durationMillis = 250,
-            easing = androidx.compose.animation.core.LinearOutSlowInEasing
+            durationMillis = 300,
+            easing = androidx.compose.animation.core.FastOutSlowInEasing
         ),
         label = "group-header-progress"
     )
