@@ -93,6 +93,7 @@ fun GroupInfoScreen(
             easing = androidx.compose.animation.core.FastOutSlowInEasing
         ),
         label = "group-header-progress"
+    )
  
 
     // ═══ КАСКАДНОЕ ИСЧЕЗНОВЕНИЕ ═══
@@ -108,7 +109,6 @@ fun GroupInfoScreen(
     val headerNameAlpha = ((progress - 0.85f) / 0.15f).coerceIn(0f, 1f)
     // Общая (для обратной совместимости)
     val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
-   )
     // 1 → 0 при progress = 0..0.5 (основной контент)
     // 0 → 1 при progress = 0.5..1 (имя в хедере)
     // Фон хедера появляется при progress > 0.1
