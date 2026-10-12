@@ -97,23 +97,31 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
 
-    // ═══ GROUPINFO_BANNER_V8 ═══
-    // Фаза 1: МГНОВЕННО круг 128dp по центру
-    val phase1 = if (progress > 0.005f) 1f else 0f
+    // ═══ GROUPINFO_BANNER_MAGNET ═══
+    // Аватарка летит по кривой к стрелке [0.00..0.35]
+    val pAvatar = (progress / 0.35f).coerceIn(0f, 1f)
+    // X — линейно к -180dp
+    val avatarX = (-180f * pAvatar).dp
+    // Y — дуга: sin(π·t/2), плавно вверх до -100dp
+    val avatarY = (-100f * kotlin.math.sin((pAvatar * Math.PI / 2).toFloat())).dp
+    val avatarSz = (96f - 60f * pAvatar).dp
+    val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
-    // Фаза 2: медленно уезжает влево-вверх, начиная с 0.15
-    val phase2 = ((progress - 0.15f) / 0.85f).coerceIn(0f, 1f)
+    // Имя летит следом [0.20..0.55]
+    val pName = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
+    val nameX  = (-180f * pName).dp
+    val nameY  = (-100f * kotlin.math.sin((pName * Math.PI / 2).toFloat())).dp
+    val nameA  = (1f - pName).coerceIn(0f, 1f)
 
-    val bannerWidthFrac = (1f - 0.68f * phase1).coerceIn(0.32f, 1f)
-    val bannerHeight    = (280f - 160f * phase1).dp
-    val bannerCorner    = (16f + 44f * phase1).dp
-    // Уезжает ТОЛЬКО на phase2
-    val bannerOffsetX   = (-140f * phase2).dp
-    val bannerOffsetY   = (-100f * phase2).dp
-    val bannerAlpha     = (1f - 0.5f * phase2).coerceIn(0f, 1f)
+    // 9 members — гаснет на месте [0.50..0.65]
+    val pMembers = ((progress - 0.50f) / 0.15f).coerceIn(0f, 1f)
+    val membersA = (1f - pMembers).coerceIn(0f, 1f)
 
-    // Имя/статус — гаснут на Фазе 1
-    val infoAlpha = (1f - phase1).coerceIn(0f, 1f)
+    // Кнопки — гаснут на месте [0.65..0.85]
+    val pActions = ((progress - 0.65f) / 0.20f).coerceIn(0f, 1f)
+    val actionsA = (1f - pActions).coerceIn(0f, 1f)
+
+    val infoAlpha = membersA
  
 
     // ═══ ПЛАВНЫЙ КАСКАД БЕЗ ПЕРЕСЕЧЕНИЙ ═══
@@ -295,7 +303,7 @@ fun GroupInfoScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
-                // ═══ GROUPINFO_BANNER_V7 ═══
+                // ═══ GROUPINFO_BANNER_MAGNET ═══
                 item {
                     Box(
                         Modifier
@@ -303,14 +311,14 @@ fun GroupInfoScreen(
                             .height(400.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        // ФОТО — от края до края, сжимается в круг (фаза 1), уезжает влево (фаза 2)
+                        // 1) АВАТАРКА — по кривой к стрелке
                         Box(
                             Modifier
-                                .fillMaxWidth(bannerWidthFrac)
-                                .height(bannerHeight)
-                                .offset(x = bannerOffsetX, y = bannerOffsetY)
-                                .clip(RoundedCornerShape(bannerCorner))
-                                .alpha(bannerAlpha)
+                                .align(Alignment.TopCenter)
+                                .offset(x = avatarX, y = 60.dp + avatarY)
+                                .size(avatarSz)
+                                .clip(CircleShape)
+                                .alpha(avatarA)
                         ) {
                             val avatarUrl = groupInfo?.avatarUrl
                             if (!avatarUrl.isNullOrEmpty()) {
@@ -323,65 +331,40 @@ fun GroupInfoScreen(
                                     modifier = Modifier.fillMaxSize()
                                 )
                             } else {
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            Brush.linearGradient(
-                                                colors = listOf(
-                                                    androidx.compose.ui.graphics.Color(0xFF2D7DD2),
-                                                    androidx.compose.ui.graphics.Color(0xFF1A4A7A)
-                                                )
-                                            )
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    com.feder.compose.ui.components.GroupAvatar(size = 80.dp)
-                                }
+                                com.feder.compose.ui.components.GroupAvatar(size = avatarSz)
                             }
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent,
-                                                Color(0x00000000),
-                                                Color(0xCC000000)
-                                            )
-                                        )
-                                    )
-                            )
                         }
-                        // ИМЯ + участники — по ЦЕНТРУ, под кругом
-                        Column(
-                            Modifier
+                        // 2) ИМЯ — по кривой за аватаркой
+                        Text(
+                            groupName,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(y = bannerHeight + 8.dp)
-                                .alpha(infoAlpha),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                groupName,
-                                color = Color.White,
-                                fontSize = 26.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                if (loading) "Loading members…" else "${members.size} members",
-                                color = Color(0xFFDDDDDD),
-                                fontSize = 14.sp
-                            )
-                        }
-                        // КНОПКИ — не сжимаются, только alpha
+                                .offset(x = nameX, y = 172.dp + nameY)
+                                .alpha(nameA)
+                        )
+                        // 3) MEMBERS — гаснет на месте
+                        Text(
+                            if (loading) "Loading members…" else "${members.size} members",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .offset(y = 212.dp)
+                                .alpha(membersA)
+                        )
+                        // 4) КНОПКИ — гаснут на месте
                         Row(
                             Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
-                                .alpha(infoAlpha),
+                                .align(Alignment.TopStart)
+                                .offset(y = 256.dp)
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .alpha(actionsA),
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             ActionTile(icon = Icons.Filled.Chat, label = "Message",
