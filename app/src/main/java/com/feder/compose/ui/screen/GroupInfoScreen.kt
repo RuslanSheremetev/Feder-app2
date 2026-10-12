@@ -99,7 +99,7 @@ fun GroupInfoScreen(
 
     // ═══ GROUPINFO_BANNER_MAGNET ═══
     // Аватарка летит по кривой к стрелке [0.00..0.35]
-    val pAvatar = progress.coerceIn(0f, 1f)
+    val pAvatar = (progress * 2.5f).coerceIn(0f, 1f)
     // X — линейно к -180dp
     val avatarX = (-160f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
@@ -108,17 +108,17 @@ fun GroupInfoScreen(
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
-    val pName = progress.coerceIn(0f, 1f)
+    val pName = (progress * 2.5f).coerceIn(0f, 1f)
     val nameX  = (-160f * pName).dp
     val nameY  = (4f * 20f * pName * (1f - pName)).dp
     val nameA  = (1f - pName).coerceIn(0f, 1f)
 
     // 9 members — гаснет на месте [0.50..0.65]
-    val pMembers = progress.coerceIn(0f, 1f)
+    val pMembers = (progress * 2.5f).coerceIn(0f, 1f)
     val membersA = (1f - pMembers).coerceIn(0f, 1f)
 
     // Кнопки — гаснут на месте [0.65..0.85]
-    val pActions = progress.coerceIn(0f, 1f)
+    val pActions = (progress * 2.5f).coerceIn(0f, 1f)
     val actionsA = (1f - pActions).coerceIn(0f, 1f)
 
     val infoAlpha = membersA
@@ -315,7 +315,7 @@ fun GroupInfoScreen(
                         Box(
                             Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = avatarX, y = 60.dp + avatarY)
+                                .offset(x = avatarX, y = 30.dp + avatarY)
                                 .size(avatarSz)
                                 .clip(CircleShape)
                                 .alpha(avatarA)
@@ -344,7 +344,7 @@ fun GroupInfoScreen(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = nameX, y = 172.dp + nameY)
+                                .offset(x = nameX, y = 142.dp + nameY)
                                 .alpha(nameA)
                         )
                         // 3) MEMBERS — гаснет на месте
@@ -354,14 +354,14 @@ fun GroupInfoScreen(
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(y = 212.dp)
+                                .offset(y = 182.dp)
                                 .alpha(membersA)
                         )
                         // 4) КНОПКИ — гаснут на месте
                         Row(
                             Modifier
                                 .align(Alignment.TopStart)
-                                .offset(y = 256.dp)
+                                .offset(y = 226.dp)
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth()
                                 .alpha(actionsA),
