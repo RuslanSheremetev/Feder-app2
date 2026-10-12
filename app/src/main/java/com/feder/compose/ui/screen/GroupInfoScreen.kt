@@ -93,13 +93,25 @@ fun GroupInfoScreen(
             easing = androidx.compose.animation.core.FastOutSlowInEasing
         ),
         label = "group-header-progress"
-    )
+ 
+
+    // ═══ КАСКАДНОЕ ИСЧЕЗНОВЕНИЕ ═══
+    // 1) Аватар + имя + members — исчезает ПЕРВЫМ (progress 0.0..0.3)
+    val avatarAlpha = (1f - progress / 0.3f).coerceIn(0f, 1f)
+    // 2) 4 кнопки — ВТОРЫМИ (progress 0.25..0.55)
+    val actionsAlpha = (1f - (progress - 0.25f) / 0.3f).coerceIn(0f, 1f)
+    // 3) Add Members — ТРЕТЬИМ (progress 0.5..0.8)
+    val addMembersAlpha = (1f - (progress - 0.5f) / 0.3f).coerceIn(0f, 1f)
+    // 4) Фон шапки — ПОСЛЕ всего (progress 0.75..0.9)
+    val headerBgAlpha = ((progress - 0.75f) / 0.15f).coerceIn(0f, 1f)
+    // 5) Имя в шапке — САМЫМ ПОСЛЕДНИМ (progress 0.85..1.0)
+    val headerNameAlpha = ((progress - 0.85f) / 0.15f).coerceIn(0f, 1f)
+    // Общая (для обратной совместимости)
+    val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
+   )
     // 1 → 0 при progress = 0..0.5 (основной контент)
-    val contentAlpha = (1f - progress / 0.7f).coerceIn(0f, 1f)
     // 0 → 1 при progress = 0.5..1 (имя в хедере)
-    val headerNameAlpha = ((progress - 0.6f) / 0.25f).coerceIn(0f, 1f)
     // Фон хедера появляется при progress > 0.1
-    val headerBgAlpha = ((progress - 0.5f) / 0.25f).coerceIn(0f, 1f)
 
     LaunchedEffect(groupName, reloadKey) {
         // === GROUPINFO_NO_FETCH_IF_CACHED_V1 ===
