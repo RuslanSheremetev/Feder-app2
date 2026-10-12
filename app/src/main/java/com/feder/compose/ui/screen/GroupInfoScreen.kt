@@ -95,11 +95,11 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
     // 1 → 0 при progress = 0..0.5 (основной контент)
-    val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
+    val contentAlpha = (1f - progress / 0.7f).coerceIn(0f, 1f)
     // 0 → 1 при progress = 0.5..1 (имя в хедере)
-    val headerNameAlpha = ((progress - 0.9f) / 0.1f).coerceIn(0f, 1f)
+    val headerNameAlpha = ((progress - 0.6f) / 0.25f).coerceIn(0f, 1f)
     // Фон хедера появляется при progress > 0.1
-    val headerBgAlpha = ((progress - 0.85f) / 0.15f).coerceIn(0f, 1f)
+    val headerBgAlpha = ((progress - 0.5f) / 0.25f).coerceIn(0f, 1f)
 
     LaunchedEffect(groupName, reloadKey) {
         // === GROUPINFO_NO_FETCH_IF_CACHED_V1 ===
