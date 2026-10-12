@@ -71,6 +71,35 @@ fun GroupInfoScreen(
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
+    // ═══ Анимация скролла ═══
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val rawProgress by remember {
+        androidx.compose.runtime.derivedStateOf {
+            val idx = listState.firstVisibleItemIndex
+            val off = listState.firstVisibleItemScrollOffset
+            when {
+                idx > 0 -> 1f
+                off > 150 -> 1f
+                off < 20 -> 0f
+                else -> (off - 20) / 130f
+            }
+        }
+    }
+    val progress by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = rawProgress,
+        animationSpec = androidx.compose.animation.core.tween(
+            durationMillis = 250,
+            easing = androidx.compose.animation.core.LinearOutSlowInEasing
+        ),
+        label = "group-header-progress"
+    )
+    // 1 → 0 при progress = 0..0.5 (основной контент)
+    val contentAlpha = (1f - progress * 2f).coerceIn(0f, 1f)
+    // 0 → 1 при progress = 0.5..1 (имя в хедере)
+    val headerNameAlpha = (progress * 2f - 1f).coerceIn(0f, 1f)
+    // Фон хедера появляется при progress > 0.1
+    val headerBgAlpha = (progress * 2f).coerceIn(0f, 1f)
+
     LaunchedEffect(groupName, reloadKey) {
         // === GROUPINFO_NO_FETCH_IF_CACHED_V1 ===
         // Как Contacts: если данные уже в кэше (префетч в loadChats), НЕ делаем HTTP.
@@ -117,7 +146,18 @@ fun GroupInfoScreen(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         // TopAppBar
-// === HEADER_PILL_V2 ===
+// === HEADER_PILL_V2 (анимированный) ===
+        // Фон-полоса хедера (появляется при скролле)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((56 + 40 * progress).dp)  // 56dp → 96dp (с учётом status bar)
+                .background(
+                    MaterialTheme.colorScheme.surface.copy(alpha = headerBgAlpha)
+                )
+                .align(androidx.compose.ui.Alignment.TopCenter)
+                .zIndex(9f)
+        )
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(androidx.compose.ui.Alignment.TopCenter)
@@ -141,12 +181,17 @@ fun GroupInfoScreen(
                     modifier = Modifier.size(20.dp)
                 )
             }
-
-            Spacer(Modifier.weight(1f))
-
-
-            Spacer(Modifier.weight(1f))
-
+            // Имя группы — появляется при скролле
+            Spacer(Modifier.width(12.dp))
+            Text(
+                groupName,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             // Круглая кнопка «Редактировать» (только для owner)
             if (isOwner) {
                 Box(
@@ -164,11 +209,10 @@ fun GroupInfoScreen(
                     )
                 }
             } else {
-                // Пустое место, чтобы название оставалось по центру
                 Spacer(Modifier.size(40.dp))
             }
         }
-// === /HEADER_PILL_V2 ===
+// === /HEADER_PILL_V2 (анимированный) ===
 
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -176,8 +220,9 @@ fun GroupInfoScreen(
             }
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 8.dp, bottom = 24.dp)
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 100.dp, bottom = 24.dp)
             ) {
                 // Аватарка + имя
                 item {
@@ -186,6 +231,10 @@ fun GroupInfoScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val avatarUrl = groupInfo?.avatarUrl
+                        // Аватар группы — исчезает при скролле
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.alpha(contentAlpha)
+                        ) {
                         if (!avatarUrl.isNullOrEmpty()) {
                             val fullUrl = if (avatarUrl.startsWith("http")) avatarUrl
                                           else "http://2.26.71.102:8010$avatarUrl"
@@ -204,12 +253,15 @@ fun GroupInfoScreen(
                         }
                         Spacer(Modifier.height(12.dp))
                         Text(groupName, fontSize = 24.sp, fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface)
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.alpha(contentAlpha))
                         Text(
                             if (loading) "Loading members…" else "${members.size} members",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.alpha(contentAlpha)
                         )
+                        }  // конец Box(alpha)
                     }
                 }
 
