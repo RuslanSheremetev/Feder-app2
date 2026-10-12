@@ -292,7 +292,7 @@ fun GroupInfoScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .height(260.dp)
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -347,7 +347,7 @@ fun GroupInfoScreen(
                             Column(
                                 Modifier
                                     .align(Alignment.BottomStart)
-                                    .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                                    .padding(start = 16.dp, bottom = 72.dp, end = 16.dp)
                                     .alpha(infoAlpha)
                             ) {
                                 Text(
@@ -365,47 +365,30 @@ fun GroupInfoScreen(
                                     fontSize = 14.sp
                                 )
                             }
+                            // GROUPINFO_BUTTONS_IN_BANNER
+                            Row(
+                                Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                                    .alpha(infoAlpha),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                ActionTile(icon = Icons.Filled.Chat, label = "Message",
+                                    modifier = Modifier.weight(1f), onClick = onMessage)
+                                ActionTile(
+                                    icon = if (isMuted) Icons.Filled.NotificationsOff else Icons.Filled.Notifications,
+                                    label = if (isMuted) "Unmute" else "Mute",
+                                    modifier = Modifier.weight(1f), onClick = onMuteToggle)
+                                ActionTile(icon = Icons.Filled.Videocam, label = "Video",
+                                    modifier = Modifier.weight(1f), onClick = onVideoCall)
+                                ActionTile(icon = Icons.Filled.ExitToApp, label = "Leave",
+                                    modifier = Modifier.weight(1f),
+                                    tint = MaterialTheme.colorScheme.error,
+                                    onClick = { })
+                            }
                         }
                     }
                 }
-                // Сетка действий — как в Telegram
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().alpha(actionsAlpha).padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Message
-                        ActionTile(
-                            icon = Icons.Filled.Chat,
-                            label = "Message",
-                            modifier = Modifier.weight(1f),
-                            onClick = onMessage
-                        )
-                        // Mute / Unmute
-                        ActionTile(
-                            icon = if (isMuted) Icons.Filled.NotificationsOff else Icons.Filled.Notifications,
-                            label = if (isMuted) "Unmute" else "Mute",
-                            modifier = Modifier.weight(1f),
-                            onClick = onMuteToggle
-                        )
-                        // Video Chat
-                        ActionTile(
-                            icon = Icons.Filled.Videocam,
-                            label = "Video Chat",
-                            modifier = Modifier.weight(1f),
-                            onClick = onVideoCall
-                        )
-                        // Leave
-                        ActionTile(
-                            icon = Icons.Filled.ExitToApp,
-                            label = "Leave",
-                            modifier = Modifier.weight(1f),
-                            tint = MaterialTheme.colorScheme.error,
-                            onClick = { /* confirmed ниже */ }
-                        )
-                    }
-                }
-
                 // Add Members — отдельная карточка
                 item {
                     Surface(
@@ -620,16 +603,16 @@ private fun ActionTile(
 ) {
     Surface(
         modifier = modifier.clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(10.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.height(6.dp))
-            Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface,
+            Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.height(3.dp))
+            Text(label, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1)
         }
     }
