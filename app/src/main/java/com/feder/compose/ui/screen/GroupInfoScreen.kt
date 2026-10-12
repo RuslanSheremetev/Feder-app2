@@ -194,8 +194,30 @@ fun GroupInfoScreen(
                     modifier = Modifier.size(20.dp)
                 )
             }
+            // Маленький аватар рядом со стрелкой — появляется при скролле
+            Spacer(Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .alpha(headerAvatarAlpha)
+            ) {
+                val hUrl = groupInfo?.avatarUrl
+                if (!hUrl.isNullOrEmpty()) {
+                    val hFull = if (hUrl.startsWith("http")) hUrl
+                                else "http://2.26.71.102:8010$hUrl"
+                    AsyncImage(
+                        model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
+                        contentDescription = groupName,
+                        modifier = Modifier.size(36.dp).clip(CircleShape),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                } else {
+                    com.feder.compose.ui.components.GroupAvatar(size = 36.dp)
+                }
+            }
+            Spacer(Modifier.width(10.dp))
             // Имя группы — появляется при скролле
-            Spacer(Modifier.width(12.dp))
             Text(
                 groupName,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
@@ -250,23 +272,23 @@ fun GroupInfoScreen(
                             AsyncImage(
                                 model = ImageRequest.Builder(ctx).data(fullUrl).crossfade(false).build(),
                                 contentDescription = groupName,
-                                modifier = Modifier.size(96.dp).clip(CircleShape),
+                                modifier = Modifier.size(avatarSize).clip(CircleShape),
                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
                             )
                         } else {
-                            com.feder.compose.ui.components.GroupAvatar(size = 96.dp)
+                            com.feder.compose.ui.components.GroupAvatar(size = avatarSize)
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height((12f - progress * 12f / 0.4f).coerceIn(0f, 12f).dp))
                         Text(
                             groupName,
-                            fontSize = 24.sp,
+                            fontSize = nameFontSize,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = nameAlpha)
                         )
                         Text(
                             if (loading) "Loading members…" else "${members.size} members",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = nameAlpha)
                         )
                     }
                 }
