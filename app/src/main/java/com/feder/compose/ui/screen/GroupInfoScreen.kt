@@ -315,8 +315,20 @@ fun GroupInfoScreen(
                                     modifier = Modifier.fillMaxSize()
                                 )
                             } else {
-                                Box(Modifier.fillMaxSize()) {
-                                    com.feder.compose.ui.components.GroupAvatar(size = 200.dp)
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.linearGradient(
+                                                colors = listOf(
+                                                    androidx.compose.ui.graphics.Color(0xFF2D7DD2),
+                                                    androidx.compose.ui.graphics.Color(0xFF1A4A7A)
+                                                )
+                                            )
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    com.feder.compose.ui.components.GroupAvatar(size = 80.dp)
                                 }
                             }
                             Box(
