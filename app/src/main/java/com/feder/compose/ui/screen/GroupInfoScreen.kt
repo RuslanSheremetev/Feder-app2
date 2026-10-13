@@ -142,9 +142,9 @@ fun GroupInfoScreen(
     // Фон шапки — появляется [0.60..0.75]
     val headerBgAlpha = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
     // Маленький аватар в хедере — появляется [0.30..0.45] (после аватара)
-    val headerAvatarAlpha = ((progress - 0.75f) / 0.25f).coerceIn(0f, 1f)
+    val headerAvatarAlpha = ((progress - 0.15f) / 0.30f).coerceIn(0f, 1f)
     // Имя в шапке — появляется [0.65..0.85]
-    val headerNameAlpha = ((progress - 0.75f) / 0.25f).coerceIn(0f, 1f)
+    val headerNameAlpha = ((progress - 0.15f) / 0.30f).coerceIn(0f, 1f)
     // Общая (для старого кода)
     // Общая (для старого кода, если остался)
     val contentAlpha = (1f - progress / 0.9f).coerceIn(0f, 1f)
