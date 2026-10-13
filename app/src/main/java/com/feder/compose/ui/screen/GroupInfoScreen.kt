@@ -212,7 +212,7 @@ fun GroupInfoScreen(
             targetValue = (16f * (1f - (progress * 1.5f).coerceIn(0f, 1f))).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (12 - progress * 4).dp, label = "outerVPad"
+            targetValue = (12f - 4f * progress).dp, label = "outerVPad"
         )
         val gap by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12f * (1f - (progress * 2.5f).coerceIn(0f, 1f))).dp, label = "gap"
@@ -227,7 +227,7 @@ fun GroupInfoScreen(
             targetValue = (44f + 60f * (progress * 1.5f).coerceIn(0f, 1f)).dp, label = "searchWidth"
         )
         val ovalInnerH by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (14 + progress * 8).dp, label = "ovalInnerH"
+            targetValue = (14f + 8f * progress).dp, label = "ovalInnerH"
         )
         Row(
             modifier = Modifier
@@ -238,65 +238,60 @@ fun GroupInfoScreen(
                 .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // ─── Контейнер овала (занимает всё свободное место) ───
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart
+            // ─── ЛЕВАЯ ПЛАШКА: растёт от 55% до 100% ───
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.55f + 0.45f * progress)
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(radius))
+                    .background(
+                        androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                            .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
+                    )
+                    .clickable { onBack() }
+                    .padding(horizontal = ovalInnerH, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // ─── Овал — растёт 55% → 100% ───
-                Row(
+                Icon(
+                    Icons.Filled.ArrowBack, "Back",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp)
+                )
+                Spacer(Modifier.width((8f * progress).dp))
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.55f + (progress * 1.5f).coerceIn(0f, 1f) * 0.45f)
-                        .height(44.dp)
-                        .clip(RoundedCornerShape(radius))
-                        .background(
-                            androidx.compose.ui.graphics.Color(0xFF1F1F1F)
-                                .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
-                        )
-                        .clickable { onBack() }
-                        .padding(horizontal = ovalInnerH, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .size((28f * progress).dp)
+                        .clip(CircleShape)
+                        .alpha(headerAvatarAlpha)
                 ) {
-                    Icon(
-                        Icons.Filled.ArrowBack, "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(Modifier.width((8f * progress).dp))
-                    Box(
-                        modifier = Modifier
-                            .size((28f * progress).dp)
-                            .clip(CircleShape)
-                            .alpha(headerAvatarAlpha)
-                    ) {
-                        val hUrl = groupInfo?.avatarUrl
-                        if (!hUrl.isNullOrEmpty()) {
-                            val hFull = if (hUrl.startsWith("http")) hUrl
-                                        else "http://2.26.71.102:8010$hUrl"
-                            AsyncImage(
-                                model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
-                                contentDescription = groupName,
-                                modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                            )
-                        } else {
-                            com.feder.compose.ui.components.GroupAvatar(size = (28f * progress).dp)
-                        }
+                    val hUrl = groupInfo?.avatarUrl
+                    if (!hUrl.isNullOrEmpty()) {
+                        val hFull = if (hUrl.startsWith("http")) hUrl
+                                    else "http://2.26.71.102:8010$hUrl"
+                        AsyncImage(
+                            model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
+                            contentDescription = groupName,
+                            modifier = Modifier.fillMaxSize().clip(CircleShape),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
+                        com.feder.compose.ui.components.GroupAvatar(size = (28f * progress).dp)
                     }
-                    Spacer(Modifier.width((8f * progress).dp))
-                    Text(
-                        groupName,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
                 }
+                Spacer(Modifier.width((8f * progress).dp))
+                Text(
+                    groupName,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
             }
-            // ─── Зазор 12 → 0 ───
+            // ─── Зазор: 12 → 0 ───
             Spacer(Modifier.width(gap))
-            // ─── Кружок ✏️ — растёт 44 → 104dp ───
+            // ─── ПРАВАЯ ПЛАШКА: 44 → 104dp ───
             if (isOwner) {
                 Box(
                     modifier = Modifier
@@ -320,7 +315,7 @@ fun GroupInfoScreen(
                 Spacer(Modifier.size(44.dp))
             }
         }
-// === /HEADER_PILL_V2 (анимированный) ===
+        // === /HEADER_PILL_V2 (анимированный) ===
 
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
