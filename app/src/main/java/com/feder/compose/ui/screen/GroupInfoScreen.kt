@@ -212,7 +212,7 @@ fun GroupInfoScreen(
             targetValue = (16f * (1f - (progress * 1.5f).coerceIn(0f, 1f))).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (12f - 4f * progress).dp, label = "outerVPad"
+            targetValue = (20f - 8f * progress).dp, label = "outerVPad"
         )
         val gap by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12f * (1f - (progress * 2.5f).coerceIn(0f, 1f))).dp, label = "gap"
