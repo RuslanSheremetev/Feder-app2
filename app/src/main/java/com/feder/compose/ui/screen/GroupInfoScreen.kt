@@ -222,7 +222,6 @@ fun GroupInfoScreen(
             )
             Row(
                 modifier = Modifier
-                    .weight(1f, fill = false)
                     .height(40.dp)
                     .clip(RoundedCornerShape(leftRadius))
                     .background(
@@ -267,10 +266,9 @@ fun GroupInfoScreen(
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
-                )
+                    )
             }
-            Spacer(Modifier.width((8f - 6f * progress).dp))
+            Spacer(Modifier.weight(1f))
             // ─── Правая плашка: ✏️ ───
             if (isOwner) {
                 Box(
