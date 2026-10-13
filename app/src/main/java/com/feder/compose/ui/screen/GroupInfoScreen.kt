@@ -302,7 +302,7 @@ fun GroupInfoScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .height(400.dp),
+                            .height(330.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // 1) АВАТАРКА — уменьшается на месте
