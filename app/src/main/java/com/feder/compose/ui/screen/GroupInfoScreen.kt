@@ -142,7 +142,7 @@ fun GroupInfoScreen(
     val addMembersAlpha = (1f - addMembersProgress).coerceIn(0f, 1f)
 
     // Фон шапки — появляется [0.60..0.75]
-    val headerBgAlpha = ((progress - 0.60f) / 0.15f).coerceIn(0f, 1f)
+    val headerBgAlpha = (progress / 0.35f).coerceIn(0f, 1f)
     // Маленький аватар в хедере — появляется [0.30..0.45] (после аватара)
     val headerAvatarAlpha = (progress / 0.30f).coerceIn(0f, 1f)
     // Имя в шапке — появляется [0.65..0.85]
@@ -204,7 +204,7 @@ fun GroupInfoScreen(
                 .fillMaxWidth()
                 .height((56 + 40 * progress).dp)  // 56dp → 96dp (с учётом status bar)
                 .background(
-                    MaterialTheme.colorScheme.surface.copy(alpha = headerBgAlpha)
+                    androidx.compose.ui.graphics.Color(0xFF0D0D0D).copy(alpha = headerBgAlpha)
                 )
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(9f)
