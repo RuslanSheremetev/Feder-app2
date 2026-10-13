@@ -200,9 +200,9 @@ fun GroupInfoScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((56 + 40 * progress).dp)  // 56dp → 96dp (с учётом status bar)
+                .height((progress * 60).dp)  // ← как в Contacts: 0 → 60dp
                 .background(
-                    androidx.compose.ui.graphics.Color(0xFF0D0D0D).copy(alpha = headerBgAlpha)
+                    androidx.compose.ui.graphics.Color(0xFF0D0D0D)
                 )
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(9f)
