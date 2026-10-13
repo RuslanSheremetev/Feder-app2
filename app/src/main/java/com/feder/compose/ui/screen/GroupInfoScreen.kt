@@ -80,12 +80,9 @@ fun GroupInfoScreen(
         androidx.compose.runtime.derivedStateOf {
             val idx = listState.firstVisibleItemIndex
             val off = listState.firstVisibleItemScrollOffset
-            when {
-                idx > 0 -> 1f
-                off > 1000 -> 1f
-                off < 10 -> 0f
-                else -> (off - 10) / 990f
-            }
+            // total = суммарный скролл в пикселях (реальный, независимо от idx)
+            val total = idx * 1000f + off
+            (total / 1800f).coerceIn(0f, 1f)
         }
     }
     val progress by androidx.compose.animation.core.animateFloatAsState(
