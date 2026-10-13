@@ -300,7 +300,6 @@ fun GroupInfoScreen(
                         .clip(RoundedCornerShape(searchRadius))
                         .background(
                             androidx.compose.ui.graphics.Color(0xFF1F1F1F)
-                                .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
                         )
                         .clickable { showRenameDialog = true },
                     contentAlignment = Alignment.Center
