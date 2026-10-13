@@ -97,28 +97,22 @@ fun GroupInfoScreen(
         label = "group-header-progress"
     )
 
-    // ═══ GROUPINFO_BANNER_MAGNET ═══
-    // Аватарка летит по кривой к стрелке [0.00..0.35]
-    val pAvatar = (progress * 2.5f).coerceIn(0f, 1f)
-    // X — линейно к -180dp
-    val avatarX = (0f).dp
-    // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (0f).dp
-    val avatarSz = (96f - 72f * pAvatar.coerceIn(0f, 1f)).dp
+    // ═══ GROUPINFO_BANNER_SIMPLE ═══
+    // Аватарка — уменьшается и гаснет НА МЕСТЕ
+    val pAvatar = (progress / 0.30f).coerceIn(0f, 1f)
+    val avatarSz = (96f - 60f * pAvatar).dp       // 96 → 36
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
-    // Имя летит следом [0.20..0.55]
-    val pName = (progress * 2.5f).coerceIn(0f, 1f)
-    val nameX  = (0f).dp
-    val nameY  = (0f).dp
-    val nameA  = (1f - pName).coerceIn(0f, 1f)
+    // Имя — гаснет на месте
+    val pName = (progress / 0.40f).coerceIn(0f, 1f)
+    val nameA = (1f - pName).coerceIn(0f, 1f)
 
-    // 9 members — гаснет на месте [0.50..0.65]
-    val pMembers = (progress * 2.5f).coerceIn(0f, 1f)
+    // Members — гаснет
+    val pMembers = (progress / 0.50f).coerceIn(0f, 1f)
     val membersA = (1f - pMembers).coerceIn(0f, 1f)
 
-    // Кнопки — гаснут на месте [0.65..0.85]
-    val pActions = (progress * 2.5f).coerceIn(0f, 1f)
+    // Кнопки — гаснут
+    val pActions = (progress / 0.60f).coerceIn(0f, 1f)
     val actionsA = (1f - pActions).coerceIn(0f, 1f)
 
     val infoAlpha = membersA
@@ -303,7 +297,7 @@ fun GroupInfoScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
-                // ═══ GROUPINFO_BANNER_MAGNET ═══
+                // ═══ GROUPINFO_BANNER_SIMPLE ═══
                 item {
                     Box(
                         Modifier
@@ -311,11 +305,11 @@ fun GroupInfoScreen(
                             .height(400.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        // 1) АВАТАРКА — по кривой к стрелке
+                        // 1) АВАТАРКА — уменьшается на месте
                         Box(
                             Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = avatarX, y = 60.dp + avatarY)
+                                .offset(y = 60.dp)
                                 .size(avatarSz)
                                 .clip(CircleShape)
                                 .alpha(avatarA)
@@ -334,7 +328,7 @@ fun GroupInfoScreen(
                                 com.feder.compose.ui.components.GroupAvatar(size = avatarSz)
                             }
                         }
-                        // 2) ИМЯ — по кривой за аватаркой
+                        // 2) ИМЯ — на месте
                         Text(
                             groupName,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -344,24 +338,24 @@ fun GroupInfoScreen(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = nameX, y = 172.dp + nameY)
+                                .offset(y = 172.dp)
                                 .alpha(nameA)
                         )
-                        // 3) MEMBERS — гаснет на месте
+                        // 3) MEMBERS
                         Text(
                             if (loading) "Loading members…" else "${members.size} members",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(y = 182.dp)
+                                .offset(y = 212.dp)
                                 .alpha(membersA)
                         )
-                        // 4) КНОПКИ — гаснут на месте
+                        // 4) КНОПКИ
                         Row(
                             Modifier
                                 .align(Alignment.TopStart)
-                                .offset(y = 226.dp)
+                                .offset(y = 256.dp)
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth()
                                 .alpha(actionsA),
