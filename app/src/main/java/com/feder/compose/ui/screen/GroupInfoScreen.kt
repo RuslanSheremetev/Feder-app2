@@ -209,22 +209,22 @@ fun GroupInfoScreen(
         )
         // ═══ HEADER — точная копия Contacts ═══
         val outerHPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (16 - progress * 16).dp, label = "outerHPad"
+            targetValue = (16f * (1f - (progress * 1.5f).coerceIn(0f, 1f))).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12 - progress * 4).dp, label = "outerVPad"
         )
         val gap by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (12 - progress * 12).dp, label = "gap"
+            targetValue = (12f * (1f - (progress * 2.5f).coerceIn(0f, 1f))).dp, label = "gap"
         )
         val radius by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (24 - progress * 22).dp, label = "radius"
+            targetValue = (24f - 22f * (progress * 1.5f).coerceIn(0f, 1f)).dp, label = "radius"
         )
         val searchRadius by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (22 - progress * 20).dp, label = "searchRadius"
+            targetValue = (22f - 20f * (progress * 1.5f).coerceIn(0f, 1f)).dp, label = "searchRadius"
         )
         val searchWidth by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (44 + progress * 60).dp, label = "searchWidth"
+            targetValue = (44f + 60f * (progress * 1.5f).coerceIn(0f, 1f)).dp, label = "searchWidth"
         )
         val ovalInnerH by androidx.compose.animation.core.animateDpAsState(
             targetValue = (14 + progress * 8).dp, label = "ovalInnerH"
@@ -246,7 +246,7 @@ fun GroupInfoScreen(
                 // ─── Овал — растёт 55% → 100% ───
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(0.55f + progress * 0.45f)
+                        .fillMaxWidth(0.55f + (progress * 1.5f).coerceIn(0f, 1f) * 0.45f)
                         .height(44.dp)
                         .clip(RoundedCornerShape(radius))
                         .background(
