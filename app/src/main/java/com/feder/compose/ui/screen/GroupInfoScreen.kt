@@ -101,10 +101,10 @@ fun GroupInfoScreen(
     // Аватарка летит по кривой к стрелке [0.00..0.35]
     val pAvatar = (progress * 2.5f).coerceIn(0f, 1f)
     // X — линейно к -180dp
-    val avatarX = (-160f * pAvatar).dp
+    val avatarX = (-150f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (4f * 30f * pAvatar * (1f - pAvatar)).dp
-    val avatarSz = (96f - 60f * pAvatar).dp
+    val avatarY = (4f * 50f * pAvatar * (1f - pAvatar)).dp
+    val avatarSz = (96f - 72f * pAvatar.coerceIn(0f, 1f)).dp
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
