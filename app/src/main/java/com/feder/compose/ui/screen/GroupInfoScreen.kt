@@ -222,6 +222,7 @@ fun GroupInfoScreen(
             )
             Row(
                 modifier = Modifier
+                    .weight(1f)
                     .height(40.dp)
                     .clip(RoundedCornerShape(leftRadius))
                     .background(
@@ -268,7 +269,7 @@ fun GroupInfoScreen(
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     )
             }
-            Spacer(Modifier.weight(1f - 0.9f * progress))
+            Spacer(Modifier.width((8f - 8f * progress).dp))
             // ─── Правая плашка: ✏️ ───
             if (isOwner) {
                 val rightW by animateDpAsState(
@@ -281,7 +282,7 @@ fun GroupInfoScreen(
                 )
                 Box(
                     modifier = Modifier
-                        .width(rightW)
+                        .weight(1f)
                         .height(40.dp)
                         .clip(RoundedCornerShape(rightR))
                         .background(
