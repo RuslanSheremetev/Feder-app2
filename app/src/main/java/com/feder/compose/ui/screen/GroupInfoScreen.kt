@@ -289,6 +289,8 @@ fun GroupInfoScreen(
                     modifier = Modifier.weight(1f, fill = false)
                 )
             }
+            // ─── Толкаем правую плашку вправо ───
+            Spacer(Modifier.weight(1f))
             // ─── Зазор: 12 → 0 ───
             Spacer(Modifier.width(gap))
             // ─── ПРАВАЯ ПЛАШКА: 44 → 104dp ───
