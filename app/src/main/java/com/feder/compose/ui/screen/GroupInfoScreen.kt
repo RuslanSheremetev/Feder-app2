@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -214,61 +215,72 @@ fun GroupInfoScreen(
                 .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Круглая кнопка «Назад»
-            Box(
+            // ─── Левая плашка: ← + аватарка + имя ───
+            val leftRadius: androidx.compose.ui.unit.Dp by animateDpAsState(
+                targetValue = (20f - 8f * progress).dp,
+                label = "leftRadius"
+            )
+            Row(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    .clickable { onBack() },
-                contentAlignment = Alignment.Center
+                    .weight(1f, fill = false)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(leftRadius))
+                    .background(
+                        androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                            .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
+                    )
+                    .clickable { onBack() }
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     Icons.Filled.ArrowBack, "Back",
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(20.dp)
                 )
-            }
-            // Маленький аватар рядом со стрелкой — появляется при скролле
-            Spacer(Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .alpha(headerAvatarAlpha)
-            ) {
-                val hUrl = groupInfo?.avatarUrl
-                if (!hUrl.isNullOrEmpty()) {
-                    val hFull = if (hUrl.startsWith("http")) hUrl
-                                else "http://2.26.71.102:8010$hUrl"
-                    AsyncImage(
-                        model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
-                        contentDescription = groupName,
-                        modifier = Modifier.size(36.dp).clip(CircleShape),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                    )
-                } else {
-                    com.feder.compose.ui.components.GroupAvatar(size = 36.dp)
+                Spacer(Modifier.width((8f * progress).dp))
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .alpha(headerAvatarAlpha)
+                ) {
+                    val hUrl = groupInfo?.avatarUrl
+                    if (!hUrl.isNullOrEmpty()) {
+                        val hFull = if (hUrl.startsWith("http")) hUrl
+                                    else "http://2.26.71.102:8010$hUrl"
+                        AsyncImage(
+                            model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
+                            contentDescription = groupName,
+                            modifier = Modifier.size(28.dp).clip(CircleShape),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
+                        com.feder.compose.ui.components.GroupAvatar(size = 28.dp)
+                    }
                 }
+                Spacer(Modifier.width((8f * progress).dp))
+                Text(
+                    groupName,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
             }
-            Spacer(Modifier.width(10.dp))
-            // Имя группы — появляется при скролле
-            Text(
-                groupName,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-            // Круглая кнопка «Редактировать» (только для owner)
+            Spacer(Modifier.width((8f - 6f * progress).dp))
+            // ─── Правая плашка: ✏️ ───
             if (isOwner) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .background(
+                            androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                                .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
+                        )
                         .clickable { showRenameDialog = true },
                     contentAlignment = Alignment.Center
                 ) {
