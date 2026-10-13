@@ -207,86 +207,105 @@ fun GroupInfoScreen(
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(9f)
         )
+        // ═══ HEADER — точная копия Contacts ═══
+        val outerHPad by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (16 - progress * 16).dp, label = "outerHPad"
+        )
+        val outerVPad by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (12 - progress * 4).dp, label = "outerVPad"
+        )
+        val gap by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (12 - progress * 12).dp, label = "gap"
+        )
+        val radius by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (24 - progress * 22).dp, label = "radius"
+        )
+        val searchRadius by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (22 - progress * 20).dp, label = "searchRadius"
+        )
+        val searchWidth by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (44 + progress * 60).dp, label = "searchWidth"
+        )
+        val ovalInnerH by androidx.compose.animation.core.animateDpAsState(
+            targetValue = (14 + progress * 8).dp, label = "ovalInnerH"
+        )
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .align(androidx.compose.ui.Alignment.TopCenter)
-                .zIndex(10f)
                 .statusBarsPadding()
-                .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
+                .padding(horizontal = outerHPad, vertical = outerVPad)
+                .zIndex(10f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // ─── Левая плашка: ← + аватарка + имя ───
-            val leftRadius: androidx.compose.ui.unit.Dp by animateDpAsState(
-                targetValue = (20f - 8f * progress).dp,
-                label = "leftRadius"
-            )
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(40.dp)
-                    .clip(RoundedCornerShape(leftRadius))
-                    .background(
-                        androidx.compose.ui.graphics.Color(0xFF1F1F1F)
-                            .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
-                    )
-                    .clickable { onBack() }
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // ─── Контейнер овала (занимает всё свободное место) ───
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
             ) {
-                Icon(
-                    Icons.Filled.ArrowBack, "Back",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width((8f * progress).dp))
-                Box(
+                // ─── Овал — растёт 55% → 100% ───
+                Row(
                     modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .alpha(headerAvatarAlpha)
-                ) {
-                    val hUrl = groupInfo?.avatarUrl
-                    if (!hUrl.isNullOrEmpty()) {
-                        val hFull = if (hUrl.startsWith("http")) hUrl
-                                    else "http://2.26.71.102:8010$hUrl"
-                        AsyncImage(
-                            model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
-                            contentDescription = groupName,
-                            modifier = Modifier.size(28.dp).clip(CircleShape),
-                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                        )
-                    } else {
-                        com.feder.compose.ui.components.GroupAvatar(size = 28.dp)
-                    }
-                }
-                Spacer(Modifier.width((8f * progress).dp))
-                Text(
-                    groupName,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                    )
-            }
-            Spacer(Modifier.width((8f - 8f * progress).dp))
-            // ─── Правая плашка: ✏️ ───
-            if (isOwner) {
-                val rightW by animateDpAsState(
-                    targetValue = (40f + 80f * progress).dp,  // 40 → 120
-                    label = "rightW"
-                )
-                val rightR: androidx.compose.ui.unit.Dp by animateDpAsState(
-                    targetValue = (20f - 8f * progress).dp,
-                    label = "rightR"
-                )
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp)
-                        .clip(RoundedCornerShape(rightR))
+                        .fillMaxWidth(0.55f + progress * 0.45f)
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(radius))
                         .background(
                             androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                                .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
+                        )
+                        .clickable { onBack() }
+                        .padding(horizontal = ovalInnerH, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Filled.ArrowBack, "Back",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(Modifier.width((8f * progress).dp))
+                    Box(
+                        modifier = Modifier
+                            .size((28f * progress).dp)
+                            .clip(CircleShape)
+                            .alpha(headerAvatarAlpha)
+                    ) {
+                        val hUrl = groupInfo?.avatarUrl
+                        if (!hUrl.isNullOrEmpty()) {
+                            val hFull = if (hUrl.startsWith("http")) hUrl
+                                        else "http://2.26.71.102:8010$hUrl"
+                            AsyncImage(
+                                model = ImageRequest.Builder(ctx).data(hFull).crossfade(false).build(),
+                                contentDescription = groupName,
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                            )
+                        } else {
+                            com.feder.compose.ui.components.GroupAvatar(size = (28f * progress).dp)
+                        }
+                    }
+                    Spacer(Modifier.width((8f * progress).dp))
+                    Text(
+                        groupName,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+            }
+            // ─── Зазор 12 → 0 ───
+            Spacer(Modifier.width(gap))
+            // ─── Кружок ✏️ — растёт 44 → 104dp ───
+            if (isOwner) {
+                Box(
+                    modifier = Modifier
+                        .width(searchWidth)
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(searchRadius))
+                        .background(
+                            androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                                .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
                         )
                         .clickable { showRenameDialog = true },
                     contentAlignment = Alignment.Center
@@ -294,11 +313,11 @@ fun GroupInfoScreen(
                     Icon(
                         Icons.Filled.Edit, "Rename",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             } else {
-                Spacer(Modifier.size(40.dp))
+                Spacer(Modifier.size(44.dp))
             }
         }
 // === /HEADER_PILL_V2 (анимированный) ===
