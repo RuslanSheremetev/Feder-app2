@@ -101,16 +101,16 @@ fun GroupInfoScreen(
     // Аватарка летит по кривой к стрелке [0.00..0.35]
     val pAvatar = (progress * 2.5f).coerceIn(0f, 1f)
     // X — линейно к -180dp
-    val avatarX = (-150f * pAvatar).dp
+    val avatarX = (-110f * pAvatar).dp
     // Y — дуга: sin(π·t/2), плавно вверх до -100dp
-    val avatarY = (4f * 50f * pAvatar * (1f - pAvatar)).dp
+    val avatarY = (-40f * pAvatar).dp
     val avatarSz = (96f - 72f * pAvatar.coerceIn(0f, 1f)).dp
     val avatarA  = (1f - pAvatar).coerceIn(0f, 1f)
 
     // Имя летит следом [0.20..0.55]
     val pName = (progress * 2.5f).coerceIn(0f, 1f)
-    val nameX  = (-160f * pName).dp
-    val nameY  = (4f * 20f * pName * (1f - pName)).dp
+    val nameX  = (-90f * pName).dp
+    val nameY  = (-40f * pName).dp
     val nameA  = (1f - pName).coerceIn(0f, 1f)
 
     // 9 members — гаснет на месте [0.50..0.65]
@@ -315,7 +315,7 @@ fun GroupInfoScreen(
                         Box(
                             Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = avatarX, y = 30.dp + avatarY)
+                                .offset(x = avatarX, y = 60.dp + avatarY)
                                 .size(avatarSz)
                                 .clip(CircleShape)
                                 .alpha(avatarA)
@@ -344,7 +344,7 @@ fun GroupInfoScreen(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
-                                .offset(x = nameX, y = 142.dp + nameY)
+                                .offset(x = nameX, y = 172.dp + nameY)
                                 .alpha(nameA)
                         )
                         // 3) MEMBERS — гаснет на месте
