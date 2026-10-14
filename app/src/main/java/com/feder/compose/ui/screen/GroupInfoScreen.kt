@@ -242,14 +242,14 @@ fun GroupInfoScreen(
             // ─── ЛЕВАЯ ПЛАШКА: растёт от 55% до 100% ───
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.55f + 0.45f * progress)
+                    .weight(1f)
                     .height(44.dp)
                     .clip(RoundedCornerShape(radius))
                     .background(
                         androidx.compose.ui.graphics.Color(0xFF131313)
                     )
                     .clickable { onBack() }
-                    .padding(horizontal = ovalInnerH, vertical = 8.dp),
+                    .padding(horizontal = ovalInnerH),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
