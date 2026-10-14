@@ -408,6 +408,7 @@ fun GroupInfoScreen(
                     }
                 }
                 // Add Members — отдельная карточка
+                if (addMembersProgress < 1f) {
                 item {
                     Surface(
                         modifier = Modifier
@@ -432,6 +433,7 @@ fun GroupInfoScreen(
                                 color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
                 }
 
                 // MEMBERS заголовок
