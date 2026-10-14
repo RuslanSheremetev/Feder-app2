@@ -135,8 +135,8 @@ fun GroupInfoScreen(
     // Пауза [0.65..0.70]
 
     // Фаза 4: Add Members 56→0dp  [0.70..0.85]
-    val addMembersProgress = ((progress - 0.70f) / 0.15f).coerceIn(0f, 1f)
-    val addMembersHeight = (56f - addMembersProgress * 56f).coerceIn(0f, 56f).dp
+    val addMembersProgress = ((progress - 0.40f) / 0.25f).coerceIn(0f, 1f)
+    val addMembersHeight = (72f - addMembersProgress * 72f).coerceIn(0f, 72f).dp
     val addMembersAlpha = (1f - addMembersProgress).coerceIn(0f, 1f)
 
     // Фон шапки — появляется [0.60..0.75]
@@ -409,7 +409,11 @@ fun GroupInfoScreen(
                 // Add Members — отдельная карточка
                 item {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().alpha(addMembersAlpha).padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(addMembersHeight)
+                            .alpha(addMembersAlpha)
+                            .padding(horizontal = 16.dp)
                             .clickable { onAddMembers() },
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.surfaceContainerHigh
