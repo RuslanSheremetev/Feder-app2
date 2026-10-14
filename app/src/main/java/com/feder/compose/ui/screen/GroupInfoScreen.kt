@@ -112,6 +112,7 @@ fun GroupInfoScreen(
     // Кнопки — гаснут
     val pActions = (progress / 0.60f).coerceIn(0f, 1f)
     val actionsA = (1f - pActions).coerceIn(0f, 1f)
+    val actionsOffsetY = (-progress * 350f).dp
 
     val infoAlpha = membersA
  
@@ -138,7 +139,7 @@ fun GroupInfoScreen(
     val addMembersProgress = ((progress - 0.30f) / 0.20f).coerceIn(0f, 1f)
     val addMembersHeight = (72f - addMembersProgress * 72f).coerceIn(0f, 72f).dp
     val addMembersAlpha = (1f - addMembersProgress).coerceIn(0f, 1f)
-    val addMembersOffsetY = (-addMembersProgress * 100f).dp
+    val addMembersOffsetY = (-progress * 400f).dp
 
     // Фон шапки — появляется [0.60..0.75]
     val headerBgAlpha = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
