@@ -200,9 +200,9 @@ fun GroupInfoScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((progress * 60).dp)  // ← как в Contacts: 0 → 60dp
+                .height((progress * 70).dp)  // ← 0 → 70dp (покрывает Row полностью)
                 .background(
-                    androidx.compose.ui.graphics.Color(0xFF0D0D0D)
+                    androidx.compose.ui.graphics.Color(0xFF1F1F1F)
                 )
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(9f)
@@ -212,7 +212,7 @@ fun GroupInfoScreen(
             targetValue = (16f * (1f - (progress * 1.5f).coerceIn(0f, 1f))).dp, label = "outerHPad"
         )
         val outerVPad by androidx.compose.animation.core.animateDpAsState(
-            targetValue = (20f - 8f * progress).dp, label = "outerVPad"
+            targetValue = (12f - 4f * progress).dp, label = "outerVPad"
         )
         val gap by androidx.compose.animation.core.animateDpAsState(
             targetValue = (12f * (1f - (progress * 2.5f).coerceIn(0f, 1f))).dp, label = "gap"
@@ -246,7 +246,6 @@ fun GroupInfoScreen(
                     .clip(RoundedCornerShape(radius))
                     .background(
                         androidx.compose.ui.graphics.Color(0xFF1F1F1F)
-                            .copy(alpha = headerBgAlpha.coerceIn(0f, 1f))
                     )
                     .clickable { onBack() }
                     .padding(horizontal = ovalInnerH, vertical = 8.dp),
