@@ -260,7 +260,7 @@ fun GroupInfoScreen(
                 Spacer(Modifier.width((8f * progress).dp))
                 Box(
                     modifier = Modifier
-                        .size((36f * progress).dp)
+                        .size(36.dp)
                         .clip(CircleShape)
                         .alpha(headerAvatarAlpha)
                 ) {
@@ -275,7 +275,7 @@ fun GroupInfoScreen(
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop
                         )
                     } else {
-                        com.feder.compose.ui.components.GroupAvatar(size = (36f * progress).dp)
+                        com.feder.compose.ui.components.GroupAvatar(size = 36.dp)
                     }
                 }
                 Spacer(Modifier.width((8f * progress).dp))
@@ -289,8 +289,6 @@ fun GroupInfoScreen(
                     modifier = Modifier.weight(1f, fill = false)
                 )
             }
-            // ─── Толкаем правую плашку вправо ───
-            Spacer(Modifier.weight(1f))
             // ─── Зазор: 12 → 0 ───
             Spacer(Modifier.width(gap))
             // ─── ПРАВАЯ ПЛАШКА: 44 → 104dp ───
