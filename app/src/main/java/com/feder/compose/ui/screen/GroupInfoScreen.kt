@@ -135,9 +135,10 @@ fun GroupInfoScreen(
     // Пауза [0.65..0.70]
 
     // Фаза 4: Add Members 56→0dp  [0.70..0.85]
-    val addMembersProgress = ((progress - 0.40f) / 0.25f).coerceIn(0f, 1f)
+    val addMembersProgress = ((progress - 0.30f) / 0.20f).coerceIn(0f, 1f)
     val addMembersHeight = (72f - addMembersProgress * 72f).coerceIn(0f, 72f).dp
     val addMembersAlpha = (1f - addMembersProgress).coerceIn(0f, 1f)
+    val addMembersOffsetY = (-addMembersProgress * 100f).dp
 
     // Фон шапки — появляется [0.60..0.75]
     val headerBgAlpha = ((progress - 0.20f) / 0.35f).coerceIn(0f, 1f)
@@ -413,6 +414,7 @@ fun GroupInfoScreen(
                             .fillMaxWidth()
                             .height(addMembersHeight)
                             .alpha(addMembersAlpha)
+                            .offset(y = addMembersOffsetY)
                             .padding(horizontal = 16.dp)
                             .clickable { onAddMembers() },
                         shape = RoundedCornerShape(16.dp),
