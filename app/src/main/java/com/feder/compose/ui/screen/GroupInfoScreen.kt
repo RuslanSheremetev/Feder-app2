@@ -333,7 +333,7 @@ fun GroupInfoScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .height(330.dp),
+                            .height(320.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // 1) АВАТАРКА — уменьшается на месте
@@ -422,7 +422,9 @@ fun GroupInfoScreen(
                         color = MaterialTheme.colorScheme.surfaceContainerHigh
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(addMembersHeight.coerceAtLeast(0.dp)),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(Icons.Filled.PersonAdd, null,
