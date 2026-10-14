@@ -202,7 +202,7 @@ fun GroupInfoScreen(
                 .fillMaxWidth()
                 .height((progress * 70).dp)  // ← 0 → 70dp (покрывает Row полностью)
                 .background(
-                    androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                    androidx.compose.ui.graphics.Color(0xFF131313)
                 )
                 .align(androidx.compose.ui.Alignment.TopCenter)
                 .zIndex(9f)
@@ -245,7 +245,7 @@ fun GroupInfoScreen(
                     .height(44.dp)
                     .clip(RoundedCornerShape(radius))
                     .background(
-                        androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                        androidx.compose.ui.graphics.Color(0xFF131313)
                     )
                     .clickable { onBack() }
                     .padding(horizontal = ovalInnerH, vertical = 8.dp),
@@ -300,7 +300,7 @@ fun GroupInfoScreen(
                         .height(44.dp)
                         .clip(RoundedCornerShape(searchRadius))
                         .background(
-                            androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+                            androidx.compose.ui.graphics.Color(0xFF131313)
                         )
                         .clickable { showRenameDialog = true },
                     contentAlignment = Alignment.Center
