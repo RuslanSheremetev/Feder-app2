@@ -260,7 +260,7 @@ fun GroupInfoScreen(
                 Spacer(Modifier.width((8f * progress).dp))
                 Box(
                     modifier = Modifier
-                        .size((28f * progress).dp)
+                        .size((36f * progress).dp)
                         .clip(CircleShape)
                         .alpha(headerAvatarAlpha)
                 ) {
@@ -275,7 +275,7 @@ fun GroupInfoScreen(
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop
                         )
                     } else {
-                        com.feder.compose.ui.components.GroupAvatar(size = (28f * progress).dp)
+                        com.feder.compose.ui.components.GroupAvatar(size = (36f * progress).dp)
                     }
                 }
                 Spacer(Modifier.width((8f * progress).dp))
