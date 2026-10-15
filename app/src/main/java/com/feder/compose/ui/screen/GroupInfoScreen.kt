@@ -7,6 +7,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -74,6 +79,32 @@ fun GroupInfoScreen(
     var loading by remember(groupName) { mutableStateOf(cachedMembers.isNullOrEmpty()) }
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
+
+    // ═══ GROUPINFO_MEDIA_UI ═══
+    var mediaUrls by remember(groupName) { mutableStateOf<List<String>>(emptyList()) }
+    var selectedTab by remember(groupName) { mutableIntStateOf(0) }  // 0 = Media, 1 = Links
+
+    LaunchedEffect(groupName) {
+        try {
+            val enc = java.net.URLEncoder.encode(groupName, "UTF-8")
+            val req = okhttp3.Request.Builder()
+                .url("http://2.26.71.102:8004/api/group/media?name=$enc")
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+            val resp = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                okhttp3.OkHttpClient().newCall(req).execute()
+            }
+            val body = resp.body?.string() ?: "{}"
+            val json = org.json.JSONObject(body)
+            val arr = json.optJSONArray("photos") ?: org.json.JSONArray()
+            val list = mutableListOf<String>()
+            for (i in 0 until arr.length()) list.add(arr.getString(i))
+            mediaUrls = list
+        } catch (e: Exception) {
+            android.util.Log.e("GroupInfo", "media load: ${e.message}")
+        }
+    }
+    // ═══ /GROUPINFO_MEDIA_UI ═══
 
     // ═══ Анимация скролла ═══
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -506,6 +537,90 @@ fun GroupInfoScreen(
                     }
                 }
 
+                // ═══ GROUPINFO_MEDIA_UI: табы + сетка ═══
+                if (mediaUrls.isNotEmpty()) {
+                    item {
+                        // Табы: Media / Links
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            listOf("Media", "Links").forEachIndexed { idx, label ->
+                                val active = selectedTab == idx
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = if (active) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                                ) {
+                                    Text(
+                                        label,
+                                        modifier = Modifier
+                                            .clickable { selectedTab = idx }
+                                            .padding(horizontal = 18.dp, vertical = 8.dp),
+                                        color = if (active) MaterialTheme.colorScheme.onPrimary
+                                                else MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    if (selectedTab == 0) {
+                        // ═══ Media: сетка фото 3 колонки ═══
+                        item {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 800.dp)
+                                    .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                userScrollEnabled = false
+                            ) {
+                                gridItems(mediaUrls) { url ->
+                                    Box(
+                                        modifier = Modifier
+                                            .aspectRatio(1f)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(url)
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // ═══ Links: пусто (пока) ═══
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "No links yet",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+                // ═══ /GROUPINFO_MEDIA_UI ═══
                 // Leave Group — отдельно внизу
 // Leave group
                 // === REMOVE_LEAVE_BOTTOM_V3: кнопка Leave Group удалена (item) ===
