@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Videocam
@@ -59,6 +61,7 @@ fun GroupInfoScreen(
     onAddMembers: () -> Unit = {},
     onMemberClick: (String) -> Unit = {},
     onMemberLongClick: (String) -> Unit = {},
+    onOpenMembers: () -> Unit = {},
     reloadKey: Int = 0,
     onMessage: () -> Unit = {},
     isMuted: Boolean = false,
@@ -468,159 +471,38 @@ fun GroupInfoScreen(
                 }
                 }
 
-                // MEMBERS заголовок
+                // ═══ MEMBERS · N → (ведёт на отдельный экран) ═══
                 item {
-                    Text("MEMBERS", fontSize = 12.sp, fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp))
-                }
-
-                // Участники — карточка со списком
-                items(members) { username ->
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .combinedClickable(
-                                onClick = { onMemberClick(username) },
-                                onLongClick = {
-                                    if (isOwner && username != myUsername) {
-                                        memberToRemove = username
-                                    }
-                                }
-                            )
-                            .padding(horizontal = 20.dp, vertical = 10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                            .clickable { onOpenMembers() }
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Аватарка — реальная через feder-avatars (8010), fallback на букву
-                        var avatarError by remember(username) { mutableStateOf(false) }
-                        if (!avatarError) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data("http://2.26.71.102:8010/avatars/$username/avatar.jpg")
-                                    .crossfade(false)
-                                    .build(),
-                                contentDescription = username,
-                                modifier = Modifier.size(44.dp).clip(CircleShape),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                onError = { avatarError = true }
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier.size(44.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(username.firstOrNull()?.uppercase() ?: "?",
-                                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            }
-                        }
+                        Icon(
+                            Icons.Filled.People, null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
                         Spacer(Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(username, fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface)
-                            Text(if (username == groupInfo?.createdBy) "online" else "last seen recently",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        if (username == groupInfo?.createdBy) {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                            ) {
-                                Text("Owner",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
-                            }
-                        }
+                        Text(
+                            "MEMBERS · ${members.size}",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Icon(
+                            Icons.Filled.ChevronRight, null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
-
-                // ═══ GROUPINFO_MEDIA_UI: табы + сетка ═══
-                if (mediaUrls.isNotEmpty()) {
-                    item {
-                        // Табы: Media / Links
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            listOf("Media", "Links").forEachIndexed { idx, label ->
-                                val active = selectedTab == idx
-                                Surface(
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = if (active) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.surfaceContainerHigh
-                                ) {
-                                    Text(
-                                        label,
-                                        modifier = Modifier
-                                            .clickable { selectedTab = idx }
-                                            .padding(horizontal = 18.dp, vertical = 8.dp),
-                                        color = if (active) MaterialTheme.colorScheme.onPrimary
-                                                else MaterialTheme.colorScheme.onSurface,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    if (selectedTab == 0) {
-                        // ═══ Media: сетка фото 3 колонки ═══
-                        item {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(3),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(max = 800.dp)
-                                    .padding(horizontal = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                                userScrollEnabled = false
-                            ) {
-                                gridItems(mediaUrls) { url ->
-                                    Box(
-                                        modifier = Modifier
-                                            .aspectRatio(1f)
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                                    ) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(url)
-                                                .crossfade(true)
-                                                .build(),
-                                            contentDescription = null,
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        // ═══ Links: пусто (пока) ═══
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    "No links yet",
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
-                // ═══ /GROUPINFO_MEDIA_UI ═══
                 // Leave Group — отдельно внизу
 // Leave group
                 // === REMOVE_LEAVE_BOTTOM_V3: кнопка Leave Group удалена (item) ===

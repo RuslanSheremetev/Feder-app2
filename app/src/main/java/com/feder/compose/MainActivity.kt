@@ -75,6 +75,7 @@ import com.feder.compose.data.FederDatabase
 import com.feder.compose.repository.ChatRepository
 import com.feder.compose.ui.screen.NewGroupScreen
 import com.feder.compose.ui.screen.GroupInfoScreen
+import com.feder.compose.ui.screen.GroupMembersScreen
 import com.feder.compose.ui.screen.AddMembersScreen
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -210,6 +211,7 @@ class ChatViewModel : ViewModel() {
     var showNewGroup by mutableStateOf(false)
     var showGroupInfo by mutableStateOf<String?>(null)
     var showAddMembers by mutableStateOf<String?>(null)
+  var showGroupMembers by mutableStateOf<String?>(null)
     var groupReloadCounter by mutableIntStateOf(0)
     var showStories by mutableStateOf(false)
     var storiesFeed by mutableStateOf<List<StoryApi.StoryUser>>(emptyList())
@@ -811,7 +813,7 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null || viewModel.showAddMembers != null) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null || viewModel.showAddMembers != null || viewModel.showGroupMembers != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
                 viewModel.showAddMembers != null -> {
@@ -855,8 +857,33 @@ fun FederApp() {
                         onMuteToggle = { /* TODO mute toggle */ },
                         onVideoCall = { /* TODO video call */ },
                         onMemberLongClick = { /* handled inline in GroupInfoScreen */ },
+                        onOpenMembers = {
+                            viewModel.showGroupMembers = viewModel.showGroupInfo
+                            viewModel.showGroupInfo = null
+                        },
                         groupMembersCache = viewModel.groupMembersCache,
                         groupInfoCache = viewModel.groupInfoCache
+                    )
+                }
+                viewModel.showGroupMembers != null -> {
+                    val gName = viewModel.showGroupMembers!!.removePrefix("group:")
+                    GroupMembersScreen(
+                        groupName = gName,
+                        myUsername = viewModel.currentUsername.ifEmpty { "demo" },
+                        token = viewModel.token,
+                        onBack = { viewModel.showGroupMembers = null },
+                        onAddMembers = {
+                            viewModel.showAddMembers = viewModel.showGroupMembers
+                            viewModel.showGroupMembers = null
+                        },
+                        onMemberClick = { username ->
+                            viewModel.selectedProfile = username
+                            viewModel.showGroupMembers = null
+                        },
+                        onMemberLongClick = { /* handled */ },
+                        members = viewModel.groupMembersCache?.get(gName) ?: emptyList(),
+                        ownerName = "",
+                        isOwner = true
                     )
                 }
                 viewModel.showNewGroup -> {
