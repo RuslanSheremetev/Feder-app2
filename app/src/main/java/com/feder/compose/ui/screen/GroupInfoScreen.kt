@@ -120,14 +120,8 @@ fun GroupInfoScreen(
             (total / 1800f).coerceIn(0f, 1f)
         }
     }
-    val progress by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = rawProgress,
-        animationSpec = androidx.compose.animation.core.tween(
-            durationMillis = 300,
-            easing = androidx.compose.animation.core.FastOutSlowInEasing
-        ),
-        label = "group-header-progress"
-    )
+    // ═══ STATIC_PROGRESS: анимация убрана ═══
+    val progress = 0f
 
     // ═══ GROUPINFO_BANNER_SIMPLE ═══
     // Аватарка — уменьшается и гаснет НА МЕСТЕ
