@@ -356,6 +356,7 @@ fun GroupInfoScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
                 // ═══ GROUPINFO_BANNER_SIMPLE ═══
+
                 item {
                     Box(
                         Modifier
@@ -432,6 +433,38 @@ fun GroupInfoScreen(
                                 tint = MaterialTheme.colorScheme.error,
                                 onClick = { })
                         }
+                    }
+                }
+                // ═══ MEMBERS · N → (ведёт на отдельный экран) ═══
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                            .clickable { onOpenMembers() }
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Filled.People, null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            "MEMBERS · ${members.size}",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Icon(
+                            Icons.Filled.ChevronRight, null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
                 // ═══ MediaTabsBlock: табы + сетка ═══
@@ -515,38 +548,6 @@ fun GroupInfoScreen(
                     }
                 }
                 // ═══ /MediaTabsBlock ═══
-                // ═══ MEMBERS · N → (ведёт на отдельный экран) ═══
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                            .clickable { onOpenMembers() }
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Filled.People, null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(
-                            "MEMBERS · ${members.size}",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(Modifier.weight(1f))
-                        Icon(
-                            Icons.Filled.ChevronRight, null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
                 // Leave Group — отдельно внизу
 // Leave group
                 // === REMOVE_LEAVE_BOTTOM_V3: кнопка Leave Group удалена (item) ===
