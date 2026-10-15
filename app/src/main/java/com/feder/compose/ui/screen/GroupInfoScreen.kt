@@ -434,37 +434,87 @@ fun GroupInfoScreen(
                         }
                     }
                 }
-                // Add Members — отдельная карточка
-                if (addMembersProgress < 1f) {
-                item {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(addMembersHeight)
-                            .alpha(addMembersAlpha)
-                            .offset(y = addMembersOffsetY)
-                            .padding(horizontal = 16.dp)
-                            .clickable { onAddMembers() },
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh
-                    ) {
+                // ═══ MediaTabsBlock: табы + сетка ═══
+                if (mediaUrls.isNotEmpty()) {
+                    item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(addMembersHeight.coerceAtLeast(0.dp)),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(Icons.Filled.PersonAdd, null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp))
-                            Spacer(Modifier.width(16.dp))
-                            Text("Add Members", fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.primary)
+                            listOf("Media", "Links").forEachIndexed { idx, label ->
+                                val active = selectedTab == idx
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = if (active) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                                ) {
+                                    Text(
+                                        label,
+                                        modifier = Modifier
+                                            .clickable { selectedTab = idx }
+                                            .padding(horizontal = 18.dp, vertical = 8.dp),
+                                        color = if (active) MaterialTheme.colorScheme.onPrimary
+                                                else MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    if (selectedTab == 0) {
+                        item {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 800.dp)
+                                    .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                userScrollEnabled = false
+                            ) {
+                                gridItems(mediaUrls) { url ->
+                                    Box(
+                                        modifier = Modifier
+                                            .aspectRatio(1f)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(url)
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "No links yet",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
-                }
-
+                // ═══ /MediaTabsBlock ═══
                 // ═══ MEMBERS · N → (ведёт на отдельный экран) ═══
                 item {
                     Row(
