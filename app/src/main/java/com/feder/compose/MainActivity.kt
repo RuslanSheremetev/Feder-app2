@@ -1191,7 +1191,7 @@ fun FederApp() {
                                 }
                                 LaunchedEffect(user.username, viewModel.showStories) {
                                     if (viewModel.showStories) {
-                                        kotlinx.coroutines.delay(idx * 120L)
+                                        kotlinx.coroutines.delay(idx * 150L)
                                         visible = true
                                     } else {
                                         visible = false
@@ -1203,12 +1203,12 @@ fun FederApp() {
                                     label = "story_alpha_${user.username}"
                                 )
                                 val staggerOffsetY by animateFloatAsState(
-                                    targetValue = if (visible) 0f else -80f,
+                                    targetValue = if (visible) 0f else -100f,
                                     animationSpec = tween(durationMillis = 260),
                                     label = "story_y_${user.username}"
                                 )
                                 val staggerScale by animateFloatAsState(
-                                    targetValue = if (visible) 1f else 0.6f,
+                                    targetValue = if (visible) 1f else 0.5f,
                                     animationSpec = tween(durationMillis = 260),
                                     label = "story_scale_${user.username}"
                                 )
