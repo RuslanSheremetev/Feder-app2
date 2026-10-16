@@ -8,6 +8,12 @@ import com.feder.compose.stories.StoryApi
 import com.feder.compose.stories.StoryPicker
 import com.feder.compose.stories.StoryViewer
 import androidx.compose.runtime.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.alpha
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.*
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -1172,15 +1178,48 @@ fun FederApp() {
                                 Spacer(Modifier.height(4.dp))
                                 Text("My story", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            // Contact stories (из API)
+                            // Contact stories (из API) — STAGGER_STORIES_V1
                             viewModel.storiesFeed.forEachIndexed { idx, user ->
                                 val hasUnread = user.stories.any { !it.viewed }
                                 val ringColor = if (hasUnread) Color(0xFF2AABEE) else Color(0xFF555555)
                                 val avatarFullUrl = if (user.avatarUrl.startsWith("http")) user.avatarUrl
                                     else "http://2.26.71.102:8010" + user.avatarUrl
+
+                                // STAGGER: появление с задержкой idx * 70ms
+                                var visible by remember(user.username, viewModel.showStories) {
+                                    mutableStateOf(false)
+                                }
+                                LaunchedEffect(user.username, viewModel.showStories) {
+                                    if (viewModel.showStories) {
+                                        kotlinx.coroutines.delay(idx * 70L)
+                                        visible = true
+                                    } else {
+                                        visible = false
+                                    }
+                                }
+                                val staggerAlpha by animateFloatAsState(
+                                    targetValue = if (visible) 1f else 0f,
+                                    animationSpec = tween(durationMillis = 220),
+                                    label = "story_alpha_${user.username}"
+                                )
+                                val staggerOffsetY by animateFloatAsState(
+                                    targetValue = if (visible) 0f else -30f,
+                                    animationSpec = tween(durationMillis = 260),
+                                    label = "story_y_${user.username}"
+                                )
+                                val staggerScale by animateFloatAsState(
+                                    targetValue = if (visible) 1f else 0.6f,
+                                    animationSpec = tween(durationMillis = 260),
+                                    label = "story_scale_${user.username}"
+                                )
+
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.clickable { viewModel.storyUserIndex = idx }
+                                    modifier = Modifier
+                                        .alpha(staggerAlpha)
+                                        .offset(y = staggerOffsetY.dp)
+                                        .scale(staggerScale)
+                                        .clickable { viewModel.storyUserIndex = idx }
                                 ) {
                                     Box(
                                         modifier = Modifier.size(68.dp).clip(CircleShape).border(2.dp, ringColor, CircleShape),
