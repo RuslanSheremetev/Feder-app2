@@ -229,7 +229,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInParent()) }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
+    Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()) }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         // Динамический размер фото через Coil painter
@@ -1798,8 +1798,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     // FIX_TAPCOORDS: ловим координаты тапа
                                     detectTapGestures { local ->
                                         if (!selectionMode) {
-                                            val base = msgPositions[msg.id]
-                                            if (base != null) {
+                                            msgPositions[msg.id]?.let { base ->
                                                 menuAbsOffset = androidx.compose.ui.geometry.Offset(
                                                     base.x + local.x,
                                                     base.y + local.y
