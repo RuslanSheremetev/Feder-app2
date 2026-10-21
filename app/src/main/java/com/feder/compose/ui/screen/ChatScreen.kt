@@ -1838,6 +1838,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             // fallback: сохраняем msg.posX/posY как есть
                                             selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         }
+                                        // FIX_MENU_FINAL: передаем координаты в Popup
+                                        menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         selectedMessage = msg
                                     }
                                 },
