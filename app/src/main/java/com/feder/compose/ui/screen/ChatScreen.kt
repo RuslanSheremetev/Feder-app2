@@ -1844,6 +1844,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                         // FIX_MENU_FINAL: передаем координаты в Popup
                                         menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
+                                        android.widget.Toast.makeText(context, "X: ${selectedMessageOffset.x.toInt()}, Y: ${selectedMessageOffset.y.toInt()}\nLazyX: ${lazyColumnOffset.x.toInt()}, LazyY: ${lazyColumnOffset.y.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
                                         selectedMessage = msg
                                     }
                                 },
