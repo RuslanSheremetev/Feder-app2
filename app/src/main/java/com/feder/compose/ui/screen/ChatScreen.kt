@@ -813,6 +813,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var deleteForAll by remember { mutableStateOf(false) }
     var messageToDelete by remember { mutableStateOf<MsgItem?>(null) }
     var menuAbsOffset by remember { mutableStateOf<androidx.compose.ui.geometry.Offset?>(null) }
+    var lazyColumnOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var editMessage by remember { mutableStateOf<MsgItem?>(null) }
@@ -1918,7 +1919,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Spacer(Modifier.height(8.dp))
                 
                 // Chat list for forward
-                LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+                LazyColumn(modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .onGloballyPositioned { coords -> lazyColumnOffset = coords.positionInWindow() }
+                ) {
                     items(allChats.filter { it.username != myUsername && it.username != "123" }, key = { it.username }) { contact ->
                         val name = contact.name
                         val avatar = contact.avatarUrl ?: ""
