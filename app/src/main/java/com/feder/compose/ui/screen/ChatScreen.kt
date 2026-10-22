@@ -2167,7 +2167,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_check_circle), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Select", color = OnSurface, fontSize = 16.sp)
                             }
-                            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
                             Row(Modifier.fillMaxWidth().clickable {
                                 messageToDelete = selectedMessage
                                 deleteForAll = false
@@ -2175,8 +2174,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 selectedMessage = null
                                 showDeleteSub = false
                             }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                                Icon(Icons.Filled.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp)
                             }
                             if (false && showDeleteSub) {
                                 Column {
