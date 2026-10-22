@@ -809,6 +809,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var inputText by remember { mutableStateOf("") }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deleteForAll by remember { mutableStateOf(false) }
+    var messageToDelete by remember { mutableStateOf<MsgItem?>(null) }
     var menuAbsOffset by remember { mutableStateOf<androidx.compose.ui.geometry.Offset?>(null) }
     var selectedMessageOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
@@ -2165,11 +2168,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Icon(painter = painterResource(R.drawable.ic_check_circle), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Select", color = OnSurface, fontSize = 16.sp)
                             }
                             HorizontalDivider(color = OutlineVariant.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
-                            Row(Modifier.fillMaxWidth().clickable { showDeleteSub = !showDeleteSub }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.fillMaxWidth().clickable {
+                                messageToDelete = selectedMessage
+                                deleteForAll = false
+                                showDeleteDialog = true
+                                selectedMessage = null
+                                showDeleteSub = false
+                            }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                                Icon(if (showDeleteSub) Icons.Filled.ExpandMore else Icons.Filled.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
+                                Icon(Icons.Filled.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(20.dp))
                             }
-                            if (showDeleteSub) {
+                            if (false && showDeleteSub) {
                                 Column {
                                     // ─── Delete for me: пометить в БД + локально скрыть ───
                                     Row(Modifier.fillMaxWidth().clickable {
@@ -2684,6 +2693,63 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
             }
         }
+        
+        // ─── ДИАЛОГ ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ───
+        if (showDeleteDialog && messageToDelete != null) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showDeleteDialog = false; messageToDelete = null },
+                title = { Text("Delete message?") },
+                text = {
+                    Column {
+                        Text("Are you sure you want to delete this message?")
+                        Spacer(Modifier.height(12.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            androidx.compose.material3.Checkbox(
+                                checked = deleteForAll,
+                                onCheckedChange = { deleteForAll = it }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Delete for everyone", color = OnSurface)
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val m = messageToDelete
+                        if (m != null) {
+                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                try {
+                                    val body = org.json.JSONObject().apply {
+                                        put("id", m.id)
+                                        put("forAll", deleteForAll)
+                                        put("user", myUsername)
+                                    }
+                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                    conn.requestMethod = "POST"
+                                    conn.setRequestProperty("Content-Type", "application/json")
+                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                    conn.doOutput = true
+                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                    conn.responseCode
+                                    conn.disconnect()
+                                } catch (e: Exception) {
+                                    android.util.Log.e("ChatScreen", "delete fail: ${e.message}")
+                                }
+                            }
+                            // Локальное удаление
+                            messages = messages.filter { it.id != m.id }
+                        }
+                        showDeleteDialog = false
+                        messageToDelete = null
+                        deleteForAll = false
+                    }) { Text("Delete", color = Error) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false; messageToDelete = null }) { Text("Cancel") }
+                }
+            )
+        }
+
         // Кнопка прокрутки вниз
         // Полноэкранный просмотр
         // FIX_VIEWER_IN_CHAT: заменяем на Telegram-style PhotoViewer
