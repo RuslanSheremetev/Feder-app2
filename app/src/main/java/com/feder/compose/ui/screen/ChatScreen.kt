@@ -1297,8 +1297,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
     fun sendMessage() {
         if (isSending) {
-            android.widget.Toast.makeText(context, "⏳ Уже отправляется...", android.widget.Toast.LENGTH_SHORT).show()
-            return
+                        return
         }
         isSending = true
         
@@ -1844,8 +1843,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                         // FIX_MENU_FINAL: передаем координаты в Popup
                                         menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
-                                        android.widget.Toast.makeText(context, "X: ${selectedMessageOffset.x.toInt()}, Y: ${selectedMessageOffset.y.toInt()}\nLazyX: ${lazyColumnOffset.x.toInt()}, LazyY: ${lazyColumnOffset.y.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
-                                        selectedMessage = msg
+                                                                                selectedMessage = msg
                                     }
                                 },
                             
@@ -2103,8 +2101,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Column(
                     modifier = Modifier
                         .offset(
-                            x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x - lazyColumnOffset.x).toDp() },
-                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y - lazyColumnOffset.y - 200f).toDp() }
+                            x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x).toDp() },
+                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y - 450f).toDp() }
                         )
                         .padding(end = 16.dp),
                     horizontalAlignment = Alignment.End
