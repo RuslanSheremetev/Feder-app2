@@ -1839,15 +1839,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     } else {
                                         // FIX_MENU_CLEAN_V1: сохраняем координаты для popup
-                                        val pos = msgPositions[msg.id]
-                                        if (pos != null && (pos.x > 1f || pos.y > 1f)) {
-                                            msg.posX = pos.x
-                                            msg.posY = pos.y
-                                            selectedMessageOffset = pos
-                                        } else {
-                                            // fallback: сохраняем msg.posX/posY как есть
-                                            selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
-                                        }
+                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         // FIX_MENU_FINAL: передаем координаты в Popup
                                         menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                                                                 selectedMessage = msg
