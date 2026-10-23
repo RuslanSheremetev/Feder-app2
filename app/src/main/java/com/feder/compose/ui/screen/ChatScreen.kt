@@ -2107,7 +2107,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     modifier = Modifier
                         .offset(
                             x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x).toDp() },
-                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y - 450f).toDp() }
+                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y - listState.firstVisibleItemScrollOffset - 450f).toDp() }
                         )
                         .padding(end = 16.dp),
                     horizontalAlignment = Alignment.End
