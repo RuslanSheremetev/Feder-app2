@@ -2088,7 +2088,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
-            val _anchor = menuAbsOffset
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false; menuAbsOffset = null },
                 popupPositionProvider = remember {
@@ -2099,7 +2098,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             layoutDirection: androidx.compose.ui.unit.LayoutDirection,
                             popupContentSize: androidx.compose.ui.unit.IntSize
                         ): androidx.compose.ui.unit.IntOffset {
-                            val a = _anchor
+                            val a = selectedMessageOffset
                             if (a == null) return androidx.compose.ui.unit.IntOffset(40, 200)
                             // FIX_TAPCOORDS: меню появляется в точке тапа, со сдвигом чтобы не под пальцем
                             val x = a.x.toInt().coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0))
