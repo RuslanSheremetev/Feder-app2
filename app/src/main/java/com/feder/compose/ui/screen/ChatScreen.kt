@@ -207,7 +207,8 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
+    onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
 onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
 
     // ═══ Стикер? Рисуем матрёшку + текст и ВЫХОДИМ ═══
@@ -275,13 +276,19 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
         val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
 val isAudioMsg = firstImageOrAudioUrl != null && com.feder.compose.audio.IsAudio.isAudioFile(firstImageOrAudioUrl)
-Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.combinedClickable(
-            onClick = onClick ?: {},
-            onLongClick = {
-                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                onLongClick?.invoke()
-            }
-        ) else Modifier).clip(RoundedCornerShape(ts, te, be, bs)).background(
+Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
+            detectTapGestures(
+                onTap = { localOffset ->
+                    onTapWithCoords?.invoke(localOffset)
+                    onClick?.invoke()
+                },
+                onLongPress = { localOffset ->
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    onTapWithCoords?.invoke(localOffset)
+                    onLongClick?.invoke()
+                }
+            )
+        } else Modifier).clip(RoundedCornerShape(ts, te, be, bs)).background(
             Brush.verticalGradient(
                 colors = if (isMine) listOf(Color(0xFF5EA8FF), Color(0xFF339DFF))
                          else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
@@ -1848,6 +1855,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 },
                             
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
+                            onTapWithCoords = { localOffset ->
+                                val screenX = msg.posX + localOffset.x
+                                val screenY = msg.posY + localOffset.y
+                                selectedMessageOffset = androidx.compose.ui.geometry.Offset(screenX, screenY)
+                                menuAbsOffset = selectedMessageOffset
+                                android.widget.Toast.makeText(context, "X: ${screenX.toInt()}, Y: ${screenY.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
+                            },
                             // FIX_HERO_STEP3_V4: сохраняем координаты тапнутого фото в top-level
                             onPhotoRectReady = { rect ->
                                 photoSourceX = rect.left
