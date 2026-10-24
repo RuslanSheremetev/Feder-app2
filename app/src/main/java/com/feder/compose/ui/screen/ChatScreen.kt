@@ -816,6 +816,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var inputText by remember { mutableStateOf("") }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var selectedMessageIsMine by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var deleteForAll by remember { mutableStateOf(false) }
     var messageToDelete by remember { mutableStateOf<MsgItem?>(null) }
@@ -1843,6 +1844,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         // FIX_MENU_FINAL: передаем координаты в Popup
                                         menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                                                                 selectedMessage = msg
+                                        selectedMessageIsMine = (msg.from == myUsername)
                                     }
                                 },
                             
@@ -2106,7 +2108,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Column(
                     modifier = Modifier
                         .offset(
-                            x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x).toDp() },
+                            x = with(androidx.compose.ui.platform.LocalDensity.current) {
+                            val config = androidx.compose.ui.platform.LocalConfiguration.current
+                            if (selectedMessageIsMine) {
+                                (config.screenWidthDp.dp - 250.dp - 16.dp)
+                            } else {
+                                16.dp
+                            }
+                        },
                             y = with(androidx.compose.ui.platform.LocalDensity.current) {
                                 val baseY = selectedMessageOffset.y - listState.firstVisibleItemScrollOffset
                                 // Если меню не влезает сверху, ставим его ПОД сообщением
