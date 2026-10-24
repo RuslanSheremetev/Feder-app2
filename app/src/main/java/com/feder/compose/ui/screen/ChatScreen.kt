@@ -816,6 +816,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
     var inputText by remember { mutableStateOf("") }
     var selectedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    val config = androidx.compose.ui.platform.LocalConfiguration.current
+    val screenWidthDp = config.screenWidthDp
     var showDeleteDialog by remember { mutableStateOf(false) }
     var deleteForAll by remember { mutableStateOf(false) }
     var messageToDelete by remember { mutableStateOf<MsgItem?>(null) }
@@ -1846,7 +1848,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessageOffset = pos
                                         } else {
                                             // fallback: сохраняем msg.posX/posY как есть
-                                            selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
+                                            // Ищем реальную позицию элемента в listState
+                                        val visibleItem = listState.layoutInfo.visibleItemsInfo.find { it.key == msg.id }
+                                        val realY = visibleItem?.offset?.toFloat() ?: (msg.posY - listState.firstVisibleItemScrollOffset)
+                                        // X: для правых - справа, для левых - слева
+                                        val realX = if (msg.from == myUsername) (screenWidthDp - 250 - 16).toFloat() else 16f
+                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY)
+                                        android.widget.Toast.makeText(context, "X: ${realX.toInt()}, Y: ${realY.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
                                         }
                                         // FIX_MENU_FINAL: передаем координаты в Popup
                                         menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
