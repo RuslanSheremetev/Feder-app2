@@ -2119,10 +2119,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             y = with(androidx.compose.ui.platform.LocalDensity.current) {
                                 val baseY = selectedMessageOffset.y - listState.firstVisibleItemScrollOffset
                                 // Если меню не влезает сверху, ставим его ПОД сообщением
-                                if (baseY - 450f < 0f) {
-                                    (baseY + 100f).toDp()
+                                if (baseY - 300f < 0f) {
+                                    (baseY + 20f).toDp()
                                 } else {
-                                    (baseY - 450f).toDp()
+                                    (baseY - 300f).toDp()
                                 }
                             }
                         )
