@@ -2089,6 +2089,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
                 Box(Modifier.wrapContentSize().clickable { selectedMessage = null; showDeleteSub = false }) {
+                val isMine = selectedMessage?.from == myUsername
                 Column(
                     modifier = Modifier,
                         
