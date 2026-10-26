@@ -1840,35 +1840,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
-                                        // FIX_MENU_CLEAN_V1: сохраняем координаты для popup
-                                        val pos = msgPositions[msg.id]
-                                        if (pos != null && (pos.x > 1f || pos.y > 1f)) {
-                                            msg.posX = pos.x
-                                            msg.posY = pos.y
-                                            selectedMessageOffset = pos
-                                        } else {
-                                            // fallback: сохраняем msg.posX/posY как есть
-                                            // Ищем реальную позицию элемента в listState
+                                        // Вычисляем координаты для меню
+                                        val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
+                                        val realX = if (isMine) (screenWidthDp - 200f) else 16f
                                         val visibleItem = listState.layoutInfo.visibleItemsInfo.find { it.key == msg.id }
-                                        val realY = visibleItem?.offset?.toFloat() ?: (msg.posY - listState.firstVisibleItemScrollOffset)
-                                        // X: для правых - справа, для левых - слева
-                                        val realX = if (msg.from == myUsername) (screenWidthDp - 250 - 16).toFloat() else 16f
-                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY)
-                                        android.widget.Toast.makeText(context, "X: ${realX.toInt()}, Y: ${realY.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
-                                        }
-                                        // FIX_MENU_FINAL: передаем координаты в Popup
-                                        menuAbsOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
-                                                                                selectedMessage = msg
+                                        val listOffset = visibleItem?.offset?.toFloat() ?: msg.posY
+                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, listOffset + 100f)
+                                        selectedMessage = msg
                                     }
                                 },
-                            
                             onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
                             onTapWithCoords = { localOffset ->
-                                val screenX = msg.posX + localOffset.x
-                                val screenY = msg.posY + localOffset.y
-                                selectedMessageOffset = androidx.compose.ui.geometry.Offset(screenX, screenY)
-                                menuAbsOffset = selectedMessageOffset
-                                android.widget.Toast.makeText(context, "X: ${screenX.toInt()}, Y: ${screenY.toInt()}", android.widget.Toast.LENGTH_SHORT).show()
+                                
+                                // onClick уже вычислил координаты
+                            
                             },
                             // FIX_HERO_STEP3_V4: сохраняем координаты тапнутого фото в top-level
                             onPhotoRectReady = { rect ->
@@ -2094,7 +2079,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         
-        
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
             Popup(
@@ -2122,10 +2106,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Box(Modifier.fillMaxSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(
                     modifier = Modifier
-                        .offset(
-                            x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x).toDp() },
-                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y ).toDp() }
-                        )
                         .padding(end = 16.dp),
                     horizontalAlignment = Alignment.End
                 ) {
@@ -2280,7 +2260,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
                 }
-
         // Attach Sheet
         if (showAttachSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false; selectedPhotos = emptySet() })
