@@ -1841,8 +1841,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
-                                        // Используем координаты, сохраненные из onGloballyPositioned выше
-                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
+                                        val savedPos = msgPositions[msg.id]
+                                        val realX = savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: if (isMine) (screenWidthDp - 200f) else 16f
+                                        val realY = savedPos?.y?.takeIf { it > 0f } ?: msg.posY.takeIf { it > 0f } ?: 300f
+                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY + 10f)
                                         selectedMessage = msg
                                     }
                                 },
