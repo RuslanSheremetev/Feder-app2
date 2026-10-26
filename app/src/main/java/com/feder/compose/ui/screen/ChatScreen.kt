@@ -2083,10 +2083,254 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (selectedMessage != null && !showForward) {
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false; menuAbsOffset = null },
-                offset = androidx.compose.ui.unit.IntOffset(
-                    x = selectedMessageOffset.x.toInt(),
-                    y = selectedMessageOffset.y.toInt()
-                ),
+                popupPositionProvider = remember {
+                    object : androidx.compose.ui.window.PopupPositionProvider {
+                        override fun calculatePosition(
+                            anchorBounds: androidx.compose.ui.unit.IntRect,
+                            windowSize: androidx.compose.ui.unit.IntSize,
+                            layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+                            popupContentSize: androidx.compose.ui.unit.IntSize
+                        ): androidx.compose.ui.unit.IntOffset {
+                            val a = selectedMessageOffset
+                            if (a == null) return androidx.compose.ui.unit.IntOffset(40, 200)
+                            // FIX_TAPCOORDS: меню появляется в точке тапа, со сдвигом чтобы не под пальцем
+                            val x = a.x.toInt().coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0))
+                            val y = (a.y.toInt() - popupContentSize.height - 20)
+                                .coerceIn(0, (windowSize.height - popupContentSize.height).coerceAtLeast(0))
+                            return androidx.compose.ui.unit.IntOffset(x, y)
+                        }
+                    }
+                }
+            ) {
+                // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
+                Box(Modifier.wrapContentSize().clickable { selectedMessage = null; showDeleteSub = false }) {
+                Column(
+                    modifier = Modifier
+                        .padding(end = 16.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                        var showAllReactions by remember { mutableStateOf(false) }
+                    val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
+                    Surface(shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
+                        Column {
+                            if (!showAllReactions) {
+                                Row(Modifier.padding(horizontal = 10.dp, vertical = 5.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    allReactions.take(6).forEach { emoji ->
+                                        Box(Modifier.size(30.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 18.sp) }
+                                    }
+                                    Box(Modifier.size(30.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = true }, contentAlignment = Alignment.Center) {
+                                        Text("›", color = OnSurfaceVariant, fontSize = 16.sp)
+                                    }
+                                }
+                            } else {
+                                Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                                Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Reactions", color = OnSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
+                                        Box(Modifier.size(28.dp).clip(CircleShape).background(SurfaceContainerHigh).clickable { showAllReactions = false }, contentAlignment = Alignment.Center) {
+                                            Text("✕", color = OnSurfaceVariant, fontSize = 14.sp)
+                                        }
+                                    }
+                                    allReactions.chunked(6).forEach { row ->
+                                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                                            row.forEach { emoji ->
+                                                Box(Modifier.size(40.dp).clip(CircleShape).clickable { val mid = selectedMessage?.id ?: 0L; if (mid > 0L) toggleReactionApi(mid, emoji); selectedMessage = null }, contentAlignment = Alignment.Center) { Text(emoji, fontSize = 24.sp) }
+                                            }
+                                            repeat(6 - row.size) { Spacer(Modifier.size(40.dp)) }
+                                        }
+                                    }
+                                }
+                                }
+                            }
+                        }
+                    }
+                    if (!showAllReactions) {
+                    Spacer(Modifier.height(12.dp))
+                    Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Column(Modifier.width(220.dp)) {
+                            Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
+                            }
+                            if (selectedMessage?.from == myUsername) {
+                                Row(Modifier.fillMaxWidth().clickable { editMessage = selectedMessage; inputText = selectedMessage?.text ?: ""; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(painter = painterResource(R.drawable.ic_edit_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
+                                }
+                            }
+                            Row(Modifier.fillMaxWidth().clickable { val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager; cm.setPrimaryClip(android.content.ClipData.newPlainText("msg", selectedMessage!!.text)); android.util.Log.d("ChatScreen", "Copied"); selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painter = painterResource(R.drawable.ic_copy_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Copy", color = OnSurface, fontSize = 16.sp)
+                            }
+                            Row(Modifier.fillMaxWidth().clickable {
+                                // Forward из popup: добавить текущее сообщение в selectedMessages
+                                selectedMessage?.let { m ->
+                                    selectedMessages = selectedMessages + m.id.toString()
+                                }
+                                selectionMode = true
+                                showForward = true
+                                forwardSelected = emptySet()
+                                selectedMessage = null
+                            }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painter = painterResource(R.drawable.ic_forward_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Forward", color = OnSurface, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                            }
+                            Row(Modifier.fillMaxWidth().clickable {
+                                selectedMessage?.let { m ->
+                                    selectionMode = true
+                                    selectedMessages = setOf(m.id.toString())
+                                }
+                                selectedMessage = null
+                            }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painter = painterResource(R.drawable.ic_check_circle), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Select", color = OnSurface, fontSize = 16.sp)
+                            }
+                            Row(Modifier.fillMaxWidth().clickable {
+                                messageToDelete = selectedMessage
+                                deleteForAll = false
+                                showDeleteDialog = true
+                                selectedMessage = null
+                                showDeleteSub = false
+                            }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp)
+                            }
+                            if (false && showDeleteSub) {
+                                Column {
+                                    // ─── Delete for me: пометить в БД + локально скрыть ───
+                                    Row(Modifier.fillMaxWidth().clickable {
+                                        val m = selectedMessage
+                                        messages = messages.filter { it != m }
+                                        selectedMessage = null
+                                        showDeleteSub = false
+                                        if (m != null && m.id > 0) {
+                                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                try {
+                                                    val body = org.json.JSONObject().apply {
+                                                        put("id", m.id)
+                                                        put("forAll", false)
+                                                        put("user", myUsername)
+                                                    }
+                                                    val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                                    conn.requestMethod = "POST"
+                                                    conn.setRequestProperty("Content-Type", "application/json")
+                                                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                    conn.doOutput = true
+                                                    conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                    conn.responseCode
+                                                    conn.disconnect()
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("ChatScreen", "delete for me fail: ${e.message}")
+                                                }
+                                            }
+                                        }
+                                    }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for me", color = OnSurface, fontSize = 14.sp) }
+
+                                    // ─── Delete for all: только для своих сообщений ───
+                                    if (selectedMessage?.from == myUsername) {
+                                        Row(Modifier.fillMaxWidth().clickable {
+                                            val m = selectedMessage
+                                            messages = messages.filter { it != m }
+                                            selectedMessage = null
+                                            showDeleteSub = false
+                                            if (m != null && m.id > 0) {
+                                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                    try {
+                                                        val body = org.json.JSONObject().apply {
+                                                            put("id", m.id)
+                                                            put("forAll", true)
+                                                            put("user", myUsername)
+                                                        }
+                                                        val conn = java.net.URL("http://2.26.71.102:8004/api/chat/delete").openConnection() as java.net.HttpURLConnection
+                                                        conn.requestMethod = "POST"
+                                                        conn.setRequestProperty("Content-Type", "application/json")
+                                                        if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer $token")
+                                                        conn.doOutput = true
+                                                        conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                                        conn.responseCode
+                                                        conn.disconnect()
+                                                    } catch (e: Exception) {
+                                                        android.util.Log.e("ChatScreen", "delete for all fail: ${e.message}")
+                                                    }
+                                                }
+                                            }
+                                        }.padding(horizontal = 16.dp, vertical = 12.dp).padding(start = 32.dp)) { Text("Delete for all", color = Error, fontSize = 14.sp) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    }
+                }
+            }
+        }
+                }
+        // Attach Sheet
+        if (showAttachSheet) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false; selectedPhotos = emptySet() })
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier)
+                    .align(Alignment.BottomCenter)
+                    .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            if (dragAmount < -50) attachExpanded = true
+                            if (dragAmount > 50 && attachExpanded) attachExpanded = false
+                        }
+                    }
+            ) {
+                // Selected photos preview
+                if (selectedPhotos.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        selectedPhotos.forEach { uri ->
+                            Box(modifier = Modifier.size(48.dp)) {
+                                val mime = context.contentResolver.getType(uri)
+                                val isImg = mime?.startsWith("image/") == true
+                                if (isImg) {
+                                    AsyncImage(
+                                        model = uri,
+                                        contentDescription = "selected",
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(SurfaceContainerHigh),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Filled.Description, "file", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                                    }
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .align(Alignment.TopEnd)
+                                        .background(PrimaryContainer, CircleShape)
+                                        .clickable { 
+                                            selectedPhotos = selectedPhotos - uri
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.Close, null, tint = OnPrimaryContainer, modifier = Modifier.size(12.dp))
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                // Drag handle
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                if (dragAmount < -50) attachExpanded = true
+                                if (dragAmount > 50 && attachExpanded) attachExpanded = false
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
