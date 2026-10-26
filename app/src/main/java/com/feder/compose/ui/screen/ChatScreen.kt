@@ -1842,7 +1842,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     } else {
                                         val savedPos = msgPositions[msg.id]
-                                        val realX = savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: if (isMine) (screenWidthDp - 200f) else 16f
+                                        val realX = savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: if (isMine) (screenWidthDp - 260f) else 16f
                                         val realY = savedPos?.y?.takeIf { it > 0f } ?: msg.posY.takeIf { it > 0f } ?: 300f
                                         selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY + 10f)
                                         selectedMessage = msg
@@ -2092,7 +2092,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Column(
                     modifier = Modifier
                         .padding(end = 16.dp),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = if (isMine) Alignment.End else Alignment.Start
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
