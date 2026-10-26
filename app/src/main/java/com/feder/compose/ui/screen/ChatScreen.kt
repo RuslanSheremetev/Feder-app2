@@ -233,6 +233,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()) }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+        val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
         // Динамический размер фото через Coil painter
         val density = androidx.compose.ui.platform.LocalDensity.current
         val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
@@ -1841,7 +1842,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     } else {
                                         // Вычисляем координаты для меню
-                                        val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
                                         val realX = if (isMine) (screenWidthDp - 200f) else 16f
                                         val visibleItem = listState.layoutInfo.visibleItemsInfo.find { it.key == msg.id }
                                         val listOffset = visibleItem?.offset?.toFloat() ?: msg.posY
