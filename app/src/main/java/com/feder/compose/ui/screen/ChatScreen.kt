@@ -2083,24 +2083,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (selectedMessage != null && !showForward) {
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false; menuAbsOffset = null },
-                popupPositionProvider = remember {
-                    object : androidx.compose.ui.window.PopupPositionProvider {
-                        override fun calculatePosition(
-                            anchorBounds: androidx.compose.ui.unit.IntRect,
-                            windowSize: androidx.compose.ui.unit.IntSize,
-                            layoutDirection: androidx.compose.ui.unit.LayoutDirection,
-                            popupContentSize: androidx.compose.ui.unit.IntSize
-                        ): androidx.compose.ui.unit.IntOffset {
-                            val a = selectedMessageOffset
-                            if (a == null) return androidx.compose.ui.unit.IntOffset(40, 200)
-                            // FIX_TAPCOORDS: меню появляется в точке тапа, со сдвигом чтобы не под пальцем
-                            val x = a.x.toInt().coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0))
-                            val y = (a.y.toInt() - popupContentSize.height - 20)
-                                .coerceIn(0, (windowSize.height - popupContentSize.height).coerceAtLeast(0))
-                            return androidx.compose.ui.unit.IntOffset(x, y)
-                        }
-                    }
-                }
+                offset = androidx.compose.ui.unit.IntOffset(
+                    x = selectedMessageOffset.x.toInt(),
+                    y = selectedMessageOffset.y.toInt()
+                ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
                 Box(Modifier.wrapContentSize().clickable { selectedMessage = null; showDeleteSub = false }) {
