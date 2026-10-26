@@ -2091,7 +2091,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Box(Modifier.wrapContentSize().clickable { selectedMessage = null; showDeleteSub = false }) {
                 Column(
                     modifier = Modifier
-                        .padding(end = 16.dp),
+                        
                     horizontalAlignment = if (isMine) Alignment.End else Alignment.Start
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
