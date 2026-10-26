@@ -2094,6 +2094,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         
+        
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
             Popup(
@@ -2123,7 +2124,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     modifier = Modifier
                         .offset(
                             x = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.x).toDp() },
-                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y - 450f).toDp() }
+                            y = with(androidx.compose.ui.platform.LocalDensity.current) { (selectedMessageOffset.y ).toDp() }
                         )
                         .padding(end = 16.dp),
                     horizontalAlignment = Alignment.End
@@ -2279,6 +2280,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
                 }
+
         // Attach Sheet
         if (showAttachSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable { showAttachSheet = false; selectedPhotos = emptySet() })
