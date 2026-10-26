@@ -1832,7 +1832,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             allChats = allChats, myUsername = myUsername,
                             linkPreviewRepo = linkPreviewRepo,
                             onYouTubeClick = { vid -> youtubeVideoId = vid },
-                            onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y; selectedMessageOffset = pos },
+                            onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y },  // НЕ трогаем selectedMessageOffset!
                             onClick = {
                                     if (selectionMode) {
                                         if (selectedMessages.contains(msg.id.toString())) {
