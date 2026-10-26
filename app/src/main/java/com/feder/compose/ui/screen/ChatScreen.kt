@@ -230,7 +230,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()) }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
+    Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
@@ -1841,11 +1841,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             selectedMessages = selectedMessages + msg.id.toString()
                                         }
                                     } else {
-                                        // Вычисляем координаты для меню
-                                        val realX = if (isMine) (screenWidthDp - 200f) else 16f
-                                        val visibleItem = listState.layoutInfo.visibleItemsInfo.find { it.key == msg.id }
-                                        val listOffset = visibleItem?.offset?.toFloat() ?: msg.posY
-                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, listOffset + 100f)
+                                        // Используем координаты, сохраненные из onGloballyPositioned выше
+                                        selectedMessageOffset = androidx.compose.ui.geometry.Offset(msg.posX, msg.posY)
                                         selectedMessage = msg
                                     }
                                 },
