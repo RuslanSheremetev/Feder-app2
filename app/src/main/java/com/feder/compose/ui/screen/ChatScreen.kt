@@ -1842,7 +1842,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     } else {
                                         val savedPos = msgPositions[msg.id]
-                                        val realX = savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: if (isMine) (screenWidthDp - 260f) else 16f
+                                        val realX = if (isMine) (screenWidthDp - 220f) else (savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: 16f)
                                         val realY = savedPos?.y?.takeIf { it > 0f } ?: msg.posY.takeIf { it > 0f } ?: 300f
                                         selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY)
                                         selectedMessage = msg
