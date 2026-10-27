@@ -1842,7 +1842,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         }
                                     } else {
                                         val savedPos = msgPositions[msg.id]
-                                        val realX = if (isMine) (screenWidthDp.toFloat() - 10f) else (savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: 16f)
+                                        val realX = if (isMine) (0f) else (savedPos?.x?.takeIf { it > 0f } ?: msg.posX.takeIf { it > 0f } ?: 16f)
                                         val realY = savedPos?.y?.takeIf { it > 0f } ?: msg.posY.takeIf { it > 0f } ?: 300f
                                         selectedMessageOffset = androidx.compose.ui.geometry.Offset(realX, realY)
                                         selectedMessage = msg
@@ -2088,7 +2088,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
-                Box(Modifier.wrapContentSize().clickable { selectedMessage = null; showDeleteSub = false }) {
+                Box(Modifier.fillMaxWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }) {
                 val isMine = selectedMessage?.from == myUsername
                 Column(
                     modifier = Modifier,
