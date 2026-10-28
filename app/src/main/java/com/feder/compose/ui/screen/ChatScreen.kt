@@ -2088,16 +2088,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
-                Box(Modifier.fillMaxWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }) {
+                Box(Modifier.fillMaxWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }, contentAlignment = if (selectedMessage?.from == myUsername) Alignment.TopEnd else Alignment.TopStart) {
                 val isMine = selectedMessage?.from == myUsername
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier,
                         
                     
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
-                    Surface(modifier = Modifier.wrapContentWidth().align(if (isMine) Alignment.End else Alignment.Start), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                    Surface(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         Column {
                             if (!showAllReactions) {
