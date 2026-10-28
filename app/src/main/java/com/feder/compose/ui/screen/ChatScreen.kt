@@ -2097,7 +2097,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
-                    Surface(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                    Surface(modifier = Modifier.wrapContentWidth().align(if (isMine) Alignment.End else Alignment.Start), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
                         Column {
                             if (!showAllReactions) {
