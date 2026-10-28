@@ -2133,8 +2133,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     if (!showAllReactions) {
                     Spacer(Modifier.height(12.dp))
-                    Surface(shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
-                        Column(Modifier.width(220.dp)) {
+                    Surface(modifier = Modifier.align(Alignment.End), shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Column(Modifier.wrapContentWidth()) {
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
