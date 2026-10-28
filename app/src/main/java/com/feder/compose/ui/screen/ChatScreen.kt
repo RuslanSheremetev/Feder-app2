@@ -2088,7 +2088,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
-                Box(Modifier.fillMaxWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }, contentAlignment = if (selectedMessage?.from == myUsername) Alignment.TopEnd else Alignment.TopStart) {
+                Box(Modifier.wrapContentWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }, contentAlignment = if (selectedMessage?.from == myUsername) Alignment.TopEnd else Alignment.TopStart) {
                 val isMine = selectedMessage?.from == myUsername
                 Column(
                     modifier = Modifier,
@@ -2133,8 +2133,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                     if (!showAllReactions) {
                     Spacer(Modifier.height(12.dp))
-                    Surface(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 16.dp).align(if (selectedMessage?.from == myUsername) Alignment.End else Alignment.Start), shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
-                        Column(Modifier.wrapContentWidth()) {
+                    Surface(modifier = Modifier.align(if (selectedMessage?.from == myUsername) Alignment.End else Alignment.Start), shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
+                        Column(Modifier.width(220.dp)) {
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
