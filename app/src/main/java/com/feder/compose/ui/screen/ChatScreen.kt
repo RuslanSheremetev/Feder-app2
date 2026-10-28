@@ -2091,7 +2091,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Box(Modifier.fillMaxWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }) {
                 val isMine = selectedMessage?.from == myUsername
                 Column(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxWidth(),
                         
                     
                 ) {
