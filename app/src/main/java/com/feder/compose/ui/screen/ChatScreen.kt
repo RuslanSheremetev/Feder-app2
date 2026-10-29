@@ -2103,17 +2103,15 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         
         // Message action menu - Popup near message
         if (selectedMessage != null && !showForward) {
-            offset = androidx.compose.ui.unit.IntOffset(
-            x = if (selectedMessage?.from == myUsername) {
-                // Для правых сообщений: сдвигаем влево на ширину меню (220dp) и оставляем 16dp отступа
-                (selectedMessageOffset.x - 220.dp.roundToPx() - 16.dp.roundToPx()).toInt()
-            } else {
-                // Для левых сообщений: 16dp отступ от левого края
-                (selectedMessageOffset.x + 16.dp.roundToPx()).toInt()
-            },
-            y = (selectedMessageOffset.y - 16.dp.roundToPx()).toInt()
-        ),
-y = selectedMessageOffset.y.toInt()
+            Popup(
+                onDismissRequest = { selectedMessage = null; showDeleteSub = false },
+                offset = androidx.compose.ui.unit.IntOffset(
+                    x = if (selectedMessage?.from == myUsername) {
+                        (selectedMessageOffset.x - 220.dp.roundToPx() - 16.dp.roundToPx()).toInt()
+                    } else {
+                        (selectedMessageOffset.x + 16.dp.roundToPx()).toInt()
+                    },
+                    y = (selectedMessageOffset.y - 16.dp.roundToPx()).toInt()
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
