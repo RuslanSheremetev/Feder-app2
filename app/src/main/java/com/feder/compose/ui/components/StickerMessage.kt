@@ -20,7 +20,7 @@ fun StickerMessage(
 ) {
     if (stickerId.isNullOrEmpty()) return
 
-    val sticker = MATRYOSHKA_PACK.firstOrNull { it.id == stickerId }
+    val sticker = DOG_PACK.firstOrNull { it.id == stickerId }
         ?: StickerItem(stickerId, 1, stickerText ?: "")
 
     Box(
@@ -35,7 +35,12 @@ fun StickerMessage(
             )
         ) {
             Box(Modifier.size(140.dp)) {
-                MatryoshkaSticker(sticker.copy(text = ""))
+                coil.compose.AsyncImage(
+                    model = "file:///android_asset/stickers/${sticker.id}",
+                    contentDescription = sticker.id,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                )
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,

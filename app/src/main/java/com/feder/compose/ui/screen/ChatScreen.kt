@@ -351,9 +351,9 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                             if (isMine) {
                                                 Spacer(Modifier.width(2.dp))
                                                 Icon(
-                                                    imageVector = if (msg.isRead) Icons.Filled.DoneAll else Icons.Filled.Done,
+                                                    imageVector = if ((msg.isRead ?: false)) Icons.Filled.DoneAll else Icons.Filled.Done,
                                                     contentDescription = null,
-                                                    tint = if (msg.isRead) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
+                                                    tint = if ((msg.isRead ?: false)) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
                                                     modifier = Modifier.size(14.dp)
                                                 )
                                             }
@@ -2107,11 +2107,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 offset = androidx.compose.ui.unit.IntOffset(
                     x = if (selectedMessage?.from == myUsername) {
-                        (selectedMessageOffset.x - 220.dp.roundToPx() - 16.dp.roundToPx()).toInt()
+                        (selectedMessageOffset.x - 220.dp.value.toInt() - 16.dp.value.toInt()).toInt()
                     } else {
-                        (selectedMessageOffset.x + 16.dp.roundToPx()).toInt()
+                        (selectedMessageOffset.x + 16.dp.value.toInt()).toInt()
                     },
-                    y = (selectedMessageOffset.y - 16.dp.roundToPx()).toInt()
+                    y = (selectedMessageOffset.y - 16.dp.value.toInt()).toInt()
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
