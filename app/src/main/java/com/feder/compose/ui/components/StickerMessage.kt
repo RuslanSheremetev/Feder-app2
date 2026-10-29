@@ -19,6 +19,7 @@ fun StickerMessage(
     stickerText: String?,
     time: String,
     isMine: Boolean,
+    status: String = "sent",
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null
@@ -71,7 +72,22 @@ fun StickerMessage(
                     Text(time, color = Color(0xFF8A919E), fontSize = 11.sp)
                     if (isMine) {
                         Spacer(Modifier.width(3.dp))
-                        Text("✓✓", color = Color(0xFF41B35D), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        // Галочка как у текстовых (зависит от статуса)
+                        val checkText = when (status) {
+                            "read" -> "✓✓"
+                            "received" -> "✓✓"
+                            else -> "✓"
+                        }
+                        val checkColor = when (status) {
+                            "read" -> Color(0xFF4CAF50)
+                            else -> Color(0xFF8A919E)
+                        }
+                        Text(
+                            checkText,
+                            color = checkColor,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
