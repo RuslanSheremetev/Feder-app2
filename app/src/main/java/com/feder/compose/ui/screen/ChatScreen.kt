@@ -2754,7 +2754,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     Column {
                         Text("Are you sure you want to delete this message?")
                         Spacer(Modifier.height(12.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { deleteForAll = !deleteForAll },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             androidx.compose.material3.Checkbox(
                                 checked = deleteForAll,
                                 onCheckedChange = { deleteForAll = it }
