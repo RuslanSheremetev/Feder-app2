@@ -2107,11 +2107,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 offset = androidx.compose.ui.unit.IntOffset(
                     x = if (selectedMessage?.from == myUsername) {
-                        (selectedMessageOffset.x - 220.dp.value.toInt() - 16.dp.value.toInt()).toInt()
+                        // Для правых сообщений: отступ от правого края (ширина меню 220dp + 16dp отступ)
+                        (androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.dp.value - 220 - 16).toInt()
                     } else {
-                        (selectedMessageOffset.x + 16.dp.value.toInt()).toInt()
+                        // Для левых сообщений: отступ от левого края
+                        16
                     },
-                    y = (selectedMessageOffset.y - 16.dp.value.toInt()).toInt()
+                    y = selectedMessageOffset.y.toInt()
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
