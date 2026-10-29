@@ -1739,7 +1739,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             showMoreMenu = false
                                             scope.launch {
                                                 try {
-                                                    val json = org.json.JSONObject().apply {
+                                                    android.util.Log.d("STICKER", "Sending: ${sticker.id}"); val json = org.json.JSONObject().apply {
                                                         put("user_from", myUsername)
                                                         put("to_user", chatUsername)
                                                         put("muted", !isMuted)
@@ -2440,10 +2440,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     scope.launch {
                         try {
                             val client = okhttp3.OkHttpClient()
-                            val json = org.json.JSONObject().apply {
+                            android.util.Log.d("STICKER", "Sending: ${sticker.id}"); val json = org.json.JSONObject().apply {
                                 put("to_user", chatUsername)
                                 put("sticker_id", sticker.id)
-                                put("sticker_text", sticker.text)
+                                put("sticker_text", sticker.text ?: "")
                             }
                             val body = json.toString()
                                 .toRequestBody("application/json".toMediaType())
