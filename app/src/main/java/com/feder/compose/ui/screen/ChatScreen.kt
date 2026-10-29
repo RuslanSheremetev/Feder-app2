@@ -1814,7 +1814,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val nextMsg = if (index < messages.size - 1) messages[index + 1] else null
                         val sameAsNext = nextMsg != null && nextMsg.from == msg.from && kotlin.math.abs((nextMsg.timeVal ?: 0) - (msg.timeVal ?: 0)) < 300
                         val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.background(
+                                if (selectionMode && selectedMessages.contains(msg.id.toString()))
+                                    (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.2f)
+                                else Color.Transparent
+                            )
+                        ) {
                             if (selectionMode) {
                                 Icon(
                                     if (selectedMessages.contains(msg.id.toString())) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
