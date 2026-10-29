@@ -22,7 +22,12 @@ val CAT_PACK = StickerPack(
     stickers = (1..11).map { StickerItem("cat$it.png") }
 )
 
-val ALL_PACKS = listOf(DOG_PACK, CAT_PACK)
+val ANIMALS_PACK = StickerPack(
+    name = "Animals",
+    stickers = (1..12).map { StickerItem("animal$it.png") }
+)
+
+val ALL_PACKS = listOf(DOG_PACK, CAT_PACK, ANIMALS_PACK)
 
 enum class StickerTab(val label: String) {
     STICKERS("Стикеры"),
