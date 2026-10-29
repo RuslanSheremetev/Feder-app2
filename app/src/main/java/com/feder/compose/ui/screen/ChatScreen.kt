@@ -1597,7 +1597,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().background(Background).imePadding()) {
+    Box(modifier = Modifier.fillMaxSize().imePadding()) {
+        // Фон чата (картинка из assets)
+        coil.compose.AsyncImage(
+            model = "file:///android_asset/chat_background.jpg",
+            contentDescription = "chat background",
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        // Затемняющий слой (чтобы сообщения читались)
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
         Column(modifier = Modifier.fillMaxSize()) {
             // Header
             Surface(color = Surface, shadowElevation = 2.dp) {
