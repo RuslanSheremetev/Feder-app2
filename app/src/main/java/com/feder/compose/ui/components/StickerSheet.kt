@@ -160,7 +160,7 @@ fun StickerSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Матрёшка",
+                    "Pets",
                     color = TextOn,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
