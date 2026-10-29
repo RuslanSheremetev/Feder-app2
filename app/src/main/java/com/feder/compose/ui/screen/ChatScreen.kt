@@ -1849,7 +1849,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             ) {
                                 MessageBubble(
                             msg,
-                            msg.text,
+                            if (msg.forwardedFrom.isNullOrEmpty()) msg.text else "",
                             msg.time.takeLast(8).take(5),
                             isMine,
                             token = token,
