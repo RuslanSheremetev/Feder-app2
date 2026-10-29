@@ -1428,6 +1428,7 @@ if (chat.isGroup) {
                                             
                                             // Текст: если есть lastMsg — текст. Иначе — "Фото"/"N фото"/"Голосовое"/"Видео"
                                             val displayText = when {
+                                                lastMsg.endsWith(".png") -> "Sticker"
                                                 lastMsg.isNotEmpty() -> lastMsg
                                                 isPhoto && chat.lastImageCount > 1 -> "${chat.lastImageCount} фото"
                                                 isPhoto -> "Фото"
