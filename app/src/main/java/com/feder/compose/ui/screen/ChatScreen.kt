@@ -1787,7 +1787,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             else {
                 val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
                 val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
+                LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     grouped.forEach { (date, msgs) ->
                         if (date.isNotEmpty()) {
@@ -1826,9 +1826,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .fillMaxWidth()
                                 .background(
                                     if (selectionMode && selectedMessages.contains(msg.id.toString()))
-                                        (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.2f)
+                                        (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.15f)
                                     else Color.Transparent
                                 )
+                                .padding(horizontal = 16.dp)
                         ) {
                             if (selectionMode) {
                                 Icon(
