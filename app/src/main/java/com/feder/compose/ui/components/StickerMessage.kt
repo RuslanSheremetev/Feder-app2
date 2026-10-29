@@ -1,5 +1,7 @@
 package com.feder.compose.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,19 +12,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StickerMessage(
     stickerId: String?,
     stickerText: String?,
     time: String,
     isMine: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null
 ) {
     if (stickerId.isNullOrEmpty()) return
-
     val sticker = ALL_PACKS.flatMap { it.stickers }.firstOrNull { it.id == stickerId }
         ?: StickerItem(stickerId, 1, stickerText ?: "")
-
     Box(
         modifier = modifier.fillMaxWidth().padding(vertical = 2.dp),
         contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart
@@ -34,7 +37,14 @@ fun StickerMessage(
                 end = if (isMine) 8.dp else 0.dp
             )
         ) {
-            Box(Modifier.size(140.dp)) {
+            Box(
+                Modifier
+                    .size(140.dp)
+                    .combinedClickable(
+                        onClick = { onClick?.invoke() },
+                        onLongClick = { onLongClick?.invoke() }
+                    )
+            ) {
                 coil.compose.AsyncImage(
                     model = "file:///android_asset/stickers/${sticker.id}",
                     contentDescription = sticker.id,

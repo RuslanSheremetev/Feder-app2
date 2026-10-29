@@ -217,7 +217,9 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
             stickerId = msg.stickerId,
             stickerText = msg.stickerText,
             time = time,
-            isMine = isMine
+            isMine = isMine,
+            onClick = { onClick?.invoke() },
+            onLongClick = { onLongClick?.invoke() }
         )
         return
     }
