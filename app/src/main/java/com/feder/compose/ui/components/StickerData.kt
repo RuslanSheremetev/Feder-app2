@@ -16,25 +16,18 @@ data class StickerItem(
  * Пак стикеров "Матрёшка" — 18 штук.
  * Рисуются в Compose Canvas (без XML-файлов).
  */
-val MATRYOSHKA_PACK = listOf(
-    StickerItem("m01", 1, "ЗДРАВ БУЧАЙ"),
-    StickerItem("m02", 2, "ДОБРОГО ПУТИ"),
-    StickerItem("m03", 3, "ЧЁВО ДАВНОЕ"),
-    StickerItem("m04", 4, "НИЗКИЙ ПОКЛОН"),
-    StickerItem("m05", 5, "ДОБРОЙ НОЧИ"),
-    StickerItem("m06", 6, "ДА/НЕТ"),
-    StickerItem("m07", 7, "ТРУНЬ"),
-    StickerItem("m08", 8, "ПРИГОРЮНИЛАСЬ"),
-    StickerItem("m09", 9, ""),
-    StickerItem("m10", 10, "УЛЫБАЙСЯ"),
-    StickerItem("m11", 11, "ОТДЫХАЙ"),
-    StickerItem("m12", 12, "СПАСИБО"),
-    StickerItem("m13", 13, "ПРИВЕТ"),
-    StickerItem("m14", 14, "УРА"),
-    StickerItem("m15", 15, "ОГОНЬ"),
-    StickerItem("m16", 16, "ЗВЕЗДА"),
-    StickerItem("m17", 17, "СЕРДЦЕ"),
-    StickerItem("m18", 18, "ПОЦЕЛУЙ")
+val DOG_PACK = listOf(
+    StickerItem("dog1.png", 1, ""),
+    StickerItem("dog2.png", 1, ""),
+    StickerItem("dog3.png", 1, ""),
+    StickerItem("dog4.png", 1, ""),
+    StickerItem("dog5.png", 1, ""),
+    StickerItem("dog6.png", 1, ""),
+    StickerItem("dog7.png", 1, ""),
+    StickerItem("dog8.png", 1, ""),
+    StickerItem("dog9.png", 1, ""),
+    StickerItem("dog10.png", 1, ""),
+    StickerItem("dog11.png", 1, "")
 )
 
 /**
@@ -44,3 +37,5 @@ enum class StickerTab(val label: String) {
     STICKERS("Стикеры"),
     EMOJI("Эмодзи")
 }
+
+

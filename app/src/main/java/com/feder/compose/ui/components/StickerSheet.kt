@@ -167,7 +167,7 @@ fun StickerSheet(
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    "${MATRYOSHKA_PACK.size} стикеров",
+                    "${DOG_PACK.size} стикеров",
                     color = TextMuted,
                     fontSize = 11.sp
                 )
@@ -184,16 +184,16 @@ fun StickerSheet(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 contentPadding = PaddingValues(vertical = 4.dp)
             ) {
-                items(MATRYOSHKA_PACK, key = { it.id }) { sticker ->
-                    Box(
-                        Modifier
+                items(DOG_PACK, key = { it.id }) { sticker ->
+                    coil.compose.AsyncImage(
+                        model = "file:///android_asset/stickers/${sticker.id}",
+                        contentDescription = sticker.id,
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .aspectRatio(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable { onStickerClick(sticker) },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        MatryoshkaSticker(sticker)
-                    }
+                            .padding(4.dp),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                    )
                 }
             }
 
