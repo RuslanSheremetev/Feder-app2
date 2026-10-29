@@ -729,6 +729,9 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
+    // Берем реальный токен из SharedPreferences
+    val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+    val effectiveToken = prefs.getString("access_token", "") ?: token
 
     // ─── Системный back (свайп от края + кнопка назад) ───
     androidx.activity.compose.BackHandler(enabled = true) {
@@ -742,7 +745,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         try {
             val url = "http://2.26.71.102:8004/api/mute/list?user=$myUsername"
             val req = okhttp3.Request.Builder().url(url)
-                .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: "")).build()
+                .addHeader("Authorization", "Bearer $effectiveToken").build()
             val resp = withContext(kotlinx.coroutines.Dispatchers.IO) {
                 okhttp3.OkHttpClient().newCall(req).execute()
             }
@@ -1746,7 +1749,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     }
                                                     val req = okhttp3.Request.Builder()
                                                         .url("http://2.26.71.102:8004/api/mute")
-                                                        .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: ""))
+                                                        .addHeader("Authorization", "Bearer $effectiveToken")
                                                         .post(json.toString().toRequestBody("application/json".toMediaType()))
                                                         .build()
                                                     withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -2451,7 +2454,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .toRequestBody("application/json".toMediaType())
                             val req = okhttp3.Request.Builder()
                                 .url("http://2.26.71.102:8018/api/stickers/send")
-                                .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: ""))
+                                .addHeader("Authorization", "Bearer $effectiveToken")
                                 .post(body)
                                 .build()
                             val resp = withContext(Dispatchers.IO) {
