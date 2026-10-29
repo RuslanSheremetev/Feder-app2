@@ -20,7 +20,7 @@ fun StickerMessage(
 ) {
     if (stickerId.isNullOrEmpty()) return
 
-    val sticker = DOG_PACK.firstOrNull { it.id == stickerId }
+    val sticker = ALL_PACKS.flatMap { it.stickers }.firstOrNull { it.id == stickerId }
         ?: StickerItem(stickerId, 1, stickerText ?: "")
 
     Box(
