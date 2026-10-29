@@ -19,7 +19,7 @@ val DOG_PACK = StickerPack(
 
 val CAT_PACK = StickerPack(
     name = "Cats",
-    stickers = (1..8).map { StickerItem("cat$it.png") }
+    stickers = (1..11).map { StickerItem("cat$it.png") }
 )
 
 val ALL_PACKS = listOf(DOG_PACK, CAT_PACK)
