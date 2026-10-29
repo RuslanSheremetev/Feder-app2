@@ -61,6 +61,7 @@ fun StickerSheet(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var activeTab by remember { mutableStateOf(StickerTab.STICKERS) }
+    var selectedPack by remember { mutableStateOf(0) }
     var expanded by remember { mutableStateOf(false) }
     var dragOffset by remember { mutableStateOf(0f) }
 
@@ -159,15 +160,22 @@ fun StickerSheet(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                androidx.compose.foundation.lazy.LazyRow(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(ALL_PACKS.size) { index ->
+                        Text(
+                            ALL_PACKS[index].name,
+                            color = if (selectedPack == index) TextOn else TextMuted,
+                            fontSize = 13.sp,
+                            fontWeight = if (selectedPack == index) FontWeight.SemiBold else FontWeight.Normal,
+                            modifier = Modifier.clickable { selectedPack = index }
+                        )
+                    }
+                }
                 Text(
-                    "Pets",
-                    color = TextOn,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    "${DOG_PACK.size} стикеров",
+                    "${ALL_PACKS[selectedPack].stickers.size} стикеров",
                     color = TextMuted,
                     fontSize = 11.sp
                 )
@@ -184,7 +192,7 @@ fun StickerSheet(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 contentPadding = PaddingValues(vertical = 4.dp)
             ) {
-                items(DOG_PACK, key = { it.id }) { sticker ->
+                items(ALL_PACKS[selectedPack].stickers, key = { it.id }) { sticker ->
                     coil.compose.AsyncImage(
                         model = "file:///android_asset/stickers/${sticker.id}",
                         contentDescription = sticker.id,
