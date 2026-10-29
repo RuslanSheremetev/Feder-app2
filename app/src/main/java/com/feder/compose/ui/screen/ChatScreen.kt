@@ -1823,14 +1823,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .offset(x = (-16).dp)
-                                .width(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.dp)
+                                .fillMaxWidth()
                                 .background(
                                     if (selectionMode && selectedMessages.contains(msg.id.toString()))
                                         (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.2f)
                                     else Color.Transparent
                                 )
-                                .padding(horizontal = 16.dp)
                         ) {
                             if (selectionMode) {
                                 Icon(
