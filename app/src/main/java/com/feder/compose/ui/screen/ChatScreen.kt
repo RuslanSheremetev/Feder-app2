@@ -327,13 +327,38 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                 }
                                 if (!msg.forwardedText.isNullOrEmpty()) {
                                     Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        msg.forwardedText.take(200),
-                                        color = if (isMine) Color.White.copy(alpha = 0.9f) else OnSurface,
-                                        fontSize = 13.sp,
-                                        maxLines = 3,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
+                                    androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth()) {
+                                        Text(
+                                            msg.forwardedText.take(200),
+                                            color = if (isMine) Color.White.copy(alpha = 0.9f) else OnSurface,
+                                            fontSize = 13.sp,
+                                            maxLines = 3,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(end = 50.dp) // Отступ, чтобы текст не наезжал на время
+                                        )
+                                        // Время в правом нижнем углу
+                                        Row(
+                                            modifier = Modifier.align(Alignment.BottomEnd),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                try {
+                                                    java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(msg.time.toLong() * 1000))
+                                                } catch (e: Exception) { msg.time ?: "" },
+                                                fontSize = 11.sp,
+                                                color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant
+                                            )
+                                            if (isMine) {
+                                                Spacer(Modifier.width(2.dp))
+                                                Icon(
+                                                    imageVector = if (msg.isRead) Icons.Filled.DoneAll else Icons.Filled.Done,
+                                                    contentDescription = null,
+                                                    tint = if (msg.isRead) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
+                                                    modifier = Modifier.size(14.dp)
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
