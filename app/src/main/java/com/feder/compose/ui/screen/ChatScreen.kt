@@ -1816,11 +1816,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val position = when { sameAsPrev && sameAsNext -> 1; sameAsPrev && !sameAsNext -> 2; !sameAsPrev && sameAsNext -> 0; else -> 3 }
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.background(
-                                if (selectionMode && selectedMessages.contains(msg.id.toString()))
-                                    (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.2f)
-                                else Color.Transparent
-                            )
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    if (selectionMode && selectedMessages.contains(msg.id.toString()))
+                                        (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.2f)
+                                    else Color.Transparent
+                                )
                         ) {
                             if (selectionMode) {
                                 Icon(
