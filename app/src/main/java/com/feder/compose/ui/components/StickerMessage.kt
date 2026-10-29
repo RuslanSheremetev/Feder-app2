@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.feder.compose.ui.screen.DrawCheck
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -72,21 +73,15 @@ fun StickerMessage(
                     Text(time, color = Color(0xFF8A919E), fontSize = 11.sp)
                     if (isMine) {
                         Spacer(Modifier.width(3.dp))
-                        // Галочка как у текстовых (зависит от статуса)
-                        val checkText = when (status) {
-                            "read" -> "✓✓"
-                            "received" -> "✓✓"
-                            else -> "✓"
-                        }
+                        // Галочка как у текстовых (нарисованная)
                         val checkColor = when (status) {
                             "read" -> Color(0xFF4CAF50)
-                            else -> Color(0xFF8A919E)
+                            else -> Color.White.copy(alpha = 0.7f)
                         }
-                        Text(
-                            checkText,
-                            color = checkColor,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                        DrawCheck(
+                            double = (status == "read" || status == "received"),
+                            tint = checkColor,
+                            size = 14.dp
                         )
                     }
                 }
