@@ -2111,20 +2111,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             Popup(
                 onDismissRequest = { selectedMessage = null; showDeleteSub = false },
                 offset = androidx.compose.ui.unit.IntOffset(
-                    x = if (selectedMessage?.from == myUsername) {
-                        // Для правых сообщений: отступ от правого края (в пикселях)
-                        val density = androidx.compose.ui.platform.LocalDensity.current.density
-                        (androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp * density - 220 * density - 16 * density).toInt()
-                    } else {
-                        // Для левых сообщений: отступ от левого края (в пикселях)
-                        val density = androidx.compose.ui.platform.LocalDensity.current.density
-                        (16 * density).toInt()
-                    },
+                    x = 0, // Popup на весь экран, позиция меню задается внутри Box
                     y = selectedMessageOffset.y.toInt()
                 ),
             ) {
                 // FIX_MENU_WIDTH: Box — прозрачный фон-клик, внутри Column без fillMaxWidth
-                Box(Modifier.wrapContentWidth().wrapContentHeight().clickable { selectedMessage = null; showDeleteSub = false }, contentAlignment = if (selectedMessage?.from == myUsername) Alignment.TopEnd else Alignment.TopStart) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 16.dp)
+                        .clickable { selectedMessage = null; showDeleteSub = false },
+                    contentAlignment = if (selectedMessage?.from == myUsername) Alignment.TopEnd else Alignment.TopStart
+                ) {
                 val isMine = selectedMessage?.from == myUsername
                 Column(
                     modifier = Modifier,
