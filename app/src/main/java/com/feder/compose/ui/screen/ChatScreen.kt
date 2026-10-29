@@ -730,7 +730,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
     // Берем реальный токен из SharedPreferences
-    val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+    val prefs = context.getSharedPreferences("feder_prefs", android.content.Context.MODE_PRIVATE)
     val effectiveToken = prefs.getString("access_token", "") ?: token
 
     // ─── Системный back (свайп от края + кнопка назад) ───
