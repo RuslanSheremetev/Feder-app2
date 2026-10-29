@@ -510,8 +510,8 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                             }
                             if (index < (msg.imageUrls.lastIndex ?: 0)) Spacer(Modifier.height(2.dp))
                         }
-                        // Подпись (текст) под фото
-                        if (msg.text.isNotEmpty()) {
+                        // Подпись (текст) под фото (только для обычных, не пересланных)
+                        if (msg.text.isNotEmpty() && msg.forwardedFrom.isNullOrEmpty()) {
                             Text(
                                 msg.text,
                                 color = if (isMine) OnPrimaryContainer else OnSurfaceVariant,
