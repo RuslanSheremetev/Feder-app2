@@ -351,9 +351,9 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                             if (isMine) {
                                                 Spacer(Modifier.width(2.dp))
                                                 Icon(
-                                                    imageVector = if ((msg.isRead ?: false)) Icons.Filled.DoneAll else Icons.Filled.Done,
+                                                    imageVector = if ((msg.status == "read")) Icons.Filled.DoneAll else Icons.Filled.Done,
                                                     contentDescription = null,
-                                                    tint = if ((msg.isRead ?: false)) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
+                                                    tint = if ((msg.status == "read")) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.7f),
                                                     modifier = Modifier.size(14.dp)
                                                 )
                                             }
