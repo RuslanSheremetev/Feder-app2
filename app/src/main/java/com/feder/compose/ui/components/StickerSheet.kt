@@ -191,7 +191,8 @@ fun StickerSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
-                            .padding(4.dp),
+                            .padding(4.dp)
+                            .clickable { onStickerClick(sticker) },
                         contentScale = androidx.compose.ui.layout.ContentScale.Fit
                     )
                 }

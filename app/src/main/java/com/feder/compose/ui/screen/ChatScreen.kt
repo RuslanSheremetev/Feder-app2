@@ -2447,6 +2447,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             val client = okhttp3.OkHttpClient()
                             android.util.Log.d("STICKER", "Sending: ${sticker.id}"); val json = org.json.JSONObject().apply {
                                 put("to_user", chatUsername)
+                                put("from_user", myUsername)
                                 put("sticker_id", sticker.id)
                                 put("sticker_text", sticker.text ?: "")
                             }
