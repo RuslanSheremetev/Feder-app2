@@ -1739,7 +1739,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             showMoreMenu = false
                                             scope.launch {
                                                 try {
-                                                    android.util.Log.d("STICKER", "Sending: ${sticker.id}"); val json = org.json.JSONObject().apply {
+                                                    val json = org.json.JSONObject().apply {
                                                         put("user_from", myUsername)
                                                         put("to_user", chatUsername)
                                                         put("muted", !isMuted)
