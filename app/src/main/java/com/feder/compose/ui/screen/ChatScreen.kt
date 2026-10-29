@@ -742,7 +742,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         try {
             val url = "http://2.26.71.102:8004/api/mute/list?user=$myUsername"
             val req = okhttp3.Request.Builder().url(url)
-                .addHeader("Authorization", "Bearer $token").build()
+                .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: "")).build()
             val resp = withContext(kotlinx.coroutines.Dispatchers.IO) {
                 okhttp3.OkHttpClient().newCall(req).execute()
             }
@@ -1746,7 +1746,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     }
                                                     val req = okhttp3.Request.Builder()
                                                         .url("http://2.26.71.102:8004/api/mute")
-                                                        .addHeader("Authorization", "Bearer $token")
+                                                        .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: ""))
                                                         .post(json.toString().toRequestBody("application/json".toMediaType()))
                                                         .build()
                                                     withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -2451,7 +2451,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .toRequestBody("application/json".toMediaType())
                             val req = okhttp3.Request.Builder()
                                 .url("http://2.26.71.102:8018/api/stickers/send")
-                                .addHeader("Authorization", "Bearer $token")
+                                .addHeader("Authorization", "Bearer " + (androidx.preference.PreferenceManager.getDefaultSharedPreferences(androidx.compose.ui.platform.LocalContext.current).getString("access_token", "") ?: ""))
                                 .post(body)
                                 .build()
                             val resp = withContext(Dispatchers.IO) {
