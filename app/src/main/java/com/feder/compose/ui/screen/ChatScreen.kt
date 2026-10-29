@@ -307,18 +307,16 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Spacer(Modifier.height(4.dp))
-                                Row(modifier = Modifier.clickable { deleteForAll = !deleteForAll }, verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        Modifier.size(18.dp).clip(CircleShape).background(if (isMine) Color.White.copy(alpha = 0.3f) else Primary.copy(alpha = 0.3f)),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            (msg.forwardedName ?: msg.forwardedFrom ?: "?").take(1).uppercase(),
-                                            color = if (isMine) Color.White else Primary,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    AsyncImage(
+                                        model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                            .data("http://2.26.71.102:8010/avatars/" + (msg.forwardedFrom ?: "") + "/avatar.jpg")
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = "Avatar",
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                        modifier = Modifier.size(18.dp).clip(CircleShape).background(if (isMine) Color.White.copy(alpha = 0.3f) else Primary.copy(alpha = 0.3f))
+                                    )
                                     Spacer(Modifier.width(6.dp))
                                     Text(
                                         msg.forwardedName ?: msg.forwardedFrom ?: "",
