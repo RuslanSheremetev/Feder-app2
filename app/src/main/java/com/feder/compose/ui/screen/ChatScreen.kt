@@ -307,7 +307,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Spacer(Modifier.height(4.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(modifier = Modifier.clickable { deleteForAll = !deleteForAll }, verticalAlignment = Alignment.CenterVertically) {
                                     Box(
                                         Modifier.size(18.dp).clip(CircleShape).background(if (isMine) Color.White.copy(alpha = 0.3f) else Primary.copy(alpha = 0.3f)),
                                         contentAlignment = Alignment.Center
