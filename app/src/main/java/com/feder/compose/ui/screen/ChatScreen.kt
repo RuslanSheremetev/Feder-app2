@@ -2108,7 +2108,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 offset = androidx.compose.ui.unit.IntOffset(
                     x = if (selectedMessage?.from == myUsername) {
                         // Для правых сообщений: отступ от правого края (ширина меню 220dp + 16dp отступ)
-                        (androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.dp.value - 220 - 16).toInt()
+                        (androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp - 220 - 16).toInt()
                     } else {
                         // Для левых сообщений: отступ от левого края
                         16
