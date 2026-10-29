@@ -1001,7 +1001,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             timeVal = entity.timeVal,
                             id = entity.id,
                             posX = entity.posX ?: 0f,
-                            posY = entity.posY ?: 0f
+                            posY = entity.posY ?: 0f,
+                            messageType = entity.messageType,
+                            stickerId = entity.stickerId,
+                            stickerText = entity.stickerText
                         )
                     }
                     withContext(Dispatchers.Main) {
@@ -1110,7 +1113,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 text = m.text,
                                 timeVal = m.timeVal,
                                 imageUrls = m.imageUrls.joinToString(","),
-                                isRead = m.status == "read"
+                                isRead = m.status == "read",
+                                messageType = m.messageType,
+                                stickerId = m.stickerId,
+                                stickerText = m.stickerText
                             )
                         })
                     }
