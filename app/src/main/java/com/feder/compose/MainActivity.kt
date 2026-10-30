@@ -155,6 +155,22 @@ fun formatTimestamp(timestamp: String?): String {
 }
 
 class ChatViewModel : ViewModel() {
+    fun shareContact(toUser: String, contactName: String, contactPhones: String, contactAvatar: String) {
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val conn = java.net.URL("http://2.26.71.102:8004/api/chat/send").openConnection() as java.net.HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.doOutput = true
+                val json = "{\"from\":\"demo\",\"to\":\"$toUser\",\"text\":\"\",\"message_type\":\"contact\",\"contact_name\":\"$contactName\",\"contact_phones\":\"$contactPhones\",\"contact_avatar\":\"$contactAvatar\"}"
+                conn.outputStream.write(json.toByteArray())
+                conn.responseCode
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     var selectedChat by mutableStateOf<String?>(null)
     var selectedProfile by mutableStateOf<String?>(null)
     var profileMediaUrls by mutableStateOf<List<String>>(emptyList())
@@ -927,6 +943,15 @@ fun FederApp() {
                         onMessage = {
                             viewModel.selectedChat = viewModel.selectedProfile
                             viewModel.selectedProfile = null
+                        },
+                        onShareContact = {
+                            val target = viewModel.selectedProfile ?: ""
+                            val cName = prof?.name ?: target
+                            val cAvatar = prof?.avatarUrl ?: ""
+                            val cPhones = "Main:+7 (962) 259-98-21|Work:+7 (962) 259-98-21"
+                            viewModel.selectedChat = target
+                            viewModel.selectedProfile = null
+                            viewModel.shareContact(target, cName, cPhones, cAvatar)
                         }
                     )
                 }

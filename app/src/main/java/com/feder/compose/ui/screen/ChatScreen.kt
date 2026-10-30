@@ -172,7 +172,13 @@ data class MsgItem(
     @com.google.gson.annotations.SerializedName("sticker_id")
     val stickerId: String? = null,
     @com.google.gson.annotations.SerializedName("sticker_text")
-    val stickerText: String? = null
+    val stickerText: String? = null,
+    @com.google.gson.annotations.SerializedName("contact_name")
+    val contactName: String? = null,
+    @com.google.gson.annotations.SerializedName("contact_phones")
+    val contactPhones: String? = null,
+    @com.google.gson.annotations.SerializedName("contact_avatar")
+    val contactAvatar: String? = null
 )
 
 @Composable
@@ -210,6 +216,20 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
     onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
 onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
+
+    // ═══ Контакт? Рисуем карточку и ВЫХОДИМ ═══
+    if (msg.messageType == "contact" && !msg.contactName.isNullOrEmpty()) {
+        com.feder.compose.ui.components.ContactBubble(
+            contactName = msg.contactName,
+            contactPhones = msg.contactPhones ?: "",
+            contactAvatar = msg.contactAvatar,
+            time = time,
+            isMine = isMine,
+            status = msg.status,
+            onClick = { onClick?.invoke() }
+        )
+        return
+    }
 
     // ═══ Стикер? Рисуем матрёшку + текст и ВЫХОДИМ ═══
     if (msg.messageType == "sticker" && !msg.stickerId.isNullOrEmpty()) {

@@ -54,6 +54,7 @@ fun TelegramContactProfile(
     onMessage: () -> Unit = {},
     onCall: () -> Unit = {},
     onVideo: () -> Unit = {},
+    onShareContact: () -> Unit = {},
     onMuteToggle: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -195,6 +196,17 @@ fun TelegramContactProfile(
                     modifier = Modifier.weight(1f),
                     onClick = onVideo
                 )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            androidx.compose.material3.Button(
+                onClick = onShareContact,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color(0xFF339DFF))
+            ) {
+                Text("Share Contact", color = androidx.compose.ui.graphics.Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
 
             Spacer(Modifier.height(16.dp))
