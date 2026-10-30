@@ -1838,13 +1838,33 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                 LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
+                    // Для каждой даты вычисляем, находится ли она между выделенными сообщениями
+                    var firstSelectedIndex = -1
+                    var lastSelectedIndex = -1
+                    if (selectionMode && selectedMessages.isNotEmpty()) {
+                        val allMessages = grouped.values.flatten()
+                        for (i in allMessages.indices) {
+                            if (selectedMessages.contains(allMessages[i].id.toString())) {
+                                if (firstSelectedIndex == -1) firstSelectedIndex = i
+                                lastSelectedIndex = i
+                            }
+                        }
+                    }
+                    var currentGlobalIndex = -1
+
                     grouped.forEach { (date, msgs) ->
+                        val startIdx = currentGlobalIndex + 1
+                        currentGlobalIndex += msgs.size
+                        val endIdx = currentGlobalIndex
+                        val isBetweenSelected = selectionMode && firstSelectedIndex != -1 &&
+                            startIdx > firstSelectedIndex && endIdx < lastSelectedIndex
+
                         if (date.isNotEmpty()) {
                             stickyHeader(key = "header_$date") {
                                 Box(
                                     Modifier
                                         .fillMaxWidth()
-                                        .background(if (selectionMode) Color(0xFF339DFF).copy(alpha = 0.15f) else Color.Transparent)
+                                        .background(if (isBetweenSelected) Color(0xFF339DFF).copy(alpha = 0.15f) else Color.Transparent)
                                         .padding(top = 10.dp, bottom = 6.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
