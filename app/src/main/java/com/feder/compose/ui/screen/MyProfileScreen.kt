@@ -207,8 +207,6 @@ fun MyProfileScreen(
             Box(
                 Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1F1F1F))
                     .clickable { /* QR */ },
                 contentAlignment = Alignment.Center
             ) {
@@ -218,8 +216,6 @@ fun MyProfileScreen(
             Box(
                 Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1F1F1F))
                     .clickable { /* More */ },
                 contentAlignment = Alignment.Center
             ) {
