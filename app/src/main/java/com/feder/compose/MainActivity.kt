@@ -982,9 +982,6 @@ fun FederApp() {
                             ) else chat
                         }
                     },
-                    onShareContact = { toUser, cName, cPhones, cAvatar ->
-                        viewModel.shareContact(toUser, cName, cPhones, cAvatar)
-                    },
                     onProfileClick = {
                         val targetUser = viewModel.selectedChat
                         viewModel.selectedProfile = targetUser
