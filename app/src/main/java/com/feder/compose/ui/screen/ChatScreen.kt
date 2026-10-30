@@ -753,7 +753,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     val scope = rememberCoroutineScope()
-    var showContactPicker by remember { mutableStateOf(false) }
     // ─── FEATURE_CHAT_MUTES ───
     var isMuted by remember { mutableStateOf(false) }
     LaunchedEffect(chatUsername) {
@@ -2492,7 +2491,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         filePicker.launch(arrayOf("*/*"))
                     }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
+                    AttachOption(Icons.Filled.Person, "Контакт") { contactPicker.launch(null) }
                 }
 
                 Spacer(Modifier.height(80.dp))
@@ -2501,37 +2500,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
-        // ─── Contact Picker (STEP 5: real ContactsScreen) ───
-        if (showContactPicker) {
-            androidx.compose.material3.AlertDialog(
-                onDismissRequest = { showContactPicker = false },
-                confirmButton = {},
-                text = {
-                    androidx.compose.foundation.layout.Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.85f)
-                    ) {
-                        com.feder.compose.ui.screen.ContactsScreen(
-                            contacts = allChats,
-                            onBack = { showContactPicker = false },
-                            onContactClick = { username ->
-                                val c = allChats.find { it.username == username }
-                                if (c != null) {
-                                    onShareContact?.invoke(
-                                        username,
-                                        c.name,
-                                        "",
-                                        c.avatarUrl ?: ""
-                                    )
-                                }
-                                showContactPicker = false
-                            }
-                        )
-                    }
-                }
-            )
-        }
 
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
