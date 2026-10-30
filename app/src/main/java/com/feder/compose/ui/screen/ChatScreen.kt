@@ -1758,7 +1758,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                             if (chatUsername != "saved_messages") {
-                                Text(
+                                if (!isGroup) {
+                            Text(
                                     when {
                                         isOnline -> "online"
                                         lastSeen > 0 -> formatLastSeen(lastSeen)
@@ -1766,6 +1767,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     },
                                     color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
                                 )
+                        }
                             }
                         }
                         if (chatUsername != myUsername && chatUsername != "saved_messages" && !isGroup && !chatUsername.startsWith("group:")) {
