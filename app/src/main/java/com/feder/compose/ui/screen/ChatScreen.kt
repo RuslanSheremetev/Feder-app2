@@ -906,45 +906,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var isSending by remember { mutableStateOf(false) }
-    val contactPicker = androidx.activity.compose.rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.PickContact()
-    ) { uri ->
-        if (uri != null) {
-            val ctx = context
-            var name = ""
-            var phonesStr = ""
-            try {
-                ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
-                    if (c.moveToFirst()) {
-                        val idxName = c.getColumnIndex(android.provider.ContactsContract.Contacts.DISPLAY_NAME)
-                        if (idxName >= 0) name = c.getString(idxName) ?: ""
-                    }
-                }
-                val phones = mutableListOf<String>()
-                ctx.contentResolver.query(
-                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null,
-                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                    arrayOf(uri.lastPathSegment ?: ""),
-                    null
-                )?.use { pc ->
-                    while (pc.moveToNext()) {
-                        val num = pc.getString(pc.getColumnIndex(
-                            android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
-                        ))
-                        if (!num.isNullOrEmpty()) phones.add(num)
-                    }
-                }
-                phonesStr = phones.joinToString("|")
-            } catch (e: Exception) {
-                android.util.Log.e("ContactPicker", "read: ${e.message}")
-            }
-            if (name.isNotEmpty()) {
-                onShareContact?.invoke(name, name, phonesStr, "")
-            }
-        }
-    }
-
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -2236,6 +2197,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
+    var showContactPicker by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
                     Surface(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
@@ -2530,7 +2492,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         filePicker.launch(arrayOf("*/*"))
                     }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт") { contactPicker.launch(null) }
+                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
                 }
 
                 Spacer(Modifier.height(80.dp))
@@ -2539,6 +2501,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
+
+        // ─── Contact Picker Bottom Sheet ───
+        if (showContactPicker) {
+            androidx.compose.material3.ModalBottomSheet(
+                onDismissRequest = { showContactPicker = false }
+            ) {
+                com.feder.compose.ui.screen.ContactsScreen(
+                    contacts = allChats,
+                    onBack = { showContactPicker = false },
+                    onContactClick = { username ->
+                        val c = allChats.find { it.username == username }
+                        if (c != null) {
+                            onShareContact?.invoke(
+                                username,
+                                c.name,
+                                "",
+                                c.avatarUrl ?: ""
+                            )
+                        }
+                        showContactPicker = false
+                    }
+                )
+            }
+        }
 
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
