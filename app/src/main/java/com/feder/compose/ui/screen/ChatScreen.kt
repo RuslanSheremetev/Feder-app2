@@ -1713,7 +1713,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             singleLine = true,
                             textStyle = TextStyle(color = OnSurface, fontSize = 16.sp),
                             cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(24.dp)).background(SurfaceContainerHigh).padding(horizontal = 16.dp, vertical = 10.dp),
+                            modifier = Modifier.weight(1f).padding(vertical = 4.dp).clip(RoundedCornerShape(20.dp)).background(SurfaceContainerHigh).padding(horizontal = 12.dp, vertical = 6.dp),
                             decorationBox = { innerTextField ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Filled.Search, null, tint = Outline, modifier = Modifier.size(20.dp))
