@@ -749,7 +749,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
-    onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }) {
+    onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }, onShareContact: ((String, String, String, String) -> Unit)? = null) {
     val context = LocalContext.current
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     // Берем реальный токен из SharedPreferences
@@ -2204,6 +2204,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
+    var showContactPicker by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
                     Surface(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
@@ -2498,7 +2499,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         filePicker.launch(arrayOf("*/*"))
                     }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт")
+                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
                 }
 
                 Spacer(Modifier.height(80.dp))
@@ -2507,6 +2508,34 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
+        // ─── Contact Picker Dialog ───
+        if (showContactPicker) {
+            androidx.compose.ui.window.Dialog(onDismissRequest = { showContactPicker = false }) {
+                androidx.compose.material3.Surface(
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.85f),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.surface
+                ) {
+                    ContactsScreen(
+                        contacts = allChats,
+                        onBack = { showContactPicker = false },
+                        onContactClick = { username ->
+                            val c = allChats.find { it.username == username }
+                            if (c != null) {
+                                onShareContact?.invoke(
+                                    username,
+                                    c.name,
+                                    "",                 // phones — пока пусто
+                                    c.avatarUrl ?: ""
+                                )
+                            }
+                            showContactPicker = false
+                        }
+                    )
+                }
+            }
+        }
+
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
             com.feder.compose.video.FullscreenYouTubePlayer(
