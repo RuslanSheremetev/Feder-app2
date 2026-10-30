@@ -2486,16 +2486,148 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
                 Spacer(Modifier.height(16.dp))
 
-                // Attach options
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                    AttachOption(Icons.Filled.Image, "Галерея", true) {
-    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-}
-                    AttachOption(Icons.Filled.Description, "Файл") {
-                        filePicker.launch(arrayOf("*/*"))
+                if (showContactPicker) {
+                    // === КОНТАКТЫ (внутри той же шторки) ===
+                    var contactSearch by remember { mutableStateOf("") }
+                    var contactsList by remember { mutableStateOf<List<Triple<String, Pair<String,String>, String>>>(emptyList()) }
+                    var isLoading by remember { mutableStateOf(true) }
+
+                    androidx.compose.runtime.LaunchedEffect(Unit) {
+                        scope.launch {
+                            try {
+                                val req = okhttp3.Request.Builder()
+                                    .url("http://2.26.71.102:8004/api/users")
+                                    .build()
+                                val client = okhttp3.OkHttpClient()
+                                client.newCall(req).execute().use { resp ->
+                                    val jsonStr = resp.body?.string() ?: "[]"
+                                    val arr = org.json.JSONArray(jsonStr)
+                                    val list = mutableListOf<Triple<String, Pair<String,String>, String>>()
+                                    for (i in 0 until arr.length()) {
+                                        val o = arr.getJSONObject(i)
+                                        val uname = o.optString("username", "")
+                                        val name = o.optString("name", uname)
+                                        val phone = o.optString("phone", "")
+                                        val avatar = o.optString("avatar_url", "")
+                                        if (uname != myUsername && uname != "123") {
+                                            list.add(Triple(uname, Pair(name, phone), avatar))
+                                        }
+                                    }
+                                    contactsList = list
+                                }
+                            } catch (e: Exception) { e.printStackTrace() }
+                            isLoading = false
+                        }
                     }
-                    AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
+
+                    // Кнопка "Назад" для возврата к меню
+                    androidx.compose.foundation.layout.Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.IconButton(onClick = { showContactPicker = false }) {
+                            androidx.compose.material3.Icon(
+                                androidx.compose.material.icons.Icons.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White
+                            )
+                        }
+                        Text("Contacts", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    androidx.compose.material3.OutlinedTextField(
+                        value = contactSearch,
+                        onValueChange = { contactSearch = it },
+                        placeholder = { Text("Search contacts", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        singleLine = true,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0xFF1E1E1E),
+                            focusedContainerColor = Color(0xFF1E1E1E),
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent
+                        ),
+                        leadingIcon = { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.Search, null, tint = Color.Gray) }
+                    )
+
+                    if (isLoading) {
+                        Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                            androidx.compose.material3.CircularProgressIndicator()
+                        }
+                    } else {
+                        val filtered = contactsList.filter {
+                            it.second.first.contains(contactSearch, true) || it.first.contains(contactSearch, true)
+                        }
+                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxHeight(0.6f)) {
+                            items(filtered) { c ->
+                                val uname = c.first
+                                val name = c.second.first
+                                val phone = c.second.second
+                                val avatar = c.third
+                                Row(
+                                    Modifier.fillMaxWidth().clickable {
+                                        scope.launch {
+                                            try {
+                                                val req = org.json.JSONObject()
+                                                req.put("from", myUsername)
+                                                req.put("to", chatUsername)
+                                                req.put("text", "")
+                                                req.put("message_type", "contact")
+                                                req.put("contact_name", name)
+                                                req.put("contact_phones", phone)
+                                                req.put("contact_avatar", avatar)
+
+                                                val client = okhttp3.OkHttpClient()
+                                                val body = okhttp3.RequestBody.create(
+                                                    "application/json".toMediaType(),
+                                                    req.toString()
+                                                )
+                                                val request = okhttp3.Request.Builder()
+                                                    .url("http://2.26.71.102:8004/api/chat/send")
+                                                    .post(body)
+                                                    .build()
+                                                client.newCall(request).execute().close()
+                                            } catch (e: Exception) { e.printStackTrace() }
+                                        }
+                                        showContactPicker = false
+                                        // Закрываем шторку
+                                        showAttachSheet = false
+                                    }.padding(horizontal = 16.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val avatarLink = if (avatar.isNotEmpty()) {
+                                        if (avatar.startsWith("http")) avatar else "http://2.26.71.102:8010" + avatar
+                                    } else {
+                                        "http://2.26.71.102:8010/avatars/$uname/avatar.jpg"
+                                    }
+                                    coil.compose.AsyncImage(
+                                        model = avatarLink,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(48.dp).clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(Modifier.width(16.dp))
+                                    Column {
+                                        Text(name, fontWeight = FontWeight.Medium, fontSize = 16.sp, color = Color(0xFFE6EDF3))
+                                        Text(phone, fontSize = 14.sp, color = Color.Gray)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // === СТАНДАРТНОЕ МЕНЮ ===
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        AttachOption(Icons.Filled.Image, "Галерея", true) {
+                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                        AttachOption(Icons.Filled.Description, "Файл") {
+                            filePicker.launch(arrayOf("*/*"))
+                        }
+                        AttachOption(Icons.Filled.LocationOn, "Локация")
+                        AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
+                    }
                 }
 
                 Spacer(Modifier.height(80.dp))
