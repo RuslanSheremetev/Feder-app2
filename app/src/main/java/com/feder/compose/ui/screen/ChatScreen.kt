@@ -732,6 +732,7 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     // Берем реальный токен из SharedPreferences
     val prefs = context.getSharedPreferences("feder_prefs", android.content.Context.MODE_PRIVATE)
     val effectiveToken = prefs.getString("access_token", "") ?: token
@@ -1902,7 +1903,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         selectedMessage = msg
                                     }
                                 },
-                            onLongClick = { selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
+                            onLongClick = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); selectionMode = true; selectedMessages = selectedMessages + msg.id.toString() },
                             onTapWithCoords = { localOffset ->
                                 
                                 // onClick уже вычислил координаты
@@ -2212,6 +2213,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 selectedMessage?.let { m ->
                                     selectedMessages = selectedMessages + m.id.toString()
                                 }
+                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                 selectionMode = true
                                 showForward = true
                                 forwardSelected = emptySet()
@@ -2221,6 +2223,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                             Row(Modifier.fillMaxWidth().clickable {
                                 selectedMessage?.let { m ->
+                                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                     selectionMode = true
                                     selectedMessages = setOf(m.id.toString())
                                 }
