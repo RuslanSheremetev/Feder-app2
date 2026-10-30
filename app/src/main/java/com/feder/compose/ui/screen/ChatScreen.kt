@@ -2570,14 +2570,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Аватарка (с заглушкой, если нет)
-                                if (!c.avatarUrl.isNullOrEmpty()) {
-                                    coil.compose.AsyncImage(
-                                        model = c.avatarUrl,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(48.dp).clip(CircleShape),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
+                                val avatarLink = if (!c.avatarUrl.isNullOrEmpty()) c.avatarUrl else "http://2.26.71.102:8010/avatars/${c.username}/avatar.jpg"
+                        AsyncImage(
+                            model = avatarLink,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp).clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        ) else {
                                     Box(
                                         Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF339DFF)),
                                         contentAlignment = Alignment.Center
