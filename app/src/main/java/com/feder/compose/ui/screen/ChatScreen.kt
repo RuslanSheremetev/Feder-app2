@@ -1762,14 +1762,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     Icon(Icons.Filled.VolumeOff, "muted", tint = OutlineVariant, modifier = Modifier.size(14.dp))
                                 }
                             }
-                            Text(
-                                when {
-                                    isOnline -> "online"
-                                    lastSeen > 0 -> formatLastSeen(lastSeen)
-                                    else -> "offline"
-                                },
-                                color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
-                            )
+                            if (chatUsername != "saved_messages") {
+                                Text(
+                                    when {
+                                        isOnline -> "online"
+                                        lastSeen > 0 -> formatLastSeen(lastSeen)
+                                        else -> "offline"
+                                    },
+                                    color = if (isOnline) Color(0xFF41B35D) else OnSurfaceVariant, fontSize = 11.sp
+                                )
+                            }
                         }
                         if (chatUsername != myUsername && chatUsername != "saved_messages" && !isGroup && !chatUsername.startsWith("group:")) {
                             IconButton(onClick = { }) { Icon(painter = painterResource(R.drawable.ic_video_outline), contentDescription = "video", tint = OnSurfaceVariant, modifier = Modifier.size(24.dp)) }
