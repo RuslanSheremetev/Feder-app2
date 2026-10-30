@@ -2510,6 +2510,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
+        // ─── Contact Picker (STEP 4: alert placeholder) ───
+        if (showContactPicker) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showContactPicker = false },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { showContactPicker = false }
+                    ) {
+                        androidx.compose.material3.Text("OK")
+                    }
+                },
+                text = {
+                    androidx.compose.material3.Text("Тут будет список контактов (шаг 4)")
+                }
+            )
+        }
+
         // ─── YouTube fullscreen player ───
         youtubeVideoId?.let { vid ->
             com.feder.compose.video.FullscreenYouTubePlayer(
