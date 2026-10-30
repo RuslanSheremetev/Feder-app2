@@ -521,10 +521,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                                     "received" -> "✓✓"
                                                     else -> "✓"
                                                 }
-                                                val checkColor = when (msg.status) {
-                                                    "read" -> Color(0xFF4CAF50)
-                                                    else -> Color.White.copy(alpha = 0.7f)
-                                                }
+                                                val checkColor = Color.White
                                                 DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                                             }
                                         }
@@ -590,10 +587,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                             "received" -> "✓✓"
                                             else -> "✓"
                                         }
-                                        val checkColor = when (msg.status) {
-                                            "read" -> Color(0xFF4CAF50)
-                                            else -> Color.White.copy(alpha = 0.7f)
-                                        }
+                                        val checkColor = Color.White
                                         DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                                     }
                                 }
@@ -679,10 +673,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                 "read" -> "✓✓"
                                 else -> "✓"
                             }
-                            val checkColor = when (msg.status) {
-                                "read" -> Color(0xFF4CAF50)
-                                else -> if (isMine) OnPrimaryContainer.copy(alpha = 0.6f) else OnSurfaceVariant
-                            }
+                            val checkColor = Color.White
                             DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.alignByBaseline().offset(y = 4.dp))
                         }
                     }
