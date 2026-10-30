@@ -53,7 +53,7 @@ fun SavedMessagesProfile(
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var photoViewerIndex by remember { mutableStateOf<Int?>(null) }
-    val tabs = listOf("Медиа", "Файлы", "Ссылки", "Музыка", "Голосовые", "Заметки")
+    val tabs = listOf("Media", "Files", "Links", "Music", "Voice", "Notes")
 
     androidx.compose.foundation.layout.Box(
         modifier = Modifier
@@ -133,7 +133,7 @@ fun SavedMessagesProfile(
                 Spacer(Modifier.height(6.dp))
 
                 Text(
-                    "Ваши сохранённые сообщения",
+                    "Your saved messages",
                     color = OnSurfaceVar,
                     fontSize = 12.sp
                 )
