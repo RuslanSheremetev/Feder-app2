@@ -2555,7 +2555,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             
                                             val client = okhttp3.OkHttpClient()
                                             val body = okhttp3.RequestBody.create(
-                                                okhttp3.MediaType.parse("application/json"),
+                                                "application/json".toMediaType(),
                                                 req.toString()
                                             )
                                             val request = okhttp3.Request.Builder()
