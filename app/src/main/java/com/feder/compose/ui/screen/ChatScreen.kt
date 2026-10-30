@@ -2625,17 +2625,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 } else {
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                        AttachOption(Icons.Filled.Image, "Галерея", true) {
-                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        }
-                        AttachOption(Icons.Filled.Description, "Файл") {
-                            filePicker.launch(arrayOf("*/*"))
-                        }
-                        AttachOption(Icons.Filled.LocationOn, "Локация")
-                        AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
-                    }
-                } else {
                     // === СТАНДАРТНОЕ МЕНЮ ===
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                         AttachOption(Icons.Filled.Image, "Галерея", true) {
