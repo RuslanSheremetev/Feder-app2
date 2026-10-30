@@ -2204,6 +2204,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     
                 ) {
                         var showAllReactions by remember { mutableStateOf(false) }
+    var showContactPicker by remember { mutableStateOf(false) }
                     val cornerRadius by animateDpAsState(if (showAllReactions) 20.dp else 50.dp, animationSpec = spring(dampingRatio = 0.8f, stiffness = 200f))
                     Surface(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(cornerRadius), color = SurfaceContainerHigh, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         val allReactions = listOf("👍", "❤️", "😂", "😮", "😢", "🙏", "😍", "🤔", "😡", "👍🏻", "👎", "🔥", "🎉", "💯", "✅", "❤️‍🔥")
@@ -2498,7 +2499,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         filePicker.launch(arrayOf("*/*"))
                     }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт")
+                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
                 }
 
                 Spacer(Modifier.height(80.dp))
