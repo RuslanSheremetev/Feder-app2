@@ -2905,7 +2905,9 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
                 Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
                     r.users.take(3).forEach { uname ->
                         val chat = allChats.find { it.username == uname }
-                        MiniAvatar(url = chat?.avatarUrl, username = uname)
+                        val avatarUrl = chat?.avatarUrl?.takeIf { it.isNotBlank() }
+                            ?: "http://2.26.71.102:8010/avatars/$uname/avatar.jpg"
+                        MiniAvatar(url = avatarUrl, username = uname)
                     }
                 }
                 Spacer(Modifier.width(2.dp))
