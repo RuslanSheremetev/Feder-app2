@@ -1,8 +1,10 @@
 package com.feder.compose.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,19 +72,25 @@ fun StickerMessage(
                     Spacer(Modifier.width(6.dp))
                 }
                 if (time.isNotEmpty()) {
-                    Text(time, color = Color(0xFF8A919E), fontSize = 11.sp)
-                    if (isMine) {
-                        Spacer(Modifier.width(3.dp))
-                        // Галочка как у текстовых (нарисованная)
-                        val checkColor = when (status) {
-                            "read" -> Color(0xFF4CAF50)
-                            else -> Color.White.copy(alpha = 0.7f)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(50))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(time, color = Color.White.copy(alpha = 0.9f), fontSize = 11.sp)
+                        if (isMine) {
+                            Spacer(Modifier.width(3.dp))
+                            val checkColor = when (status) {
+                                "read" -> Color(0xFF4CAF50)
+                                else -> Color.White.copy(alpha = 0.7f)
+                            }
+                            DrawCheck(
+                                double = (status == "read" || status == "received"),
+                                tint = checkColor,
+                                size = 12.dp
+                            )
                         }
-                        DrawCheck(
-                            double = (status == "read" || status == "received"),
-                            tint = checkColor,
-                            size = 14.dp
-                        )
                     }
                 }
             }
