@@ -2898,6 +2898,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (showDeleteDialog && messageToDelete != null) {
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { showDeleteDialog = false; messageToDelete = null },
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
                 title = { Text("Delete message?") },
                 text = {
                     Column {
