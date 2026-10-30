@@ -1839,7 +1839,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Box(
                                     Modifier
                                         .fillMaxWidth()
-                                        .background(if (selectionMode) Color(0xFF4A4A55).copy(alpha = 0.15f) else Color.Transparent)
+                                        .background(if (selectionMode) Color(0xFF339DFF).copy(alpha = 0.15f) else Color.Transparent)
                                         .padding(top = 10.dp, bottom = 6.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -1876,7 +1876,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 .fillMaxWidth()
                                 .background(
                                     if (selectionMode && selectedMessages.contains(msg.id.toString()))
-                                        (if (isMine) Color(0xFF339DFF) else Color(0xFF4A4A55)).copy(alpha = 0.15f)
+                                        Color(0xFF339DFF).copy(alpha = 0.15f)
                                     else Color.Transparent
                                 )
                                 .padding(horizontal = 16.dp)
