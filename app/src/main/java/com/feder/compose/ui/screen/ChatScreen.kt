@@ -2510,19 +2510,34 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             }
         }
         // Emoji Sheet
-        // ─── Contact Picker (STEP 4: alert placeholder) ───
+        // ─── Contact Picker (STEP 5: real ContactsScreen) ───
         if (showContactPicker) {
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { showContactPicker = false },
-                confirmButton = {
-                    androidx.compose.material3.TextButton(
-                        onClick = { showContactPicker = false }
-                    ) {
-                        androidx.compose.material3.Text("OK")
-                    }
-                },
+                confirmButton = {},
                 text = {
-                    androidx.compose.material3.Text("Тут будет список контактов (шаг 4)")
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.85f)
+                    ) {
+                        com.feder.compose.ui.screen.ContactsScreen(
+                            contacts = allChats,
+                            onBack = { showContactPicker = false },
+                            onContactClick = { username ->
+                                val c = allChats.find { it.username == username }
+                                if (c != null) {
+                                    onShareContact?.invoke(
+                                        username,
+                                        c.name,
+                                        "",
+                                        c.avatarUrl ?: ""
+                                    )
+                                }
+                                showContactPicker = false
+                            }
+                        )
+                    }
                 }
             )
         }
