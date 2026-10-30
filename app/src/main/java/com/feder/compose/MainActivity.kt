@@ -1298,23 +1298,44 @@ fun FederApp() {
                                 confirmValueChange = { value ->
                                     // Saved Messages нельзя удалить свайпом
                                     if (chat.username == "saved_messages") return@rememberSwipeToDismissBoxState false
-                                    if (value == SwipeToDismissBoxValue.EndToStart) {
-                                        showDeleteDialog = true
-                                        false  // откатываем свайп, показываем диалог
-                                    } else false
+                                    when (value) {
+                                        SwipeToDismissBoxValue.EndToStart -> {
+                                            showDeleteDialog = true
+                                            false  // откатываем свайп, показываем диалог
+                                        }
+                                        SwipeToDismissBoxValue.StartToEnd -> {
+                                            viewModel.markChatRead(chat.username)
+                                            false  // откатываем (не удаляем)
+                                        }
+                                        else -> false
+                                    }
                                 }
                             )
                             SwipeToDismissBox(
                                 state = dismissState,
-                                enableDismissFromStartToEnd = false,
+                                // allow both directions
                                 backgroundContent = {
-                                    // Не показываем красный фон для Saved Messages
+                                    // Не показываем фон для Saved Messages
                                     if (chat.username != "saved_messages") {
                                         Box(
-                                            Modifier.fillMaxSize().background(Color(0xFFE53935)),
-                                            contentAlignment = Alignment.CenterEnd
+                                            Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd)
+                                                        Color(0xFF4CAF50)
+                                                    else
+                                                        Color(0xFFE53935)
+                                                ),
+                                            contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd)
+                                                Alignment.CenterStart
+                                            else
+                                                Alignment.CenterEnd
                                         ) {
-                                            Icon(Icons.Filled.Delete, "Delete", tint = Color.White, modifier = Modifier.padding(end = 24.dp).size(24.dp))
+                                            if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
+                                                Icon(Icons.Filled.Check, "Read", tint = Color.White, modifier = Modifier.padding(start = 24.dp).size(24.dp))
+                                            } else {
+                                                Icon(Icons.Filled.Delete, "Delete", tint = Color.White, modifier = Modifier.padding(end = 24.dp).size(24.dp))
+                                            }
                                         }
                                     }
                                 }
