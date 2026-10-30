@@ -224,6 +224,7 @@ fun GroupMembersScreen(
                     .align(Alignment.BottomEnd)
                     .padding(end = 20.dp, bottom = 24.dp)
                     .navigationBarsPadding(),
+                shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
