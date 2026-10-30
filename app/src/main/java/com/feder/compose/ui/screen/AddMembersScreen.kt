@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,7 +67,7 @@ fun AddMembersScreen(
     val ctx = LocalContext.current
 
     // Исключаем уже участников
-    val available = contacts.filter { it.username !in existingMembers && it.username !in existingFromServer }
+    val available = contacts.filter { !it.isGroup && it.username !in existingMembers && it.username !in existingFromServer }
     val canAdd = selected.isNotEmpty()
 
     Column(
@@ -161,10 +163,21 @@ fun AddMembersScreen(
                             Text("@" + c.username, fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Checkbox(checked = isChecked, onCheckedChange = { ch ->
-                            if (ch) selected.add(c.username)
-                            else selected.remove(c.username)
-                        })
+                        if (isChecked) {
+                            Icon(
+                                Icons.Filled.CheckCircle,
+                                contentDescription = "selected",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        } else {
+                            Icon(
+                                Icons.Filled.RadioButtonUnchecked,
+                                contentDescription = "not selected",
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                 }
             }
