@@ -1323,12 +1323,33 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     fun toggleReactionApi(messageId: Long, emoji: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // Перелогин (чтобы получить свежий токен для реакции)
+                var reactionToken = internalToken
+                try {
+                    val authJson = gson.toJson(mapOf("username" to myUsername, "password" to myUsername))
+                    val authBody = authJson.toRequestBody("application/json".toMediaType())
+                    val authResp = httpClient.newCall(
+                        Request.Builder()
+                            .url("http://2.26.71.102:8004/api/login")
+                            .post(authBody).build()
+                    ).execute()
+                    val freshToken = JsonParser.parseString(authResp.body?.string() ?: "")
+                        .asJsonObject.get("access_token")?.asString ?: ""
+                    if (freshToken.isNotEmpty()) {
+                        internalToken = freshToken
+                        reactionToken = freshToken
+                        android.util.Log.d("ChatScreen", "REACTION_RELOGIN ok")
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("ChatScreen", "REACTION_RELOGIN fail: ${e.message}")
+                }
+
                 val json = gson.toJson(mapOf("message_id" to messageId, "emoji" to emoji))
                 val body = json.toRequestBody("application/json".toMediaType())
                 val resp = httpClient.newCall(
                     Request.Builder()
                         .url("http://2.26.71.102:8016/api/reaction/toggle")
-                        .header("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
+                        .header("Authorization", "Bearer ${reactionToken.ifEmpty { token }}")
                         .post(body).build()
                 ).execute()
                 val respText = resp.body?.string() ?: ""
