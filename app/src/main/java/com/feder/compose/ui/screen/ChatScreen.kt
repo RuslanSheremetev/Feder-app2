@@ -2913,7 +2913,7 @@ fun ReactionPill(r: Reaction, allChats: List<ChatItem> = emptyList(), myUsername
                 Spacer(Modifier.width(2.dp))
             }
             Text(r.emoji, fontSize = 13.sp)
-            if (r.count > 0) {
+            if (r.count > 1) {
                 Text(r.count.toString(), fontSize = 11.sp, fontWeight = FontWeight.Medium,
                     color = if (r.me) Primary else OnSurfaceVariant)
             }
