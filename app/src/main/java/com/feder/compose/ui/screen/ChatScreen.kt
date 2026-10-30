@@ -906,6 +906,45 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var isSending by remember { mutableStateOf(false) }
+    val contactPicker = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.PickContact()
+    ) { uri ->
+        if (uri != null) {
+            val ctx = context
+            var name = ""
+            var phonesStr = ""
+            try {
+                ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
+                    if (c.moveToFirst()) {
+                        val idxName = c.getColumnIndex(android.provider.ContactsContract.Contacts.DISPLAY_NAME)
+                        if (idxName >= 0) name = c.getString(idxName) ?: ""
+                    }
+                }
+                val phones = mutableListOf<String>()
+                ctx.contentResolver.query(
+                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    null,
+                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                    arrayOf(uri.lastPathSegment ?: ""),
+                    null
+                )?.use { pc ->
+                    while (pc.moveToNext()) {
+                        val num = pc.getString(pc.getColumnIndex(
+                            android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
+                        ))
+                        if (!num.isNullOrEmpty()) phones.add(num)
+                    }
+                }
+                phonesStr = phones.joinToString("|")
+            } catch (e: Exception) {
+                android.util.Log.e("ContactPicker", "read: ${e.message}")
+            }
+            if (name.isNotEmpty()) {
+                onShareContact?.invoke(name, name, phonesStr, "")
+            }
+        }
+    }
+
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
