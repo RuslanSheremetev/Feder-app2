@@ -686,8 +686,7 @@ fun MiniAvatar(url: String?, username: String) {
         modifier = Modifier
             .size(18.dp)
             .clip(CircleShape)
-            .background(bg)
-            .border(1.dp, SecondaryContainer, CircleShape),
+            .background(bg),
         contentAlignment = Alignment.Center
     ) {
         if (url.isNullOrBlank()) {
