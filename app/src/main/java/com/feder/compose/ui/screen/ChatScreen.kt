@@ -737,8 +737,10 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
     }
 }
 
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    androidx.compose.foundation.ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }, onShareContact: ((String, String, String, String) -> Unit)? = null) {
