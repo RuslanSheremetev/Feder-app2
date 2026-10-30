@@ -2507,25 +2507,93 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
         // ─── Contact Picker Bottom Sheet ───
         if (showContactPicker) {
+            var contactSearch by remember { mutableStateOf("") }
+            
             androidx.compose.material3.ModalBottomSheet(
                 onDismissRequest = { showContactPicker = false }
             ) {
-                com.feder.compose.ui.screen.ContactsScreen(
-                    contacts = allChats,
-                    onBack = { showContactPicker = false },
-                    onContactClick = { username ->
-                        val c = allChats.find { it.username == username }
-                        if (c != null) {
-                            onShareContact?.invoke(
-                                username,
-                                c.name,
-                                "",
-                                c.avatarUrl ?: ""
-                            )
-                        }
-                        showContactPicker = false
+                Column(Modifier.fillMaxWidth().fillMaxHeight(0.85f)) {
+                    // Поле поиска
+                    androidx.compose.material3.OutlinedTextField(
+                        value = contactSearch,
+                        onValueChange = { contactSearch = it },
+                        placeholder = { Text("Search contacts", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        singleLine = true,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0xFF1E1E1E),
+                            focusedContainerColor = Color(0xFF1E1E1E),
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent
+                        ),
+                        leadingIcon = { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.Search, null, tint = Color.Gray) }
+                    )
+                    
+                    // Список контактов (фильтруем allChats)
+                    val filteredContacts = allChats.filter {
+                        it.username != myUsername && 
+                        !it.isGroup && 
+                        (contactSearch.isEmpty() || it.name.contains(contactSearch, true) || it.username.contains(contactSearch, true))
                     }
-                )
+                    
+                    androidx.compose.foundation.lazy.LazyColumn {
+                        items(filteredContacts, key = { it.username }) { c ->
+                            Row(
+                                Modifier.fillMaxWidth().clickable {
+                                    // Отправка контакта
+                                    scope.launch {
+                                        try {
+                                            val req = org.json.JSONObject()
+                                            req.put("from", myUsername)
+                                            req.put("to", chatUsername)
+                                            req.put("text", "")
+                                            req.put("message_type", "contact")
+                                            req.put("contact_name", c.name)
+                                            req.put("contact_phones", "+7 (999) 000-00-00") // Заглушка, пока нет реального номера
+                                            req.put("contact_avatar", c.avatarUrl ?: "")
+                                            
+                                            val client = okhttp3.OkHttpClient()
+                                            val body = okhttp3.RequestBody.create(
+                                                okhttp3.MediaType.parse("application/json"),
+                                                req.toString()
+                                            )
+                                            val request = okhttp3.Request.Builder()
+                                                .url("http://2.26.71.102:8004/api/chat/send")
+                                                .post(body)
+                                                .build()
+                                            client.newCall(request).execute().close()
+                                        } catch (e: Exception) { e.printStackTrace() }
+                                    }
+                                    showContactPicker = false
+                                }.padding(horizontal = 16.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Аватарка (с заглушкой, если нет)
+                                if (!c.avatarUrl.isNullOrEmpty()) {
+                                    coil.compose.AsyncImage(
+                                        model = c.avatarUrl,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(48.dp).clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF339DFF)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(c.name.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                                Spacer(Modifier.width(16.dp))
+                                Column {
+                                    Text(c.name, fontWeight = FontWeight.Medium, fontSize = 16.sp, color = Color(0xFFE6EDF3))
+                                    Text("+7 (999) 000-00-00", fontSize = 14.sp, color = Color.Gray)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
