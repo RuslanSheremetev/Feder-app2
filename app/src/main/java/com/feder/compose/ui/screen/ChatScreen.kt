@@ -2542,20 +2542,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
 
-                    // Кнопка "Назад" для возврата к меню
-                    androidx.compose.foundation.layout.Row(
-                        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        androidx.compose.material3.IconButton(onClick = { showContactPicker = false }) {
-                            androidx.compose.material3.Icon(
-                                androidx.compose.material.icons.Icons.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.White
-                            )
-                        }
-                        Text("Contacts", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    }
 
                     androidx.compose.material3.OutlinedTextField(
                         value = contactSearch,
@@ -2637,6 +2623,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
+                    }
+                } else {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        AttachOption(Icons.Filled.Image, "Галерея", true) {
+                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                        AttachOption(Icons.Filled.Description, "Файл") {
+                            filePicker.launch(arrayOf("*/*"))
+                        }
+                        AttachOption(Icons.Filled.LocationOn, "Локация")
+                        AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
                     }
                 } else {
                     // === СТАНДАРТНОЕ МЕНЮ ===
