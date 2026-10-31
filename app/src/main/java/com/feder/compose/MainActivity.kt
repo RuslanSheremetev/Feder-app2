@@ -231,6 +231,9 @@ class ChatViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var selectedTab by mutableIntStateOf(0)
     var showNewGroup by mutableStateOf(false)
+    var showNewChannel by mutableStateOf(false)
+    var channelStep by mutableStateOf(1)
+    var channelData by mutableStateOf<Pair<String, Boolean>?>(null)
     var showGroupInfo by mutableStateOf<String?>(null)
     var showAddMembers by mutableStateOf<String?>(null)
   var showGroupMembers by mutableStateOf<String?>(null)
@@ -835,7 +838,7 @@ fun FederApp() {
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
     
     // Если открыт чат или настройки — показываем без шапки
-    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showGroupInfo != null || viewModel.showAddMembers != null || viewModel.showGroupMembers != null) {
+    if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showNewChannel || viewModel.showGroupInfo != null || viewModel.showAddMembers != null || viewModel.showGroupMembers != null) {
         Box(Modifier.fillMaxSize().background(Background)) {
             when {
                 viewModel.showAddMembers != null -> {
@@ -908,6 +911,29 @@ fun FederApp() {
                         isOwner = true
                     )
                 }
+                viewModel.showNewChannel -> {
+                    if (viewModel.channelStep == 1) {
+                        com.feder.compose.ui.screen.CreateChannelScreen(
+                            onBack = { viewModel.showNewChannel = false },
+                            onNext = { name, isPrivate ->
+                                viewModel.channelData = name to isPrivate
+                                viewModel.channelStep = 2
+                            }
+                        )
+                    } else if (viewModel.channelStep == 2) {
+                        com.feder.compose.ui.screen.SelectChannelSubscribersScreen(
+                            contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" && !it.isGroup },
+                            myUsername = viewModel.currentUsername.ifEmpty { "demo" },
+                            onBack = { viewModel.channelStep = 1 },
+                            onFinish = { selected ->
+                                val name = viewModel.channelData?.first ?: "channel"
+                                viewModel.createGroupViaOkHttp("channel:$name", selected)
+                                viewModel.showNewChannel = false
+                                viewModel.channelStep = 1
+                            }
+                        )
+                    }
+                }
                 viewModel.showNewGroup -> {
                     NewGroupScreen(
                         contacts = viewModel.chats.filter {
@@ -957,8 +983,9 @@ fun FederApp() {
                 }
                 viewModel.selectedChat != null -> {
                     val selectedChatItem = viewModel.chats.find { it.username == viewModel.selectedChat }
+                    val displayName = selectedChatItem?.name?.removePrefix("channel:") ?: ""
                     ChatScreen(
-                    chatName = selectedChatItem?.name ?: "",
+                    chatName = displayName,
                     chatUsername = viewModel.selectedChat ?: "",
                     myUsername = "demo",
                     token = viewModel.token,
@@ -1010,7 +1037,7 @@ fun FederApp() {
                 viewModel.selectedProfile != null ||
                 viewModel.showGroupInfo != null ||
                 viewModel.showAddMembers != null ||
-                viewModel.showNewGroup ||
+                viewModel.showNewGroup || viewModel.showNewChannel ||
                 viewModel.showSavedProfile
             if (!hideTopBar) {
             Box(
@@ -1124,7 +1151,7 @@ fun FederApp() {
                     ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (targetTab == 1) {
-                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" && !it.isGroup }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it }, onToggleSearch = { viewModel.isSearchVisible = !viewModel.isSearchVisible })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" && !it.isGroup }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, onNewChannel = { viewModel.showNewChannel = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it }, onToggleSearch = { viewModel.isSearchVisible = !viewModel.isSearchVisible })
                     } else if (targetTab == 2) {
                         val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(

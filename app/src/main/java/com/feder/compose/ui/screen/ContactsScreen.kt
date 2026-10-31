@@ -52,6 +52,7 @@ data class Contact(
 @Composable
 fun ContactsScreen(
     contacts: List<ChatItem>,
+    onNewChannel: () -> Unit = {},
     onBack: () -> Unit,
     onContactClick: (String) -> Unit = {},
     onNewGroup: () -> Unit = {},
@@ -153,9 +154,11 @@ fun ContactsScreen(
             // ═══ БОЛЬШИЕ ДЕЙСТВИЯ ═══
             item {
                 Column {
-                    ContactsActionRow(Icons.Filled.GroupAdd, "New Group", onClick = onNewGroup)
+                                        ContactsActionRow(Icons.Filled.GroupAdd, "New Group", onClick = onNewGroup)
+                    Spacer(Modifier.height(12.dp))
                     ContactsActionRow(Icons.Filled.Lock, "New Secret Chat")
-                    ContactsActionRow(Icons.Filled.Campaign, "New Channel")
+                    Spacer(Modifier.height(12.dp))
+                    ContactsActionRow(Icons.Filled.Campaign, "New Channel", onClick = onNewChannel)
                 }
             }
 
