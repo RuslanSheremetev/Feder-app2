@@ -54,6 +54,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -291,6 +292,16 @@ fun ChannelPostBubble(
                         Text("0", color = Color.Gray, fontSize = 12.sp)
                         Spacer(Modifier.width(8.dp))
                         Text(time, color = Color.Gray, fontSize = 12.sp)
+                        Spacer(Modifier.width(12.dp))
+                        // Стрелочка "Переслать"
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share",
+                            tint = Color.LightGray,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { onClick?.invoke() }
+                        )
                     }
                 }
             }
