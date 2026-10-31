@@ -152,6 +152,21 @@ data class Reaction(
     val me: Boolean = false
 )
 
+
+// FIX: десериализатор image_urls (принимает строку и массив)
+class ImageUrlsAdapter : com.google.gson.JsonDeserializer<List<String>> {
+    override fun deserialize(json: com.google.gson.JsonElement?, typeOfT: java.lang.reflect.Type?, context: com.google.gson.JsonDeserializationContext?): List<String> {
+        if (json == null || json.isJsonNull) return emptyList()
+        if (json.isJsonArray) return json.asJsonArray.mapNotNull { if (it.isJsonPrimitive) it.asString else null }.filter { it.isNotBlank() }
+        if (json.isJsonPrimitive) {
+            val s = json.asString
+            if (s.isBlank()) return emptyList()
+            return s.split(",").map { it.trim() }.filter { it.isNotBlank() }
+        }
+        return emptyList()
+    }
+}
+
 data class MsgItem(
     @com.google.gson.annotations.SerializedName(value = "from_user", alternate = ["from"])
     val from: String = "unknown",
@@ -164,6 +179,8 @@ data class MsgItem(
     var posX: Float = 0f,
     var posY: Float = 0f,
     val imageUrl: String? = null,
+    @com.google.gson.annotations.SerializedName("image_urls")
+    @com.google.gson.annotations.JsonAdapter(ImageUrlsAdapter::class)
     val imageUrls: List<String> = emptyList(),
     val replyToStoryId: Int = 0,
     val replyToStoryFilename: String? = null,
@@ -344,7 +361,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     }
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
-    if (msg.to?.startsWith("channel:") == true) {
+    if (msg.to?.contains("channel:") == true) {
         ChannelPostBubble(msg, time, myUsername, onClick, onLongClick)
         return
     }
