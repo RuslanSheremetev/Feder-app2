@@ -929,7 +929,10 @@ fun FederApp() {
                                 val name = viewModel.channelData?.first ?: "channel"
                                 viewModel.createGroupViaOkHttp("channel:$name", selected)
                                 viewModel.showNewChannel = false
-                                viewModel.channelStep = 1
+                                viewModel.channelStep = 0
+                                // FIX: обновляем список и открываем созданный канал
+                                viewModel.loadChats()
+                                viewModel.selectedChat = "channel:$name"
                             }
                         )
                     }
@@ -987,7 +990,7 @@ fun FederApp() {
                     ChatScreen(
                     chatName = displayName,
                     chatUsername = viewModel.selectedChat ?: "",
-                    myUsername = "demo",
+                    myUsername = viewModel.currentUsername.ifEmpty { "demo" },
                     token = viewModel.token,
                     avatarUrl = selectedChatItem?.avatarUrl,
                     lastSeen = selectedChatItem?.lastSeen ?: 0,

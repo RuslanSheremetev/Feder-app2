@@ -760,6 +760,12 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
 @Composable
 fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }, onShareContact: ((String, String, String, String) -> Unit)? = null) {
+    // === CHANNEL_ADMIN_FIX ===
+    val isChannel = chatUsername.startsWith("channel:")
+    // Пока считаем всех админами (потом уточним через created_by)
+    val isChannelAdmin = true
+    // === END CHANNEL_ADMIN_FIX ===
+
     val context = LocalContext.current
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     // Берем реальный токен из SharedPreferences
@@ -2819,9 +2825,11 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Icon(painter = painterResource(R.drawable.ic_attach_clip), contentDescription = "attach", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
                     Box(modifier = Modifier.weight(1f).then(if (expandInput) Modifier.fillMaxHeight() else Modifier)) {
-                        BasicTextField(value = inputText, onValueChange = { inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
+                        BasicTextField(value = inputText, onValueChange = { 
+                                if (isChannel && !isChannelAdmin) return@BasicTextField
+                                inputText = it }, singleLine = false, maxLines = if (expandInput) Int.MAX_VALUE else 4,
                             textStyle = TextStyle(color = OnSurface, fontSize = 14.sp), cursorBrush = SolidColor(Primary),
-                            modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(vertical = 6.dp).padding(end = 4.dp).heightIn(max = if (expandInput) 1000.dp else 80.dp),
+                            modifier = Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(vertical = 6.dp).padding(end = 4.dp).heightIn(max = if (expandInput) 1000.dp else 80.dp).alpha(if (isChannel && !isChannelAdmin) 0.5f else 1f),
                             decorationBox = { innerTextField ->
                                 if (inputText.isEmpty()) Text("Message", color = OnSurfaceVariant, fontSize = 14.sp)
                                 innerTextField()
