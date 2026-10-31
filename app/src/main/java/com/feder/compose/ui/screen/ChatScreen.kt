@@ -213,7 +213,7 @@ fun MenuAction(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: Str
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
+fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, isGroup: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
     onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
 onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
 
@@ -253,7 +253,23 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     val te = if (isMine) topRadius else 20.dp
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
-    Box(Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.fillMaxWidth().padding(top = vertPad), contentAlignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart) {
+    Row(
+        Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.fillMaxWidth().padding(top = vertPad),
+        horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Top
+    ) {
+        if (isGroup && !isMine && position == 0) {
+            coil.compose.AsyncImage(
+                model = "http://2.26.71.102:8010/avatars/${msg.from}/avatar.jpg",
+                contentDescription = null,
+                modifier = Modifier.size(32.dp).clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(Modifier.width(8.dp))
+        } else if (isGroup && !isMine) {
+            Spacer(Modifier.width(40.dp))
+        }
+
         // Получаем Vibrator ОДИН раз вне лямбды
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
@@ -1948,6 +1964,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             isMine,
                             token = token,
                             position = position,
+                            isGroup = isGroup,
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
                             allChats = allChats, myUsername = myUsername,
                             linkPreviewRepo = linkPreviewRepo,
