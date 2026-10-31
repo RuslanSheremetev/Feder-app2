@@ -18,3 +18,10 @@ feder-release.keystore
 *.bak
 *.bak_*
 *.bak.*
+
+# Мусор от фиксов
+*.bak_*
+*.broken_*
+fix_*.py
+fix*.py
+fix*.sh
