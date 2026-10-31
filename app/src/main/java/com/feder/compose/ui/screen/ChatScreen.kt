@@ -1265,6 +1265,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     toUser = toUser,
                                     text = text,
                                     timeVal = timeVal,
+                                    imageUrls = "",
+                                    messageType = "text",
                                     isRead = false
                                 )
                             )
@@ -1497,7 +1499,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     try {
                         val sendJson = gson.toJson(mapOf(
                             "to" to chatUsername, "text" to caption,
-                            "imageUrls" to serverUrls
+                            "image_urls" to serverUrls
                         ))
                         val sendBody = sendJson.toRequestBody("application/json".toMediaType())
                         val resp = httpClient.newCall(
@@ -1521,6 +1523,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 text = caption,        // ← подпись
                                 timeVal = System.currentTimeMillis() / 1000,
                                 imageUrls = serverUrls.joinToString(","),
+                                messageType = "image",
                                 isRead = false
                             ))
                         } catch (_: Exception) {}
