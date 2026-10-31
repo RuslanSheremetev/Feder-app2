@@ -258,7 +258,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
-        if (isGroup && !isMine && position == 0) {
+        if (isGroup && !isMine && (position == 0 || position == 3)) {
             coil.compose.AsyncImage(
                 model = "http://2.26.71.102:8010/avatars/${msg.from}/avatar.jpg",
                 contentDescription = null,
@@ -1818,7 +1818,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                 try {
                                                     val json = org.json.JSONObject().apply {
                                                         put("user_from", myUsername)
-                                                        put("to_user", chatUsername)
+                                                        put("to_user", chatUsername.removePrefix("group:"))
                                                         put("muted", !isMuted)
                                                     }
                                                     val req = okhttp3.Request.Builder()
@@ -2596,7 +2596,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             try {
                                                 val req = org.json.JSONObject()
                                                 req.put("from", myUsername)
-                                                req.put("to", chatUsername)
+                                                req.put("to", chatUsername.removePrefix("group:"))
                                                 req.put("text", "")
                                                 req.put("message_type", "contact")
                                                 req.put("contact_name", name)
@@ -2681,7 +2681,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         try {
                             val client = okhttp3.OkHttpClient()
                             android.util.Log.d("STICKER", "Sending: ${sticker.id}"); val json = org.json.JSONObject().apply {
-                                put("to_user", chatUsername)
+                                put("to_user", chatUsername.removePrefix("group:"))
                                 put("from_user", myUsername)
                                 put("sticker_id", sticker.id)
                                 put("sticker_text", sticker.text ?: "")
