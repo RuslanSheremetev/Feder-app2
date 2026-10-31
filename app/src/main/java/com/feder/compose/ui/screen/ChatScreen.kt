@@ -299,6 +299,7 @@ fun ChannelPostBubble(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, isGroup: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
     onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
 onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
