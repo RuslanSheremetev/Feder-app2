@@ -151,7 +151,7 @@ data class MsgItem(
     @com.google.gson.annotations.SerializedName(value = "from_user", alternate = ["from"])
     val from: String = "unknown",
     val to: String = "unknown",
-    val text: String,
+    val text: String = "",
     val time: String = "",
     var status: String = "sent",
     val timeVal: Long = 0L,
