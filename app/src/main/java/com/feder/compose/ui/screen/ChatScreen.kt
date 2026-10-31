@@ -1227,7 +1227,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
                 // К какому чату относится?
                 val isForThisChat = when {
-                    chatUsername.startsWith("group:") -> toUser == chatUsername
+                    chatUsername.startsWith("group:") -> toUser == chatUsername.removePrefix("group:")
                     else -> fromUser == chatUsername
                 }
 
