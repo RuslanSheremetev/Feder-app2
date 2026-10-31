@@ -245,7 +245,7 @@ fun ChannelPostBubble(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(start = 0.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
