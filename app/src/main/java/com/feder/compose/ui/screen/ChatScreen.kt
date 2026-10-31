@@ -885,7 +885,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // === CHANNEL_ADMIN_FIX ===
     val isChannel = chatUsername.startsWith("channel:")
     // Пока считаем всех админами (потом уточним через created_by)
-    val isChannelAdmin = true
+    val isChannelAdmin = (chatUsername == "channel:${myUsername}" || true) // TODO: заменить на createdBy
     // === END CHANNEL_ADMIN_FIX ===
 
     val context = LocalContext.current
@@ -1523,6 +1523,39 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     // === END REACTIONS API ===
 
     fun sendMessage() {
+        // === EDIT_MESSAGE ===
+        if (editMessage != null) {
+            val msgId = editMessage!!.id
+            val newText = inputText.trim()
+            if (newText.isEmpty()) return
+
+            // Обновляем локально сразу
+            messages = messages.map { if (it.id == msgId) it.copy(text = newText) else it }
+
+            // Отправляем на сервер
+            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    val body = gson.toJson(mapOf("id" to msgId, "text" to newText))
+                    val req = okhttp3.Request.Builder()
+                        .url("http://2.26.71.102:8004/api/chat/edit")
+                        .addHeader("Authorization", "Bearer ${internalToken.ifEmpty { token }}")
+                        .post(body.toRequestBody("application/json".toMediaType()))
+                        .build()
+                    httpClient.newCall(req).execute().use { resp ->
+                        android.util.Log.d("ChatScreen", "edit resp: ${resp.body?.string()}")
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("ChatScreen", "edit error: ${e.message}")
+                }
+            }
+
+            editMessage = null
+            inputText = ""
+            return
+        }
+        // === END EDIT_MESSAGE ===
+
+
         if (isSending) {
                         return
         }
