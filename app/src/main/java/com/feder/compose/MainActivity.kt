@@ -930,8 +930,7 @@ fun FederApp() {
                                 viewModel.createGroupViaOkHttp("channel:$name", selected)
                                 viewModel.showNewChannel = false
                                 viewModel.channelStep = 0
-                                // FIX: обновляем список и открываем созданный канал
-                                viewModel.loadChats()
+                                // FIX: канал создаётся, откроется через список после обновления
                                 viewModel.selectedChat = "channel:$name"
                             }
                         )
