@@ -333,7 +333,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     }
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
-    if (isGroup && (msg.to?.startsWith("channel:") == true)) {
+    if (msg.to?.startsWith("channel:") == true) {
         ChannelPostBubble(msg, time, myUsername, onClick, onLongClick)
         return
     }
