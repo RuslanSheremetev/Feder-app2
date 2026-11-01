@@ -246,92 +246,101 @@ fun ChannelPostBubble(
     selectionMode: Boolean = false,
     isSelected: Boolean = false
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = if (selectionMode) 32.dp else 0.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.Bottom // Выравниваем по низу
     ) {
-        if (selectionMode) {
-            androidx.compose.material3.Checkbox(
-                checked = isSelected,
-                onCheckedChange = { onClick?.invoke() },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(24.dp)
-            )
-        }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick?.invoke() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            val firstImg = msg.imageUrls?.firstOrNull()
-            if (!firstImg.isNullOrEmpty()) {
-                coil.compose.AsyncImage(
-                    model = firstImg,
-                    contentDescription = null,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 150.dp, max = 400.dp)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                )
-            }
-            Column(modifier = Modifier.padding(12.dp)) {
-                if (!msg.text.isNullOrEmpty()) {
-                    Text(
-                        text = msg.text,
-                        color = Color.White,
-                        fontSize = 15.sp,
-                        lineHeight = 20.sp
+        // Карточка поста (суженная)
+        Card(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+                .clickable { onClick?.invoke() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Уменьшенная картинка (не на весь экран, ограничиваем высоту)
+                val firstImg = msg.imageUrls?.firstOrNull()
+                if (!firstImg.isNullOrEmpty()) {
+                    coil.compose.AsyncImage(
+                        model = firstImg,
+                        contentDescription = null,
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp) // Фиксированная высота (как в ТГ)
+                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     )
-                    Spacer(Modifier.height(8.dp))
                 }
-                if (!msg.reactions.isNullOrEmpty()) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        msg.reactions.forEach { r ->
-                            Surface(
-                                shape = RoundedCornerShape(50),
-                                color = Color(0xFF2B3B4E)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                Column(modifier = Modifier.padding(12.dp)) {
+                    if (!msg.text.isNullOrEmpty()) {
+                        Text(
+                            text = msg.text,
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            lineHeight = 20.sp
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                    if (!msg.reactions.isNullOrEmpty()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            msg.reactions.forEach { r ->
+                                Surface(
+                                    shape = RoundedCornerShape(50),
+                                    color = Color(0xFF2B3B4E)
                                 ) {
-                                    Text(r.emoji, fontSize = 14.sp)
-                                    Spacer(Modifier.width(4.dp))
-                                    Text(r.count.toString(), color = Color.White, fontSize = 12.sp)
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(r.emoji, fontSize = 14.sp)
+                                        Spacer(Modifier.width(4.dp))
+                                        Text(r.count.toString(), color = Color.White, fontSize = 12.sp)
+                                    }
                                 }
                             }
                         }
+                        Spacer(Modifier.height(8.dp))
                     }
-                    Spacer(Modifier.height(8.dp))
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Нижняя панель (без стрелочки, она сбоку)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text("0 comments", color = Color.Gray, fontSize = 12.sp)
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("0", color = Color.Gray, fontSize = 12.sp)
-                        Spacer(Modifier.width(8.dp))
-                        Text(time, color = Color.Gray, fontSize = 12.sp)
-                        Spacer(Modifier.width(12.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("0", color = Color.Gray, fontSize = 12.sp)
+                            Spacer(Modifier.width(8.dp))
+                            Text(time, color = Color.Gray, fontSize = 12.sp)
+                        }
                     }
                 }
             }
         }
+
+        // Кнопка "Поделиться" (кружочек сбоку)
+        IconButton(
+            onClick = { onClick?.invoke() },
+            modifier = Modifier
+                .size(36.dp)
+                .background(Color(0xFF2B3B4E), RoundedCornerShape(50))
+                .padding(bottom = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = "Share",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
     }
-    } // Box
 }
 
 @Composable
