@@ -335,11 +335,11 @@ fun ChannelPostBubble(
             onClick = { onClick?.invoke() },
             modifier = Modifier
                 .size(32.dp)
-                .background(Color(0xFF2B3B4E), RoundedCornerShape(50))
+                .background(Color(0xFF1C2733).copy(alpha = 0.8f), RoundedCornerShape(50))
                 .padding(bottom = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Share,
+                imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Share",
                 tint = Color.White,
                 modifier = Modifier.size(18.dp)
