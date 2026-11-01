@@ -259,7 +259,8 @@ fun ChannelPostBubble(
         Card(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 4.dp),
+                .padding(end = 4.dp)
+                .clickable { onClick?.invoke() },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
