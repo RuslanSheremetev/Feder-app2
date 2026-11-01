@@ -251,7 +251,7 @@ fun ChannelPostBubble(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 0.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = 0.dp, end = 0.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.Bottom // Выравниваем по низу
     ) {
         // Карточка поста (суженная)
@@ -273,7 +273,7 @@ fun ChannelPostBubble(
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp) // Фиксированная высота (как в ТГ)
+                            .height(250.dp) // Увеличено для пропорций (как в ТГ)
                             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                             .clickable { onPhotoClick?.invoke() }
                     )
@@ -334,7 +334,7 @@ fun ChannelPostBubble(
         IconButton(
             onClick = { onClick?.invoke() },
             modifier = Modifier
-                .size(36.dp)
+                .size(32.dp)
                 .background(Color(0xFF2B3B4E), RoundedCornerShape(50))
                 .padding(bottom = 8.dp)
         ) {
