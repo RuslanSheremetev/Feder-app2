@@ -251,14 +251,14 @@ fun ChannelPostBubble(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = 0.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.Bottom // Выравниваем по низу
     ) {
         // Карточка поста (суженная)
         Card(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp),
+                .padding(end = 4.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
