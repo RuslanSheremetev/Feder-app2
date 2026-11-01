@@ -118,7 +118,9 @@ data class LoginResponse(
 data class ChatItem(
     val username: String,
     val name: String,
-    @SerializedName("unread_count") val unread: Int = 0,
+    @SerializedName("unread_count",
+    val createdBy: String = ""
+) val unread: Int = 0,
     @SerializedName("avatar_color") val avatarColor: String = "#339dff",
     @SerializedName("avatar_url") val avatarUrl: String? = null,
     val online: Boolean = false,
@@ -995,6 +997,7 @@ fun FederApp() {
                     lastSeen = selectedChatItem?.lastSeen ?: 0,
                     isOnline = selectedChatItem?.online ?: false,
                     isGroup = selectedChatItem?.isGroup ?: false,
+                    createdBy = selectedChatItem?.createdBy ?: "",
                     allChats = viewModel.chats,
                     wsManager = viewModel.wsManager,
                     repository = viewModel.repository,

@@ -191,6 +191,8 @@ data class MsgItem(
     val reactions: List<Reaction> = emptyList(),
     @com.google.gson.annotations.SerializedName("message_type")
     val messageType: String = "text",
+    @com.google.gson.annotations.SerializedName("edited")
+    val edited: Boolean = false,
     @com.google.gson.annotations.SerializedName("sticker_id")
     val stickerId: String? = null,
     @com.google.gson.annotations.SerializedName("sticker_text")
@@ -801,7 +803,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                     // Если фото-сообщение — время справа в этом же ряду
                     if (time.isNotEmpty() && msg.forwardedFrom.isNullOrEmpty()) {
                         Spacer(Modifier.weight(1f))
-                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false)
+                        Text(if (msg.edited) "$time (изменено)" else time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false)
                         if (isMine) {
                             Spacer(Modifier.width(2.dp))
                             val checkText = when (msg.status) {
@@ -880,12 +882,12 @@ private fun MenuRow(text: String, icon: ImageVector, onClick: () -> Unit) {
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
+fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token: String, avatarUrl: String? = null, lastSeen: Long = 0, isOnline: Boolean = false, isGroup: Boolean = false, createdBy: String = "", allChats: List<ChatItem> = emptyList(), wsManager: ProWebSocket? = null, repository: com.feder.compose.repository.ChatRepository? = null, linkPreviewRepo: com.feder.compose.repository.LinkPreviewRepository? = null, onBack: () -> Unit, onProfileClick: () -> Unit = {}, onSavedProfileClick: () -> Unit = {},
     onGroupInfoClick: () -> Unit = {}, onMessageSent: ((String, String) -> Unit)? = null, reactionUpdates: kotlinx.coroutines.flow.SharedFlow<Pair<Long, String>>? = null, onMuteChanged: (String, Boolean) -> Unit = { _, _ -> }, onShareContact: ((String, String, String, String) -> Unit)? = null) {
     // === CHANNEL_ADMIN_FIX ===
     val isChannel = chatUsername.startsWith("channel:")
     // Пока считаем всех админами (потом уточним через created_by)
-    val isChannelAdmin = (chatUsername == "channel:${myUsername}" || true) // TODO: заменить на createdBy
+    val isChannelAdmin = (createdBy == myUsername || createdBy.isEmpty())
     // === END CHANNEL_ADMIN_FIX ===
 
     val context = LocalContext.current
@@ -2446,7 +2448,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
-                            if (selectedMessage?.from == myUsername) {
+                            if (selectedMessage?.from == myUsername && (!isChannel || isChannelAdmin)) {
                                 Row(Modifier.fillMaxWidth().clickable { editMessage = selectedMessage; inputText = selectedMessage?.text ?: ""; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(painter = painterResource(R.drawable.ic_edit_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Edit", color = OnSurface, fontSize = 16.sp)
                                 }
