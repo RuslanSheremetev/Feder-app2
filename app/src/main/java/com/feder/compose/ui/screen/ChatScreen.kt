@@ -273,7 +273,7 @@ fun ChannelPostBubble(
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 450.dp) // Максимальная высота, чтобы картинка была длиннее
+                            .aspectRatio(3f / 4f) // Пропорции 3:4 (портрет) для вытянутой карточки
                             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                             .clickable { onPhotoClick?.invoke() }
                     )
