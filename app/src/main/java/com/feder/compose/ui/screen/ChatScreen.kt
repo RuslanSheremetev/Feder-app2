@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -339,7 +340,7 @@ fun ChannelPostBubble(
                 .padding(bottom = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
+                imageVector = Icons.Default.Send,
                 contentDescription = "Share",
                 tint = Color.White,
                 modifier = Modifier.size(18.dp)
