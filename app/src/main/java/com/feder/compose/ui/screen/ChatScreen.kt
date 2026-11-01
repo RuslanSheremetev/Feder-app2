@@ -2032,7 +2032,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             else {
                 val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
                 val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
-                LazyColumn(Modifier.weight(1f), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     // Для каждой даты вычисляем, находится ли она между выделенными сообщениями
                     var firstSelectedIndex = -1
@@ -2186,6 +2187,17 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     item { Spacer(Modifier.height(16.dp)) }
                     item { Spacer(Modifier.height(60.dp)) }
                 }
+                    // Scrim (вуаль) при выделении
+                    if (selectionMode) {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.3f))
+                            .pointerInput(Unit) {
+                                detectTapGestures { selectionMode = false; selectedMessages = emptySet() }
+                            })
+                    }
+                }
+
 
             }
 
