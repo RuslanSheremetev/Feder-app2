@@ -759,13 +759,13 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
                 Box(
-                    Modifier.padding(horizontal = 6.dp, vertical = 3.dp).fillMaxWidth()
+                    Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text,
                         color = if (isMine) Color.White else OnSurface,
                         fontSize = 14.sp,
-                        modifier = Modifier.fillMaxWidth().padding(end = if (time.isNotEmpty()) 50.dp else 0.dp)
+                        modifier = Modifier.padding(end = if (time.isNotEmpty()) 50.dp else 0.dp)
                     )
                     // Время и галочка в правом нижнем углу
                     val hasLinkPreview = linkPreviewRepo != null && extractFirstUrl(text) != null
