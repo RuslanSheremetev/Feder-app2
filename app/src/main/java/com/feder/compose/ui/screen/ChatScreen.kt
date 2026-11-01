@@ -326,14 +326,6 @@ fun ChannelPostBubble(
                         Spacer(Modifier.width(8.dp))
                         Text(time, color = Color.Gray, fontSize = 12.sp)
                         Spacer(Modifier.width(12.dp))
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                            tint = Color.LightGray,
-                            modifier = Modifier
-                                .size(18.dp)
-                                .clickable { onClick?.invoke() }
-                        )
                     }
                 }
             }
