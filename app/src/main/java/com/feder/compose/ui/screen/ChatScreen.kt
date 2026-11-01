@@ -674,7 +674,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                         shape = RoundedCornerShape(12.dp),
                                         color = SurfaceContainerHigh
                                     ) {
-                                        Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Top) {
+                                        Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Bottom) {
                                             Text(time, color = Color.White, fontSize = 11.sp, maxLines = 1, softWrap = false)
                                             if (isMine) {
                                                 Spacer(Modifier.width(1.dp))
