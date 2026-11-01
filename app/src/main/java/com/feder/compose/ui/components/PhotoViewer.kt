@@ -47,6 +47,7 @@ fun PhotoViewer(
     onClose: () -> Unit,
     senderName: String = "",
     timeText: String = "",
+    caption: String = "",
     onEdit: (() -> Unit)? = null,
     onShare: (() -> Unit)? = null,
     onMore: (() -> Unit)? = null,

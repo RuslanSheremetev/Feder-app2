@@ -138,6 +138,7 @@ private val loggerClient: okhttp3.OkHttpClient by lazy {
 
 // FIX_HERO_CLOSE_V1: fullScreenPhoto должен быть state, иначе закрытие не триггерит рекомпозицию
 var fullScreenPhoto by mutableStateOf<String?>(null)
+var fullScreenCaption by mutableStateOf<String?>(null)
 // FIX_HERO_STEP1: координаты миниатюры фото для hero-анимации
 var photoSourceX by mutableStateOf(0f)
 var photoSourceY by mutableStateOf(0f)
@@ -243,6 +244,7 @@ fun ChannelPostBubble(
     myUsername: String,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
+    onPhotoClick: (() -> Unit)? = null,
     selectionMode: Boolean = false,
     isSelected: Boolean = false
 ) {
@@ -273,6 +275,7 @@ fun ChannelPostBubble(
                             .fillMaxWidth()
                             .height(200.dp) // Фиксированная высота (как в ТГ)
                             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                            .clickable { onPhotoClick?.invoke() }
                     )
                 }
                 Column(modifier = Modifier
@@ -381,7 +384,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
     if (msg.to?.contains("channel:") == true) {
-        ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, selectionMode, selectedMessages.contains(msg.id.toString()))
+        ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
 
@@ -3229,6 +3232,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 initialIndex = 0,
                 senderName = chatName,
                 timeText = "",
+                caption = fullScreenCaption ?: "",
                 onClose = { fullScreenPhoto = null },
                 onEdit = { /* TODO */ },
                 onShare = { /* TODO */ },
