@@ -242,12 +242,27 @@ fun ChannelPostBubble(
     time: String,
     myUsername: String,
     onClick: (() -> Unit)? = null,
-    onLongClick: (() -> Unit)? = null
+    onLongClick: (() -> Unit)? = null,
+    selectionMode: Boolean = false,
+    isSelected: Boolean = false
 ) {
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 0.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = if (selectionMode) 32.dp else 0.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+    ) {
+        if (selectionMode) {
+            androidx.compose.material3.Checkbox(
+                checked = isSelected,
+                onCheckedChange = { onClick?.invoke() },
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(24.dp)
+            )
+        }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2733)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -312,7 +327,6 @@ fun ChannelPostBubble(
                         Spacer(Modifier.width(8.dp))
                         Text(time, color = Color.Gray, fontSize = 12.sp)
                         Spacer(Modifier.width(12.dp))
-                        // Стрелочка "Переслать"
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share",
@@ -326,6 +340,7 @@ fun ChannelPostBubble(
             }
         }
     }
+    } // Box
 }
 
 @Composable
@@ -364,7 +379,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
     if (msg.to?.contains("channel:") == true) {
-        ChannelPostBubble(msg, time, myUsername, onClick, onLongClick)
+        ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
 
