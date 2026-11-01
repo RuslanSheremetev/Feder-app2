@@ -317,8 +317,6 @@ fun ChannelPostBubble(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Menu, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp))
                         Text("0 comments", color = Color.Gray, fontSize = 12.sp)
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
