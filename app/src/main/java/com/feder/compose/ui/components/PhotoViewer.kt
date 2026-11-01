@@ -251,6 +251,29 @@ fun PhotoViewer(
             }
         }
 
+        // ─── Текст поста (caption) ───
+        if (uiVisible && !isDragging && caption.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 60.dp)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0x00000000), Color(0xCC000000))
+                        )
+                    )
+                    .padding(16.dp)
+            ) {
+                Text(
+                    caption,
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                )
+            }
+        }
         // ─── Счётчик N of M ───
         if (uiVisible && !isDragging) {
             Text(
