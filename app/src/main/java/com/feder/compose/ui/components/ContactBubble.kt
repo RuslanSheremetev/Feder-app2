@@ -59,14 +59,6 @@ fun ContactBubble(
                 modifier = Modifier.padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Вертикальная белая полоса
-                Box(
-                    Modifier
-                        .width(3.dp)
-                        .height(42.dp)
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(2.dp))
-                )
-                Spacer(Modifier.width(10.dp))
                 
                 // Аватарка
                 if (!contactAvatar.isNullOrEmpty()) {
