@@ -60,6 +60,15 @@ fun ContactBubble(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 
+                // Вертикальная белая полоса (возвращена)
+                Box(
+                    Modifier
+                        .width(3.dp)
+                        .height(42.dp)
+                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(2.dp))
+                )
+                Spacer(Modifier.width(10.dp))
+
                 // Аватарка
                 if (!contactAvatar.isNullOrEmpty()) {
                     AsyncImage(
@@ -100,16 +109,7 @@ fun ContactBubble(
                 }
             }
             
-            // Разделитель
-            Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.15f)))
             
-            // Нижний блок: "MESSAGE"
-            Box(
-                Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("MESSAGE", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            }
             
             // Время + галочки
             Row(
