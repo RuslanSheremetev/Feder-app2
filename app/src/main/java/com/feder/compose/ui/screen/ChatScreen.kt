@@ -674,7 +674,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                         shape = RoundedCornerShape(12.dp),
                                         color = SurfaceContainerHigh
                                     ) {
-                                        Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Bottom) {
+                                        Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.Top) {
                                             Text(time, color = Color.White, fontSize = 11.sp, maxLines = 1, softWrap = false)
                                             if (isMine) {
                                                 Spacer(Modifier.width(1.dp))
@@ -758,38 +758,39 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                     }
                 }
             if (msg.imageUrls.isEmpty() && msg.imageUrl == null) {
-                Box(
-                    Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                Row(
+                    Modifier.padding(horizontal = 6.dp, vertical = 3.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                    Text(
-                        text,
-                        color = if (isMine) Color.White else OnSurface,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(end = if (time.isNotEmpty()) 50.dp else 0.dp)
-                    )
-                    // Время и галочка в правом нижнем углу
+                    if (text.isNotEmpty()) {
+                        Text(
+                            text,
+                            color = if (isMine) Color.White else OnSurface,
+                            fontSize = 14.sp,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                    // Скрыть время, если есть link preview (оно уже внутри карточки)
                     val hasLinkPreview = linkPreviewRepo != null && extractFirstUrl(text) != null
                     if (time.isNotEmpty() && msg.reactions.isEmpty() && !hasLinkPreview && msg.forwardedFrom.isNullOrEmpty()) {
-                        Row(
-                            modifier = Modifier.align(Alignment.BottomEnd),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false)
-                            if (isMine) {
-                                Spacer(Modifier.width(2.dp))
-                                val checkText = when (msg.status) {
-                                    "pending" -> "✓"
-                                    "sent" -> "✓"
-                                    "received" -> "✓✓"
-                                    "read" -> "✓✓"
-                                    else -> "✓"
-                                }
-                                val checkColor = when (msg.status) {
-                                    "read" -> Color(0xFF4CAF50)
-                                    else -> Color.White.copy(alpha = 0.7f)
-                                }
-                                DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp)
+                        Spacer(Modifier.width(6.dp))
+                        Text(time, color = if (isMine) Color.White.copy(alpha = 0.7f) else OnSurfaceVariant, fontSize = 10.sp, maxLines = 1, softWrap = false, modifier = Modifier.align(Alignment.Bottom).offset(y = (-1).dp))
+                        if (isMine) {
+                            Spacer(Modifier.width(2.dp))
+                            val checkText = when (msg.status) {
+                                "pending" -> "✓"
+                                "sent" -> "✓"
+                                "received" -> "✓✓"
+                                "read" -> "✓✓"
+                                else -> "✓"
                             }
+                            val checkColor = when (msg.status) {
+                                "read" -> Color(0xFF4CAF50)
+                                else -> Color.White.copy(alpha = 0.7f)
+                            }
+                            DrawCheck(double = checkText.contains("✓✓"), tint = checkColor, size = 12.dp, modifier = Modifier.align(Alignment.Bottom).offset(y = (-1).dp))
                         }
                     }
                 }
