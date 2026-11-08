@@ -923,7 +923,7 @@ fun FederApp() {
                         )
                     } else if (viewModel.channelStep == 2) {
                         com.feder.compose.ui.screen.SelectChannelSubscribersScreen(
-                            contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" && !it.isGroup },
+                            contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" },
                             myUsername = viewModel.currentUsername.ifEmpty { "demo" },
                             onBack = { viewModel.channelStep = 1 },
                             onFinish = { selected ->
@@ -1155,7 +1155,7 @@ fun FederApp() {
                     ) { targetTab ->
                     // Если выбраны Contacts или Settings — показываем их
                     if (targetTab == 1) {
-                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" && !it.isGroup }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, onNewChannel = { viewModel.showNewChannel = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it }, onToggleSearch = { viewModel.isSearchVisible = !viewModel.isSearchVisible })
+                        ContactsScreen(contacts = viewModel.chats.filter { it.username != "demo" && it.username != "123" && it.username != "saved_messages" }, onBack = { viewModel.selectedTab = 0 }, onContactClick = { username -> viewModel.selectedChat = username; viewModel.markChatRead(username) }, onNewGroup = { viewModel.showNewGroup = true }, onNewChannel = { viewModel.showNewChannel = true }, isSearchVisible = viewModel.isSearchVisible, searchQuery = viewModel.searchQuery, onSearchChange = { viewModel.searchQuery = it }, onToggleSearch = { viewModel.isSearchVisible = !viewModel.isSearchVisible })
                     } else if (targetTab == 2) {
                         val myProfileItem = viewModel.chats.find { it.username == "demo" }
                         MyProfileScreen(
