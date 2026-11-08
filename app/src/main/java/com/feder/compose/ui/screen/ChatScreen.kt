@@ -482,7 +482,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                          else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
             )
         )) {
-            Column(Modifier.padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
+            Column(Modifier.then(if (isAudioMsg) Modifier.width(300.dp) else Modifier).padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
                         // ═══ Reply to story preview ═══
                         // ─── Forwarded from плашка (внутри bubble) ───
                         if (!msg.forwardedFrom.isNullOrEmpty()) {
@@ -550,7 +550,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                             }
                         }
 
-                        if (msg.replyToStoryId > 0 && !msg.replyToStoryFilename.isNullOrEmpty()) {
+                        if (!isAudioMsg && msg.replyToStoryId > 0 && !msg.replyToStoryFilename.isNullOrEmpty()) {
                             Row(
                                 Modifier
                                     .padding(horizontal = 6.dp, vertical = 6.dp)
