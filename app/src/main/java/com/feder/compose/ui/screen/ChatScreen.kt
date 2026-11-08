@@ -2153,7 +2153,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             isMine,
                             token = token,
                             position = position,
-                            isGroup = isGroup,
+                            isGroup = true, // FIX: force group bubble style
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
                             allChats = allChats, myUsername = myUsername,
                             linkPreviewRepo = linkPreviewRepo,
