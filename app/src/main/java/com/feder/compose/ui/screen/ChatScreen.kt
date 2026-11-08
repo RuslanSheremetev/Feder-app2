@@ -204,7 +204,8 @@ data class MsgItem(
     @com.google.gson.annotations.SerializedName("contact_phones")
     val contactPhones: String? = null,
     @com.google.gson.annotations.SerializedName("contact_avatar")
-    val contactAvatar: String? = null
+    val contactAvatar: String? = null,
+    @com.google.gson.annotations.SerializedName("contact_username") val contactUsername: String? = null
 )
 
 @Composable
