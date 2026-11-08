@@ -585,10 +585,9 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     val isAudio = firstUrl.contains(".m4a") || firstUrl.contains("audio_") || firstUrl.contains(".mp3")
-                    // removed rlog for perf
                     val isVideo = firstUrl.contains(".mp4") || firstUrl.contains("video_") || firstUrl.contains(".webm")
+                    
                     if (isAudio) {
-                        // ═══ AUDIO BUBBLE ═══
                         com.feder.compose.audio.AudioBubble(
                             audioUrl = firstUrl,
                             token = token,
@@ -598,19 +597,18 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                             onLongClick = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() }
                         )
                     } else if (isVideo) {
-                        VideoBubble(
+                        com.feder.compose.video.VideoBubble(
                             videoUrl = firstUrl,
                             token = token,
                             isMine = isMine,
                             time = time,
                             msgStatus = msg.status,
-                            thumbUrl = firstUrl.substringBeforeLast(".").replace("videos/", "video_thumbs/") + ".jpg",
+                            thumbUrl = null,
                             isVisible = true,
-                            onLongPress = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() },
-                            onOpenFullscreen = { onClick?.invoke() }
+                            onLongPress = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onClick?.invoke() }
                         )
                     } else {
-                    Column(Modifier.fillMaxWidth()) {
+                        Column(Modifier.fillMaxWidth()) {
                         msg.imageUrls.forEachIndexed { index, url ->
                             Box {
                                 if (uploadingPhotos && msg.status == "pending") {
