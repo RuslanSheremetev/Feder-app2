@@ -462,7 +462,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         val photoHeight = computedSize.second.dp
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
         val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
-val isAudioMsg = firstImageOrAudioUrl != null && com.feder.compose.audio.IsAudio.isAudioFile(firstImageOrAudioUrl)
+val isAudioMsg = firstImageOrAudioUrl != null && (firstImageOrAudioUrl.contains(".m4a") || firstImageOrAudioUrl.contains("audio_") || firstImageOrAudioUrl.contains(".mp3"))
 Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
             detectTapGestures(
                 onTap = { localOffset ->
@@ -583,9 +583,9 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 // removed rlog for perf
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
-                    val isAudio = com.feder.compose.audio.IsAudio.isAudioFile(firstUrl)
+                    val isAudio = firstUrl.contains(".m4a") || firstUrl.contains("audio_") || firstUrl.contains(".mp3")
                     // removed rlog for perf
-                    val isVideo = com.feder.compose.audio.IsVideo.isVideoFile(firstUrl)
+                    val isVideo = firstUrl.contains(".mp4") || firstUrl.contains("video_") || firstUrl.contains(".webm")
                     if (isAudio) {
                         // ═══ AUDIO BUBBLE ═══
                         com.feder.compose.audio.AudioBubble(
