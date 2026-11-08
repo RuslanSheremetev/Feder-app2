@@ -38,6 +38,7 @@ fun AudioBubble(
     val context = LocalContext.current
     var player by remember { mutableStateOf<MediaPlayer?>(null) }
     var isPlaying by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
     var positionMs by remember { mutableStateOf(0) }
     var durationMs by remember { mutableStateOf(0) }
 
@@ -82,7 +83,11 @@ fun AudioBubble(
                             positionMs = 0
                             it.seekTo(0)
                         }
-                        setOnErrorListener { _, _, _ -> isPlaying = false; true }
+                        setOnErrorListener { _, what, extra -> 
+                            android.util.Log.e("AudioBubble", "MediaPlayer error: what=$what extra=$extra")
+                            isPlaying = false
+                            true 
+                        }
                         prepareAsync()
                     }
                 } catch (e: Exception) {
@@ -100,6 +105,9 @@ fun AudioBubble(
         return "%d:%02d".format(s / 60, s % 60)
     }
 
+    if (errorMsg != null) {
+        Text("Ошибка: $errorMsg", color = Color.Red, fontSize = 10.sp)
+    }
     Row(
         modifier = Modifier
             .combinedClickable(onClick = { togglePlay() }, onLongClick = onLongClick)
