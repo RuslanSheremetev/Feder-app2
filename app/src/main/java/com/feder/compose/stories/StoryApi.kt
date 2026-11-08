@@ -19,7 +19,7 @@ import java.net.URL
  */
 object StoryApi {
 
-    const val BASE_URL = "http://2.26.71.102:8020"
+    const val BASE_URL = "https://2.26.71.102"
     private const val TAG = "StoryApi"
 
     // ─── Модели данных ──────────────────────────────────────────────────
