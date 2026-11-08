@@ -43,11 +43,8 @@ fun VideoBubble(
     val player = rememberFederVideoPlayer()
 
     val fullVideoUrl = remember(videoUrl, token) {
-        if (videoUrl.startsWith("http")) {
-            if (videoUrl.contains("?")) videoUrl else "$videoUrl?token=$token"
-        } else {
-            "http://2.26.71.102:8018/videos/$videoUrl?token=$token"
-        }
+        val fileName = videoUrl.substringAfterLast("/")
+        "http://2.26.71.102:8018/videos/$fileName?token=$token"
     }
 
     val fullThumbUrl = remember(thumbUrl) {
