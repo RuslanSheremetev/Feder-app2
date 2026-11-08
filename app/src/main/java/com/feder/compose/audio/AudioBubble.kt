@@ -41,8 +41,12 @@ fun AudioBubble(
     var positionMs by remember { mutableStateOf(0) }
     var durationMs by remember { mutableStateOf(0) }
 
-    val fullUrl = if (audioUrl.startsWith("http")) "$audioUrl?token=$token"
-                  else "http://2.26.71.102:8014/$audioUrl?token=$token"
+    val fullUrl = if (audioUrl.startsWith("http")) {
+        // Если ссылка идет на 8012 (фото), меняем на 8014 (аудио)
+        audioUrl.replace(":8012/", ":8014/") + "?token=$token"
+    } else {
+        "http://2.26.71.102:8014/$audioUrl?token=$token"
+    }
 
     LaunchedEffect(isPlaying) {
         while (isPlaying) {
