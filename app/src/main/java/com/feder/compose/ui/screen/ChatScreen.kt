@@ -387,7 +387,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     }
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
-    if (msg.to?.contains("channel:") == true) {
+    if (msg.to?.startsWith("channel:") == true) {
         ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
