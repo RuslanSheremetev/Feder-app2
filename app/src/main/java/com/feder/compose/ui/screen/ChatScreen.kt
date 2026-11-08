@@ -362,6 +362,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
             contactName = msg.contactName,
             contactPhones = msg.contactPhones ?: "",
             contactAvatar = msg.contactAvatar,
+            contactUsername = msg.contactUsername,
             time = time,
             isMine = isMine,
             status = msg.status,

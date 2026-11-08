@@ -27,6 +27,7 @@ fun ContactBubble(
     contactName: String,
     contactPhones: String,
     contactAvatar: String?,
+    contactUsername: String? = null,
     time: String,
     isMine: Boolean,
     status: String,
@@ -37,6 +38,14 @@ fun ContactBubble(
         val parts = it.split(":")
         if (parts.size >= 2) parts[0] to parts[1] else "Phone" to it
     }
+
+    val realAvatarUrl = if (!contactAvatar.isNullOrEmpty()) {
+                    contactAvatar
+                } else if (!contactUsername.isNullOrEmpty()) {
+                    "http://2.26.71.102:8010/avatars/${contactUsername}/avatar.jpg"
+                } else {
+                    null
+                }
 
     Box(
         modifier = Modifier
