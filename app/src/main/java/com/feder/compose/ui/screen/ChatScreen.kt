@@ -402,7 +402,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
     Row(
-        Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.fillMaxWidth().padding(top = vertPad),
+        Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.padding(top = vertPad),
         horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
