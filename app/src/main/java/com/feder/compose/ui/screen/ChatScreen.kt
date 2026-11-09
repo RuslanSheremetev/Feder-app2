@@ -406,7 +406,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
-        if (isGroup && !isMine && (position == 0 || position == 3)) {
+        if (false && isGroup && !isMine && (position == 0 || position == 3)) {
             coil.compose.AsyncImage(
                 model = "http://2.26.71.102:8010/avatars/${msg.from}/avatar.jpg",
                 contentDescription = null,
@@ -2153,7 +2153,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             isMine,
                             token = token,
                             position = position,
-                            isGroup = true, // FIX: force group bubble style
+                            isGroup = isGroup,
                             selectionMode = selectionMode, selectedMessages = selectedMessages,
                             allChats = allChats, myUsername = myUsername,
                             linkPreviewRepo = linkPreviewRepo,
