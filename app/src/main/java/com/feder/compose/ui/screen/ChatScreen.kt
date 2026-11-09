@@ -414,8 +414,6 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
                 contentScale = ContentScale.Crop
             )
             Spacer(Modifier.width(8.dp))
-        } else if (isGroup && !isMine) {
-            Spacer(Modifier.width(40.dp))
         }
 
         // Получаем Vibrator ОДИН раз вне лямбды
@@ -464,7 +462,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
         val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
 val isAudioMsg = firstImageOrAudioUrl != null && (firstImageOrAudioUrl.contains(".m4a") || firstImageOrAudioUrl.contains("audio_") || firstImageOrAudioUrl.contains(".mp3"))
-Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
+Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.wrapContentWidth() }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
             detectTapGestures(
                 onTap = { localOffset ->
                     onTapWithCoords?.invoke(localOffset)
