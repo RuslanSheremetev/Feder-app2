@@ -181,7 +181,7 @@ data class MsgItem(
     var posX: Float = 0f,
     var posY: Float = 0f,
     val imageUrl: String? = null,
-    @com.google.gson.annotations.SerializedName("image_urls")
+    @com.google.gson.annotations.SerializedName(value = "image_urls", alternate = ["imageUrls"])
     @com.google.gson.annotations.JsonAdapter(ImageUrlsAdapter::class)
     val imageUrls: List<String> = emptyList(),
     val replyToStoryId: Int = 0,
@@ -387,7 +387,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     }
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
-    if (msg.to?.startsWith("channel:") == true) {
+    if (msg.to?.contains("channel:") == true) {
         ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
@@ -402,11 +402,11 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
     val bs = if (isMine) 20.dp else bottomRadius
     val be = if (isMine) bottomRadius else 20.dp
     Row(
-        Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.padding(top = vertPad),
+        Modifier.onGloballyPositioned { coords -> onPositioned?.invoke(coords.positionInWindow()); msg.posY = coords.positionInWindow().y; msg.posX = coords.positionInWindow().x }.fillMaxWidth().padding(top = vertPad),
         horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
-        if (false && isGroup && !isMine && (position == 0 || position == 3)) {
+        if (isGroup && !isMine && (position == 0 || position == 3)) {
             coil.compose.AsyncImage(
                 model = "http://2.26.71.102:8010/avatars/${msg.from}/avatar.jpg",
                 contentDescription = null,
@@ -414,6 +414,8 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
                 contentScale = ContentScale.Crop
             )
             Spacer(Modifier.width(8.dp))
+        } else if (isGroup && !isMine) {
+            Spacer(Modifier.width(40.dp))
         }
 
         // Получаем Vibrator ОДИН раз вне лямбды
@@ -462,7 +464,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
         val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
 val isAudioMsg = firstImageOrAudioUrl != null && (firstImageOrAudioUrl.contains(".m4a") || firstImageOrAudioUrl.contains("audio_") || firstImageOrAudioUrl.contains(".mp3"))
-Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.wrapContentWidth() }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
+Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
             detectTapGestures(
                 onTap = { localOffset ->
                     onTapWithCoords?.invoke(localOffset)
@@ -480,7 +482,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                          else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
             )
         )) {
-            Column(Modifier.then(if (isAudioMsg) Modifier.width(300.dp) else Modifier).padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
+            Column(Modifier.widthIn(max = 280.dp).then(if (isAudioMsg) Modifier.width(300.dp) else Modifier).padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
                         // ═══ Reply to story preview ═══
                         // ─── Forwarded from плашка (внутри bubble) ───
                         if (!msg.forwardedFrom.isNullOrEmpty()) {
@@ -582,6 +584,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 // removed rlog for perf
                 if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
+                    android.util.Log.d("DEBUG_MEDIA", "firstUrl = $firstUrl")
                     val isAudio = firstUrl.contains(".m4a") || firstUrl.contains("audio_") || firstUrl.contains(".mp3")
                     val isVideo = firstUrl.contains(".mp4") || firstUrl.contains("video_") || firstUrl.contains(".webm")
                     
