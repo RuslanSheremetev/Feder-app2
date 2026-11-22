@@ -359,7 +359,7 @@ fun ChannelPostBubble(
 @OptIn(ExperimentalFoundationApi::class)
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, isGroup: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
     onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
-onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
+onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null, onReactionToggle: ((Long, String) -> Unit)? = null) {
 
     // ═══ Контакт? Рисуем карточку и ВЫХОДИМ ═══
     if (msg.messageType == "contact" && !msg.contactName.isNullOrEmpty()) {
@@ -824,7 +824,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                     verticalAlignment = Alignment.Bottom
                 ) {
                     msg.reactions.forEach { r ->
-                        ReactionPill(r = r, allChats = allChats, myUsername = myUsername, onClick = { }, onLongClick = { })
+                        ReactionPill(r = r, allChats = allChats, myUsername = myUsername, onClick = { onReactionToggle?.invoke(msg.id, r.emoji) }, onLongClick = { })
                         Spacer(Modifier.width(4.dp))
                     }
                     // Если фото-сообщение — время справа в этом же ряду
