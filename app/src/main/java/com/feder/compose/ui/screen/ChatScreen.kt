@@ -424,7 +424,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         val screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.toFloat()
         // Динамический размер фото через Coil painter
         val density = androidx.compose.ui.platform.LocalDensity.current
-        val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+        val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl?.takeIf { it.isNotEmpty() }
         val fullUrl = if (firstUrl != null) {
             if (firstUrl.startsWith("content://") || firstUrl.startsWith("file://")) firstUrl
             else if (firstUrl.contains("?")) firstUrl
@@ -463,9 +463,9 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
         val photoWidth = computedSize.first.dp
         val photoHeight = computedSize.second.dp
         var imageAspectRatio by remember { mutableStateOf<Float?>(null) }
-        val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+        val firstImageOrAudioUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl?.takeIf { it.isNotEmpty() }
 val isAudioMsg = firstImageOrAudioUrl != null && (firstImageOrAudioUrl.contains(".m4a") || firstImageOrAudioUrl.contains("audio_") || firstImageOrAudioUrl.contains(".mp3"))
-Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || msg.imageUrl != null -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
+Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrls.isNotEmpty() || !msg.imageUrl.isNullOrEmpty() -> Modifier.width(280.dp); else -> Modifier.width(androidx.compose.foundation.layout.IntrinsicSize.Max).widthIn(max = 280.dp) }).then(if (onClick != null) Modifier.pointerInput(msg.id) {
             detectTapGestures(
                 onTap = { localOffset ->
                     onTapWithCoords?.invoke(localOffset)
@@ -483,7 +483,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                          else listOf(Color(0xFF3A3A48), Color(0xFF2A2A38))
             )
         )) {
-            Column(Modifier.widthIn(max = 280.dp).then(if (isAudioMsg) Modifier.width(300.dp) else Modifier).padding(if (msg.imageUrls.isNotEmpty() || msg.imageUrl != null) 2.dp else 1.dp)) {
+            Column(Modifier.widthIn(max = 280.dp).then(if (isAudioMsg) Modifier.width(300.dp) else Modifier).padding(if (msg.imageUrls.isNotEmpty() || !msg.imageUrl.isNullOrEmpty()) 2.dp else 1.dp)) {
                         // ═══ Reply to story preview ═══
                         // ─── Forwarded from плашка (внутри bubble) ───
                         if (!msg.forwardedFrom.isNullOrEmpty()) {
