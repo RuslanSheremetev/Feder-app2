@@ -2090,7 +2090,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Column(modifier = Modifier.weight(1f)) {
                 if (pinnedMessage != null) {
                     Surface(
-                        modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(androidx.compose.ui.graphics.Color(0xFF1C2733))
                             .clickable {
