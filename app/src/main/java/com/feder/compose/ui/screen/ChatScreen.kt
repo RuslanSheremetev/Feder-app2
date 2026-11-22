@@ -2795,7 +2795,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         value = contactSearch,
                         onValueChange = { contactSearch = it },
                         placeholder = { Text("Search contacts", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         singleLine = true,
                         shape = RoundedCornerShape(24.dp),
                         colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
@@ -2815,7 +2815,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val filtered = contactsList.filter {
                             it.second.first.contains(contactSearch, true) || it.first.contains(contactSearch, true)
                         }
-                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxHeight(0.6f)) {
+                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(160.dp))) {
                             items(filtered) { c ->
                                 val uname = c.first
                                 val name = c.second.first
