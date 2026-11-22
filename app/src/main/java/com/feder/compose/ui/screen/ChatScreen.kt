@@ -2564,6 +2564,31 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     Spacer(Modifier.height(12.dp))
                     Surface(modifier = Modifier.align(if (selectedMessage?.from == myUsername) Alignment.End else Alignment.Start), shape = RoundedCornerShape(16.dp), color = SurfaceContainerLow, shadowElevation = 16.dp, border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))) {
                         Column(Modifier.width(220.dp)) {
+                                                        // Pin / Unpin
+                            if (selectedMessage != null) {
+                                val isP = selectedMessage!!.isPinned
+                                Row(Modifier.fillMaxWidth().clickable {
+                                    val newP = !isP
+                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = newP) else it }
+                                    if (newP) pinnedMessage = selectedMessage
+                                    else if (pinnedMessage?.id == selectedMessage!!.id) pinnedMessage = null
+                                    selectedMessage = null
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        try {
+                                            val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", newP) }
+                                            val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
+                                                .addHeader("Authorization", "Bearer $token")
+                                                .addHeader("Content-Type", "application/json")
+                                                .post(json.toString().toRequestBody("application/json".toMediaType())).build()
+                                            okhttp3.OkHttpClient().newCall(req).execute().close()
+                                        } catch (e: Exception) { android.util.Log.e("PIN", "toggle fail", e) }
+                                    }
+                                }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(androidx.compose.material.icons.Icons.Filled.PushPin, null, tint = if (isP) Primary else OnSurface, modifier = Modifier.size(22.dp))
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(if (isP) "Unpin" else "Pin", color = OnSurface, fontSize = 16.sp)
+                                }
+                            }
                             Row(Modifier.fillMaxWidth().clickable { replyMessage = selectedMessage; selectedMessage = null }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_reply_outline), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Reply", color = OnSurface, fontSize = 16.sp)
                             }
