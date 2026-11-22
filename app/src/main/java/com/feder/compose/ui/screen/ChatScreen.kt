@@ -2639,7 +2639,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier)
+                    .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(520.dp))
                     .align(Alignment.BottomCenter)
                     .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                     .padding(16.dp)
@@ -2730,7 +2730,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 // Gallery grid (только если НЕ выбраны контакты)
                 if (!showContactPicker && !showFilePicker) {
-                    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
+                    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
@@ -2826,7 +2826,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val filtered = contactsList.filter {
                             it.second.first.contains(contactSearch, true) || it.first.contains(contactSearch, true)
                         }
-                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(160.dp))) {
+                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f))) {
                             items(filtered) { c ->
                                 val uname = c.first
                                 val name = c.second.first
@@ -2945,7 +2945,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             else -> Pair(Icons.Filled.InsertDriveFile, Color(0xFF81C784))
                         }
                     }
-                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
+                    Column(modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("*/*"))
                         }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
