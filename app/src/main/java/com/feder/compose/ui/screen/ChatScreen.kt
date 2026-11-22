@@ -147,6 +147,7 @@ var photoSourceY by mutableStateOf(0f)
 var photoSourceW by mutableStateOf(0f)
 var photoSourceH by mutableStateOf(0f)
 var uploadingPhotos: Boolean = false
+var openChatRequest by mutableStateOf<String?>(null)
 
 data class Reaction(
     val emoji: String = "",
@@ -160,11 +161,11 @@ data class Reaction(
 class ImageUrlsAdapter : com.google.gson.JsonDeserializer<List<String>> {
     override fun deserialize(json: com.google.gson.JsonElement?, typeOfT: java.lang.reflect.Type?, context: com.google.gson.JsonDeserializationContext?): List<String> {
         if (json == null || json.isJsonNull) return emptyList()
-        if (json.isJsonArray) return json.asJsonArray.mapNotNull { if (it.isJsonPrimitive) it.asString else null }.filter { it.isNotBlank() }
+        if (json.isJsonArray) return json.asJsonArray.mapNotNull { if (it.isJsonPrimitive) it.asString else null }.filter { it.isNotBlank() && it != "[]" && it != "null" && (it.contains("/") || it.contains(".")) }
         if (json.isJsonPrimitive) {
             val s = json.asString
             if (s.isBlank()) return emptyList()
-            return s.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            return s.split(",").map { it.trim() }.filter { it.isNotBlank() && it != "[]" && it != "null" && (it.contains("/") || it.contains(".")) }
         }
         return emptyList()
     }
@@ -245,6 +246,7 @@ fun ChannelPostBubble(
     msg: MsgItem,
     time: String,
     myUsername: String,
+    token: String = "",
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     onPhotoClick: (() -> Unit)? = null,
@@ -271,8 +273,9 @@ fun ChannelPostBubble(
                 // Уменьшенная картинка (не на весь экран, ограничиваем высоту)
                 val firstImg = msg.imageUrls?.firstOrNull()
                 if (!firstImg.isNullOrEmpty()) {
+                    val chUrl = if (firstImg.startsWith("http") || firstImg.startsWith("content://") || firstImg.startsWith("file://")) firstImg else "http://2.26.71.102:8012/uploads/" + firstImg + (if (token.isNotEmpty()) "?token=" + token else "")
                     coil.compose.AsyncImage(
-                        model = firstImg,
+                        model = chUrl,
                         contentDescription = null,
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                         modifier = Modifier
@@ -368,7 +371,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
             time = time,
             isMine = isMine,
             status = msg.status,
-            onClick = { onClick?.invoke() }
+            onClick = { val cu = msg.contactUsername; if (!cu.isNullOrEmpty()) openChatRequest = cu else onClick?.invoke() }
         )
         return
     }
@@ -389,7 +392,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null) {
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
     if (msg.to?.contains("channel:") == true) {
-        ChannelPostBubble(msg, time, myUsername, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
+        ChannelPostBubble(msg, time, myUsername, token = token, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
 
@@ -2032,7 +2035,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Videocam, "Video Call", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Video Call", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable {
                                             showMoreMenu = false
-                                            scope.launch {
+                                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                                 try {
                                                     val json = org.json.JSONObject().apply {
                                                         put("user_from", myUsername)
@@ -2845,7 +2848,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     .url("http://2.26.71.102:8004/api/chat/send")
                                                     .post(body)
                                                     .build()
-                                                client.newCall(request).execute().close()
+                                                val resp = client.newCall(request).execute()
+                                                val ok = resp.isSuccessful
+                                                resp.close()
+                                                if (ok) {
+                                                    val nowStr = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+                                                    messages = messages + MsgItem(
+                                                        from = myUsername,
+                                                        to = chatUsername,
+                                                        text = "",
+                                                        time = nowStr,
+                                                        status = "sent",
+                                                        id = System.currentTimeMillis(),
+                                                        messageType = "contact",
+                                                        contactName = name,
+                                                        contactPhones = phone,
+                                                        contactAvatar = avatar,
+                                                        contactUsername = uname
+                                                    )
+                                                }
                                             } catch (e: Exception) { android.util.Log.e("CONTACTS", "send contact fail", e) }
                                         }
                                         showContactPicker = false

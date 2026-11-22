@@ -837,6 +837,12 @@ fun FederApp() {
         }
     }
     LaunchedEffect(viewModel.error) { viewModel.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+    LaunchedEffect(com.feder.compose.ui.screen.openChatRequest) {
+        com.feder.compose.ui.screen.openChatRequest?.let { uname ->
+            viewModel.selectedChat = uname
+            com.feder.compose.ui.screen.openChatRequest = null
+        }
+    }
     
     // Если открыт чат или настройки — показываем без шапки
     if (viewModel.selectedChat != null || viewModel.selectedProfile != null || viewModel.showSavedProfile || viewModel.showNewGroup || viewModel.showNewChannel || viewModel.showGroupInfo != null || viewModel.showAddMembers != null || viewModel.showGroupMembers != null) {
