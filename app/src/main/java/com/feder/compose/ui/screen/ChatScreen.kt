@@ -2087,10 +2087,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             else {
                 val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
                 val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
-                Column(modifier = Modifier.weight(1f)) {
+                Box(modifier = Modifier.weight(1f)) {
                 if (pinnedMessage != null) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+                        modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(androidx.compose.ui.graphics.Color(0xFF1C2733))
                             .clickable {
@@ -2128,7 +2128,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
-                LazyColumn(Modifier.fillMaxWidth().weight(1f), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
+                LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(top = if (pinnedMessage != null) 68.dp else 0.dp, bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     // Для каждой даты вычисляем, находится ли она между выделенными сообщениями
                     var firstSelectedIndex = -1
