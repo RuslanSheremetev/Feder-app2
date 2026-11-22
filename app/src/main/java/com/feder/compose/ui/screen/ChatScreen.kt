@@ -27,6 +27,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
@@ -2916,6 +2917,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             else -> Pair(Icons.Filled.InsertDriveFile, Color(0xFF81C784))
                         }
                     }
+                    val fileScrollState = rememberScrollState()
+                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(220.dp).verticalScroll(fileScrollState))) {
                     Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("*/*"))
@@ -2982,6 +2985,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
+                    }
                     }
                     Spacer(Modifier.height(16.dp))
                 } // закрываем if (showFilePicker)
