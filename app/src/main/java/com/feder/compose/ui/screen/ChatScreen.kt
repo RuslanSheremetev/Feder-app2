@@ -148,6 +148,7 @@ var photoSourceW by mutableStateOf(0f)
 var photoSourceH by mutableStateOf(0f)
 var uploadingPhotos: Boolean = false
 var openChatRequest by mutableStateOf<String?>(null)
+    var pinnedMessage by remember { mutableStateOf<MsgItem?>(null) }
 
 data class Reaction(
     val emoji: String = "",
@@ -197,6 +198,8 @@ data class MsgItem(
     val messageType: String = "text",
     @com.google.gson.annotations.SerializedName("edited")
     val edited: Boolean = false,
+    @com.google.gson.annotations.SerializedName("is_pinned")
+    val isPinned: Boolean = false,
     @com.google.gson.annotations.SerializedName("sticker_id")
     val stickerId: String? = null,
     @com.google.gson.annotations.SerializedName("sticker_text")
@@ -1149,6 +1152,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardMultiSelect by remember { mutableStateOf(false) }
     var forwardMessage by remember { mutableStateOf("") }
     var youtubeVideoId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(messages) {
+        pinnedMessage = messages.firstOrNull { it.isPinned }
+    }
+
 
         LaunchedEffect(selectedMessage) {
         selectedMessage?.let {
@@ -2560,6 +2567,30 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 selectedMessage = null
                                 showDeleteSub = false
                             }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                if (selectedMessage != null) {
+                                    val isP = selectedMessage!!.isPinned
+                                    Row(Modifier.fillMaxWidth().clickable {
+                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            try {
+                                                val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", !isP) }
+                                                val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
+                                                    .addHeader("Authorization", "Bearer $token")
+                                                    .addHeader("Content-Type", "td/json")
+                                                    .post(json.toString().toRequestBody("application/json".toMediaType())).build()
+                                                okhttp3.OkHttpClient().newCall(req).execute().close()
+                                                withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = !isP) else it }
+                                                    selectedMessage = null
+                                                    showMenu = false
+                                                }
+                                            } catch (e: Exception) { android.util.Log.e("PIN", "toggle fail", e) }
+                                        }
+                                    }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                        Icon(androidx.compose.material.icons.Icons.Filled.PushPin, null, tint = if (isP) Primary else OnSurface, modifier = Modifier.size(22.dp))
+                                        Spacer(Modifier.width(12.dp))
+                                        Text(if (isP) "Unpin" else "Pin", color = OnSurface, fontSize = 16.sp)
+                                    }
+                                }
                                 Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp)
                             }
                             if (false && showDeleteSub) {
