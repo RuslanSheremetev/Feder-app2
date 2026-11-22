@@ -3032,7 +3032,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             else -> Pair(Icons.Filled.InsertDriveFile, Color(0xFF81C784))
                         }
                     }
-                    Column(modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
+                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("*/*"))
                         }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -3072,12 +3072,12 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
                         Text("Recent files", color = Primary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                         if (recentFiles.isEmpty()) {
                             Text("No recent files", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                         } else {
-                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 132.dp)) {
+                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
                                 items(recentFiles) { f ->
                                     Row(modifier = Modifier.fillMaxWidth().clickable {
                                         selectedPhotos = selectedPhotos + f.first
