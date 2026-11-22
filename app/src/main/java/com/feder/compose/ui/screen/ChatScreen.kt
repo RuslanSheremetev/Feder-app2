@@ -1055,6 +1055,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var clickedMsgOffset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     var editMessage by remember { mutableStateOf<MsgItem?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
+    var highlightedMessageId by remember { mutableStateOf<Long?>(null) }
     var selectedMessages by remember { mutableStateOf<Set<String>>(emptySet()) }
     var searchMode by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -2095,7 +2096,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             .background(androidx.compose.ui.graphics.Color(0xFF1C2733))
                             .clickable {
                                 val idx = messages.indexOfFirst { it.id == pinnedMessage!!.id }
-                                if (idx >= 0) scope.launch { listState.animateScrollToItem(idx) }
+                                if (idx >= 0) {
+                                scope.launch { listState.animateScrollToItem(idx) }
+                                highlightedMessageId = pinnedMessage!!.id
+                            }
                             },
                         color = androidx.compose.ui.graphics.Color(0xFF1C2733)
                     ) {
@@ -2192,8 +2196,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    if (selectionMode && selectedMessages.contains(msg.id.toString()))
-                                        Color(0xFF339DFF).copy(alpha = 0.15f)
+                                    if (highlightedMessageId == msg.id) Color(0xFF339DFF).copy(alpha = 0.25f)
+                                    else if (selectionMode && selectedMessages.contains(msg.id.toString())) Color(0xFF339DFF).copy(alpha = 0.15f)
                                     else Color.Transparent
                                 )
                                 .padding(horizontal = 16.dp)
