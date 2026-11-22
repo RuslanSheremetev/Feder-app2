@@ -39,13 +39,13 @@ fun ContactBubble(
         if (parts.size >= 2) parts[0] to parts[1] else "Phone" to it
     }
 
-    val realAvatarUrl = if (!contactAvatar.isNullOrEmpty()) {
-                    contactAvatar
-                } else if (!contactUsername.isNullOrEmpty()) {
-                    "http://2.26.71.102:8010/avatars/${contactUsername}/avatar.jpg"
-                } else {
-                    null
-                }
+    val realAvatarUrl = when {
+        contactAvatar != null && contactAvatar.startsWith("http") -> contactAvatar
+        contactAvatar != null && contactAvatar.startsWith("/") -> "http://2.26.71.102:8010" + contactAvatar
+        contactAvatar != null && contactAvatar.isNotEmpty() -> "http://2.26.71.102:8010/avatars/" + contactAvatar
+        !contactUsername.isNullOrEmpty() -> "http://2.26.71.102:8010/avatars/${contactUsername}/avatar.jpg"
+        else -> null
+    }
 
     Box(
         modifier = Modifier
@@ -79,10 +79,10 @@ fun ContactBubble(
                 Spacer(Modifier.width(10.dp))
 
                 // Аватарка
-                if (!contactAvatar.isNullOrEmpty()) {
+                if (realAvatarUrl != null) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(contactAvatar).crossfade(true).build(),
+                            .data(realAvatarUrl).crossfade(true).build(),
                         contentDescription = "Avatar",
                         modifier = Modifier.size(42.dp).clip(CircleShape),
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop

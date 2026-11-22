@@ -273,7 +273,13 @@ fun ChannelPostBubble(
                 // Уменьшенная картинка (не на весь экран, ограничиваем высоту)
                 val firstImg = msg.imageUrls?.firstOrNull()
                 if (!firstImg.isNullOrEmpty()) {
-                    val chUrl = if (firstImg.startsWith("http") || firstImg.startsWith("content://") || firstImg.startsWith("file://")) firstImg else "http://2.26.71.102:8012/uploads/" + firstImg + (if (token.isNotEmpty()) "?token=" + token else "")
+                    val chTok = if (token.isNotEmpty()) "?token=" + token else ""
+                    val chUrl = when {
+                        firstImg.startsWith("http") || firstImg.startsWith("content://") || firstImg.startsWith("file://") -> firstImg
+                        firstImg.startsWith("/uploads/") -> "http://2.26.71.102:8012" + firstImg + chTok
+                        firstImg.startsWith("/") -> "http://2.26.71.102:8012" + firstImg + chTok
+                        else -> "http://2.26.71.102:8012/uploads/" + firstImg + chTok
+                    }
                     coil.compose.AsyncImage(
                         model = chUrl,
                         contentDescription = null,
