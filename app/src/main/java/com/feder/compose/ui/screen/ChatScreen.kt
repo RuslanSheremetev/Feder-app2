@@ -2215,7 +2215,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 )
                                 Spacer(Modifier.width(8.dp))
                             }
-                            Box(modifier = Modifier
+                            Box(modifier = Modifier.weight(1f)
                                 .onGloballyPositioned { coords ->
                                     // FIX_TAPCOORDS: сохраняем и позицию, и размер
                                     msgPositions[msg.id] = coords.positionInWindow()
