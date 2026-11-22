@@ -2088,45 +2088,46 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 val grouped = remember(messages) { messages.groupBy { formatHeaderDate(it.timeVal) } }
                 val msgIndexMap = remember(messages) { messages.withIndex().associate { (i, m) -> m.id to i } }
                 Box(modifier = Modifier.weight(1f)) {
-                LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                 if (pinnedMessage != null) {
-                    item {
-                        Surface(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(androidx.compose.ui.graphics.Color(0xFF1C2733)).clickable {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().padding(top = 56.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .background(androidx.compose.ui.graphics.Color(0xFF1C2733))
+                            .clickable {
                                 val idx = messages.indexOfFirst { it.id == pinnedMessage!!.id }
                                 if (idx >= 0) scope.launch { listState.animateScrollToItem(idx) }
                             },
-                            color = androidx.compose.ui.graphics.Color(0xFF1C2733)
-                        ) {
-                            Row(Modifier.padding(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                Icon(androidx.compose.material.icons.Icons.Filled.PushPin, "pin", tint = androidx.compose.ui.graphics.Color(0xFFA1C9FF), modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(8.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text("Pinned Message", color = androidx.compose.ui.graphics.Color(0xFFA1C9FF), fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
-                                    Text(pinnedMessage!!.text.takeIf { it.isNotEmpty() } ?: "Media", color = androidx.compose.ui.graphics.Color(0xFFE5E2E1), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        color = androidx.compose.ui.graphics.Color(0xFF1C2733)
+                    ) {
+                        Row(Modifier.padding(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Icon(androidx.compose.material.icons.Icons.Filled.PushPin, "pin", tint = androidx.compose.ui.graphics.Color(0xFFA1C9FF), modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text("Pinned Message", color = androidx.compose.ui.graphics.Color(0xFFA1C9FF), fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+                                Text(pinnedMessage!!.text.takeIf { it.isNotEmpty() } ?: "Media", color = androidx.compose.ui.graphics.Color(0xFFE5E2E1), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                            }
+                            IconButton(onClick = {
+                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                    try {
+                                        val json = org.json.JSONObject().apply { put("id", pinnedMessage!!.id); put("pinned", false) }
+                                        val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
+                                            .addHeader("Authorization", "Bearer $token")
+                                            .addHeader("Content-Type", "application/json")
+                                            .post(json.toString().toRequestBody("application/json".toMediaType())).build()
+                                        okhttp3.OkHttpClient().newCall(req).execute().close()
+                                        withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                            messages = messages.map { if (it.id == pinnedMessage!!.id) it.copy(isPinned = false) else it }
+                                            pinnedMessage = null
+                                        }
+                                    } catch (e: Exception) { android.util.Log.e("PIN", "unpin fail", e) }
                                 }
-                                IconButton(onClick = {
-                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                        try {
-                                            val json = org.json.JSONObject().apply { put("id", pinnedMessage!!.id); put("pinned", false) }
-                                            val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
-                                                .addHeader("Authorization", "Bearer $token")
-                                                .addHeader("Content-Type", "application/json")
-                                                .post(json.toString().toRequestBody("application/json".toMediaType())).build()
-                                            okhttp3.OkHttpClient().newCall(req).execute().close()
-                                            withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                messages = messages.map { if (it.id == pinnedMessage!!.id) it.copy(isPinned = false) else it }
-                                                pinnedMessage = null
-                                            }
-                                        } catch (e: Exception) { android.util.Log.e("PIN", "unpin fail", e) }
-                                    }
-                                }, modifier = Modifier.size(32.dp)) {
-                                    Icon(androidx.compose.material.icons.Icons.Filled.Close, "unpin", tint = androidx.compose.ui.graphics.Color.Gray, modifier = Modifier.size(18.dp))
-                                }
+                            }, modifier = Modifier.size(32.dp)) {
+                                Icon(androidx.compose.material.icons.Icons.Filled.Close, "unpin", tint = androidx.compose.ui.graphics.Color.Gray, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
                 }
+                LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(bottom = 12.dp)) {
                     item { Spacer(Modifier.height(16.dp)) }
                     // Для каждой даты вычисляем, находится ли она между выделенными сообщениями
                     var firstSelectedIndex = -1
