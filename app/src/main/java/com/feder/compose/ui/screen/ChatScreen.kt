@@ -2028,8 +2028,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.3f))
                                 ) {
                                     Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false; searchMode = true }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Search, "Search", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Search", color = OnSurface, fontSize = 14.sp) }
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Videocam, "Video Call", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Video Call", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false; searchMode = true }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Search, "Search", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Search", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Videocam, "Video Call", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Video Call", color = OnSurface, fontSize = 14.sp) }
                                         Row(modifier = Modifier.fillMaxWidth().clickable {
                                             showMoreMenu = false
                                             scope.launch {
@@ -2053,10 +2053,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     android.util.Log.e("MUTE", "set: ${e.message}")
                                                 }
                                             }
-                                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(if (isMuted) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff, "Mute", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text(if (isMuted) "Unmute" else "Mute", color = OnSurface, fontSize = 14.sp) }
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Wallpaper, "Change Wallpaper", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Change Wallpaper", color = OnSurface, fontSize = 14.sp) }
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.DeleteSweep, "Clear History", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Clear History", color = OnSurface, fontSize = 14.sp) }
-                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Delete, "Delete Chat", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Delete Chat", color = OnSurface, fontSize = 14.sp) }
+                                        }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(if (isMuted) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff, "Mute", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text(if (isMuted) "Unmute" else "Mute", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Wallpaper, "Change Wallpaper", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Change Wallpaper", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.DeleteSweep, "Clear History", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Clear History", color = OnSurface, fontSize = 14.sp) }
+                                        Row(modifier = Modifier.fillMaxWidth().clickable { showMoreMenu = false }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Filled.Delete, "Delete Chat", tint = OnSurfaceVariant, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(12.dp)); Text("Delete Chat", color = OnSurface, fontSize = 14.sp) }
                                     }
                                 }
                             }
@@ -2917,75 +2917,72 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             else -> Pair(Icons.Filled.InsertDriveFile, Color(0xFF81C784))
                         }
                     }
-                    val fileScrollState = rememberScrollState()
-                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(220.dp).verticalScroll(fileScrollState))) {
                     Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("*/*"))
-                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF4CAF50)), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Filled.Dns, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                        }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(36.dp).clip(CircleShape).background(Color(0xFF4CAF50)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Dns, null, tint = Color.White, modifier = Modifier.size(18.dp))
                             }
-                            Spacer(Modifier.width(16.dp))
+                            Spacer(Modifier.width(12.dp))
                             Column {
-                                Text("Internal Storage", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
-                                Text("Browse your file system", color = Color.Gray, fontSize = 14.sp)
+                                Text("Internal Storage", color = Color(0xFFE6EDF3), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                                Text("Browse your file system", color = Color.Gray, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             val init = android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Android/data/" + context.packageName + "/files").toString()
                             federFolderPicker.launch(arrayOf("*/*", init))
-                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFFB39DDB)), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Filled.Folder, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                        }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(36.dp).clip(CircleShape).background(Color(0xFFB39DDB)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Folder, null, tint = Color.White, modifier = Modifier.size(18.dp))
                             }
-                            Spacer(Modifier.width(16.dp))
+                            Spacer(Modifier.width(12.dp))
                             Column {
-                                Text("Feder", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
-                                Text("Browse the app's folder", color = Color.Gray, fontSize = 14.sp)
+                                Text("Feder", color = Color(0xFFE6EDF3), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                                Text("Browse the app's folder", color = Color.Gray, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("image/*"))
-                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFFE5C07B)), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Filled.PermMedia, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                        }.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(36.dp).clip(CircleShape).background(Color(0xFFE5C07B)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.PermMedia, null, tint = Color.White, modifier = Modifier.size(18.dp))
                             }
-                            Spacer(Modifier.width(16.dp))
+                            Spacer(Modifier.width(12.dp))
                             Column {
-                                Text("Gallery", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
-                                Text("To send images without compression", color = Color.Gray, fontSize = 14.sp)
+                                Text("Gallery", color = Color(0xFFE6EDF3), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                                Text("To send images without compression", color = Color.Gray, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
                     }
-                    Spacer(Modifier.height(12.dp))
-                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 8.dp)) {
-                        Text("Recent files", color = Primary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                    Spacer(Modifier.height(8.dp))
+                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
+                        Text("Recent files", color = Primary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                         if (recentFiles.isEmpty()) {
-                            Text("No recent files", color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
+                            Text("No recent files", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                         } else {
-                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp)) {
+                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 132.dp)) {
                                 items(recentFiles) { f ->
                                     Row(modifier = Modifier.fillMaxWidth().clickable {
                                         selectedPhotos = selectedPhotos + f.first
                                         showFilePicker = false
                                         showAttachSheet = false
                                         sendMessage()
-                                    }.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    }.padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                                         val ic = fileIcon(f.second)
-                                        Box(Modifier.size(48.dp).clip(RoundedCornerShape(10.dp)).background(ic.second), contentAlignment = Alignment.Center) {
-                                            Icon(ic.first, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                                        Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(ic.second), contentAlignment = Alignment.Center) {
+                                            Icon(ic.first, null, tint = Color.White, modifier = Modifier.size(18.dp))
                                         }
                                         Spacer(Modifier.width(16.dp))
                                         Column {
-                                            Text(f.second, color = Color(0xFFE6EDF3), fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            Text(fmtFileSize(f.third), color = Color.Gray, fontSize = 13.sp)
+                                            Text(f.second, color = Color(0xFFE6EDF3), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text(fmtFileSize(f.third), color = Color.Gray, fontSize = 11.sp)
                                         }
                                     }
                                 }
                             }
                         }
-                    }
                     }
                     Spacer(Modifier.height(16.dp))
                 } // закрываем if (showFilePicker)
