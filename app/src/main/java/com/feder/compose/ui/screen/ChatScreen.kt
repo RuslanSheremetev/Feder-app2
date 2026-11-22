@@ -2929,7 +2929,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Text("Browse your file system", color = Color.Gray, fontSize = 14.sp)
                             }
                         }
-                        androidx.compose.material3.HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 1.dp)
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             val init = android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Android/data/" + context.packageName + "/files").toString()
                             federFolderPicker.launch(arrayOf("*/*", init))
@@ -2943,7 +2942,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Text("Browse the app's folder", color = Color.Gray, fontSize = 14.sp)
                             }
                         }
-                        androidx.compose.material3.HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 1.dp)
                         Row(modifier = Modifier.fillMaxWidth().clickable {
                             filePicker.launch(arrayOf("image/*"))
                         }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -2994,7 +2992,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     AttachOption(Icons.Filled.Image, "Галерея", !showContactPicker && !showFilePicker) {
                         showContactPicker = false
                         showFilePicker = false
-                        photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     }
                     AttachOption(Icons.Filled.Description, "Файл", showFilePicker) {
                         showContactPicker = false
