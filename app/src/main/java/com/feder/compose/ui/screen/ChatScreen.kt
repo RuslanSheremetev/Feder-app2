@@ -2735,7 +2735,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     var isLoading by remember { mutableStateOf(true) }
 
                     androidx.compose.runtime.LaunchedEffect(Unit) {
-                        scope.launch {
+                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                             try {
                                 val req = okhttp3.Request.Builder()
                                     .url("http://2.26.71.102:8004/api/users")
@@ -2757,7 +2757,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     }
                                     contactsList = list
                                 }
-                            } catch (e: Exception) { e.printStackTrace() }
+                            } catch (e: Exception) { android.util.Log.e("CONTACTS", "load users fail", e) }
                             isLoading = false
                         }
                     }
@@ -2795,7 +2795,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 val avatar = c.third
                                 Row(
                                     Modifier.fillMaxWidth().clickable {
-                                        scope.launch {
+                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                             try {
                                                 val req = org.json.JSONObject()
                                                 req.put("from", myUsername)
@@ -2805,6 +2805,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                 req.put("contact_name", name)
                                                 req.put("contact_phones", phone)
                                                 req.put("contact_avatar", avatar)
+                                                req.put("contact_username", uname)
 
                                                 val client = okhttp3.OkHttpClient()
                                                 val body = okhttp3.RequestBody.create(
@@ -2816,7 +2817,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                     .post(body)
                                                     .build()
                                                 client.newCall(request).execute().close()
-                                            } catch (e: Exception) { e.printStackTrace() }
+                                            } catch (e: Exception) { android.util.Log.e("CONTACTS", "send contact fail", e) }
                                         }
                                         showContactPicker = false
                                         // Закрываем шторку
