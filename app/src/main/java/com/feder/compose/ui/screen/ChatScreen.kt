@@ -148,7 +148,7 @@ var photoSourceW by mutableStateOf(0f)
 var photoSourceH by mutableStateOf(0f)
 var uploadingPhotos: Boolean = false
 var openChatRequest by mutableStateOf<String?>(null)
-    var pinnedMessage by remember { mutableStateOf<MsgItem?>(null) }
+    var pinnedMessage by mutableStateOf<MsgItem?>(null)
 
 data class Reaction(
     val emoji: String = "",
@@ -2619,7 +2619,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                 withContext(kotlinx.coroutines.Dispatchers.Main) {
                                                     messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = !isP) else it }
                                                     selectedMessage = null
-                                                    showMenu = false
                                                 }
                                             } catch (e: Exception) { android.util.Log.e("PIN", "toggle fail", e) }
                                         }
