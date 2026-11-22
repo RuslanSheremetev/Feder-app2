@@ -1079,6 +1079,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var attachExpanded by remember { mutableStateOf(false) }
     var selectedPhotos by remember { mutableStateOf<Set<android.net.Uri>>(emptySet()) }
     var isSending by remember { mutableStateOf(false) }
+    var showFilePicker by remember { mutableStateOf(false) }
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -1090,9 +1091,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     }
 
     // File picker — тот же Set, что фото
-    val filePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenMultipleDocuments()
-    ) { uris ->
+    val addPickedFiles: (List<android.net.Uri>) -> Unit = { uris ->
         if (uris.isNotEmpty()) {
             uris.forEach { uri ->
                 try {
@@ -1105,6 +1104,35 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
             android.util.Log.d("ChatScreen", "Files picked: ${uris.size}")
         }
     }
+    val filePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris -> addPickedFiles(uris) }
+    val federFolderContract = remember {
+        object : androidx.activity.result.contract.ActivityResultContract<Array<String>, List<android.net.Uri>>() {
+            override fun createIntent(context: android.content.Context, input: Array<String>): android.content.Intent {
+                val i = android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT)
+                    .addCategory(android.content.Intent.CATEGORY_OPENABLE)
+                    .setType(if (input.isNotEmpty()) input[0] else "*/*")
+                    .putExtra(android.content.Intent.EXTRA_ALLOW_MULTIPLE, true)
+                if (input.size > 1 && input[1].isNotEmpty()) {
+                    i.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI, android.net.Uri.parse(input[1]))
+                }
+                return i
+            }
+            override fun parseResult(resultCode: Int, intent: android.content.Intent?): List<android.net.Uri> {
+                if (resultCode != android.app.Activity.RESULT_OK || intent == null) return emptyList()
+                val out = mutableListOf<android.net.Uri>()
+                val clip = intent.clipData
+                if (clip != null && clip.itemCount > 0) {
+                    for (k in 0 until clip.itemCount) out.add(clip.getItemAt(k).uri)
+                } else {
+                    intent.data?.let { out.add(it) }
+                }
+                return out
+            }
+        }
+    }
+    val federFolderPicker = rememberLauncherForActivityResult(federFolderContract) { uris -> addPickedFiles(uris) }
     var forwardSearch by remember { mutableStateOf("") }
     var forwardSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     var forwardMultiSelect by remember { mutableStateOf(false) }
@@ -2339,7 +2367,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
-                        IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
+                        IconButton(onClick = { showAttachSheet = true; showContactPicker = false; showFilePicker = false }, modifier = Modifier.size(40.dp)) {
                             Icon(painter = painterResource(R.drawable.ic_attach_clip), contentDescription = "attach", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                         Box(modifier = Modifier.weight(1f)) {
@@ -2690,7 +2718,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                 }
                 // Gallery grid (только если НЕ выбраны контакты)
-                if (!showContactPicker) {
+                if (!showContactPicker && !showFilePicker) {
                     LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
@@ -2724,7 +2752,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
-                } // закрываем if (!showContactPicker)
+                } // закрываем if (!showContactPicker && !showFilePicker)
 
                 Spacer(Modifier.height(16.dp))
 
@@ -2847,18 +2875,136 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                 } // закрываем if (showContactPicker)
 
+                if (showFilePicker) {
+                    // === ФАЙЛЫ (Telegram-style шторка) ===
+                    var recentFiles by remember { mutableStateOf<List<Triple<android.net.Uri, String, Long>>>(emptyList()) }
+                    LaunchedEffect(Unit) {
+                        val list = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                            val out = mutableListOf<Triple<android.net.Uri, String, Long>>()
+                            try {
+                                val base = if (android.os.Build.VERSION.SDK_INT >= 29) android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI else android.provider.MediaStore.Files.getContentUri("external")
+                                val proj = arrayOf(android.provider.MediaStore.MediaColumns._ID, android.provider.MediaStore.MediaColumns.DISPLAY_NAME, android.provider.MediaStore.MediaColumns.SIZE)
+                                val sel = if (android.os.Build.VERSION.SDK_INT >= 29) null else android.provider.MediaStore.MediaColumns.DATA + " LIKE '%Download%'"
+                                context.contentResolver.query(base, proj, sel, null, android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC")?.use { cur ->
+                                    val idC = cur.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns._ID)
+                                    val nameC = cur.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                                    val sizeC = cur.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns.SIZE)
+                                    while (cur.moveToNext() && out.size < 8) {
+                                        val name = cur.getString(nameC) ?: continue
+                                        out.add(Triple(android.content.ContentUris.withAppendedId(base, cur.getLong(idC)), name, cur.getLong(sizeC)))
+                                    }
+                                }
+                            } catch (e: Exception) { android.util.Log.e("FILES", "recent query fail", e) }
+                            out
+                        }
+                        recentFiles = list
+                    }
+                    fun fmtFileSize(b: Long): String = when {
+                        b < 1024 -> "$b B"
+                        b < 1048576 -> String.format(java.util.Locale.US, "%.1f KB", b / 1024.0)
+                        else -> String.format(java.util.Locale.US, "%.1f MB", b / 1048576.0)
+                    }
+                    fun fileIcon(name: String): Pair<androidx.compose.ui.graphics.vector.ImageVector, Color> {
+                        val n = name.lowercase()
+                        return when {
+                            n.endsWith(".pdf") -> Pair(Icons.Filled.PictureAsPdf, Color(0xFFE57373))
+                            n.endsWith(".doc") || n.endsWith(".docx") || n.endsWith(".txt") || n.endsWith(".rtf") -> Pair(Icons.Filled.Description, Color(0xFF64B5F6))
+                            n.endsWith(".zip") || n.endsWith(".rar") || n.endsWith(".7z") -> Pair(Icons.Filled.FolderZip, Color(0xFFFFB74D))
+                            n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".png") || n.endsWith(".webp") -> Pair(Icons.Filled.Image, Color(0xFF81C784))
+                            n.endsWith(".mp3") || n.endsWith(".m4a") || n.endsWith(".ogg") || n.endsWith(".wav") -> Pair(Icons.Filled.AudioFile, Color(0xFFBA68C8))
+                            n.endsWith(".mp4") || n.endsWith(".mkv") || n.endsWith(".webm") -> Pair(Icons.Filled.VideoFile, Color(0xFF4DD0E1))
+                            else -> Pair(Icons.Filled.InsertDriveFile, Color(0xFF81C784))
+                        }
+                    }
+                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121))) {
+                        Row(modifier = Modifier.fillMaxWidth().clickable {
+                            filePicker.launch(arrayOf("*/*"))
+                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF4CAF50)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Dns, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column {
+                                Text("Internal Storage", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
+                                Text("Browse your file system", color = Color.Gray, fontSize = 14.sp)
+                            }
+                        }
+                        androidx.compose.material3.HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 1.dp)
+                        Row(modifier = Modifier.fillMaxWidth().clickable {
+                            val init = android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Android/data/" + context.packageName + "/files").toString()
+                            federFolderPicker.launch(arrayOf("*/*", init))
+                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFFB39DDB)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Folder, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column {
+                                Text("Feder", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
+                                Text("Browse the app's folder", color = Color.Gray, fontSize = 14.sp)
+                            }
+                        }
+                        androidx.compose.material3.HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 1.dp)
+                        Row(modifier = Modifier.fillMaxWidth().clickable {
+                            filePicker.launch(arrayOf("image/*"))
+                        }.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFFE5C07B)), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.PermMedia, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column {
+                                Text("Gallery", color = Color(0xFFE6EDF3), fontSize = 17.sp, fontWeight = FontWeight.Medium)
+                                Text("To send images without compression", color = Color.Gray, fontSize = 14.sp)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 8.dp)) {
+                        Text("Recent files", color = Primary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                        if (recentFiles.isEmpty()) {
+                            Text("No recent files", color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
+                        } else {
+                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp)) {
+                                items(recentFiles) { f ->
+                                    Row(modifier = Modifier.fillMaxWidth().clickable {
+                                        selectedPhotos = selectedPhotos + f.first
+                                        showFilePicker = false
+                                        showAttachSheet = false
+                                        sendMessage()
+                                    }.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        val ic = fileIcon(f.second)
+                                        Box(Modifier.size(48.dp).clip(RoundedCornerShape(10.dp)).background(ic.second), contentAlignment = Alignment.Center) {
+                                            Icon(ic.first, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                                        }
+                                        Spacer(Modifier.width(16.dp))
+                                        Column {
+                                            Text(f.second, color = Color(0xFFE6EDF3), fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text(fmtFileSize(f.third), color = Color.Gray, fontSize = 13.sp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                } // закрываем if (showFilePicker)
+
+
                 // === СТАНДАРТНОЕ МЕНЮ (всегда видимо) ===
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                    AttachOption(Icons.Filled.Image, "Галерея", true) {
+                    AttachOption(Icons.Filled.Image, "Галерея", !showContactPicker && !showFilePicker) {
                         showContactPicker = false
+                        showFilePicker = false
                         photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     }
-                    AttachOption(Icons.Filled.Description, "Файл") {
+                    AttachOption(Icons.Filled.Description, "Файл", showFilePicker) {
                         showContactPicker = false
-                        filePicker.launch(arrayOf("*/*"))
+                        showFilePicker = true
                     }
                     AttachOption(Icons.Filled.LocationOn, "Локация")
-                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
+                    AttachOption(Icons.Filled.Person, "Контакт", showContactPicker) {
+                        showFilePicker = false
+                        showContactPicker = true
+                    }
                 }
 
                 Spacer(Modifier.height(80.dp))
@@ -3021,7 +3167,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     Row(Modifier.fillMaxWidth().then(if (expandInput) Modifier.fillMaxHeight() else Modifier).padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.Bottom) {
-                    IconButton(onClick = { showAttachSheet = true }, modifier = Modifier.size(40.dp)) {
+                    IconButton(onClick = { showAttachSheet = true; showContactPicker = false; showFilePicker = false }, modifier = Modifier.size(40.dp)) {
                         Icon(painter = painterResource(R.drawable.ic_attach_clip), contentDescription = "attach", tint = Color.White, modifier = Modifier.size(24.dp))
                     }
                     Box(modifier = Modifier.weight(1f).then(if (expandInput) Modifier.fillMaxHeight() else Modifier)) {
