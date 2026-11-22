@@ -2567,15 +2567,16 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                         // Pin / Unpin
                             if (selectedMessage != null) {
                                 val isP = selectedMessage!!.isPinned
+                                val msgId = selectedMessage!!.id
                                 Row(Modifier.fillMaxWidth().clickable {
                                     val newP = !isP
-                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = newP) else it }
+                                    messages = messages.map { if (it.id == msgId) it.copy(isPinned = newP) else it }
                                     if (newP) pinnedMessage = selectedMessage
-                                    else if (pinnedMessage?.id == selectedMessage!!.id) pinnedMessage = null
+                                    else if (pinnedMessage?.id == msgId) pinnedMessage = null
                                     selectedMessage = null
                                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                         try {
-                                            val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", newP) }
+                                            val json = org.json.JSONObject().apply { put("id", msgId); put("pinned", newP) }
                                             val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
                                                 .addHeader("Authorization", "Bearer $token")
                                                 .addHeader("Content-Type", "application/json")
@@ -2626,12 +2627,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             // Pin / Unpin Row
                             if (selectedMessage != null) {
                                 val isP = selectedMessage!!.isPinned
+                                val msgId = selectedMessage!!.id
                                 Row(Modifier.fillMaxWidth().clickable {
                                     // 1. Мгновенное обновление UI (оптимистичное)
                                     val newPinned = !isP
                                     messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = newPinned) else it }
                                     if (newPinned) pinnedMessage = selectedMessage
-                                    else if (pinnedMessage?.id == selectedMessage!!.id) pinnedMessage = null
+                                    else if (pinnedMessage?.id == msgId) pinnedMessage = null
                                     selectedMessage = null // закрываем меню
                                     
                                     // 2. Запрос в фоне
