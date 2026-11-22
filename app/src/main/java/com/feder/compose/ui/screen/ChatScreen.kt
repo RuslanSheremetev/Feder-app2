@@ -2090,7 +2090,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Column(modifier = Modifier.weight(1f)) {
                 if (pinnedMessage != null) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(androidx.compose.ui.graphics.Color(0xFF1C2733))
                             .clickable {
@@ -2099,13 +2099,13 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             },
                         color = androidx.compose.ui.graphics.Color(0xFF1C2733)
                     ) {
-                        Row(Modifier.padding(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.PushPin, "pin", tint = androidx.compose.ui.graphics.Color(0xFFA1C9FF), modifier = Modifier.size(18.dp))
+                        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Box(Modifier.width(3.dp).height(28.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(2.dp)).background(androidx.compose.ui.graphics.Color(0xFFA1C9FF)))
+                            Spacer(Modifier.width(10.dp))
+                            Icon(androidx.compose.material.icons.Icons.Filled.PushPin, "pin", tint = androidx.compose.ui.graphics.Color(0xFFA1C9FF), modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text("Pinned Message", color = androidx.compose.ui.graphics.Color(0xFFA1C9FF), fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
-                                Text(pinnedMessage!!.text.takeIf { it.isNotEmpty() } ?: "Media", color = androidx.compose.ui.graphics.Color(0xFFE5E2E1), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                            }
+                            Text(pinnedMessage!!.text.takeIf { it.isNotEmpty() } ?: "Media", color = androidx.compose.ui.graphics.Color(0xFFE5E2E1), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                            Spacer(Modifier.width(8.dp))
                             IconButton(onClick = {
                                 scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                     try {
