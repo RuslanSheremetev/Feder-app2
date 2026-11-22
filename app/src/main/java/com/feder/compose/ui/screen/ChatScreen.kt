@@ -275,7 +275,8 @@ fun ChannelPostBubble(
                 if (!firstImg.isNullOrEmpty()) {
                     val chTok = if (token.isNotEmpty()) "?token=" + token else ""
                     val chUrl = when {
-                        firstImg.startsWith("http") || firstImg.startsWith("content://") || firstImg.startsWith("file://") -> firstImg
+                        firstImg.startsWith("http") -> if (token.isNotEmpty() && !firstImg.contains("token=")) firstImg + (if (firstImg.contains("?")) "&" else "?") + "token=" + token else firstImg
+                        firstImg.startsWith("content://") || firstImg.startsWith("file://") -> firstImg
                         firstImg.startsWith("/uploads/") -> "http://2.26.71.102:8012" + firstImg + chTok
                         firstImg.startsWith("/") -> "http://2.26.71.102:8012" + firstImg + chTok
                         else -> "http://2.26.71.102:8012/uploads/" + firstImg + chTok
