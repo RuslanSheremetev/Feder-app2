@@ -2219,19 +2219,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     msgPositions[msg.id] = coords.positionInWindow()
                                     msgSizesGlobal[msg.id] = coords.size
                                 }
-                                .pointerInput(msg.id) {
-                                    // FIX_TAPCOORDS: ловим координаты тапа
-                                    detectTapGestures { local ->
-                                        if (!selectionMode) {
-                                            msgPositions[msg.id]?.let { base ->
-                                                menuAbsOffset = androidx.compose.ui.geometry.Offset(
-                                                    base.x + local.x,
-                                                    base.y + local.y
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
                             ) {
                                 MessageBubble(
                             msg,
