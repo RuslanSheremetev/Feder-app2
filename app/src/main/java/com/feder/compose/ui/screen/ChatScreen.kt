@@ -2689,8 +2689,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
-                // Gallery grid
-                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
+                // Gallery grid (только если НЕ выбраны контакты)
+                if (!showContactPicker) {
+                    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(200.dp)).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
@@ -2723,6 +2724,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
+                } // закрываем if (!showContactPicker)
 
                 Spacer(Modifier.height(16.dp))
 
@@ -2749,7 +2751,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         val name = o.optString("name", uname)
                                         val phone = o.optString("phone", "")
                                         val avatar = o.optString("avatar_url", "")
-                                        if (uname != myUsername && uname != "123") {
+                                        if (uname != myUsername && uname != "123" && !uname.startsWith("channel:") && !uname.startsWith("group:")) {
                                             list.add(Triple(uname, Pair(name, phone), avatar))
                                         }
                                     }
@@ -2842,18 +2844,20 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }
                         }
                     }
-                } else {
-                    // === СТАНДАРТНОЕ МЕНЮ ===
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                        AttachOption(Icons.Filled.Image, "Галерея", true) {
-                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        }
-                        AttachOption(Icons.Filled.Description, "Файл") {
-                            filePicker.launch(arrayOf("*/*"))
-                        }
-                        AttachOption(Icons.Filled.LocationOn, "Локация")
-                        AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
+                } // закрываем if (showContactPicker)
+
+                // === СТАНДАРТНОЕ МЕНЮ (всегда видимо) ===
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    AttachOption(Icons.Filled.Image, "Галерея", true) {
+                        showContactPicker = false
+                        photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     }
+                    AttachOption(Icons.Filled.Description, "Файл") {
+                        showContactPicker = false
+                        filePicker.launch(arrayOf("*/*"))
+                    }
+                    AttachOption(Icons.Filled.LocationOn, "Локация")
+                    AttachOption(Icons.Filled.Person, "Контакт") { showContactPicker = true }
                 }
 
                 Spacer(Modifier.height(80.dp))
