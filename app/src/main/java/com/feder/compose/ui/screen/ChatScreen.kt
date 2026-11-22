@@ -2598,6 +2598,42 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painter = painterResource(R.drawable.ic_check_circle), contentDescription = null, tint = Primary, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Select", color = OnSurface, fontSize = 16.sp)
                             }
+                            // Pin / Unpin Row
+                            if (selectedMessage != null) {
+                                val isP = selectedMessage!!.isPinned
+                                Row(Modifier.fillMaxWidth().clickable {
+                                    // 1. Мгновенное обновление UI (оптимистичное)
+                                    val newPinned = !isP
+                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = newPinned) else it }
+                                    if (newPinned) pinnedMessage = selectedMessage
+                                    else if (pinnedMessage?.id == selectedMessage!!.id) pinnedMessage = null
+                                    selectedMessage = null // закрываем меню
+                                    
+                                    // 2. Запрос в фоне
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        try {
+                                            val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", newPinned) }
+                                            val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
+                                                .addHeader("Authorization", "Bearer $token")
+                                                .addHeader("Content-Type", "application/json")
+                                                .post(json.toString().toRequestBody("application/json".toMediaType())).build()
+                                            okhttp3.OkHttpClient().newCall(req).execute().close()
+                                        } catch (e: Exception) { 
+                                            android.util.Log.e("PIN", "toggle fail", e)
+                                            // Откат при ошибке
+                                            withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = isP) else it }
+                                                if (isP) pinnedMessage = selectedMessage else pinnedMessage = null
+                                            }
+                                        }
+                                    }
+                                }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(androidx.compose.material.icons.Icons.Filled.PushPin, null, tint = if (isP) Primary else OnSurface, modifier = Modifier.size(22.dp))
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(if (isP) "Unpin" else "Pin", color = OnSurface, fontSize = 16.sp)
+                                }
+                            }
+                            // Delete Row
                             Row(Modifier.fillMaxWidth().clickable {
                                 messageToDelete = selectedMessage
                                 deleteForAll = false
@@ -2605,30 +2641,9 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 selectedMessage = null
                                 showDeleteSub = false
                             }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                if (selectedMessage != null) {
-                                    val isP = selectedMessage!!.isPinned
-                                    Row(Modifier.fillMaxWidth().clickable {
-                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                            try {
-                                                val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", !isP) }
-                                                val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
-                                                    .addHeader("Authorization", "Bearer $token")
-                                                    .addHeader("Content-Type", "td/json")
-                                                    .post(json.toString().toRequestBody("application/json".toMediaType())).build()
-                                                okhttp3.OkHttpClient().newCall(req).execute().close()
-                                                withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = !isP) else it }
-                                                    selectedMessage = null
-                                                }
-                                            } catch (e: Exception) { android.util.Log.e("PIN", "toggle fail", e) }
-                                        }
-                                    }.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                        Icon(androidx.compose.material.icons.Icons.Filled.PushPin, null, tint = if (isP) Primary else OnSurface, modifier = Modifier.size(22.dp))
-                                        Spacer(Modifier.width(12.dp))
-                                        Text(if (isP) "Unpin" else "Pin", color = OnSurface, fontSize = 16.sp)
-                                    }
-                                }
-                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text("Delete", color = Error, fontSize = 16.sp)
+                                Icon(painter = painterResource(R.drawable.ic_delete_outline), contentDescription = null, tint = Error, modifier = Modifier.size(22.dp))
+                                Spacer(Modifier.width(12.dp))
+                                Text("Delete", color = Error, fontSize = 16.sp)
                             }
                             if (false && showDeleteSub) {
                                 Column {
