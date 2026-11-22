@@ -2109,7 +2109,10 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             IconButton(onClick = {
                                 scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                     try {
-                                        val json = org.json.JSONObject().apply { put("id", pinnedMessage!!.id); put("pinned", false) }
+                                        val mId = pinnedMessage!!.id
+                                            messages = messages.map { if (it.id == mId) it.copy(isPinned = false) else it }
+                                            pinnedMessage = null
+                                            val json = org.json.JSONObject().apply { put("id", mId); put("pinned", false) }
                                         val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
                                             .addHeader("Authorization", "Bearer $token")
                                             .addHeader("Content-Type", "application/json")
