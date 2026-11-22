@@ -3105,7 +3105,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
 
 
                 // === СТАНДАРТНОЕ МЕНЮ (всегда видимо) ===
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     AttachOption(Icons.Filled.Image, "Галерея", !showContactPicker && !showFilePicker) {
                         showContactPicker = false
                         showFilePicker = false
