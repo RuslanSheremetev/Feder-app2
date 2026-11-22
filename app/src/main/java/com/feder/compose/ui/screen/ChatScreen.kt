@@ -2107,21 +2107,19 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Text(pinnedMessage!!.text.takeIf { it.isNotEmpty() } ?: "Media", color = androidx.compose.ui.graphics.Color(0xFFE5E2E1), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                             Spacer(Modifier.width(8.dp))
                             IconButton(onClick = {
+                                val mId = pinnedMessage!!.id
+                                // Оптимистичное обновление UI в главном потоке
+                                messages = messages.map { if (it.id == mId) it.copy(isPinned = false) else it }
+                                pinnedMessage = null
+                                // Запрос в фоне
                                 scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                     try {
-                                        val mId = pinnedMessage!!.id
-                                            messages = messages.map { if (it.id == mId) it.copy(isPinned = false) else it }
-                                            pinnedMessage = null
-                                            val json = org.json.JSONObject().apply { put("id", mId); put("pinned", false) }
+                                        val json = org.json.JSONObject().apply { put("id", mId); put("pinned", false) }
                                         val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
                                             .addHeader("Authorization", "Bearer $token")
                                             .addHeader("Content-Type", "application/json")
                                             .post(json.toString().toRequestBody("application/json".toMediaType())).build()
                                         okhttp3.OkHttpClient().newCall(req).execute().close()
-                                        withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                            messages = messages.map { if (it.id == pinnedMessage!!.id) it.copy(isPinned = false) else it }
-                                            pinnedMessage = null
-                                        }
                                     } catch (e: Exception) { android.util.Log.e("PIN", "unpin fail", e) }
                                 }
                             }, modifier = Modifier.size(32.dp)) {
@@ -2611,7 +2609,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 Row(Modifier.fillMaxWidth().clickable {
                                     // 1. Мгновенное обновление UI (оптимистичное)
                                     val newPinned = !isP
-                                    messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = newPinned) else it }
+                                    messages = messages.map { if (it.id == msgId) it.copy(isPinned = newPinned) else it }
                                     if (newPinned) pinnedMessage = selectedMessage
                                     else if (pinnedMessage?.id == msgId) pinnedMessage = null
                                     selectedMessage = null // закрываем меню
@@ -2619,7 +2617,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     // 2. Запрос в фоне
                                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                         try {
-                                            val json = org.json.JSONObject().apply { put("id", selectedMessage!!.id); put("pinned", newPinned) }
+                                            val json = org.json.JSONObject().apply { put("id", msgId); put("pinned", newPinned) }
                                             val req = okhttp3.Request.Builder().url("http://2.26.71.102:8004/api/chat/pin")
                                                 .addHeader("Authorization", "Bearer $token")
                                                 .addHeader("Content-Type", "application/json")
@@ -2629,7 +2627,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                             android.util.Log.e("PIN", "toggle fail", e)
                                             // Откат при ошибке
                                             withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                messages = messages.map { if (it.id == selectedMessage!!.id) it.copy(isPinned = isP) else it }
+                                                messages = messages.map { if (it.id == msgId) it.copy(isPinned = isP) else it }
                                                 if (isP) pinnedMessage = selectedMessage else pinnedMessage = null
                                             }
                                         }
