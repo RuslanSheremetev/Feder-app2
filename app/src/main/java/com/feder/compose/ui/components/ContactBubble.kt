@@ -39,10 +39,11 @@ fun ContactBubble(
         if (parts.size >= 2) parts[0] to parts[1] else "Phone" to it
     }
 
+    val av = contactAvatar?.replace("\\/", "/")
     val realAvatarUrl = when {
-        contactAvatar != null && contactAvatar.startsWith("http") -> contactAvatar
-        contactAvatar != null && contactAvatar.startsWith("/") -> "http://2.26.71.102:8010" + contactAvatar
-        contactAvatar != null && contactAvatar.isNotEmpty() -> "http://2.26.71.102:8010/avatars/" + contactAvatar
+        av != null && av.startsWith("http") -> av
+        av != null && av.startsWith("/") -> "http://2.26.71.102:8010" + av
+        av != null && av.isNotEmpty() -> "http://2.26.71.102:8010/avatars/" + av
         !contactUsername.isNullOrEmpty() -> "http://2.26.71.102:8010/avatars/${contactUsername}/avatar.jpg"
         else -> null
     }

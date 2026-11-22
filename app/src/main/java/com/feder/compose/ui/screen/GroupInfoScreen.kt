@@ -82,10 +82,12 @@ fun GroupInfoScreen(
     var loading by remember(groupName) { mutableStateOf(cachedMembers.isNullOrEmpty()) }
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
+    val displayGroupName = groupName.removePrefix("channel:").removePrefix("group:")
 
     // ═══ GROUPINFO_MEDIA_UI ═══
     var mediaUrls by remember(groupName) { mutableStateOf<List<String>>(emptyList()) }
-    var selectedTab by remember(groupName) { mutableIntStateOf(0) }  // 0 = Media, 1 = Links
+    var selectedTab by remember(groupName) { mutableIntStateOf(0) }  // 0 Media 1 Files 2 Links 3 Music 4 Polls
+    var linksUrls by remember(groupName) { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(groupName) {
         try {
@@ -103,6 +105,10 @@ fun GroupInfoScreen(
             val list = mutableListOf<String>()
             for (i in 0 until arr.length()) list.add(arr.getString(i))
             mediaUrls = list
+            val larr = json.optJSONArray("links") ?: org.json.JSONArray()
+            val ll = mutableListOf<String>()
+            for (i in 0 until larr.length()) ll.add(larr.getString(i))
+            linksUrls = ll
         } catch (e: Exception) {
             android.util.Log.e("GroupInfo", "media load: ${e.message}")
         }
@@ -309,7 +315,7 @@ fun GroupInfoScreen(
                 }
                 Spacer(Modifier.width((8f * progress).dp))
                 Text(
-                    groupName,
+                    displayGroupName,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = headerNameAlpha),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -389,7 +395,7 @@ fun GroupInfoScreen(
                         }
                         // 2) ИМЯ — на месте
                         Text(
-                            groupName,
+                            displayGroupName,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 26.sp,
                             fontWeight = FontWeight.Bold,
@@ -467,83 +473,100 @@ fun GroupInfoScreen(
                         )
                     }
                 }
-                // ═══ MediaTabsBlock: табы + сетка ═══
-                if (mediaUrls.isNotEmpty()) {
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            listOf("Media", "Links").forEachIndexed { idx, label ->
-                                val active = selectedTab == idx
-                                Surface(
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = if (active) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.surfaceContainerHigh
-                                ) {
-                                    Text(
-                                        label,
-                                        modifier = Modifier
-                                            .clickable { selectedTab = idx }
-                                            .padding(horizontal = 18.dp, vertical = 8.dp),
-                                        color = if (active) MaterialTheme.colorScheme.onPrimary
-                                                else MaterialTheme.colorScheme.onSurface,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
+                // ═══ MediaTabsBlock: табы + сетка (как в профиле) ═══
+                item {
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("Media", "Files", "Links", "Music", "Polls").forEachIndexed { idx, label ->
+                            val active = selectedTab == idx
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = if (active) Color(0xFFA1C9FF) else Color(0xFF1F1F1F),
+                                modifier = Modifier.clickable { selectedTab = idx }
+                            ) {
+                                Text(
+                                    label,
+                                    color = if (active) Color(0xFF00325A) else Color(0xFFC0C7D4),
+                                    fontSize = 14.sp,
+                                    fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
                             }
                         }
                     }
-                    if (selectedTab == 0) {
-                        item {
+                }
+                if (selectedTab == 0) {
+                    item {
+                        if (mediaUrls.isEmpty()) {
+                            Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                                Text("No media yet", color = Color(0xFFC0C7D4), fontSize = 14.sp)
+                            }
+                        } else {
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(3),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(max = 800.dp)
-                                    .padding(horizontal = 8.dp),
+                                modifier = Modifier.fillMaxWidth().heightIn(max = 800.dp).padding(horizontal = 8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp),
                                 userScrollEnabled = false
                             ) {
                                 gridItems(mediaUrls) { url ->
+                                    val full = when {
+                                        url.startsWith("http") -> url
+                                        url.startsWith("/") -> "http://2.26.71.102:8012" + url
+                                        else -> "http://2.26.71.102:8012/uploads/" + url
+                                    }
                                     Box(
-                                        modifier = Modifier
-                                            .aspectRatio(1f)
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                        Modifier.aspectRatio(1f).clip(RoundedCornerShape(6.dp)).background(Color(0xFF353534))
                                     ) {
                                         AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(url)
-                                                .crossfade(true)
-                                                .build(),
+                                            model = ImageRequest.Builder(LocalContext.current).data(full).crossfade(true).build(),
                                             contentDescription = null,
                                             modifier = Modifier.fillMaxSize(),
-                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                            contentScale = ContentScale.Crop
                                         )
                                     }
                                 }
                             }
                         }
-                    } else {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    "No links yet",
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                    }
+                } else if (selectedTab == 2) {
+                    item {
+                        if (linksUrls.isEmpty()) {
+                            Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                                Text("No links yet", color = Color(0xFFC0C7D4), fontSize = 14.sp)
                             }
+                        } else {
+                            Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                                linksUrls.forEach { u ->
+                                    val host = try { java.net.URL(u).host.removePrefix("www.") } catch (_: Exception) { u }
+                                    Row(
+                                        Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable {
+                                            try {
+                                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
+                                                ctx.startActivity(intent)
+                                            } catch (_: Exception) {}
+                                        }.padding(vertical = 10.dp, horizontal = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)).background(Color(0xFF2A2A2A)), contentAlignment = Alignment.Center) {
+                                            Icon(Icons.Filled.OpenInNew, null, tint = Color(0xFFA1C9FF), modifier = Modifier.size(20.dp))
+                                        }
+                                        Spacer(Modifier.width(12.dp))
+                                        Column(Modifier.weight(1f)) {
+                                            Text(host, color = Color(0xFFE5E2E1), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                            Text(u, color = Color(0xFF8A919E), fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    item {
+                        Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                            Text("Coming soon", color = Color(0xFFC0C7D4), fontSize = 14.sp)
                         }
                     }
                 }
