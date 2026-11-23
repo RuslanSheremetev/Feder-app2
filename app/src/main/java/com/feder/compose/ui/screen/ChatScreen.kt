@@ -606,7 +606,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 ).any { cleanUrl.endsWith(it) }
                 
                 if (isDocument) {
-                    val fileName = firstUrl.substringAfterLast("/").substringBefore("?").takeIf { it.isNotBlank() } ?: "Unknown File"
+                    val fileName = firstUrl?.substringAfterLast("/")?.substringBefore("?")?.takeIf { it.isNotBlank() } ?: "Unknown File"
                     val (fileIcon, iconColor) = getFileIconAndColor(fileName)
                     
                     Row(
