@@ -1057,7 +1057,21 @@ fun FederApp() {
                 if (viewModel.selectedTab == 0) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.showStories = !viewModel.showStories }) {
                     if (viewModel.showStories) {
-                        Icon(Icons.Filled.Close, "close", tint = Primary, modifier = Modifier.size(24.dp).clickable { viewModel.showStories = false })
+                        // Пустой кружок с той же обводкой, что и аватарка историй
+                        val slot = 28.dp
+                        val ringColor = Color(0xFF2AABEE)
+                        Box(
+                            modifier = Modifier
+                                .size(slot)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .border(2.dp, ringColor, CircleShape)
+                                .padding(1.dp)
+                                .clickable { viewModel.showStories = false },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            // центр пустой — индикатор раскрытых историй
+                        }
                     } else {
                         // ─── Аватарки авторов историй (0..3) ───
                         val feed = viewModel.storiesFeed.take(3)
