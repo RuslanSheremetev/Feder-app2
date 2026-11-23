@@ -596,7 +596,48 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                         }
                         }
                 // removed rlog for perf
-                if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
+                // ═══ ПРОВЕРКА: это документ/файл, а не медиа? ═══
+                val firstUrl = msg.imageUrls.firstOrNull() ?: msg.imageUrl
+                val cleanUrl = firstUrl?.substringBefore("?")?.lowercase() ?: ""
+                val isDocument = cleanUrl.isNotEmpty() && !listOf(
+                    ".jpg", ".jpeg", ".png", ".webp", ".gif",
+                    ".mp4", ".mkv", ".webm",
+                    ".mp3", ".m4a", ".ogg", ".wav"
+                ).any { cleanUrl.endsWith(it) }
+                
+                if (isDocument) {
+                    val fileName = firstUrl.substringAfterLast("/").substringBefore("?").takeIf { it.isNotBlank() } ?: "Unknown File"
+                    val (fileIcon, iconColor) = getFileIconAndColor(fileName)
+                    
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 240.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.size(40.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)).background(iconColor.copy(alpha = 0.2f)),
+                            contentAlignment = androidx.compose.ui.Alignment.Center
+                        ) {
+                            androidx.compose.material3.Icon(fileIcon, contentDescription = null, tint = iconColor, modifier = androidx.compose.ui.Modifier.size(24.dp))
+                        }
+                        androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.width(12.dp))
+                        androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.weight(1f)) {
+                            androidx.compose.material3.Text(
+                                text = fileName,
+                                color = if (isMine) androidx.compose.ui.graphics.Color.White else androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
+                                fontSize = 15.sp,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                            androidx.compose.material3.Text(
+                                text = "File",
+                                color = if (isMine) androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 12.sp,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                } else if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     android.util.Log.d("DEBUG_MEDIA", "firstUrl = $firstUrl")
                     val isAudio = firstUrl.contains(".m4a") || firstUrl.contains("audio_") || firstUrl.contains(".mp3")
@@ -3647,5 +3688,19 @@ private fun formatHeaderDate(timeVal: Long): String {
         today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> "Yesterday"
         today.get(java.util.Calendar.YEAR) == msgCal.get(java.util.Calendar.YEAR) -> sdf.format(msgDate)
         else -> sdfYear.format(msgDate)
+    }
+}
+// ═══ Helper: Определение иконки и цвета по расширению файла (Top-Level) ═══
+fun getFileIconAndColor(name: String): Pair<androidx.compose.ui.graphics.vector.ImageVector, androidx.compose.ui.graphics.Color> {
+    val n = name.lowercase()
+    return when {
+        n.endsWith(".pdf") -> Pair(androidx.compose.material.icons.Icons.Filled.PictureAsPdf, androidx.compose.ui.graphics.Color(0xFFE57373))
+        n.endsWith(".doc") || n.endsWith(".docx") || n.endsWith(".txt") || n.endsWith(".rtf") || n.endsWith(".md") -> Pair(androidx.compose.material.icons.Icons.Filled.Description, androidx.compose.ui.graphics.Color(0xFF64B5F6))
+        n.endsWith(".zip") || n.endsWith(".rar") || n.endsWith(".7z") || n.endsWith(".gz") || n.endsWith(".tar") || n.endsWith(".apk") -> Pair(androidx.compose.material.icons.Icons.Filled.FolderZip, androidx.compose.ui.graphics.Color(0xFFFFB74D))
+        n.endsWith(".json") || n.endsWith(".xml") || n.endsWith(".csv") || n.endsWith(".sql") -> Pair(androidx.compose.material.icons.Icons.Filled.Code, androidx.compose.ui.graphics.Color(0xFF81C784))
+        n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".png") || n.endsWith(".webp") || n.endsWith(".gif") -> Pair(androidx.compose.material.icons.Icons.Filled.Image, androidx.compose.ui.graphics.Color(0xFF81C784))
+        n.endsWith(".mp3") || n.endsWith(".m4a") || n.endsWith(".ogg") || n.endsWith(".wav") -> Pair(androidx.compose.material.icons.Icons.Filled.AudioFile, androidx.compose.ui.graphics.Color(0xFFBA68C8))
+        n.endsWith(".mp4") || n.endsWith(".mkv") || n.endsWith(".webm") -> Pair(androidx.compose.material.icons.Icons.Filled.VideoFile, androidx.compose.ui.graphics.Color(0xFF4DD0E1))
+        else -> Pair(androidx.compose.material.icons.Icons.Filled.InsertDriveFile, androidx.compose.ui.graphics.Color(0xFF81C784))
     }
 }
