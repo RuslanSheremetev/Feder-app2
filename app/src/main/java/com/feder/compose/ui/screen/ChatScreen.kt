@@ -3413,6 +3413,25 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                                             android.util.Log.d("ChatScreen", "UPLOAD start file=${file.name} size=${file.length()}")
                                                             val url = try { com.feder.compose.AudioUploader.uploadAudio(file.inputStream(), file.name, token, chatUsername) } catch (e: Exception) { null }
                                                             android.util.Log.d("ChatScreen", "UPLOAD done url=$url")
+
+                                                            // Сохраняем в Room, чтобы сообщение не исчезало после перезахода
+                                                            if (url != null) {
+                                                                val isMedia = listOf(".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".mkv", ".webm", ".mp3", ".m4a", ".ogg", ".wav")
+                                                                    .any { url.lowercase().endsWith(it) }
+                                                                val finalType = if (isMedia) "image" else "file"
+                                                                
+                                                                repository?.saveMessage(com.feder.compose.data.entity.MessageEntity(
+                                                                    id = localId,
+                                                                    fromUser = myUsername,
+                                                                    toUser = chatUsername,
+                                                                    text = "",
+                                                                    timeVal = now,
+                                                                    imageUrls = url,
+                                                                    messageType = finalType,
+                                                                    isRead = false
+                                                                ))
+                                                            }
+
                                                             withContext(kotlinx.coroutines.Dispatchers.Main) {
                                                                 if (url != null) messages = messages.map { if (it.id == localId) it.copy(status = "sent", imageUrls = listOf(url)) else it }
                                                                 file.delete()
