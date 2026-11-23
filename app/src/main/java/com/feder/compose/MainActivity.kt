@@ -1059,7 +1059,7 @@ fun FederApp() {
                     if (viewModel.showStories) {
                         // Пустой кружок с той же обводкой, что и аватарка историй
                         val slot = 28.dp
-                        val ringColor = Color(0xFF2AABEE)
+                        val ringColor = Color.White
                         Box(
                             modifier = Modifier
                                 .size(slot)
