@@ -625,7 +625,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                     val (fileIcon, iconColor) = getFileIconAndColor(fileName)
                     
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 240.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 260.dp),
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         androidx.compose.foundation.layout.Box(
@@ -649,6 +649,20 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                                 color = if (isMine) androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 12.sp,
                                 maxLines = 1
+                            )
+                        }
+                        androidx.compose.material3.IconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                onLongClick?.invoke()
+                            },
+                            modifier = androidx.compose.ui.Modifier.size(32.dp)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                androidx.compose.material.icons.Icons.Filled.MoreVert,
+                                contentDescription = "Menu",
+                                tint = if (isMine) androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = androidx.compose.ui.Modifier.size(20.dp)
                             )
                         }
                     }
