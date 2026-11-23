@@ -607,6 +607,21 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 
                 if (isDocument) {
                     val fileName = firstUrl?.substringAfterLast("/")?.substringBefore("?")?.takeIf { it.isNotBlank() } ?: "Unknown File"
+                    if (msg.status == "pending") {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 240.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            androidx.compose.foundation.layout.Box(
+                                modifier = Modifier.size(40.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)).background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.2f)),
+                                contentAlignment = androidx.compose.ui.Alignment.Center
+                            ) {
+                                androidx.compose.material3.CircularProgressIndicator(color = androidx.compose.ui.graphics.Color.White, strokeWidth = 2.dp, modifier = androidx.compose.ui.Modifier.size(22.dp))
+                            }
+                            androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.width(12.dp))
+                            androidx.compose.material3.Text("Загрузка…", color = if (isMine) androidx.compose.ui.graphics.Color.White else androidx.compose.material3.MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+                        }
+                    } else {
                     val (fileIcon, iconColor) = getFileIconAndColor(fileName)
                     
                     Row(
@@ -614,10 +629,10 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         androidx.compose.foundation.layout.Box(
-                            modifier = Modifier.size(40.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)).background(iconColor.copy(alpha = 0.2f)),
+                            modifier = Modifier.size(40.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)).background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.2f)),
                             contentAlignment = androidx.compose.ui.Alignment.Center
                         ) {
-                            androidx.compose.material3.Icon(fileIcon, contentDescription = null, tint = iconColor, modifier = androidx.compose.ui.Modifier.size(24.dp))
+                            androidx.compose.material3.Icon(fileIcon, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = androidx.compose.ui.Modifier.size(24.dp))
                         }
                         androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.width(12.dp))
                         androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.weight(1f)) {
@@ -637,6 +652,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                             )
                         }
                     }
+                                    }
                 } else if (msg.imageUrls != null && msg.imageUrls.isNotEmpty()) {
                     val firstUrl = msg.imageUrls.first()
                     android.util.Log.d("DEBUG_MEDIA", "firstUrl = $firstUrl")
