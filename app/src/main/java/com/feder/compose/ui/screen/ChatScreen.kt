@@ -2813,7 +2813,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(520.dp))
                     .align(Alignment.BottomCenter)
                     .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(16.dp)
+                    .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
                     .navigationBarsPadding()
                     .pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
@@ -2822,6 +2822,27 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
             ) {
+                // Drag handle
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 0.dp, bottom = 8.dp)
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                if (dragAmount < -50) attachExpanded = true
+                                if (dragAmount > 50 && attachExpanded) attachExpanded = false
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(OnSurfaceVariant.copy(alpha = 0.5f))
+                    )
+                }
                 // Selected photos preview
                 if (selectedPhotos.isNotEmpty()) {
                     Row(
@@ -2863,27 +2884,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                }
-                // Drag handle
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .pointerInput(Unit) {
-                            detectVerticalDragGestures { _, dragAmount ->
-                                if (dragAmount < -50) attachExpanded = true
-                                if (dragAmount > 50 && attachExpanded) attachExpanded = false
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(OnSurfaceVariant.copy(alpha = 0.5f))
-                    )
                 }
                 val context = LocalContext.current
                 val photos = remember { mutableStateListOf<android.net.Uri>() }
