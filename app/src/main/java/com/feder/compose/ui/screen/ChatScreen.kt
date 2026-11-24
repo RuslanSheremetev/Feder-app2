@@ -606,6 +606,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 ).any { cleanUrl.endsWith(it) }
                 
                 if (isDocument) {
+var showMoreMenu by remember { mutableStateOf(false) }
                     val fileName = firstUrl?.substringAfterLast("/")?.substringBefore("?")?.takeIf { it.isNotBlank() } ?: "Unknown File"
                     if (msg.status == "pending") {
                         Row(
@@ -654,7 +655,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                         androidx.compose.material3.IconButton(
                             onClick = {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                showMoreMenu = true
+                                onLongClick?.invoke()
                             },
                             modifier = androidx.compose.ui.Modifier.size(32.dp)
                         ) {
