@@ -606,6 +606,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                 ).any { cleanUrl.endsWith(it) }
                 
                 if (isDocument) {
+                    var showFileMenu by remember { mutableStateOf(false) }
 var showMoreMenu by remember { mutableStateOf(false) }
                     val fileName = firstUrl?.substringAfterLast("/")?.substringBefore("?")?.takeIf { it.isNotBlank() } ?: "Unknown File"
                     if (msg.status == "pending") {
@@ -665,6 +666,29 @@ var showMoreMenu by remember { mutableStateOf(false) }
                                 tint = if (isMine) androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = androidx.compose.ui.Modifier.size(20.dp)
                             )
+                        }
+                        if (showFileMenu) {
+                            androidx.compose.material3.DropdownMenu(
+                                expanded = showFileMenu,
+                                onDismissRequest = { showFileMenu = false }
+                            ) {
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { androidx.compose.material3.Text("Reply") },
+                                    onClick = { showFileMenu = false; onLongClick?.invoke() }
+                                )
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { androidx.compose.material3.Text("Copy") },
+                                    onClick = { showFileMenu = false }
+                                )
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { androidx.compose.material3.Text("Forward") },
+                                    onClick = { showFileMenu = false }
+                                )
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { androidx.compose.material3.Text("Delete") },
+                                    onClick = { showFileMenu = false; onLongClick?.invoke() }
+                                )
+                            }
                         }
                     }
                                     }
