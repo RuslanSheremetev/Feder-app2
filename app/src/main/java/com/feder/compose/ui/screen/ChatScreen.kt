@@ -654,7 +654,7 @@ Box(Modifier.then(when { isAudioMsg -> Modifier.wrapContentWidth(); msg.imageUrl
                         androidx.compose.material3.IconButton(
                             onClick = {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                onLongClick?.invoke()
+                                showMoreMenu = true
                             },
                             modifier = androidx.compose.ui.Modifier.size(32.dp)
                         ) {
