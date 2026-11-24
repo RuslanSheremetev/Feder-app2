@@ -2972,13 +2972,14 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
 
 
+                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
                     androidx.compose.foundation.text.BasicTextField(
                         value = contactSearch,
                         onValueChange = { contactSearch = it },
                         singleLine = true,
                         textStyle = androidx.compose.ui.text.TextStyle(color = androidx.compose.ui.graphics.Color.White, fontSize = 16.sp),
                         cursorBrush = androidx.compose.ui.graphics.SolidColor(androidx.compose.ui.graphics.Color(0xFF339DFF)),
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).background(androidx.compose.ui.graphics.Color(0xFF1E1E1E)).padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).background(androidx.compose.ui.graphics.Color(0xFF1E1E1E)).padding(horizontal = 12.dp, vertical = 6.dp),
                         decorationBox = { innerTextField ->
                             androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                                 androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.Search, null, tint = androidx.compose.ui.graphics.Color.Gray, modifier = androidx.compose.ui.Modifier.size(20.dp))
@@ -3072,6 +3073,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                 }
                             }
                         }
+                    }
                     }
                 } // закрываем if (showContactPicker)
 
