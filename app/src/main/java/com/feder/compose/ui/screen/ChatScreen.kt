@@ -627,7 +627,10 @@ var showMoreMenu by remember { mutableStateOf(false) }
                     val (fileIcon, iconColor) = getFileIconAndColor(fileName)
                     
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 260.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).widthIn(max = 260.dp).clickable {
+                            // Поглощаем тап по карточке файла: меню не открывается.
+                            // (Открытие файла по тапу — следующим шагом)
+                        },
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         androidx.compose.foundation.layout.Box(
@@ -656,7 +659,7 @@ var showMoreMenu by remember { mutableStateOf(false) }
                         androidx.compose.material3.IconButton(
                             onClick = {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                onLongClick?.invoke()
+                                onClick?.invoke()
                             },
                             modifier = androidx.compose.ui.Modifier.size(32.dp)
                         ) {
