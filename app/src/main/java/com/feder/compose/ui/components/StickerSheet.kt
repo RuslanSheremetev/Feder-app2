@@ -74,7 +74,7 @@ fun StickerSheet(
         Column(
             Modifier
                 .fillMaxWidth()
-                .then(if (expanded) Modifier.fillMaxHeight(0.92f) else Modifier.fillMaxHeight(0.62f))
+                .then(if (expanded) Modifier.fillMaxHeight().navigationBarsPadding() else Modifier.fillMaxHeight(0.62f))
                 .align(Alignment.BottomCenter)
                 .background(
                     SheetBg,
