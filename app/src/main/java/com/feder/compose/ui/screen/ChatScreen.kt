@@ -2973,20 +2973,21 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
 
 
-                    androidx.compose.material3.OutlinedTextField(
+                    androidx.compose.foundation.text.BasicTextField(
                         value = contactSearch,
                         onValueChange = { contactSearch = it },
-                        placeholder = { Text("Search contacts", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         singleLine = true,
-                        shape = RoundedCornerShape(24.dp),
-                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color(0xFF1E1E1E),
-                            focusedContainerColor = Color(0xFF1E1E1E),
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
-                        ),
-                        leadingIcon = { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.Search, null, tint = Color.Gray) }
+                        textStyle = androidx.compose.ui.text.TextStyle(color = androidx.compose.ui.graphics.Color.White, fontSize = 16.sp),
+                        cursorBrush = androidx.compose.ui.graphics.SolidColor(androidx.compose.ui.graphics.Color(0xFF339DFF)),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).background(androidx.compose.ui.graphics.Color(0xFF1E1E1E)).padding(horizontal = 12.dp, vertical = 6.dp),
+                        decorationBox = { innerTextField ->
+                            androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.Search, null, tint = androidx.compose.ui.graphics.Color.Gray, modifier = androidx.compose.ui.Modifier.size(20.dp))
+                                androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.width(8.dp))
+                                if (contactSearch.isEmpty()) androidx.compose.material3.Text("Search contacts", color = androidx.compose.ui.graphics.Color.Gray, fontSize = 16.sp)
+                                innerTextField()
+                            }
+                        }
                     )
 
                     if (isLoading) {
