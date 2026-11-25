@@ -347,7 +347,7 @@ fun ChannelPostBubble(
             }
         }
 
-        // Кнопка "Поделиться" (кружочек сбоку)
+        // Кнопка "Переслать" (кружочек сбоку, как в Telegram)
         IconButton(
             onClick = { onClick?.invoke() },
             modifier = Modifier
@@ -356,10 +356,10 @@ fun ChannelPostBubble(
                 .padding(bottom = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Send,
-                contentDescription = "Share",
+                imageVector = androidx.compose.material.icons.Icons.Filled.Forward,
+                contentDescription = "Forward",
                 tint = Color.White,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
     }
