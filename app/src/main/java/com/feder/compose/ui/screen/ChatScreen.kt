@@ -2813,7 +2813,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     .then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(520.dp))
                     .align(Alignment.BottomCenter)
                     .background(SurfaceContainerLow, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp)
                     .navigationBarsPadding()
                     .pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
@@ -2826,7 +2826,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 8.dp)
+                        .height(28.dp)
                         .pointerInput(Unit) {
                             detectVerticalDragGestures { _, dragAmount ->
                                 if (dragAmount < -50) attachExpanded = true
