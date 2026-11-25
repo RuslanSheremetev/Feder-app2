@@ -2901,7 +2901,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 // Gallery grid (только если НЕ выбраны контакты)
                 if (!showContactPicker && !showFilePicker) {
-                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(8.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(340.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(8.dp)) {
                     LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxWidth().weight(1f).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
@@ -2974,7 +2974,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
 
 
-                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(340.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(vertical = 4.dp)) {
                     androidx.compose.foundation.text.BasicTextField(
                         value = contactSearch,
                         onValueChange = { contactSearch = it },
@@ -3000,7 +3000,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         val filtered = contactsList.filter {
                             it.second.first.contains(contactSearch, true) || it.first.contains(contactSearch, true)
                         }
-                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f))) {
+                        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.height(340.dp))) {
                             items(filtered) { c ->
                                 val uname = c.first
                                 val name = c.second.first
