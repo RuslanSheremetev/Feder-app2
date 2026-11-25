@@ -1610,7 +1610,7 @@ if (chat.isGroup) {
                                             .border(
                                                 width = if (selected) 1.5.dp else 0.dp,
                                                 color = if (selected) Color(0xFFA1C9FF) else Color.Transparent,
-                                                shape = CircleShape
+                                                shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
                                             ),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -1631,7 +1631,7 @@ if (chat.isGroup) {
                                         modifier = Modifier
                                             // FIX_BOTTOM_NAV_V1: уменьшено чтобы не выходило за панель
                                             .size(if (selected) 28.dp else 26.dp)
-                                            .background(color = if (selected) Color(0xFFA1C9FF) else Color.Transparent, shape = CircleShape),
+                                            .background(color = if (selected) Color(0xFFA1C9FF) else Color.Transparent, shape = androidx.compose.foundation.shape.RoundedCornerShape(50)),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         if (i == 3) {
