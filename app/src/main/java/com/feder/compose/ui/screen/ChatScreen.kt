@@ -2901,7 +2901,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 }
                 // Gallery grid (только если НЕ выбраны контакты)
                 if (!showContactPicker && !showFilePicker) {
-                    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).pointerInput(Unit) {
+                    Column(modifier = Modifier.fillMaxWidth().then(if (attachExpanded) Modifier.fillMaxHeight() else Modifier.weight(1f)).clip(RoundedCornerShape(16.dp)).background(Color(0xFF212121)).padding(8.dp)) {
+                    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxWidth().weight(1f).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < -50) attachExpanded = true
                             if (dragAmount > 50 && attachExpanded) attachExpanded = false
@@ -2935,6 +2936,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                     }
                 }
                     Spacer(Modifier.height(16.dp))
+                    }
                 } // закрываем if (!showContactPicker && !showFilePicker)
 
                 if (showContactPicker) {
