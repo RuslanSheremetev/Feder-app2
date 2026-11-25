@@ -2962,7 +2962,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                         val name = o.optString("name", uname)
                                         val phone = o.optString("phone", "")
                                         val avatar = o.optString("avatar_url", "")
-                                        if (uname != myUsername && uname != "123" && !uname.startsWith("channel:") && !uname.startsWith("group:")) {
+                                        if (uname != myUsername && uname != "123" && !uname.startsWith("channel:") && !uname.startsWith("group:") && phone.isNotEmpty()) {
                                             list.add(Triple(uname, Pair(name, phone), avatar))
                                         }
                                     }
