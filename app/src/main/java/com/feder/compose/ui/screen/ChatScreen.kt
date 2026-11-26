@@ -2935,7 +2935,6 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                 }
-                    Spacer(Modifier.height(16.dp))
                     }
                     Spacer(Modifier.height(16.dp))
                 } // закрываем if (!showContactPicker && !showFilePicker)
