@@ -1164,6 +1164,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var showForward by remember { mutableStateOf(false) }
     var showChannelForwardSheet by remember { mutableStateOf(false) }
+    var forwardTarget by remember { mutableStateOf<String?>(null) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var preloading by remember { mutableStateOf(false) }
@@ -3230,7 +3231,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         if (showChannelForwardSheet) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false }) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false; forwardTarget = null }) {
                 Column(
                     Modifier.fillMaxWidth().align(Alignment.BottomCenter)
                         .background(Color(0xFF1C1B1B), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
@@ -3246,7 +3247,37 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             Text("Send to...", color = Color.Gray, fontSize = 16.sp)
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        modifier = Modifier.fillMaxWidth().height(280.dp).padding(horizontal = 8.dp)
+                    ) {
+                        items(allChats.filter { it.username != myUsername && it.username != "123" && it.username != chatUsername }.distinctBy { it.username }, key = { it.username }) { c ->
+                            val sel = forwardTarget == c.username
+                            val avCol = runCatching { android.graphics.Color.parseColor(c.avatarColor) }.getOrDefault(0xFF339DFF.toInt())
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(if (sel) Color(0xFF2B3B4E) else Color.Transparent).clickable { forwardTarget = c.username },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(Modifier.size(44.dp).clip(CircleShape).background(Color(avCol)), contentAlignment = Alignment.Center) {
+                                    if (!c.avatarUrl.isNullOrEmpty()) {
+                                        coil.compose.AsyncImage(
+                                            model = if (c.avatarUrl.startsWith("http")) c.avatarUrl else "http://2.26.71.102:8010" + c.avatarUrl,
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Text(c.name.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    }
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column {
+                                    Text(c.name, color = Color.White, fontSize = 15.sp)
+                                    Text(c.username, color = Color.Gray, fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
                     Box(
                         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).clip(RoundedCornerShape(24.dp)).background(Color(0xFF2A2A2A)).clickable { showChannelForwardSheet = false }.padding(vertical = 14.dp),
                         contentAlignment = Alignment.Center
