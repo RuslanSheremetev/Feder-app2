@@ -253,6 +253,7 @@ fun ChannelPostBubble(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     onPhotoClick: (() -> Unit)? = null,
+    onForward: (() -> Unit)? = null,
     selectionMode: Boolean = false,
     isSelected: Boolean = false
 ) {
@@ -349,7 +350,7 @@ fun ChannelPostBubble(
 
         // Кнопка "Переслать" (кружочек сбоку, как в Telegram)
         IconButton(
-            onClick = { onClick?.invoke() },
+            onClick = { onForward?.invoke() },
             modifier = Modifier
                 .size(32.dp)
                 .background(Color(0xFF1C2733).copy(alpha = 0.8f), RoundedCornerShape(50))
@@ -369,7 +370,7 @@ fun ChannelPostBubble(
 @OptIn(ExperimentalFoundationApi::class)
 fun MessageBubble(msg: MsgItem, text: String, time: String, isMine: Boolean, token: String = "", position: Int = 3, isGroup: Boolean = false, onClick: (() -> Unit)? = null, onLongClick: (() -> Unit)? = null, onPositioned: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null,
     onTapWithCoords: ((androidx.compose.ui.geometry.Offset) -> Unit)? = null, selectionMode: Boolean = false, selectedMessages: Set<String> = emptySet(), allChats: List<ChatItem> = emptyList(), myUsername: String = "demo", linkPreviewRepo: LinkPreviewRepository? = null, onYouTubeClick: (String) -> Unit = {},
-onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null, onReactionToggle: ((Long, String) -> Unit)? = null) {
+onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null, onReactionToggle: ((Long, String) -> Unit)? = null, onForward: (() -> Unit)? = null) {
 
     // ═══ Контакт? Рисуем карточку и ВЫХОДИМ ═══
     if (msg.messageType == "contact" && !msg.contactName.isNullOrEmpty()) {
@@ -402,7 +403,7 @@ onPhotoRectReady: ((androidx.compose.ui.geometry.Rect) -> Unit)? = null, onReact
 
     // ═══ Канал? Рисуем пост и ВЫХОДИМ ═══
     if (msg.to?.contains("channel:") == true) {
-        ChannelPostBubble(msg, time, myUsername, token = token, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, selectionMode, selectedMessages.contains(msg.id.toString()))
+        ChannelPostBubble(msg, time, myUsername, token = token, onClick, onLongClick, onPhotoClick = { fullScreenPhoto = msg.imageUrls?.firstOrNull(); fullScreenCaption = msg.text }, onForward = onForward, selectionMode, selectedMessages.contains(msg.id.toString()))
         return
     }
 
@@ -1162,6 +1163,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var expandInput by remember { mutableStateOf(false) }
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var showForward by remember { mutableStateOf(false) }
+    var showChannelForwardSheet by remember { mutableStateOf(false) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var preloading by remember { mutableStateOf(false) }
@@ -2335,6 +2337,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                             allChats = allChats, myUsername = myUsername,
                             linkPreviewRepo = linkPreviewRepo,
                             onYouTubeClick = { vid -> youtubeVideoId = vid },
+                            onForward = { showChannelForwardSheet = true },
                             onPositioned = { pos -> msg.posX = pos.x; msg.posY = pos.y },  // НЕ трогаем selectedMessageOffset!
                             onClick = {
                                     if (selectionMode) {
@@ -3224,6 +3227,35 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                 videoId = vid,
                 onClose = { youtubeVideoId = null }
             )
+        }
+
+        if (showChannelForwardSheet) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false }) {
+                Column(
+                    Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+                        .background(Color(0xFF1C1B1B), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                        .clickable(enabled = false) {}
+                ) {
+                    Box(Modifier.fillMaxWidth().height(28.dp), contentAlignment = Alignment.Center) {
+                        Box(Modifier.width(38.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0xFF555555)))
+                    }
+                    Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clip(RoundedCornerShape(20.dp)).background(Color(0xFF2A2A2A)).padding(horizontal = 12.dp, vertical = 10.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Search, null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Send to...", color = Color.Gray, fontSize = 16.sp)
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    Box(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).clip(RoundedCornerShape(24.dp)).background(Color(0xFF2A2A2A)).clickable { showChannelForwardSheet = false }.padding(vertical = 14.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("COPY LINK", color = Color(0xFF339DFF), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
         }
 
         if (showEmojiSheet) {
