@@ -3233,7 +3233,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         if (showChannelForwardSheet) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false; forwardTarget = null }) {
                 Column(
-                    Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+                    Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 96.dp)
                         .background(Color(0xFF1C1B1B), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                         .clickable(enabled = false) {}
                 ) {
@@ -3248,7 +3248,7 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                         }
                     }
                     androidx.compose.foundation.lazy.LazyColumn(
-                        modifier = Modifier.fillMaxWidth().height(280.dp).padding(horizontal = 8.dp)
+                        modifier = Modifier.fillMaxWidth().height(200.dp).padding(horizontal = 8.dp)
                     ) {
                         items(allChats.filter { it.username != myUsername && it.username != "123" && it.username != chatUsername }.distinctBy { it.username }, key = { it.username }) { c ->
                             val sel = forwardTarget == c.username
