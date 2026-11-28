@@ -1164,7 +1164,8 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
     var forwardContacts by remember { mutableStateOf<List<Map<String, Any?>>>(emptyList()) }
     var showForward by remember { mutableStateOf(false) }
     var showChannelForwardSheet by remember { mutableStateOf(false) }
-    var forwardTarget by remember { mutableStateOf<String?>(null) }
+    var forwardTargets by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var channelForwardExpanded by remember { mutableStateOf(false) }
     var showDeleteSub by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var preloading by remember { mutableStateOf(false) }
@@ -3231,32 +3232,57 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
         }
 
         if (showChannelForwardSheet) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false; forwardTarget = null }) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).clickable { showChannelForwardSheet = false; forwardTargets = emptySet(); channelForwardExpanded = false }) {
                 Column(
                     Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 96.dp)
+                        .then(if (channelForwardExpanded) Modifier.fillMaxHeight(0.92f) else Modifier.fillMaxHeight(0.62f))
                         .background(Color(0xFF1C1B1B), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                         .clickable(enabled = false) {}
                 ) {
-                    Box(Modifier.fillMaxWidth().height(28.dp), contentAlignment = Alignment.Center) {
+                    // Drag handle
+                    Box(Modifier.fillMaxWidth().height(28.dp).pointerInput(Unit) {
+                        detectVerticalDragGestures { _, drag ->
+                            if (drag < -50f && !channelForwardExpanded) channelForwardExpanded = true
+                            else if (drag > 50f && channelForwardExpanded) channelForwardExpanded = false
+                        }
+                    }, contentAlignment = Alignment.Center) {
                         Box(Modifier.width(38.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0xFF555555)))
                     }
+                    // Header
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { showChannelForwardSheet = false; forwardTargets = emptySet(); channelForwardExpanded = false }) {
+                            Icon(Icons.Filled.ArrowBack, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text("Forward message", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    }
+                    // Search
                     Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clip(RoundedCornerShape(20.dp)).background(Color(0xFF2A2A2A)).padding(horizontal = 12.dp, vertical = 10.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Search, null, tint = Color.Gray, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Send to...", color = Color.Gray, fontSize = 16.sp)
+                            Text("Search contacts", color = Color.Gray, fontSize = 16.sp)
                         }
                     }
+                    // List with checkboxes
                     androidx.compose.foundation.lazy.LazyColumn(
-                        modifier = Modifier.fillMaxWidth().height(200.dp).padding(horizontal = 8.dp)
+                        modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp)
                     ) {
                         items(allChats.filter { it.username != myUsername && it.username != "123" && it.username != chatUsername }.distinctBy { it.username }, key = { it.username }) { c ->
-                            val sel = forwardTarget == c.username
+                            val sel = c.username in forwardTargets
                             val avCol = runCatching { android.graphics.Color.parseColor(c.avatarColor) }.getOrDefault(0xFF339DFF.toInt())
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(if (sel) Color(0xFF2B3B4E) else Color.Transparent).clickable { forwardTarget = c.username },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp).clickable {
+                                    forwardTargets = if (sel) forwardTargets - c.username else forwardTargets + c.username
+                                },
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // Checkbox
+                                Box(Modifier.size(24.dp).clip(CircleShape).background(if (sel) Color(0xFF339DFF) else Color.Transparent).border(2.dp, if (sel) Color(0xFF339DFF) else Color.Gray, CircleShape), contentAlignment = Alignment.Center) {
+                                    if (sel) Icon(Icons.Filled.Check, null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                // Avatar
                                 Box(Modifier.size(44.dp).clip(CircleShape).background(Color(avCol)), contentAlignment = Alignment.Center) {
                                     if (!c.avatarUrl.isNullOrEmpty()) {
                                         coil.compose.AsyncImage(
@@ -3270,19 +3296,23 @@ fun ChatScreen(chatName: String, chatUsername: String, myUsername: String, token
                                     }
                                 }
                                 Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text(c.name, color = Color.White, fontSize = 15.sp)
-                                    Text(c.username, color = Color.Gray, fontSize = 12.sp)
-                                }
+                                Text(c.name, color = Color.White, fontSize = 15.sp)
                             }
                         }
                     }
-                    Spacer(Modifier.height(12.dp))
-                    Box(
-                        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).clip(RoundedCornerShape(24.dp)).background(Color(0xFF2A2A2A)).clickable { showChannelForwardSheet = false }.padding(vertical = 14.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("COPY LINK", color = Color(0xFF339DFF), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    // Send button
+                    if (forwardTargets.isNotEmpty()) {
+                        Box(
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).clip(RoundedCornerShape(24.dp)).background(Color(0xFF339DFF)).clickable {
+                                // TODO: send forwarded message to forwardTargets
+                                showChannelForwardSheet = false
+                                forwardTargets = emptySet()
+                                channelForwardExpanded = false
+                            }.padding(vertical = 14.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("${forwardTargets.size} ${if (forwardTargets.size == 1) "message" else "messages"} forward", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                     Spacer(Modifier.height(16.dp))
                 }
